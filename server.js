@@ -3,14 +3,22 @@ const session = require("express-session");
 
 const app = express();
 
+/* Render / HTTPS session fix */
+app.set("trust proxy", 1);
+
 app.use(express.json());
 app.use(express.static("public"));
 
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "taskearn-demo-secret-change-me",
+    secret:
+      process.env.SESSION_SECRET ||
+      "taskearn-demo-secret-change-this",
+
     resave: false,
+
     saveUninitialized: false,
+
     cookie: {
       httpOnly: true,
       sameSite: "lax",
@@ -19,8 +27,9 @@ app.use(
   })
 );
 
+
 /* =========================
-   DEMO DATA
+   USERS
 ========================= */
 
 const users = [
@@ -33,6 +42,7 @@ const users = [
     balance: 0,
     completed: 0
   },
+
   {
     id: 2,
     name: "Admin",
@@ -44,6 +54,11 @@ const users = [
   }
 ];
 
+
+/* =========================
+   TASKS
+========================= */
+
 let tasks = [
   {
     id: 1,
@@ -54,6 +69,7 @@ let tasks = [
     reward: 6,
     active: true
   },
+
   {
     id: 2,
     title: "Test a mobile website",
@@ -63,6 +79,7 @@ let tasks = [
     reward: 20,
     active: true
   },
+
   {
     id: 3,
     title: "Daily check-in",
@@ -72,6 +89,7 @@ let tasks = [
     reward: 2,
     active: true
   },
+
   {
     id: 4,
     title: "Visit a sponsor page",
@@ -83,6 +101,7 @@ let tasks = [
   }
 ];
 
+
 let submissions = [];
 let withdrawals = [];
 
@@ -93,41 +112,19 @@ let nextWithdrawalId = 1;
 
 
 /* =========================
-   AUTH MIDDLEWARE
-========================= */
-
-function auth(req, res, next) {
-  if (!req.session.user) {
-    return res.status(401).json({
-      error: "Login required"
-    });
-  }
-
-  next();
-}
-
-
-function admin(req, res, next) {
-  if (
-    !req.session.user ||
-    req.session.user.role !== "admin"
-  ) {
-    return res.status(403).json({
-      error: "Admin only"
-    });
-  }
-
-  next();
-}
-
-
-/* =========================
    HELPERS
 ========================= */
 
 function getUser(id) {
   return users.find(
     user => user.id === Number(id)
+  );
+}
+
+
+function getTask(id) {
+  return tasks.find(
+    task => task.id === Number(id)
   );
 }
 
@@ -142,11 +139,51 @@ function publicUser(user) {
 }
 
 
-function getTask(id) {
-  return tasks.find(
-    task => task.id === Number(id)
-  );
+/* =========================
+   AUTH
+========================= */
+
+function auth(req, res, next) {
+
+  if (!req.session.user) {
+
+    return res.status(401).json({
+      error: "Login required"
+    });
+  }
+
+  next();
 }
+
+
+function admin(req, res, next) {
+
+  if (
+    !req.session.user ||
+    req.session.user.role !== "admin"
+  ) {
+
+    return res.status(403).json({
+      error: "Admin only"
+    });
+  }
+
+  next();
+}
+
+
+/* =========================
+   HEALTH
+========================= */
+
+app.get("/health", (req, res) => {
+
+  res.json({
+    ok: true,
+    service: "TaskEarn"
+  });
+
+});
 
 
 /* =========================
@@ -154,7 +191,11 @@ function getTask(id) {
 ========================= */
 
 app.get("/api/me", (req, res) => {
-  res.json(req.session.user || null);
+
+  res.json(
+    req.session.user || null
+  );
+
 });
 
 
@@ -163,6 +204,7 @@ app.get("/api/me", (req, res) => {
 ========================= */
 
 app.post("/api/login", (req, res) => {
+
   const email =
     String(req.body.email || "")
       .trim()
@@ -171,21 +213,46 @@ app.post("/api/login", (req, res) => {
   const password =
     String(req.body.password || "");
 
-  const user = users.find(
-    item =>
-      item.email.toLowerCase() === email &&
-      item.password === password
-  );
+  const user =
+    users.find(
+      item =>
+        item.email.toLowerCase() === email &&
+        item.password === password
+    );
 
   if (!user) {
+
     return res.status(401).json({
       error: "Invalid login"
     });
+
   }
 
-  req.session.user = publicUser(user);
+  req.session.user =
+    publicUser(user);
 
-  res.json(req.session.user);
+  req.session.save(err => {
+
+    if (err) {
+
+      console.error(
+        "Session save error:",
+        err
+      );
+
+      return res.status(500).json({
+        error:
+          "Login session could not be saved"
+      });
+
+    }
+
+    res.json(
+      req.session.user
+    );
+
+  });
+
 });
 
 
@@ -194,27 +261,44 @@ app.post("/api/login", (req, res) => {
 ========================= */
 
 app.post("/api/register", (req, res) => {
+
   const name =
-    String(req.body.name || "").trim();
+    String(
+      req.body.name || ""
+    ).trim();
 
   const email =
-    String(req.body.email || "")
+    String(
+      req.body.email || ""
+    )
       .trim()
       .toLowerCase();
 
   const password =
-    String(req.body.password || "");
+    String(
+      req.body.password || ""
+    );
 
-  if (!name || !email || !password) {
+  if (
+    !name ||
+    !email ||
+    !password
+  ) {
+
     return res.status(400).json({
-      error: "All fields are required"
+      error:
+        "All fields are required"
     });
+
   }
 
   if (password.length < 6) {
+
     return res.status(400).json({
-      error: "Password must be at least 6 characters"
+      error:
+        "Password must be at least 6 characters"
     });
+
   }
 
   if (
@@ -223,26 +307,54 @@ app.post("/api/register", (req, res) => {
         user.email.toLowerCase() === email
     )
   ) {
+
     return res.status(400).json({
-      error: "Email already exists"
+      error:
+        "Email already exists"
     });
+
   }
 
   const user = {
+
     id: nextUserId++,
+
     name,
+
     email,
+
     password,
+
     role: "user",
+
     balance: 0,
+
     completed: 0
+
   };
 
   users.push(user);
 
-  req.session.user = publicUser(user);
+  req.session.user =
+    publicUser(user);
 
-  res.json(req.session.user);
+  req.session.save(err => {
+
+    if (err) {
+
+      return res.status(500).json({
+        error:
+          "Account created but session failed"
+      });
+
+    }
+
+    res.json(
+      req.session.user
+    );
+
+  });
+
 });
 
 
@@ -251,66 +363,58 @@ app.post("/api/register", (req, res) => {
 ========================= */
 
 app.post("/api/logout", (req, res) => {
-  req.session.destroy(() => {
+
+  req.session.destroy(err => {
+
+    if (err) {
+
+      return res.status(500).json({
+        error:
+          "Logout failed"
+      });
+
+    }
+
     res.json({
       ok: true
     });
+
   });
+
 });
 
 
 /* =========================
-   PUBLIC TASK LIST
+   TASKS
 ========================= */
 
 app.get("/api/tasks", (req, res) => {
+
   res.json(
-    tasks.filter(task => task.active)
+    tasks.filter(
+      task => task.active
+    )
   );
+
 });
 
 
-/* =========================
-   SINGLE TASK
-========================= */
-
 app.get("/api/tasks/:id", (req, res) => {
-  const task = getTask(req.params.id);
+
+  const task =
+    getTask(req.params.id);
 
   if (!task) {
+
     return res.status(404).json({
-      error: "Task not found"
+      error:
+        "Task not found"
     });
+
   }
 
   res.json(task);
-});
 
-
-/* =========================
-   WALLET
-========================= */
-
-app.get("/api/wallet", auth, (req, res) => {
-  const user =
-    getUser(req.session.user.id);
-
-  if (!user) {
-    return res.status(404).json({
-      error: "User not found"
-    });
-  }
-
-  res.json({
-    balance: user.balance,
-    completed: user.completed,
-
-    withdrawals:
-      withdrawals.filter(
-        item =>
-          item.userId === user.id
-      )
-  });
 });
 
 
@@ -324,21 +428,34 @@ app.post(
   (req, res) => {
 
     const user =
-      getUser(req.session.user.id);
+      getUser(
+        req.session.user.id
+      );
 
     const task =
-      getTask(req.params.id);
+      getTask(
+        req.params.id
+      );
 
     if (!user) {
+
       return res.status(404).json({
-        error: "User not found"
+        error:
+          "User not found"
       });
+
     }
 
-    if (!task || !task.active) {
+    if (
+      !task ||
+      !task.active
+    ) {
+
       return res.status(404).json({
-        error: "Task not available"
+        error:
+          "Task not available"
       });
+
     }
 
     const existing =
@@ -353,32 +470,52 @@ app.post(
       );
 
     if (existing) {
+
       return res.status(400).json({
         error:
           existing.status === "approved"
             ? "Task already approved"
             : "Task already submitted"
       });
+
     }
 
     const submission = {
+
       id: nextSubmissionId++,
+
       userId: user.id,
+
       userName: user.name,
+
       taskId: task.id,
+
       taskTitle: task.title,
-      reward: Number(task.reward),
-      status: "pending",
-      submittedAt: new Date().toISOString()
+
+      reward:
+        Number(task.reward),
+
+      status:
+        "pending",
+
+      submittedAt:
+        new Date().toISOString()
+
     };
 
-    submissions.push(submission);
+    submissions.push(
+      submission
+    );
 
     res.json({
+
       ok: true,
+
       message:
         "Task submitted for review."
+
     });
+
   }
 );
 
@@ -392,21 +529,64 @@ app.get(
   auth,
   (req, res) => {
 
-    const userId =
-      req.session.user.id;
-
     res.json(
       submissions.filter(
         item =>
-          item.userId === userId
+          item.userId ===
+          req.session.user.id
       )
     );
+
   }
 );
 
 
 /* =========================
-   WITHDRAWAL
+   WALLET
+========================= */
+
+app.get(
+  "/api/wallet",
+  auth,
+  (req, res) => {
+
+    const user =
+      getUser(
+        req.session.user.id
+      );
+
+    if (!user) {
+
+      return res.status(404).json({
+        error:
+          "User not found"
+      });
+
+    }
+
+    res.json({
+
+      balance:
+        Number(user.balance),
+
+      completed:
+        Number(user.completed),
+
+      withdrawals:
+        withdrawals.filter(
+          item =>
+            item.userId ===
+            user.id
+        )
+
+    });
+
+  }
+);
+
+
+/* =========================
+   WITHDRAW
 ========================= */
 
 app.post(
@@ -415,66 +595,82 @@ app.post(
   (req, res) => {
 
     const user =
-      getUser(req.session.user.id);
+      getUser(
+        req.session.user.id
+      );
 
     const amount =
-      Number(req.body.amount);
+      Number(
+        req.body.amount
+      );
 
     const method =
       String(
-        req.body.method || "UPI"
+        req.body.method ||
+        "UPI"
       ).trim();
 
-    if (!Number.isFinite(amount)) {
+    if (
+      !Number.isFinite(amount)
+    ) {
+
       return res.status(400).json({
-        error: "Invalid amount"
+        error:
+          "Invalid amount"
       });
+
     }
 
     if (amount < 100) {
+
       return res.status(400).json({
         error:
           "Minimum withdrawal is ₹100"
       });
+
     }
 
-    if (amount > user.balance) {
+    if (
+      amount > user.balance
+    ) {
+
       return res.status(400).json({
         error:
           "Insufficient balance"
       });
+
     }
 
-    if (!method) {
-      return res.status(400).json({
-        error:
-          "Payment method is required"
-      });
-    }
+    user.balance -=
+      amount;
 
-    /*
-      Reserve the requested amount.
-      If admin rejects the request later,
-      the amount is returned.
-    */
+    withdrawals.push({
 
-    user.balance -= amount;
+      id:
+        nextWithdrawalId++,
 
-    const withdrawal = {
-      id: nextWithdrawalId++,
-      userId: user.id,
-      name: user.name,
+      userId:
+        user.id,
+
+      name:
+        user.name,
+
       amount,
-      method,
-      status: "pending",
-      createdAt: new Date().toISOString()
-    };
 
-    withdrawals.push(withdrawal);
+      method,
+
+      status:
+        "pending",
+
+      createdAt:
+        new Date().toISOString()
+
+    });
 
     res.json({
       ok: true
     });
+
   }
 );
 
@@ -489,41 +685,47 @@ app.get(
   (req, res) => {
 
     res.json({
-      users: users.length,
-      tasks: tasks.length,
+
+      users:
+        users.length,
+
+      tasks:
+        tasks.length,
 
       submissions:
         submissions.filter(
           item =>
-            item.status === "pending"
+            item.status ===
+            "pending"
         ).length,
 
       pending:
         withdrawals.filter(
           item =>
-            item.status === "pending"
+            item.status ===
+            "pending"
         ).length
+
     });
+
   }
 );
 
 
 /* =========================
-   ADMIN TASK LIST
+   ADMIN TASKS
 ========================= */
 
 app.get(
   "/api/admin/tasks",
   admin,
   (req, res) => {
+
     res.json(tasks);
+
   }
 );
 
-
-/* =========================
-   ADMIN ADD TASK
-========================= */
 
 app.post(
   "/api/admin/tasks",
@@ -546,48 +748,60 @@ app.post(
       ).trim();
 
     const reward =
-      Number(req.body.reward);
+      Number(
+        req.body.reward
+      );
 
     if (
       !title ||
       !description ||
       !type
     ) {
+
       return res.status(400).json({
         error:
           "Title, description and type are required"
       });
+
     }
 
     if (
       !Number.isFinite(reward) ||
       reward <= 0
     ) {
+
       return res.status(400).json({
         error:
-          "Reward must be greater than zero"
+          "Invalid reward"
       });
+
     }
 
     const task = {
-      id: nextTaskId++,
+
+      id:
+        nextTaskId++,
+
       title,
+
       description,
+
       type,
+
       reward,
-      active: true
+
+      active:
+        true
+
     };
 
     tasks.push(task);
 
     res.json(task);
+
   }
 );
 
-
-/* =========================
-   ADMIN UPDATE TASK
-========================= */
 
 app.put(
   "/api/admin/tasks/:id",
@@ -595,73 +809,72 @@ app.put(
   (req, res) => {
 
     const task =
-      getTask(req.params.id);
+      getTask(
+        req.params.id
+      );
 
     if (!task) {
+
       return res.status(404).json({
-        error: "Task not found"
+        error:
+          "Task not found"
       });
+
     }
 
-    const title =
+    task.title =
       String(
-        req.body.title || ""
+        req.body.title ||
+        task.title
       ).trim();
 
-    const description =
+    task.description =
       String(
-        req.body.description || ""
+        req.body.description ||
+        task.description
       ).trim();
 
-    const type =
+    task.type =
       String(
-        req.body.type || ""
+        req.body.type ||
+        task.type
       ).trim();
 
     const reward =
-      Number(req.body.reward);
-
-    if (
-      !title ||
-      !description ||
-      !type
-    ) {
-      return res.status(400).json({
-        error:
-          "All task fields are required"
-      });
-    }
+      Number(
+        req.body.reward
+      );
 
     if (
       !Number.isFinite(reward) ||
       reward <= 0
     ) {
+
       return res.status(400).json({
         error:
           "Invalid reward"
       });
+
     }
 
-    task.title = title;
-    task.description = description;
-    task.type = type;
-    task.reward = reward;
+    task.reward =
+      reward;
 
     if (
-      typeof req.body.active === "boolean"
+      typeof req.body.active ===
+      "boolean"
     ) {
+
       task.active =
         req.body.active;
+
     }
 
     res.json(task);
+
   }
 );
 
-
-/* =========================
-   ADMIN DISABLE TASK
-========================= */
 
 app.delete(
   "/api/admin/tasks/:id",
@@ -669,19 +882,26 @@ app.delete(
   (req, res) => {
 
     const task =
-      getTask(req.params.id);
+      getTask(
+        req.params.id
+      );
 
     if (!task) {
+
       return res.status(404).json({
-        error: "Task not found"
+        error:
+          "Task not found"
       });
+
     }
 
-    task.active = false;
+    task.active =
+      false;
 
     res.json({
       ok: true
     });
+
   }
 );
 
@@ -695,14 +915,13 @@ app.get(
   admin,
   (req, res) => {
 
-    res.json(submissions);
+    res.json(
+      submissions
+    );
+
   }
 );
 
-
-/* =========================
-   ADMIN APPROVE / REJECT
-========================= */
 
 app.post(
   "/api/admin/submissions/:id",
@@ -713,65 +932,85 @@ app.post(
       submissions.find(
         item =>
           item.id ===
-          Number(req.params.id)
+          Number(
+            req.params.id
+          )
       );
 
     if (!submission) {
+
       return res.status(404).json({
         error:
           "Submission not found"
       });
+
     }
 
-    const newStatus =
+    if (
+      submission.status !==
+      "pending"
+    ) {
+
+      return res.status(400).json({
+        error:
+          "Submission already reviewed"
+      });
+
+    }
+
+    const status =
       String(
         req.body.status || ""
       ).toLowerCase();
 
     if (
-      newStatus !== "approved" &&
-      newStatus !== "rejected"
+      status !== "approved" &&
+      status !== "rejected"
     ) {
-      return res.status(400).json({
-        error:
-          "Invalid submission status"
-      });
-    }
 
-    if (
-      submission.status !== "pending"
-    ) {
       return res.status(400).json({
         error:
-          "Submission has already been reviewed"
+          "Invalid status"
       });
+
     }
 
     const user =
-      getUser(submission.userId);
+      getUser(
+        submission.userId
+      );
 
     if (!user) {
+
       return res.status(404).json({
         error:
           "User not found"
       });
+
     }
 
     submission.status =
-      newStatus;
+      status;
 
-    if (newStatus === "approved") {
+    if (
+      status === "approved"
+    ) {
 
       user.balance +=
-        Number(submission.reward);
+        Number(
+          submission.reward
+        );
 
-      user.completed += 1;
+      user.completed +=
+        1;
+
     }
 
     res.json({
       ok: true,
-      status: newStatus
+      status
     });
+
   }
 );
 
@@ -785,14 +1024,13 @@ app.get(
   admin,
   (req, res) => {
 
-    res.json(withdrawals);
+    res.json(
+      withdrawals
+    );
+
   }
 );
 
-
-/* =========================
-   ADMIN WITHDRAWAL REVIEW
-========================= */
 
 app.post(
   "/api/admin/withdrawals/:id",
@@ -803,84 +1041,84 @@ app.post(
       withdrawals.find(
         item =>
           item.id ===
-          Number(req.params.id)
+          Number(
+            req.params.id
+          )
       );
 
     if (!withdrawal) {
+
       return res.status(404).json({
         error:
           "Withdrawal not found"
       });
+
     }
 
-    const newStatus =
+    if (
+      withdrawal.status !==
+      "pending"
+    ) {
+
+      return res.status(400).json({
+        error:
+          "Withdrawal already reviewed"
+      });
+
+    }
+
+    const status =
       String(
         req.body.status || ""
       ).toLowerCase();
 
     if (
-      newStatus !== "approved" &&
-      newStatus !== "rejected"
+      status !== "approved" &&
+      status !== "rejected"
     ) {
-      return res.status(400).json({
-        error:
-          "Invalid withdrawal status"
-      });
-    }
 
-    if (
-      withdrawal.status !== "pending"
-    ) {
       return res.status(400).json({
         error:
-          "Withdrawal already reviewed"
+          "Invalid status"
       });
+
     }
 
     const user =
-      getUser(withdrawal.userId);
+      getUser(
+        withdrawal.userId
+      );
 
     if (!user) {
+
       return res.status(404).json({
         error:
           "User not found"
       });
+
     }
 
     withdrawal.status =
-      newStatus;
+      status;
 
-    /*
-      The amount was reserved when the
-      withdrawal was requested.
-
-      If rejected, return it to wallet.
-    */
-
-    if (newStatus === "rejected") {
+    if (
+      status === "rejected"
+    ) {
 
       user.balance +=
-        Number(withdrawal.amount);
+        Number(
+          withdrawal.amount
+        );
+
     }
 
     res.json({
       ok: true,
-      status: newStatus
+      status
     });
+
   }
 );
-
-
-/* =========================
-   HEALTH CHECK
-========================= */
-
-app.get("/health", (req, res) => {
-  res.json({
-    ok: true,
-    service: "TaskEarn"
-  });
-});
 
 
 /* =========================
@@ -894,8 +1132,10 @@ app.listen(
   PORT,
   "0.0.0.0",
   () => {
+
     console.log(
       `TaskEarn running on port ${PORT}`
     );
+
   }
 );
