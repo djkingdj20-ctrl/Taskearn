@@ -63,5 +63,5 @@ app.post('/api/admin/withdrawals/:id',admin,(req,res)=>{
 });
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(TaskEarn running on port ${PORT});
+  console.log('TaskEarn running on port ${PORT}');
 });
