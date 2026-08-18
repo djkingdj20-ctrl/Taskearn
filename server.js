@@ -6,11 +6,15 @@ const app = express();
 app.use(express.json());
 app.use(express.static("public"));
 
+/* =========================
+   SESSION
+========================= */
+
 app.use(
   session({
     secret:
       process.env.SESSION_SECRET ||
-      "change-this-secret-in-production",
+      "taskearn-secret-2026",
 
     resave: false,
 
@@ -19,14 +23,14 @@ app.use(
     cookie: {
       httpOnly: true,
       sameSite: "lax",
-      secure: process.env.NODE_ENV === "production"
+      secure: false
     }
   })
 );
 
 
 /* =========================
-   IN-MEMORY DATA
+   USERS
 ========================= */
 
 const users = [
@@ -52,12 +56,14 @@ const users = [
 ];
 
 
-/*
-  IMPORTANT:
-  No default/demo tasks.
+/* =========================
+   DATA
+========================= */
 
-  Admin creates tasks from the
-  Admin Dashboard.
+/*
+   NO DEFAULT TASKS
+
+   Admin creates tasks.
 */
 
 const tasks = [];
@@ -68,23 +74,27 @@ const withdrawals = [];
 
 
 /* =========================
-   ID HELPERS
+   ID
 ========================= */
 
 function nextId(list) {
 
-  if (!list.length) {
+  if (list.length === 0) {
     return 1;
   }
 
-  return Math.max(
-    ...list.map(x => Number(x.id) || 0)
-  ) + 1;
+  return (
+    Math.max(
+      ...list.map(
+        item => Number(item.id) || 0
+      )
+    ) + 1
+  );
 }
 
 
 /* =========================
-   AUTH MIDDLEWARE
+   AUTH
 ========================= */
 
 function auth(req, res, next) {
@@ -98,11 +108,12 @@ function auth(req, res, next) {
   }
 
   next();
+
 }
 
 
 /* =========================
-   ADMIN MIDDLEWARE
+   ADMIN AUTH
 ========================= */
 
 function admin(req, res, next) {
@@ -119,11 +130,12 @@ function admin(req, res, next) {
   }
 
   next();
+
 }
 
 
 /* =========================
-   GET CURRENT USER
+   CURRENT USER
 ========================= */
 
 app.get("/api/me", (req, res) => {
@@ -142,18 +154,25 @@ app.get("/api/me", (req, res) => {
 app.post("/api/login", (req, res) => {
 
   const email =
-    String(req.body.email || "")
+    String(
+      req.body.email || ""
+    )
       .trim()
       .toLowerCase();
 
   const password =
-    String(req.body.password || "");
+    String(
+      req.body.password || ""
+    );
 
-  const user = users.find(
-    x =>
-      x.email.toLowerCase() === email &&
-      x.password === password
-  );
+
+  const user =
+    users.find(
+      x =>
+        x.email.toLowerCase() ===
+          email &&
+        x.password === password
+    );
 
 
   if (!user) {
@@ -178,7 +197,35 @@ app.post("/api/login", (req, res) => {
   };
 
 
-  res.json(req.session.user);
+  req.session.save(
+    err => {
+
+      if (err) {
+
+        console.error(
+          "SESSION SAVE ERROR:",
+          err
+        );
+
+        return res.status(500).json({
+          error:
+            "Could not create login session"
+        });
+
+      }
+
+
+      res.json({
+
+        ok: true,
+
+        user:
+          req.session.user
+
+      });
+
+    }
+  );
 
 });
 
@@ -187,151 +234,218 @@ app.post("/api/login", (req, res) => {
    REGISTER
 ========================= */
 
-app.post("/api/register", (req, res) => {
+app.post(
+  "/api/register",
+  (req, res) => {
 
-  const name =
-    String(req.body.name || "").trim();
+    const name =
+      String(
+        req.body.name || ""
+      ).trim();
 
-  const email =
-    String(req.body.email || "")
-      .trim()
-      .toLowerCase();
+    const email =
+      String(
+        req.body.email || ""
+      )
+        .trim()
+        .toLowerCase();
 
-  const password =
-    String(req.body.password || "");
+    const password =
+      String(
+        req.body.password || ""
+      );
 
 
-  if (!name || !email || !password) {
+    if (
+      !name ||
+      !email ||
+      !password
+    ) {
 
-    return res.status(400).json({
-      error: "All fields are required"
-    });
+      return res.status(400).json({
+        error:
+          "All fields are required"
+      });
+
+    }
+
+
+    if (password.length < 6) {
+
+      return res.status(400).json({
+        error:
+          "Password must be at least 6 characters"
+      });
+
+    }
+
+
+    if (
+      users.some(
+        x =>
+          x.email.toLowerCase() ===
+          email
+      )
+    ) {
+
+      return res.status(400).json({
+        error:
+          "Email already exists"
+      });
+
+    }
+
+
+    const user = {
+
+      id:
+        nextId(users),
+
+      name,
+
+      email,
+
+      password,
+
+      role:
+        "user",
+
+      balance:
+        0,
+
+      completed:
+        0
+
+    };
+
+
+    users.push(user);
+
+
+    req.session.user = {
+
+      id:
+        user.id,
+
+      name:
+        user.name,
+
+      email:
+        user.email,
+
+      role:
+        user.role
+
+    };
+
+
+    req.session.save(
+      err => {
+
+        if (err) {
+
+          console.error(
+            "SESSION SAVE ERROR:",
+            err
+          );
+
+          return res.status(500).json({
+            error:
+              "Could not create account session"
+          });
+
+        }
+
+
+        res.json({
+
+          ok: true,
+
+          user:
+            req.session.user
+
+        });
+
+      }
+    );
 
   }
-
-
-  if (password.length < 6) {
-
-    return res.status(400).json({
-      error: "Password must be at least 6 characters"
-    });
-
-  }
-
-
-  if (
-    users.some(
-      x =>
-        x.email.toLowerCase() === email
-    )
-  ) {
-
-    return res.status(400).json({
-      error: "Email already exists"
-    });
-
-  }
-
-
-  const user = {
-
-    id: nextId(users),
-
-    name,
-
-    email,
-
-    password,
-
-    role: "user",
-
-    balance: 0,
-
-    completed: 0
-
-  };
-
-
-  users.push(user);
-
-
-  req.session.user = {
-
-    id: user.id,
-
-    name: user.name,
-
-    email: user.email,
-
-    role: user.role
-
-  };
-
-
-  res.json(req.session.user);
-
-});
+);
 
 
 /* =========================
    LOGOUT
 ========================= */
 
-app.post("/api/logout", (req, res) => {
+app.post(
+  "/api/logout",
+  (req, res) => {
 
-  req.session.destroy(() => {
+    req.session.destroy(
+      () => {
 
-    res.json({
-      ok: true
-    });
+        res.json({
+          ok: true
+        });
 
-  });
-
-});
-
-
-/* =========================
-   USER TASK LIST
-========================= */
-
-app.get("/api/tasks", auth, (req, res) => {
-
-  res.json(
-    tasks.filter(
-      task => task.active !== false
-    )
-  );
-
-});
-
-
-/* =========================
-   GET SINGLE TASK
-========================= */
-
-app.get("/api/tasks/:id", auth, (req, res) => {
-
-  const id =
-    Number(req.params.id);
-
-  const task =
-    tasks.find(
-      x => x.id === id
+      }
     );
 
+  }
+);
 
-  if (!task) {
 
-    return res.status(404).json({
-      error: "Task not found"
-    });
+/* =========================
+   USER TASKS
+========================= */
+
+app.get(
+  "/api/tasks",
+  auth,
+  (req, res) => {
+
+    res.json(
+      tasks.filter(
+        task =>
+          task.active !== false
+      )
+    );
 
   }
+);
 
 
-  res.json(task);
+/* =========================
+   SINGLE TASK
+========================= */
 
-});
+app.get(
+  "/api/tasks/:id",
+  auth,
+  (req, res) => {
+
+    const task =
+      tasks.find(
+        x =>
+          x.id ===
+          Number(req.params.id)
+      );
+
+
+    if (!task) {
+
+      return res.status(404).json({
+        error:
+          "Task not found"
+      });
+
+    }
+
+
+    res.json(task);
+
+  }
+);
 
 
 /* =========================
@@ -344,7 +458,9 @@ app.post(
   (req, res) => {
 
     const taskId =
-      Number(req.params.id);
+      Number(
+        req.params.id
+      );
 
     const userId =
       req.session.user.id;
@@ -361,13 +477,14 @@ app.post(
     if (!task) {
 
       return res.status(404).json({
-        error: "Task not found or disabled"
+        error:
+          "Task not found or disabled"
       });
 
     }
 
 
-    const existing =
+    const pending =
       submissions.find(
         x =>
           x.userId === userId &&
@@ -376,17 +493,17 @@ app.post(
       );
 
 
-    if (existing) {
+    if (pending) {
 
       return res.status(400).json({
         error:
-          "You already submitted this task and it is waiting for review."
+          "This task is already submitted and waiting for review."
       });
 
     }
 
 
-    const alreadyApproved =
+    const approved =
       submissions.find(
         x =>
           x.userId === userId &&
@@ -395,7 +512,7 @@ app.post(
       );
 
 
-    if (alreadyApproved) {
+    if (approved) {
 
       return res.status(400).json({
         error:
@@ -407,7 +524,8 @@ app.post(
 
     const submission = {
 
-      id: nextId(submissions),
+      id:
+        nextId(submissions),
 
       userId,
 
@@ -422,17 +540,21 @@ app.post(
       reward:
         Number(task.reward),
 
-      status: "pending",
+      status:
+        "pending",
 
       submittedAt:
         new Date().toISOString(),
 
-      reviewedAt: null
+      reviewedAt:
+        null
 
     };
 
 
-    submissions.push(submission);
+    submissions.push(
+      submission
+    );
 
 
     res.json({
@@ -489,7 +611,8 @@ app.get(
     if (!user) {
 
       return res.status(404).json({
-        error: "User not found"
+        error:
+          "User not found"
       });
 
     }
@@ -498,10 +621,14 @@ app.get(
     res.json({
 
       balance:
-        Number(user.balance || 0),
+        Number(
+          user.balance || 0
+        ),
 
       completed:
-        Number(user.completed || 0),
+        Number(
+          user.completed || 0
+        ),
 
       withdrawals:
         withdrawals.filter(
@@ -517,7 +644,7 @@ app.get(
 
 
 /* =========================
-   WITHDRAWAL REQUEST
+   WITHDRAW
 ========================= */
 
 app.post(
@@ -536,19 +663,23 @@ app.post(
     if (!user) {
 
       return res.status(404).json({
-        error: "User not found"
+        error:
+          "User not found"
       });
 
     }
 
 
     const amount =
-      Number(req.body.amount);
+      Number(
+        req.body.amount
+      );
 
 
     const method =
       String(
-        req.body.method || "UPI"
+        req.body.method ||
+          "UPI"
       ).trim();
 
 
@@ -565,7 +696,10 @@ app.post(
     }
 
 
-    if (amount > user.balance) {
+    if (
+      amount >
+      user.balance
+    ) {
 
       return res.status(400).json({
         error:
@@ -575,28 +709,16 @@ app.post(
     }
 
 
-    if (!method) {
-
-      return res.status(400).json({
-        error:
-          "Payment method is required"
-      });
-
-    }
-
-
-    /*
-      Reserve the amount while
-      withdrawal is pending.
-    */
-
-    user.balance -= amount;
+    user.balance -=
+      amount;
 
 
     withdrawals.push({
 
       id:
-        nextId(withdrawals),
+        nextId(
+          withdrawals
+        ),
 
       userId:
         user.id,
@@ -663,7 +785,7 @@ app.get(
 
 
 /* =========================
-   ADMIN TASK LIST
+   ADMIN TASKS
 ========================= */
 
 app.get(
@@ -671,14 +793,16 @@ app.get(
   admin,
   (req, res) => {
 
-    res.json(tasks);
+    res.json(
+      tasks
+    );
 
   }
 );
 
 
 /* =========================
-   ADMIN ADD TASK
+   ADMIN CREATE TASK
 ========================= */
 
 app.post(
@@ -693,7 +817,8 @@ app.post(
 
     const description =
       String(
-        req.body.description || ""
+        req.body.description ||
+          ""
       ).trim();
 
     const type =
@@ -702,7 +827,9 @@ app.post(
       ).trim();
 
     const reward =
-      Number(req.body.reward);
+      Number(
+        req.body.reward
+      );
 
 
     if (
@@ -720,7 +847,9 @@ app.post(
 
 
     if (
-      !Number.isFinite(reward) ||
+      !Number.isFinite(
+        reward
+      ) ||
       reward <= 0
     ) {
 
@@ -775,13 +904,13 @@ app.put(
   admin,
   (req, res) => {
 
-    const id =
-      Number(req.params.id);
-
     const task =
       tasks.find(
         x =>
-          x.id === id
+          x.id ===
+          Number(
+            req.params.id
+          )
       );
 
 
@@ -795,69 +924,75 @@ app.put(
     }
 
 
-    const title =
-      String(
-        req.body.title ??
-        task.title
-      ).trim();
-
-    const description =
-      String(
-        req.body.description ??
-        task.description
-      ).trim();
-
-    const type =
-      String(
-        req.body.type ??
-        task.type
-      ).trim();
-
-    const reward =
-      Number(
-        req.body.reward ??
-        task.reward
-      );
-
-
     if (
-      !title ||
-      !description ||
-      !type
+      req.body.title !==
+      undefined
     ) {
 
-      return res.status(400).json({
-        error:
-          "Task details are required"
-      });
+      task.title =
+        String(
+          req.body.title
+        ).trim();
 
     }
 
 
     if (
-      !Number.isFinite(reward) ||
-      reward <= 0
+      req.body.description !==
+      undefined
     ) {
 
-      return res.status(400).json({
-        error:
-          "Invalid reward"
-      });
+      task.description =
+        String(
+          req.body.description
+        ).trim();
 
     }
 
 
-    task.title =
-      title;
+    if (
+      req.body.type !==
+      undefined
+    ) {
 
-    task.description =
-      description;
+      task.type =
+        String(
+          req.body.type
+        ).trim();
 
-    task.type =
-      type;
+    }
 
-    task.reward =
-      reward;
+
+    if (
+      req.body.reward !==
+      undefined
+    ) {
+
+      const reward =
+        Number(
+          req.body.reward
+        );
+
+
+      if (
+        !Number.isFinite(
+          reward
+        ) ||
+        reward <= 0
+      ) {
+
+        return res.status(400).json({
+          error:
+            "Invalid reward"
+        });
+
+      }
+
+
+      task.reward =
+        reward;
+
+    }
 
 
     if (
@@ -878,7 +1013,7 @@ app.put(
 
 
 /* =========================
-   ADMIN DISABLE TASK
+   DISABLE TASK
 ========================= */
 
 app.delete(
@@ -886,13 +1021,13 @@ app.delete(
   admin,
   (req, res) => {
 
-    const id =
-      Number(req.params.id);
-
     const task =
       tasks.find(
         x =>
-          x.id === id
+          x.id ===
+          Number(
+            req.params.id
+          )
       );
 
 
@@ -936,7 +1071,7 @@ app.get(
 
 
 /* =========================
-   ADMIN REVIEW SUBMISSION
+   REVIEW SUBMISSION
 ========================= */
 
 app.post(
@@ -944,16 +1079,15 @@ app.post(
   admin,
   (req, res) => {
 
-    const id =
-      Number(req.params.id);
-
     const status =
       req.body.status;
 
 
     if (
-      status !== "approved" &&
-      status !== "rejected"
+      status !==
+        "approved" &&
+      status !==
+        "rejected"
     ) {
 
       return res.status(400).json({
@@ -967,7 +1101,10 @@ app.post(
     const submission =
       submissions.find(
         x =>
-          x.id === id
+          x.id ===
+          Number(
+            req.params.id
+          )
       );
 
 
@@ -1015,16 +1152,15 @@ app.post(
     submission.status =
       status;
 
+
     submission.reviewedAt =
       new Date().toISOString();
 
 
-    /*
-      Reward is credited ONLY
-      after admin approval.
-    */
-
-    if (status === "approved") {
+    if (
+      status ===
+      "approved"
+    ) {
 
       user.balance +=
         Number(
@@ -1062,7 +1198,7 @@ app.get(
 
 
 /* =========================
-   ADMIN REVIEW WITHDRAWAL
+   REVIEW WITHDRAWAL
 ========================= */
 
 app.post(
@@ -1070,16 +1206,15 @@ app.post(
   admin,
   (req, res) => {
 
-    const id =
-      Number(req.params.id);
-
     const status =
       req.body.status;
 
 
     if (
-      status !== "approved" &&
-      status !== "rejected"
+      status !==
+        "approved" &&
+      status !==
+        "rejected"
     ) {
 
       return res.status(400).json({
@@ -1093,7 +1228,10 @@ app.post(
     const withdrawal =
       withdrawals.find(
         x =>
-          x.id === id
+          x.id ===
+          Number(
+            req.params.id
+          )
       );
 
 
@@ -1138,12 +1276,10 @@ app.post(
     }
 
 
-    /*
-      If rejected, return the
-      reserved balance to user.
-    */
-
-    if (status === "rejected") {
+    if (
+      status ===
+      "rejected"
+    ) {
 
       user.balance +=
         Number(
@@ -1155,6 +1291,7 @@ app.post(
 
     withdrawal.status =
       status;
+
 
     withdrawal.reviewedAt =
       new Date().toISOString();
@@ -1172,22 +1309,27 @@ app.post(
    HEALTH CHECK
 ========================= */
 
-app.get("/health", (req, res) => {
+app.get(
+  "/health",
+  (req, res) => {
 
-  res.json({
-    ok: true,
-    service: "TaskEarn"
-  });
+    res.json({
+      ok: true,
+      service:
+        "TaskEarn"
+    });
 
-});
+  }
+);
 
 
 /* =========================
-   START SERVER
+   SERVER
 ========================= */
 
 const PORT =
-  process.env.PORT || 3000;
+  process.env.PORT ||
+  3000;
 
 
 app.listen(
