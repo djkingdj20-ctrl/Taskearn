@@ -61,4 +61,7 @@ app.post('/api/admin/withdrawals/:id',admin,(req,res)=>{
  const w=withdrawals.find(x=>x.id===Number(req.params.id)); if(!w)return res.status(404).json({error:'Not found'});
  w.status=req.body.status;res.json({ok:true});
 });
-app.listen(process.env.PORT||3000,()=>console.log('TaskEarn running'));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(TaskEarn running on port ${PORT});
+});
