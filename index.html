@@ -1,7 +1,9 @@
 <!doctype html>
 <html lang="en">
 <head>
+
   <meta name="google-adsense-account" content="ca-pub-5877718538170577">
+
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
 
@@ -10,42 +12,61 @@
     src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5877718538170577"
     crossorigin="anonymous"></script>
 
-  <title>TaskEarn</title>
+  <title>TaskEarn - Online Tasks & Rewards</title>
+
+  <meta
+    name="description"
+    content="TaskEarn is an online platform for discovering legitimate tasks, tracking completed tasks and managing eligible earnings."
+  >
 
   <style>
-    *{box-sizing:border-box}
+    *{
+      box-sizing:border-box
+    }
+
+    html{
+      scroll-behavior:smooth
+    }
+
     body{
       margin:0;
       background:#f4f6fb;
       font-family:Arial,sans-serif;
       color:#172033
     }
+
     .top{
       background:linear-gradient(135deg,#5b45f5,#795cff);
       color:#fff;
       padding:18px
     }
+
     .bar,.wrap{
       max-width:900px;
       margin:auto
     }
+
     .bar{
       display:flex;
       justify-content:space-between;
       align-items:center
     }
+
     .brand{
       font-size:25px;
       font-weight:800
     }
+
     .balance{
       background:#ffffff22;
       padding:10px 14px;
       border-radius:14px
     }
+
     .wrap{
       padding:16px
     }
+
     .card{
       background:#fff;
       border-radius:18px;
@@ -53,25 +74,43 @@
       margin-bottom:14px;
       box-shadow:0 5px 22px #0000000a
     }
+
+    .hero{
+      padding:28px 20px
+    }
+
+    .hero h1{
+      margin-top:0;
+      font-size:32px
+    }
+
+    .hero p{
+      line-height:1.6
+    }
+
     .grid{
       display:grid;
       grid-template-columns:repeat(2,1fr);
       gap:14px
     }
+
     .stats{
       display:grid;
       grid-template-columns:repeat(3,1fr);
       gap:10px
     }
+
     .stat{
       background:#fff;
       border-radius:14px;
       padding:14px
     }
+
     .muted{
       color:#687386;
       font-size:14px
     }
+
     .tag{
       display:inline-block;
       background:#eeedff;
@@ -80,37 +119,1038 @@
       padding:5px 9px;
       font-size:12px
     }
+
     .earn{
       color:#079653;
       font-weight:800
     }
+
     .row{
       display:flex;
       justify-content:space-between;
       align-items:center;
       gap:8px
     }
+
     .btn{
+      display:inline-block;
       padding:11px 14px;
       border:0;
       border-radius:11px;
       font-weight:700;
-      cursor:pointer
+      cursor:pointer;
+      text-decoration:none
     }
+
     .primary{
       background:#5b45f5;
       color:#fff
     }
+
     .secondary{
       background:#fff;
-      border:1px solid #ddd
+      border:1px solid #ddd;
+      color:#172033
     }
+
     .input{
       width:100%;
       padding:12px;
       border:1px solid #ddd;
       border-radius:11px
     }
+
+    .form{
+      display:grid;
+      gap:10px;
+      max-width:450px
+    }
+
+    .nav{
+      display:flex;
+      gap:8px;
+      overflow:auto;
+      margin:15px 0
+    }
+
+    .info-list{
+      padding-left:20px;
+      line-height:1.8
+    }
+
+    .footer{
+      text-align:center;
+      padding:25px 10px;
+      color:#687386;
+      font-size:13px
+    }
+
+    @media(max-width:650px){
+
+      .grid{
+        grid-template-columns:1fr
+      }
+
+      .stats{
+        grid-template-columns:1fr 1fr 1fr
+      }
+
+      .wrap{
+        padding:12px
+      }
+
+      .hero h1{
+        font-size:27px
+      }
+
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <div class="top">
+    <div class="bar">
+
+      <div class="brand">
+        TaskEarn
+      </div>
+
+      <div id="bal" class="balance">
+        ₹0.00
+      </div>
+
+    </div>
+  </div>
+
+
+  <!--
+    Public content is included directly in the HTML
+    so visitors and search crawlers can access useful
+    information without requiring login.
+  -->
+
+  <main id="app" class="wrap">
+
+    <section class="card hero">
+
+      <h1>
+        Welcome to TaskEarn
+      </h1>
+
+      <p class="muted">
+        TaskEarn is an online platform for discovering legitimate
+        tasks, tracking completed tasks and managing eligible earnings.
+      </p>
+
+      <div class="nav">
+
+        <button
+          class="btn primary"
+          onclick="showLoginFromHome()">
+          Login
+        </button>
+
+        <button
+          class="btn secondary"
+          onclick="showRegisterFromHome()">
+          Create Account
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <section class="card">
+
+      <h2>
+        How TaskEarn Works
+      </h2>
+
+      <ol class="info-list">
+
+        <li>
+          Create a TaskEarn account.
+        </li>
+
+        <li>
+          Browse eligible tasks available on the platform.
+        </li>
+
+        <li>
+          Read the task requirements carefully.
+        </li>
+
+        <li>
+          Complete eligible tasks according to their requirements.
+        </li>
+
+        <li>
+          Track eligible earnings in your TaskEarn wallet.
+        </li>
+
+        <li>
+          Submit a withdrawal request when you meet
+          the applicable minimum.
+        </li>
+
+      </ol>
+
+    </section>
+
+
+    <section class="card">
+
+      <h2>
+        About TaskEarn
+      </h2>
+
+      <p class="muted">
+
+        TaskEarn provides a simple interface for users to discover
+        online tasks, monitor completed tasks and manage eligible
+        task-related earnings.
+
+      </p>
+
+      <p class="muted">
+
+        Task availability and rewards can vary depending on the
+        tasks available on the platform.
+
+      </p>
+
+    </section>
+
+
+    <section class="card">
+
+      <h2>
+        Important Information
+      </h2>
+
+      <p class="muted">
+
+        TaskEarn does not guarantee a specific amount of earnings.
+        Rewards depend on eligible tasks and their applicable
+        conditions.
+
+      </p>
+
+      <p class="muted">
+
+        Users should complete only legitimate tasks and follow
+        the applicable task requirements and platform policies.
+
+      </p>
+
+    </section>
+
+
+    <section class="card">
+
+      <h2>
+        Frequently Asked Questions
+      </h2>
+
+      <h3>
+        How do I earn?
+      </h3>
+
+      <p class="muted">
+        Eligible users can complete available tasks and receive
+        applicable rewards after successful completion.
+      </p>
+
+      <h3>
+        Is a specific income guaranteed?
+      </h3>
+
+      <p class="muted">
+        No. Earnings depend on the availability and conditions
+        of eligible tasks.
+      </p>
+
+      <h3>
+        How can I track my earnings?
+      </h3>
+
+      <p class="muted">
+        Registered users can use the wallet section to view
+        eligible balances and withdrawal requests.
+      </p>
+
+    </section>
+
+
+    <!-- Login / Register / Dashboard area -->
+
+    <div id="accountArea"></div>
+
+    <div class="footer">
+      © 2026 TaskEarn. All rights reserved.
+    </div>
+
+  </main>
+
+
+  <script>
+
+    const $ = id => document.getElementById(id);
+
+
+    async function api(url,opt={}){
+
+      let r = await fetch(
+        url,
+        {
+          headers:{
+            'Content-Type':'application/json'
+          },
+          ...opt
+        }
+      );
+
+      let d = await r.json();
+
+      if(!r.ok){
+
+        throw Error(
+          d.error || 'Something went wrong'
+        );
+
+      }
+
+      return d;
+
+    }
+
+
+    async function boot(){
+
+      try{
+
+        let me = await api('/api/me');
+
+        if(me){
+
+          dash(me);
+
+        }
+
+      }catch(e){
+
+        // Public homepage remains visible.
+
+      }
+
+    }
+
+
+    function showLoginFromHome(){
+
+      accountArea.innerHTML = `
+
+        <div class="card">
+
+          <h2>
+            Login to TaskEarn
+          </h2>
+
+          <div class="form">
+
+            <input
+              id="email"
+              class="input"
+              placeholder="Email">
+
+            <input
+              id="pass"
+              class="input"
+              type="password"
+              placeholder="Password">
+
+            <button
+              class="btn primary"
+              onclick="login()">
+              Login
+            </button>
+
+            <p class="muted">
+              Demo: user@taskearn.demo / 123456
+            </p>
+
+          </div>
+
+        </div>
+
+      `;
+
+      accountArea.scrollIntoView({
+        behavior:'smooth'
+      });
+
+    }
+
+
+    function showRegisterFromHome(){
+
+      accountArea.innerHTML = `
+
+        <div class="card">
+
+          <h2>
+            Create TaskEarn Account
+          </h2>
+
+          <div class="form">
+
+            <input
+              id="name"
+              class="input"
+              placeholder="Name">
+
+            <input
+              id="email"
+              class="input"
+              placeholder="Email">
+
+            <input
+              id="pass"
+              class="input"
+              type="password"
+              placeholder="Password">
+
+            <button
+              class="btn primary"
+              onclick="register()">
+              Create Account
+            </button>
+
+          </div>
+
+        </div>
+
+      `;
+
+      accountArea.scrollIntoView({
+        behavior:'smooth'
+      });
+
+    }
+
+
+    async function login(){
+
+      try{
+
+        await api(
+          '/api/login',
+          {
+            method:'POST',
+
+            body:JSON.stringify({
+
+              email:email.value,
+
+              password:pass.value
+
+            })
+
+          }
+        );
+
+        boot();
+
+      }catch(e){
+
+        alert(e.message);
+
+      }
+
+    }
+
+
+    async function register(){
+
+      try{
+
+        await api(
+          '/api/register',
+          {
+            method:'POST',
+
+            body:JSON.stringify({
+
+              name:name.value,
+
+              email:email.value,
+
+              password:pass.value
+
+            })
+
+          }
+        );
+
+        boot();
+
+      }catch(e){
+
+        alert(e.message);
+
+      }
+
+    }
+
+
+    async function dash(me){
+
+      let w = await api(
+        '/api/wallet'
+      );
+
+      bal.textContent =
+        '₹' + w.balance.toFixed(2);
+
+
+      accountArea.innerHTML = `
+
+        <div class="card">
+
+          <div class="row">
+
+            <div>
+
+              <h2>
+                Hi, ${me.name} 👋
+              </h2>
+
+              <p class="muted">
+                Choose a simple mobile task.
+              </p>
+
+            </div>
+
+            <button
+              class="btn secondary"
+              onclick="logout()">
+              Logout
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <div class="stats">
+
+          <div class="stat">
+
+            Balance<br>
+
+            <b>
+              ₹${w.balance.toFixed(2)}
+            </b>
+
+          </div>
+
+
+          <div class="stat">
+
+            Completed<br>
+
+            <b>
+              ${w.completed}
+            </b>
+
+          </div>
+
+
+          <div class="stat">
+
+            Role<br>
+
+            <b>
+              ${me.role}
+            </b>
+
+          </div>
+
+        </div>
+
+
+        <div class="nav">
+
+          <button
+            class="btn primary"
+            onclick="tasksPage()">
+            Tasks
+          </button>
+
+          <button
+            class="btn secondary"
+            onclick="walletPage()">
+            Wallet
+          </button>
+
+          ${
+            me.role === 'admin'
+            ?
+            `
+              <button
+                class="btn secondary"
+                onclick="adminPage()">
+                Admin
+              </button>
+            `
+            :
+            ''
+          }
+
+        </div>
+
+
+        <div id="screen"></div>
+
+      `;
+
+
+      tasksPage();
+
+    }
+
+
+    async function tasksPage(){
+
+      let ts = await api(
+        '/api/tasks'
+      );
+
+
+      screen.innerHTML = `
+
+        <div class="card">
+
+          <b>
+            Important:
+          </b>
+
+          <p class="muted">
+
+            Use legitimate sponsor-funded tasks.
+            Do not incentivize prohibited likes,
+            follows or reviews.
+
+          </p>
+
+        </div>
+
+
+        <div class="grid">
+
+          ${
+            ts.map(
+              t => `
+
+                <div class="card">
+
+                  <span class="tag">
+                    ${t.type}
+                  </span>
+
+                  <h3>
+                    ${t.title}
+                  </h3>
+
+                  <p class="muted">
+                    ${t.description}
+                  </p>
+
+                  <div class="row">
+
+                    <span class="earn">
+                      +₹${t.reward}
+                    </span>
+
+                    <button
+                      class="btn primary"
+                      onclick="completeTask(${t.id})">
+                      Start
+                    </button>
+
+                  </div>
+
+                </div>
+
+              `
+            ).join('')
+          }
+
+        </div>
+
+      `;
+
+    }
+
+
+    async function completeTask(id){
+
+      try{
+
+        let d = await api(
+          '/api/tasks/' + id + '/complete',
+          {
+            method:'POST'
+          }
+        );
+
+        alert(
+          'You earned ₹' + d.reward
+        );
+
+        let me = await api(
+          '/api/me'
+        );
+
+        dash(me);
+
+      }catch(e){
+
+        alert(e.message);
+
+      }
+
+    }
+
+
+    async function walletPage(){
+
+      let w = await api(
+        '/api/wallet'
+      );
+
+
+      screen.innerHTML = `
+
+        <div class="card">
+
+          <h2>
+            Wallet
+          </h2>
+
+          <h1>
+            ₹${w.balance.toFixed(2)}
+          </h1>
+
+          <p class="muted">
+            Minimum withdrawal ₹100
+          </p>
+
+
+          <div class="form">
+
+            <input
+              id="amount"
+              class="input"
+              type="number"
+              placeholder="Amount">
+
+
+            <input
+              id="method"
+              class="input"
+              value="UPI">
+
+
+            <button
+              class="btn primary"
+              onclick="withdraw()">
+              Request Withdrawal
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <div class="card">
+
+          <h3>
+            Withdrawal History
+          </h3>
+
+          ${
+            w.withdrawals.length
+            ?
+
+            w.withdrawals
+              .map(
+                x => `
+
+                  <p class="row">
+
+                    <span>
+                      ₹${x.amount} • ${x.method}
+                    </span>
+
+                    <span>
+                      ${x.status}
+                    </span>
+
+                  </p>
+
+                `
+              )
+              .join('')
+
+            :
+
+            '<p class="muted">No requests yet.</p>'
+          }
+
+        </div>
+
+      `;
+
+    }
+
+
+    async function withdraw(){
+
+      try{
+
+        await api(
+          '/api/withdraw',
+          {
+            method:'POST',
+
+            body:JSON.stringify({
+
+              amount:Number(
+                amount.value
+              ),
+
+              method:
+                method.value
+
+            })
+
+          }
+        );
+
+
+        alert(
+          'Withdrawal request submitted'
+        );
+
+
+        let me = await api(
+          '/api/me'
+        );
+
+        dash(me);
+
+      }catch(e){
+
+        alert(e.message);
+
+      }
+
+    }
+
+
+    async function adminPage(){
+
+      let s =
+        await api(
+          '/api/admin/stats'
+        );
+
+      let ws =
+        await api(
+          '/api/admin/withdrawals'
+        );
+
+
+      screen.innerHTML = `
+
+        <div class="card">
+
+          <h2>
+            Admin Dashboard
+          </h2>
+
+
+          <div class="stats">
+
+            <div class="stat">
+
+              ${s.users}
+
+              <br>
+
+              Users
+
+            </div>
+
+
+            <div class="stat">
+
+              ${s.tasks}
+
+              <br>
+
+              Tasks
+
+            </div>
+
+
+            <div class="stat">
+
+              ${s.pending}
+
+              <br>
+
+              Pending
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="card">
+
+          <h3>
+            Withdrawals
+          </h3>
+
+
+          ${
+            ws.length
+
+            ?
+
+            ws
+              .map(
+                x => `
+
+                  <p class="row">
+
+                    <span>
+
+                      ${x.name}
+                      • ₹${x.amount}
+                      • ${x.method}
+
+                    </span>
+
+
+                    <span>
+
+                      ${
+                        x.status === 'pending'
+
+                        ?
+
+                        `
+
+                          <button
+                            class="btn primary"
+                            onclick="wd(${x.id},'approved')">
+                            Approve
+                          </button>
+
+
+                          <button
+                            class="btn secondary"
+                            onclick="wd(${x.id},'rejected')">
+                            Reject
+                          </button>
+
+                        `
+
+                        :
+
+                        x.status
+                      }
+
+                    </span>
+
+                  </p>
+
+                `
+              )
+              .join('')
+
+            :
+
+            '<p class="muted">No requests.</p>'
+          }
+
+        </div>
+
+      `;
+
+    }
+
+
+    async function wd(
+      id,
+      status
+    ){
+
+      try{
+
+        await api(
+          '/api/admin/withdrawals/' + id,
+          {
+            method:'POST',
+
+            body:JSON.stringify({
+              status
+            })
+
+          }
+        );
+
+
+        adminPage();
+
+      }catch(e){
+
+        alert(e.message);
+
+      }
+
+    }
+
+
+    async function logout(){
+
+      await api(
+        '/api/logout',
+        {
+          method:'POST'
+        }
+      );
+
+
+      location.reload();
+
+    }
+
+
+    boot();
+
+  </script>
+
+</body>
+</html>    }
     .form{
       display:grid;
       gap:10px;
