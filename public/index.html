@@ -1,14 +1,35 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TaskEarn</title>
+
+  <meta
+    name="google-adsense-account"
+    content="ca-pub-5877718538170577"
+  >
+
+  <meta
+    name="description"
+    content="TaskEarn is an online platform for discovering legitimate tasks, tracking completed tasks and managing eligible task-related earnings."
+  >
+
+  <!-- Google AdSense -->
+  <script async
+    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5877718538170577"
+    crossorigin="anonymous"></script>
+
+  <title>TaskEarn - Online Tasks & Rewards</title>
 
   <style>
+
     * {
       box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
     }
 
     body {
@@ -58,8 +79,13 @@
       box-shadow: 0 5px 22px rgba(0,0,0,0.06);
     }
 
+    .hero {
+      padding: 28px 20px;
+    }
+
     .hero h1 {
       margin-top: 0;
+      font-size: 32px;
     }
 
     .grid {
@@ -84,6 +110,7 @@
     .muted {
       color: #687386;
       font-size: 14px;
+      line-height: 1.6;
     }
 
     .tag {
@@ -124,6 +151,7 @@
     .secondary {
       background: white;
       border: 1px solid #ddd;
+      color: #172033;
     }
 
     .input {
@@ -154,7 +182,15 @@
       margin-bottom: 15px;
     }
 
+    .footer {
+      text-align: center;
+      padding: 30px 10px;
+      color: #687386;
+      font-size: 13px;
+    }
+
     @media (max-width: 650px) {
+
       .grid {
         grid-template-columns: 1fr;
       }
@@ -166,36 +202,246 @@
       .container {
         padding: 12px;
       }
+
+      .hero h1 {
+        font-size: 27px;
+      }
+
     }
+
   </style>
+
 </head>
 
 <body>
 
   <div class="header">
+
     <div class="header-inner">
-      <div class="logo">TaskEarn</div>
-      <div id="balance" class="balance">₹0.00</div>
+
+      <div class="logo">
+        TaskEarn
+      </div>
+
+      <div id="balance" class="balance">
+        ₹0.00
+      </div>
+
     </div>
+
   </div>
 
-  <main id="app" class="container"></main>
+
+  <main id="app" class="container">
+
+    <!-- PUBLIC HOMEPAGE -->
+
+    <section class="card hero">
+
+      <h1>
+        Welcome to TaskEarn 🚀
+      </h1>
+
+      <p class="muted">
+        TaskEarn is an online platform for discovering legitimate
+        tasks, tracking completed tasks and managing eligible
+        task-related earnings.
+      </p>
+
+      <div class="nav">
+
+        <button
+          class="btn primary"
+          onclick="showLogin()">
+          Login
+        </button>
+
+        <button
+          class="btn secondary"
+          onclick="showRegister()">
+          Create Account
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <section class="card">
+
+      <h2>
+        How TaskEarn Works
+      </h2>
+
+      <ol>
+
+        <li>
+          Create a TaskEarn account.
+        </li>
+
+        <li>
+          Browse eligible tasks available on the platform.
+        </li>
+
+        <li>
+          Read the task requirements carefully.
+        </li>
+
+        <li>
+          Complete eligible tasks according to their requirements.
+        </li>
+
+        <li>
+          Track eligible earnings in your wallet.
+        </li>
+
+        <li>
+          Submit a withdrawal request when the applicable
+          minimum requirement is reached.
+        </li>
+
+      </ol>
+
+    </section>
+
+
+    <section class="card">
+
+      <h2>
+        About TaskEarn
+      </h2>
+
+      <p class="muted">
+        TaskEarn provides a simple interface for users to discover
+        online tasks, monitor completed tasks and manage eligible
+        task-related earnings.
+      </p>
+
+      <p class="muted">
+        Task availability and rewards may vary depending on the
+        tasks available on the platform.
+      </p>
+
+    </section>
+
+
+    <section class="card">
+
+      <h2>
+        Task & Reward Information
+      </h2>
+
+      <p class="muted">
+        Available tasks may include content-related activities,
+        website testing, sponsored activities and other eligible
+        tasks.
+      </p>
+
+      <p class="muted">
+        Rewards displayed on the platform depend on the applicable
+        task conditions. TaskEarn does not guarantee a specific
+        income or earnings amount.
+      </p>
+
+    </section>
+
+
+    <section class="card">
+
+      <h2>
+        Frequently Asked Questions
+      </h2>
+
+      <h3>
+        How do I earn?
+      </h3>
+
+      <p class="muted">
+        Registered users can browse available eligible tasks and
+        complete them according to the stated requirements.
+      </p>
+
+      <h3>
+        Is a specific income guaranteed?
+      </h3>
+
+      <p class="muted">
+        No. Earnings depend on task availability, eligibility and
+        the applicable conditions of each task.
+      </p>
+
+      <h3>
+        How can I track my earnings?
+      </h3>
+
+      <p class="muted">
+        Registered users can view eligible balances and withdrawal
+        requests through the wallet section.
+      </p>
+
+      <h3>
+        What is the minimum withdrawal?
+      </h3>
+
+      <p class="muted">
+        The current demo configuration uses a minimum withdrawal
+        amount of ₹100.
+      </p>
+
+    </section>
+
+
+    <section class="card">
+
+      <h2>
+        Important Information
+      </h2>
+
+      <p class="muted">
+        Users should complete only legitimate tasks and follow the
+        applicable task requirements and platform policies.
+      </p>
+
+      <p class="muted">
+        TaskEarn does not guarantee earnings, employment or a fixed
+        income. Task availability and rewards can change.
+      </p>
+
+    </section>
+
+
+    <!-- LOGIN / REGISTER / USER AREA -->
+
+    <div id="accountArea"></div>
+
+
+    <div class="footer">
+      © 2026 TaskEarn. All rights reserved.
+    </div>
+
+  </main>
+
 
   <script>
 
     async function api(url, options = {}) {
 
       const response = await fetch(url, {
+
         headers: {
           "Content-Type": "application/json"
         },
+
         ...options
+
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Something went wrong");
+        throw new Error(
+          data.error || "Something went wrong"
+        );
       }
 
       return data;
@@ -206,130 +452,129 @@
 
       try {
 
-        const user = await api("/api/me");
+        const user =
+          await api("/api/me");
 
         if (user) {
+
           dashboard(user);
-        } else {
-          loginPage();
+
         }
 
       } catch (error) {
 
-        loginPage();
+        console.log(
+          "Public homepage available."
+        );
 
       }
 
     }
 
 
-    function loginPage() {
+    function showLogin() {
 
-      document.getElementById("app").innerHTML = `
+      document.getElementById(
+        "accountArea"
+      ).innerHTML = `
 
-        <div class="card hero">
+        <div class="card">
 
-          <h1>Earn with TaskEarn 🚀</h1>
+          <h2>
+            Login to TaskEarn
+          </h2>
 
-          <p class="muted">
-            Complete simple mobile tasks and earn rewards.
-          </p>
+          <div class="form">
 
-          <div class="nav">
+            <input
+              id="loginEmail"
+              class="input"
+              placeholder="Email"
+              autocomplete="email">
+
+            <input
+              id="loginPassword"
+              class="input"
+              type="password"
+              placeholder="Password"
+              autocomplete="current-password">
 
             <button
               class="btn primary"
-              onclick="showLogin()">
+              onclick="login()">
               Login
             </button>
 
-            <button
-              class="btn secondary"
-              onclick="showRegister()">
-              Register
-            </button>
+            <p class="muted">
+              Demo account:
+              user@taskearn.demo / 123456
+            </p>
 
           </div>
 
-          <div id="form"></div>
-
         </div>
 
       `;
 
-      showLogin();
-
-    }
-
-
-    function showLogin() {
-
-      document.getElementById("form").innerHTML = `
-
-        <div class="form">
-
-          <input
-            id="email"
-            class="input"
-            placeholder="Email">
-
-          <input
-            id="password"
-            class="input"
-            type="password"
-            placeholder="Password">
-
-          <button
-            class="btn primary"
-            onclick="login()">
-            Login
-          </button>
-
-          <p class="muted">
-            Demo account:
-            user@taskearn.demo
-            /
-            123456
-          </p>
-
-        </div>
-
-      `;
+      document.getElementById(
+        "accountArea"
+      ).scrollIntoView({
+        behavior: "smooth"
+      });
 
     }
 
 
     function showRegister() {
 
-      document.getElementById("form").innerHTML = `
+      document.getElementById(
+        "accountArea"
+      ).innerHTML = `
 
-        <div class="form">
+        <div class="card">
 
-          <input
-            id="name"
-            class="input"
-            placeholder="Your name">
+          <h2>
+            Create TaskEarn Account
+          </h2>
 
-          <input
-            id="email"
-            class="input"
-            placeholder="Email">
+          <div class="form">
 
-          <input
-            id="password"
-            class="input"
-            type="password"
-            placeholder="Password">
+            <input
+              id="registerName"
+              class="input"
+              placeholder="Your name"
+              autocomplete="name">
 
-          <button
-            class="btn primary"
-            onclick="register()">
-            Create Account
-          </button>
+            <input
+              id="registerEmail"
+              class="input"
+              placeholder="Email"
+              autocomplete="email">
+
+            <input
+              id="registerPassword"
+              class="input"
+              type="password"
+              placeholder="Password"
+              autocomplete="new-password">
+
+            <button
+              class="btn primary"
+              onclick="register()">
+              Create Account
+            </button>
+
+          </div>
 
         </div>
 
       `;
+
+      document.getElementById(
+        "accountArea"
+      ).scrollIntoView({
+        behavior: "smooth"
+      });
 
     }
 
@@ -338,21 +583,28 @@
 
       try {
 
-        await api("/api/login", {
+        await api(
+          "/api/login",
+          {
 
-          method: "POST",
+            method: "POST",
 
-          body: JSON.stringify({
+            body: JSON.stringify({
 
-            email:
-              document.getElementById("email").value,
+              email:
+                document.getElementById(
+                  "loginEmail"
+                ).value,
 
-            password:
-              document.getElementById("password").value
+              password:
+                document.getElementById(
+                  "loginPassword"
+                ).value
 
-          })
+            })
 
-        });
+          }
+        );
 
         startApp();
 
@@ -369,24 +621,33 @@
 
       try {
 
-        await api("/api/register", {
+        await api(
+          "/api/register",
+          {
 
-          method: "POST",
+            method: "POST",
 
-          body: JSON.stringify({
+            body: JSON.stringify({
 
-            name:
-              document.getElementById("name").value,
+              name:
+                document.getElementById(
+                  "registerName"
+                ).value,
 
-            email:
-              document.getElementById("email").value,
+              email:
+                document.getElementById(
+                  "registerEmail"
+                ).value,
 
-            password:
-              document.getElementById("password").value
+              password:
+                document.getElementById(
+                  "registerPassword"
+                ).value
 
-          })
+            })
 
-        });
+          }
+        );
 
         startApp();
 
@@ -404,11 +665,15 @@
       const wallet =
         await api("/api/wallet");
 
-      document.getElementById("balance").innerText =
+      document.getElementById(
+        "balance"
+      ).innerText =
         "₹" + wallet.balance.toFixed(2);
 
 
-      document.getElementById("app").innerHTML = `
+      document.getElementById(
+        "accountArea"
+      ).innerHTML = `
 
         <div class="card">
 
@@ -416,9 +681,9 @@
 
             <div>
 
-              <h1>
+              <h2>
                 Hi, ${user.name} 👋
-              </h1>
+              </h2>
 
               <p class="muted">
                 Choose a simple mobile task.
@@ -441,11 +706,7 @@
 
           <div class="stat">
 
-            <span class="muted">
-              Balance
-            </span>
-
-            <br>
+            Balance<br>
 
             <b>
               ₹${wallet.balance.toFixed(2)}
@@ -456,11 +717,7 @@
 
           <div class="stat">
 
-            <span class="muted">
-              Completed
-            </span>
-
-            <br>
+            Completed<br>
 
             <b>
               ${wallet.completed}
@@ -471,11 +728,7 @@
 
           <div class="stat">
 
-            <span class="muted">
-              Account
-            </span>
-
-            <br>
+            Account<br>
 
             <b>
               ${user.role}
@@ -502,17 +755,15 @@
 
           ${
             user.role === "admin"
-
             ?
-
-            `<button
-              class="btn secondary"
-              onclick="adminPage()">
-              Admin
-            </button>`
-
+            `
+              <button
+                class="btn secondary"
+                onclick="adminPage()">
+                Admin
+              </button>
+            `
             :
-
             ""
           }
 
@@ -533,7 +784,9 @@
       const tasks =
         await api("/api/tasks");
 
-      document.getElementById("screen").innerHTML = `
+      document.getElementById(
+        "screen"
+      ).innerHTML = `
 
         <div class="notice">
 
@@ -545,39 +798,43 @@
 
         <div class="grid">
 
-          ${tasks.map(task => `
+          ${
+            tasks.map(
+              task => `
 
-            <div class="card">
+                <div class="card">
 
-              <span class="tag">
-                ${task.type}
-              </span>
+                  <span class="tag">
+                    ${task.type}
+                  </span>
 
-              <h3>
-                ${task.title}
-              </h3>
+                  <h3>
+                    ${task.title}
+                  </h3>
 
-              <p class="muted">
-                ${task.description}
-              </p>
+                  <p class="muted">
+                    ${task.description}
+                  </p>
 
-              <div class="row">
+                  <div class="row">
 
-                <span class="earn">
-                  +₹${task.reward}
-                </span>
+                    <span class="earn">
+                      +₹${task.reward}
+                    </span>
 
-                <button
-                  class="btn primary"
-                  onclick="completeTask(${task.id})">
-                  Start
-                </button>
+                    <button
+                      class="btn primary"
+                      onclick="completeTask(${task.id})">
+                      Start
+                    </button>
 
-              </div>
+                  </div>
 
-            </div>
+                </div>
 
-          `).join("")}
+              `
+            ).join("")
+          }
 
         </div>
 
@@ -621,7 +878,9 @@
       const wallet =
         await api("/api/wallet");
 
-      document.getElementById("screen").innerHTML = `
+      document.getElementById(
+        "screen"
+      ).innerHTML = `
 
         <div class="card">
 
@@ -673,30 +932,33 @@
 
             ?
 
-            wallet.withdrawals.map(item => `
+            wallet.withdrawals.map(
+              item => `
 
-              <p class="row">
+                <p class="row">
 
-                <span>
-                  ₹${item.amount}
-                  •
-                  ${item.method}
-                </span>
+                  <span>
+                    ₹${item.amount}
+                    •
+                    ${item.method}
+                  </span>
 
-                <span>
-                  ${item.status}
-                </span>
+                  <span>
+                    ${item.status}
+                  </span>
 
-              </p>
+                </p>
 
-            `).join("")
+              `
+            ).join("")
 
             :
 
-            `<p class="muted">
-              No withdrawals yet.
-            </p>`
-
+            `
+              <p class="muted">
+                No withdrawals yet.
+              </p>
+            `
           }
 
         </div>
@@ -712,31 +974,39 @@
 
         const amount =
           Number(
-            document.getElementById("amount").value
+            document.getElementById(
+              "amount"
+            ).value
           );
 
         const method =
-          document.getElementById("method").value;
+          document.getElementById(
+            "method"
+          ).value;
 
 
-        await api("/api/withdraw", {
+        await api(
+          "/api/withdraw",
+          {
 
-          method: "POST",
+            method: "POST",
 
-          body: JSON.stringify({
+            body: JSON.stringify({
 
-            amount: amount,
+              amount: amount,
 
-            method: method
+              method: method
 
-          })
+            })
 
-        });
+          }
+        );
 
 
         alert(
           "Withdrawal request submitted!"
         );
+
 
         dashboard(
           await api("/api/me")
@@ -754,13 +1024,19 @@
     async function adminPage() {
 
       const stats =
-        await api("/api/admin/stats");
+        await api(
+          "/api/admin/stats"
+        );
 
       const withdrawals =
-        await api("/api/admin/withdrawals");
+        await api(
+          "/api/admin/withdrawals"
+        );
 
 
-      document.getElementById("screen").innerHTML = `
+      document.getElementById(
+        "screen"
+      ).innerHTML = `
 
         <div class="card">
 
@@ -804,76 +1080,79 @@
 
             ?
 
-            withdrawals.map(item => `
+            withdrawals.map(
+              item => `
 
-              <div class="card">
+                <div class="card">
 
-                <div class="row">
+                  <div class="row">
 
-                  <div>
+                    <div>
 
-                    <b>
-                      ${item.name}
-                    </b>
+                      <b>
+                        ${item.name}
+                      </b>
 
-                    <p class="muted">
-                      ₹${item.amount}
-                      •
-                      ${item.method}
-                    </p>
+                      <p class="muted">
+                        ₹${item.amount}
+                        •
+                        ${item.method}
+                      </p>
 
-                  </div>
+                    </div>
 
 
-                  <div>
+                    <div>
 
-                    ${
-                      item.status === "pending"
+                      ${
+                        item.status === "pending"
 
-                      ?
+                        ?
 
-                      `
+                        `
 
-                      <button
-                        class="btn primary"
-                        onclick="updateWithdrawal(
-                          ${item.id},
-                          'approved'
-                        )">
-                        Approve
-                      </button>
+                          <button
+                            class="btn primary"
+                            onclick="updateWithdrawal(
+                              ${item.id},
+                              'approved'
+                            )">
+                            Approve
+                          </button>
 
-                      <button
-                        class="btn secondary"
-                        onclick="updateWithdrawal(
-                          ${item.id},
-                          'rejected'
-                        )">
-                        Reject
-                      </button>
+                          <button
+                            class="btn secondary"
+                            onclick="updateWithdrawal(
+                              ${item.id},
+                              'rejected'
+                            )">
+                            Reject
+                          </button>
 
-                      `
+                        `
 
-                      :
+                        :
 
-                      item.status
+                        item.status
 
-                    }
+                      }
+
+                    </div>
 
                   </div>
 
                 </div>
 
-              </div>
-
-            `).join("")
+              `
+            ).join("")
 
             :
 
-            `<p class="muted">
-              No withdrawal requests.
-            </p>`
-
+            `
+              <p class="muted">
+                No withdrawal requests.
+              </p>
+            `
           }
 
         </div>
@@ -923,10 +1202,16 @@
         }
       );
 
-      startApp();
+      location.reload();
 
     }
 
+
+    /*
+      IMPORTANT:
+      The public homepage is already visible in the HTML.
+      This only checks whether a logged-in session exists.
+    */
 
     startApp();
 
