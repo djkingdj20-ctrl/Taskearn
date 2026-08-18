@@ -1,94 +1,177 @@
 const express = require('express');
 const session = require('express-session');
+const Database = require('better-sqlite3');
+const path = require('path');
 
 const app = express();
 
+/* =========================
+   BASIC CONFIGURATION
+========================= */
+
 app.use(express.json());
-app.use(express.static('public'));
-
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'change-this-secret',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    httpOnly: true,
-    sameSite: 'lax'
-  }
-}));
+app.use(express.static(path.join(__dirname, 'public')));
 
 /* =========================
-   USERS
+   SESSION
 ========================= */
 
-const users = [
-  {
-    id: 1,
-    name: 'Demo User',
-    email: 'user@taskearn.demo',
-    password: '123456',
-    role: 'user',
-    balance: 0,
-    completed: 0
-  },
-  {
-    id: 2,
-    name: 'Admin',
-    email: 'admin@taskearn.demo',
-    password: 'admin123',
-    role: 'admin',
-    balance: 0,
-    completed: 0
-  }
-];
+app.use(
+  session({
+    secret:
+      process.env.SESSION_SECRET ||
+      'change-this-secret-before-production',
+
+    resave: false,
+
+    saveUninitialized: false,
+
+    cookie: {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: false
+    }
+  })
+);
 
 /* =========================
-   TASKS
+   DATABASE
 ========================= */
 
-const tasks = [
-  {
-    id: 1,
-    title: 'Watch a sponsored video',
-    description: 'Watch the complete licensed sponsor video and submit confirmation.',
-    type: 'Watch',
-    reward: 8
-  },
-  {
-    id: 2,
-    title: 'Visit a sponsor page',
-    description: 'Open the sponsor page and confirm one simple detail.',
-    type: 'Visit',
-    reward: 5
-  },
-  {
-    id: 3,
-    title: 'Daily check-in',
-    description: 'Open the task and submit your daily check-in.',
-    type: 'Check-in',
-    reward: 2
-  },
-  {
-    id: 4,
-    title: 'Test a mobile website',
-    description: 'Test two buttons and submit your result.',
-    type: 'Testing',
-    reward: 20
-  },
-  {
-    id: 5,
-    title: 'Read a short description',
-    description: 'Read the description and submit the correct category.',
-    type: 'Content',
-    reward: 6
-  }
-];
+const dbPath = path.join(__dirname, 'taskearn.db');
+
+const db = new Database(dbPath);
+
+db.pragma('journal_mode = WAL');
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    role TEXT NOT NULL DEFAULT 'user',
+    balance REAL NOT NULL DEFAULT 0,
+    completed INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS tasks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    description TEXT NOT NULL,
+    type TEXT NOT NULL,
+    reward REAL NOT NULL,
+    active INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS submissions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    user_name TEXT NOT NULL,
+    task_id INTEGER NOT NULL,
+    task_title TEXT NOT NULL,
+    reward REAL NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending',
+    submitted_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    reviewed_at TEXT
+  );
+
+  CREATE TABLE IF NOT EXISTS withdrawals (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    amount REAL NOT NULL,
+    method TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending',
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
+`);
 
 /* =========================
-   DATA STORAGE
+   DEFAULT DATA
 ========================= */
 
-const submissions = [];
-const withdrawals = [];
+const userCount = db
+  .prepare('SELECT COUNT(*) AS count FROM users')
+  .get().count;
+
+if (userCount === 0) {
+
+  const insertUser = db.prepare(`
+    INSERT INTO users
+    (name, email, password, role, balance, completed)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `);
+
+  insertUser.run(
+    'Demo User',
+    'user@taskearn.demo',
+    '123456',
+    'user',
+    0,
+    0
+  );
+
+  insertUser.run(
+    'Admin',
+    'admin@taskearn.demo',
+    'admin123',
+    'admin',
+    0,
+    0
+  );
+}
+
+
+const taskCount = db
+  .prepare('SELECT COUNT(*) AS count FROM tasks')
+  .get().count;
+
+if (taskCount === 0) {
+
+  const insertTask = db.prepare(`
+    INSERT INTO tasks
+    (title, description, type, reward)
+    VALUES (?, ?, ?, ?)
+  `);
+
+  insertTask.run(
+    'Watch a sponsored video',
+    'Watch the complete licensed sponsor video and submit confirmation.',
+    'Watch',
+    8
+  );
+
+  insertTask.run(
+    'Visit a sponsor page',
+    'Open the sponsor page and confirm one simple detail.',
+    'Visit',
+    5
+  );
+
+  insertTask.run(
+    'Daily check-in',
+    'Complete the daily check-in and submit it for review.',
+    'Check-in',
+    2
+  );
+
+  insertTask.run(
+    'Test a mobile website',
+    'Test two buttons and submit your result.',
+    'Testing',
+    20
+  );
+
+  insertTask.run(
+    'Read a short description',
+    'Read a short product description and submit the correct category.',
+    'Content',
+    6
+  );
+}
 
 /* =========================
    AUTH MIDDLEWARE
@@ -97,6 +180,7 @@ const withdrawals = [];
 function auth(req, res, next) {
 
   if (!req.session.user) {
+
     return res.status(401).json({
       error: 'Login required'
     });
@@ -115,6 +199,7 @@ function admin(req, res, next) {
     !req.session.user ||
     req.session.user.role !== 'admin'
   ) {
+
     return res.status(403).json({
       error: 'Admin only'
     });
@@ -124,7 +209,7 @@ function admin(req, res, next) {
 }
 
 /* =========================
-   CURRENT USER
+   GET CURRENT USER
 ========================= */
 
 app.get('/api/me', (req, res) => {
@@ -141,28 +226,47 @@ app.get('/api/me', (req, res) => {
 
 app.post('/api/login', (req, res) => {
 
-  const email = req.body.email;
-  const password = req.body.password;
+  const email =
+    String(req.body.email || '')
+      .trim()
+      .toLowerCase();
 
-  const user = users.find(
-    u =>
-      u.email === email &&
-      u.password === password
-  );
+  const password =
+    String(req.body.password || '');
 
-  if (!user) {
+  const user = db
+    .prepare(`
+      SELECT
+        id,
+        name,
+        email,
+        password,
+        role
+      FROM users
+      WHERE email = ?
+    `)
+    .get(email);
+
+  if (
+    !user ||
+    user.password !== password
+  ) {
 
     return res.status(401).json({
       error: 'Invalid login'
     });
-
   }
 
   req.session.user = {
+
     id: user.id,
+
     name: user.name,
+
     email: user.email,
+
     role: user.role
+
   };
 
   res.json(req.session.user);
@@ -175,63 +279,83 @@ app.post('/api/login', (req, res) => {
 
 app.post('/api/register', (req, res) => {
 
-  const name = req.body.name;
-  const email = req.body.email;
-  const password = req.body.password;
+  const name =
+    String(req.body.name || '').trim();
 
-  if (!name || !email || !password) {
+  const email =
+    String(req.body.email || '')
+      .trim()
+      .toLowerCase();
+
+  const password =
+    String(req.body.password || '');
+
+  if (
+    !name ||
+    !email ||
+    !password
+  ) {
 
     return res.status(400).json({
       error: 'All fields required'
     });
-
   }
 
-  if (
-    users.some(
-      u => u.email === email
+  if (password.length < 6) {
+
+    return res.status(400).json({
+      error: 'Password must be at least 6 characters'
+    });
+  }
+
+  const existing = db
+    .prepare(
+      'SELECT id FROM users WHERE email = ?'
     )
-  ) {
+    .get(email);
+
+  if (existing) {
 
     return res.status(400).json({
       error: 'Email already exists'
     });
-
   }
 
-  const user = {
+  try {
 
-    id: users.length + 1,
+    const result = db
+      .prepare(`
+        INSERT INTO users
+        (name, email, password, role, balance, completed)
+        VALUES (?, ?, ?, 'user', 0, 0)
+      `)
+      .run(
+        name,
+        email,
+        password
+      );
 
-    name,
+    req.session.user = {
 
-    email,
+      id: result.lastInsertRowid,
 
-    password,
+      name,
 
-    role: 'user',
+      email,
 
-    balance: 0,
+      role: 'user'
 
-    completed: 0
+    };
 
-  };
+    res.json(req.session.user);
 
-  users.push(user);
+  } catch (error) {
 
-  req.session.user = {
+    res.status(500).json({
+      error: 'Could not create account'
+    });
 
-    id: user.id,
-
-    name: user.name,
-
-    email: user.email,
-
-    role: user.role
-
-  };
-
-  res.json(req.session.user);
+  }
 
 });
 
@@ -252,94 +376,164 @@ app.post('/api/logout', (req, res) => {
 });
 
 /* =========================
-   TASK LIST
+   GET ACTIVE TASKS
 ========================= */
 
 app.get('/api/tasks', auth, (req, res) => {
+
+  const tasks = db
+    .prepare(`
+      SELECT
+        id,
+        title,
+        description,
+        type,
+        reward
+      FROM tasks
+      WHERE active = 1
+      ORDER BY id DESC
+    `)
+    .all();
 
   res.json(tasks);
 
 });
 
 /* =========================
-   START / SUBMIT TASK
+   GET ONE TASK
 ========================= */
 
-app.post('/api/tasks/:id/submit', auth, (req, res) => {
+app.get('/api/tasks/:id', auth, (req, res) => {
 
-  const taskId = Number(req.params.id);
+  const id =
+    Number(req.params.id);
 
-  const user = users.find(
-    u =>
-      u.id === req.session.user.id
-  );
-
-  const task = tasks.find(
-    t =>
-      t.id === taskId
-  );
+  const task = db
+    .prepare(`
+      SELECT
+        id,
+        title,
+        description,
+        type,
+        reward
+      FROM tasks
+      WHERE id = ?
+    `)
+    .get(id);
 
   if (!task) {
 
     return res.status(404).json({
       error: 'Task not found'
     });
-
   }
 
-  const alreadyPending =
-    submissions.find(
-      s =>
-        s.userId === user.id &&
-        s.taskId === task.id &&
-        s.status === 'pending'
+  res.json(task);
+
+});
+
+/* =========================
+   SUBMIT TASK
+========================= */
+
+app.post('/api/tasks/:id/submit', auth, (req, res) => {
+
+  const taskId =
+    Number(req.params.id);
+
+  const userId =
+    req.session.user.id;
+
+  const task = db
+    .prepare(`
+      SELECT
+        id,
+        title,
+        description,
+        type,
+        reward
+      FROM tasks
+      WHERE id = ?
+      AND active = 1
+    `)
+    .get(taskId);
+
+  if (!task) {
+
+    return res.status(404).json({
+      error: 'Task not found'
+    });
+  }
+
+  const user = db
+    .prepare(`
+      SELECT
+        id,
+        name
+      FROM users
+      WHERE id = ?
+    `)
+    .get(userId);
+
+  if (!user) {
+
+    return res.status(401).json({
+      error: 'User not found'
+    });
+  }
+
+  const existing = db
+    .prepare(`
+      SELECT id
+      FROM submissions
+      WHERE user_id = ?
+      AND task_id = ?
+      AND status IN ('pending', 'approved')
+      LIMIT 1
+    `)
+    .get(
+      userId,
+      taskId
     );
 
-  if (alreadyPending) {
+  if (existing) {
 
     return res.status(400).json({
-      error: 'This task is already pending review'
+      error:
+        'You already have a pending or approved submission for this task'
     });
-
   }
 
-  const alreadyApproved =
-    submissions.find(
-      s =>
-        s.userId === user.id &&
-        s.taskId === task.id &&
-        s.status === 'approved'
+  const result = db
+    .prepare(`
+      INSERT INTO submissions
+      (
+        user_id,
+        user_name,
+        task_id,
+        task_title,
+        reward,
+        status
+      )
+      VALUES (?, ?, ?, ?, ?, 'pending')
+    `)
+    .run(
+      user.id,
+      user.name,
+      task.id,
+      task.title,
+      task.reward
     );
 
-  if (alreadyApproved) {
-
-    return res.status(400).json({
-      error: 'You have already completed this task'
-    });
-
-  }
-
-  const submission = {
-
-    id: submissions.length + 1,
-
-    userId: user.id,
-
-    userName: user.name,
-
-    taskId: task.id,
-
-    taskTitle: task.title,
-
-    reward: task.reward,
-
-    status: 'pending',
-
-    submittedAt: new Date().toISOString()
-
-  };
-
-  submissions.push(submission);
+  const submission = db
+    .prepare(`
+      SELECT *
+      FROM submissions
+      WHERE id = ?
+    `)
+    .get(
+      result.lastInsertRowid
+    );
 
   res.json({
 
@@ -358,141 +552,518 @@ app.post('/api/tasks/:id/submit', auth, (req, res) => {
    USER SUBMISSIONS
 ========================= */
 
-app.get('/api/my-submissions', auth, (req, res) => {
+app.get(
+  '/api/my-submissions',
+  auth,
+  (req, res) => {
 
-  const userSubmissions =
-    submissions.filter(
-      s =>
-        s.userId ===
+    const submissions = db
+      .prepare(`
+        SELECT
+          id,
+          task_id AS taskId,
+          task_title AS taskTitle,
+          reward,
+          status,
+          submitted_at AS submittedAt,
+          reviewed_at AS reviewedAt
+        FROM submissions
+        WHERE user_id = ?
+        ORDER BY id DESC
+      `)
+      .all(
         req.session.user.id
-    );
+      );
 
-  res.json(userSubmissions);
+    res.json(submissions);
 
-});
+  }
+);
 
 /* =========================
    WALLET
 ========================= */
 
-app.get('/api/wallet', auth, (req, res) => {
+app.get(
+  '/api/wallet',
+  auth,
+  (req, res) => {
 
-  const user = users.find(
-    u =>
-      u.id === req.session.user.id
-  );
+    const user = db
+      .prepare(`
+        SELECT
+          balance,
+          completed
+        FROM users
+        WHERE id = ?
+      `)
+      .get(
+        req.session.user.id
+      );
 
-  res.json({
+    if (!user) {
 
-    balance: user.balance,
+      return res.status(404).json({
+        error: 'User not found'
+      });
+    }
 
-    completed: user.completed,
+    const withdrawals = db
+      .prepare(`
+        SELECT
+          id,
+          amount,
+          method,
+          status,
+          created_at AS createdAt
+        FROM withdrawals
+        WHERE user_id = ?
+        ORDER BY id DESC
+      `)
+      .all(
+        req.session.user.id
+      );
 
-    withdrawals:
-      withdrawals.filter(
-        w =>
-          w.userId === user.id
-      )
+    res.json({
 
-  });
+      balance: user.balance,
 
-});
+      completed: user.completed,
+
+      withdrawals
+
+    });
+
+  }
+);
 
 /* =========================
-   WITHDRAWAL
+   WITHDRAWAL REQUEST
 ========================= */
 
-app.post('/api/withdraw', auth, (req, res) => {
+app.post(
+  '/api/withdraw',
+  auth,
+  (req, res) => {
 
-  const user = users.find(
-    u =>
-      u.id === req.session.user.id
-  );
+    const amount =
+      Number(req.body.amount);
 
-  const amount =
-    Number(req.body.amount);
+    const method =
+      String(
+        req.body.method || 'UPI'
+      ).trim();
 
-  const method =
-    req.body.method || 'UPI';
+    if (
+      !Number.isFinite(amount) ||
+      amount <= 0
+    ) {
 
-  if (
-    !Number.isFinite(amount) ||
-    amount <= 0
-  ) {
+      return res.status(400).json({
+        error: 'Enter a valid amount'
+      });
+    }
 
-    return res.status(400).json({
-      error: 'Enter a valid amount'
+    if (amount < 100) {
+
+      return res.status(400).json({
+        error: 'Minimum withdrawal is ₹100'
+      });
+    }
+
+    const user = db
+      .prepare(`
+        SELECT
+          id,
+          name,
+          balance
+        FROM users
+        WHERE id = ?
+      `)
+      .get(
+        req.session.user.id
+      );
+
+    if (!user) {
+
+      return res.status(404).json({
+        error: 'User not found'
+      });
+    }
+
+    if (amount > user.balance) {
+
+      return res.status(400).json({
+        error: 'Insufficient balance'
+      });
+    }
+
+    const transaction =
+      db.transaction(() => {
+
+        db.prepare(`
+          UPDATE users
+          SET balance = balance - ?
+          WHERE id = ?
+        `).run(
+          amount,
+          user.id
+        );
+
+        db.prepare(`
+          INSERT INTO withdrawals
+          (
+            user_id,
+            name,
+            amount,
+            method,
+            status
+          )
+          VALUES (?, ?, ?, ?, 'pending')
+        `).run(
+          user.id,
+          user.name,
+          amount,
+          method
+        );
+
+      });
+
+    transaction();
+
+    res.json({
+      ok: true
     });
 
   }
-
-  if (amount < 100) {
-
-    return res.status(400).json({
-      error: 'Minimum withdrawal is ₹100'
-    });
-
-  }
-
-  if (amount > user.balance) {
-
-    return res.status(400).json({
-      error: 'Insufficient balance'
-    });
-
-  }
-
-  user.balance -= amount;
-
-  withdrawals.push({
-
-    id: withdrawals.length + 1,
-
-    userId: user.id,
-
-    name: user.name,
-
-    amount,
-
-    method,
-
-    status: 'pending'
-
-  });
-
-  res.json({
-    ok: true
-  });
-
-});
+);
 
 /* =========================
    ADMIN STATS
 ========================= */
 
-app.get('/api/admin/stats', admin, (req, res) => {
+app.get(
+  '/api/admin/stats',
+  admin,
+  (req, res) => {
 
-  res.json({
+    const users =
+      db.prepare(
+        'SELECT COUNT(*) AS count FROM users'
+      ).get().count;
 
-    users: users.length,
+    const tasks =
+      db.prepare(
+        'SELECT COUNT(*) AS count FROM tasks'
+      ).get().count;
 
-    tasks: tasks.length,
+    const pendingSubmissions =
+      db.prepare(`
+        SELECT COUNT(*) AS count
+        FROM submissions
+        WHERE status = 'pending'
+      `).get().count;
 
-    pending:
-      withdrawals.filter(
-        w =>
-          w.status === 'pending'
-      ).length,
+    const pendingWithdrawals =
+      db.prepare(`
+        SELECT COUNT(*) AS count
+        FROM withdrawals
+        WHERE status = 'pending'
+      `).get().count;
 
-    submissions:
-      submissions.filter(
-        s =>
-          s.status === 'pending'
-      ).length
+    res.json({
 
-  });
+      users,
 
-});
+      tasks,
+
+      submissions:
+        pendingSubmissions,
+
+      pending:
+        pendingWithdrawals
+
+    });
+
+  }
+);
+
+/* =========================
+   ADMIN GET ALL TASKS
+========================= */
+
+app.get(
+  '/api/admin/tasks',
+  admin,
+  (req, res) => {
+
+    const tasks = db
+      .prepare(`
+        SELECT
+          id,
+          title,
+          description,
+          type,
+          reward,
+          active,
+          created_at AS createdAt
+        FROM tasks
+        ORDER BY id DESC
+      `)
+      .all();
+
+    res.json(tasks);
+
+  }
+);
+
+/* =========================
+   ADMIN ADD TASK
+========================= */
+
+app.post(
+  '/api/admin/tasks',
+  admin,
+  (req, res) => {
+
+    const title =
+      String(req.body.title || '')
+        .trim();
+
+    const description =
+      String(req.body.description || '')
+        .trim();
+
+    const type =
+      String(req.body.type || 'General')
+        .trim();
+
+    const reward =
+      Number(req.body.reward);
+
+    if (
+      !title ||
+      !description ||
+      !type
+    ) {
+
+      return res.status(400).json({
+        error:
+          'Title, description and type are required'
+      });
+    }
+
+    if (
+      !Number.isFinite(reward) ||
+      reward <= 0
+    ) {
+
+      return res.status(400).json({
+        error:
+          'Reward must be greater than 0'
+      });
+    }
+
+    const result = db
+      .prepare(`
+        INSERT INTO tasks
+        (
+          title,
+          description,
+          type,
+          reward,
+          active
+        )
+        VALUES (?, ?, ?, ?, 1)
+      `)
+      .run(
+        title,
+        description,
+        type,
+        reward
+      );
+
+    const task = db
+      .prepare(`
+        SELECT
+          id,
+          title,
+          description,
+          type,
+          reward,
+          active
+        FROM tasks
+        WHERE id = ?
+      `)
+      .get(
+        result.lastInsertRowid
+      );
+
+    res.json({
+
+      ok: true,
+
+      task
+
+    });
+
+  }
+);
+
+/* =========================
+   ADMIN EDIT TASK
+========================= */
+
+app.put(
+  '/api/admin/tasks/:id',
+  admin,
+  (req, res) => {
+
+    const id =
+      Number(req.params.id);
+
+    const title =
+      String(req.body.title || '')
+        .trim();
+
+    const description =
+      String(req.body.description || '')
+        .trim();
+
+    const type =
+      String(req.body.type || 'General')
+        .trim();
+
+    const reward =
+      Number(req.body.reward);
+
+    const active =
+      req.body.active === false
+        ? 0
+        : 1;
+
+    if (
+      !title ||
+      !description ||
+      !type
+    ) {
+
+      return res.status(400).json({
+        error:
+          'Title, description and type are required'
+      });
+    }
+
+    if (
+      !Number.isFinite(reward) ||
+      reward <= 0
+    ) {
+
+      return res.status(400).json({
+        error:
+          'Reward must be greater than 0'
+      });
+    }
+
+    const existing =
+      db.prepare(`
+        SELECT id
+        FROM tasks
+        WHERE id = ?
+      `).get(id);
+
+    if (!existing) {
+
+      return res.status(404).json({
+        error: 'Task not found'
+      });
+    }
+
+    db.prepare(`
+      UPDATE tasks
+      SET
+        title = ?,
+        description = ?,
+        type = ?,
+        reward = ?,
+        active = ?
+      WHERE id = ?
+    `).run(
+      title,
+      description,
+      type,
+      reward,
+      active,
+      id
+    );
+
+    const task =
+      db.prepare(`
+        SELECT
+          id,
+          title,
+          description,
+          type,
+          reward,
+          active
+        FROM tasks
+        WHERE id = ?
+      `).get(id);
+
+    res.json({
+
+      ok: true,
+
+      task
+
+    });
+
+  }
+);
+
+/* =========================
+   ADMIN DELETE TASK
+========================= */
+
+app.delete(
+  '/api/admin/tasks/:id',
+  admin,
+  (req, res) => {
+
+    const id =
+      Number(req.params.id);
+
+    const task =
+      db.prepare(`
+        SELECT id
+        FROM tasks
+        WHERE id = ?
+      `).get(id);
+
+    if (!task) {
+
+      return res.status(404).json({
+        error: 'Task not found'
+      });
+    }
+
+    db.prepare(`
+      UPDATE tasks
+      SET active = 0
+      WHERE id = ?
+    `).run(id);
+
+    res.json({
+
+      ok: true,
+
+      message:
+        'Task removed from active tasks'
+
+    });
+
+  }
+);
 
 /* =========================
    ADMIN TASK SUBMISSIONS
@@ -502,6 +1073,22 @@ app.get(
   '/api/admin/submissions',
   admin,
   (req, res) => {
+
+    const submissions =
+      db.prepare(`
+        SELECT
+          id,
+          user_id AS userId,
+          user_name AS userName,
+          task_id AS taskId,
+          task_title AS taskTitle,
+          reward,
+          status,
+          submitted_at AS submittedAt,
+          reviewed_at AS reviewedAt
+        FROM submissions
+        ORDER BY id DESC
+      `).all();
 
     res.json(submissions);
 
@@ -517,74 +1104,83 @@ app.post(
   admin,
   (req, res) => {
 
+    const id =
+      Number(req.params.id);
+
+    const status =
+      req.body.status;
+
+    if (
+      status !== 'approved' &&
+      status !== 'rejected'
+    ) {
+
+      return res.status(400).json({
+        error:
+          'Status must be approved or rejected'
+      });
+    }
+
     const submission =
-      submissions.find(
-        s =>
-          s.id ===
-          Number(req.params.id)
-      );
+      db.prepare(`
+        SELECT *
+        FROM submissions
+        WHERE id = ?
+      `).get(id);
 
     if (!submission) {
 
       return res.status(404).json({
-        error: 'Submission not found'
+        error:
+          'Submission not found'
       });
-
     }
 
     if (
-      submission.status !==
-      'pending'
+      submission.status !== 'pending'
     ) {
 
       return res.status(400).json({
-        error: 'Submission already reviewed'
+        error:
+          'Submission already reviewed'
       });
-
     }
 
-    const newStatus =
-      req.body.status;
+    const transaction =
+      db.transaction(() => {
 
-    if (
-      newStatus !== 'approved' &&
-      newStatus !== 'rejected'
-    ) {
-
-      return res.status(400).json({
-        error: 'Invalid status'
-      });
-
-    }
-
-    submission.status =
-      newStatus;
-
-    if (
-      newStatus === 'approved'
-    ) {
-
-      const user =
-        users.find(
-          u =>
-            u.id ===
-            submission.userId
+        db.prepare(`
+          UPDATE submissions
+          SET
+            status = ?,
+            reviewed_at = CURRENT_TIMESTAMP
+          WHERE id = ?
+        `).run(
+          status,
+          id
         );
 
-      if (user) {
+        if (status === 'approved') {
 
-        user.balance +=
-          submission.reward;
+          db.prepare(`
+            UPDATE users
+            SET
+              balance = balance + ?,
+              completed = completed + 1
+            WHERE id = ?
+          `).run(
+            submission.reward,
+            submission.user_id
+          );
 
-        user.completed++;
+        }
 
-      }
+      });
 
-    }
+    transaction();
 
     res.json({
-      ok: true,
-      submission
+      ok: true
     });
 
   }
@@ -598,6 +1194,20 @@ app.get(
   '/api/admin/withdrawals',
   admin,
   (req, res) => {
+
+    const withdrawals =
+      db.prepare(`
+        SELECT
+          id,
+          user_id AS userId,
+          name,
+          amount,
+          method,
+          status,
+          created_at AS createdAt
+        FROM withdrawals
+        ORDER BY id DESC
+      `).all();
 
     res.json(withdrawals);
 
@@ -613,20 +1223,8 @@ app.post(
   admin,
   (req, res) => {
 
-    const withdrawal =
-      withdrawals.find(
-        w =>
-          w.id ===
-          Number(req.params.id)
-      );
-
-    if (!withdrawal) {
-
-      return res.status(404).json({
-        error: 'Withdrawal not found'
-      });
-
-    }
+    const id =
+      Number(req.params.id);
 
     const status =
       req.body.status;
@@ -637,13 +1235,69 @@ app.post(
     ) {
 
       return res.status(400).json({
-        error: 'Invalid status'
+        error:
+          'Status must be approved or rejected'
       });
-
     }
 
-    withdrawal.status =
-      status;
+    const withdrawal =
+      db.prepare(`
+        SELECT *
+        FROM withdrawals
+        WHERE id = ?
+      `).get(id);
+
+    if (!withdrawal) {
+
+      return res.status(404).json({
+        error:
+          'Withdrawal not found'
+      });
+    }
+
+    if (
+      withdrawal.status !== 'pending'
+    ) {
+
+      return res.status(400).json({
+        error:
+          'Withdrawal already reviewed'
+      });
+    }
+
+    const transaction =
+      db.transaction(() => {
+
+        db.prepare(`
+          UPDATE withdrawals
+          SET status = ?
+          WHERE id = ?
+        `).run(
+          status,
+          id
+        );
+
+        /*
+          If a withdrawal is rejected,
+          return the money to the user's balance.
+        */
+
+        if (status === 'rejected') {
+
+          db.prepare(`
+            UPDATE users
+            SET balance = balance + ?
+            WHERE id = ?
+          `).run(
+            withdrawal.amount,
+            withdrawal.user_id
+          );
+
+        }
+
+      });
+
+    transaction();
 
     res.json({
       ok: true
@@ -651,6 +1305,19 @@ app.post(
 
   }
 );
+
+/* =========================
+   HEALTH CHECK
+========================= */
+
+app.get('/api/health', (req, res) => {
+
+  res.json({
+    ok: true,
+    service: 'TaskEarn'
+  });
+
+});
 
 /* =========================
    SERVER
