@@ -14,7 +14,7 @@
     html { scroll-behavior: smooth; }
     body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: #f7f8fc; color: #171b2d; line-height: 1.5; }
     button, input, textarea, select { font: inherit; }
-    button { touch-action: manipulation; }
+    button { touch-action: manipulation; cursor: pointer; }
     a { color: inherit; text-decoration: none; cursor: pointer; }
 
     /* HEADER */
@@ -25,7 +25,7 @@
     .logo { font-size: 20px; font-weight: 900; letter-spacing: -.5px; }
     .header-right { display: flex; align-items: center; gap: 8px; position: relative; }
     .balance { background: #f0fdf7; color: #087a42; border: 1px solid #d5f3e2; padding: 8px 12px; border-radius: 999px; font-size: 13px; font-weight: 800; white-space: nowrap; }
-    .menu-btn { width: 42px; height: 42px; border: 0; border-radius: 12px; background: #f4f5f9; cursor: pointer; font-size: 21px; color: #20243a; }
+    .menu-btn { width: 42px; height: 42px; border: 0; border-radius: 12px; background: #f4f5f9; font-size: 21px; color: #20243a; }
     .menu-btn:active { transform: scale(.95); }
 
     /* DROPDOWN */
@@ -47,29 +47,25 @@
     .hero-actions { position: relative; z-index: 2; display: flex; gap: 10px; flex-wrap: wrap; }
 
     /* BUTTONS */
-    .btn { min-height: 46px; padding: 11px 17px; border: 0; border-radius: 13px; font-weight: 800; cursor: pointer; transition: transform .15s ease, box-shadow .15s ease, background .15s ease; }
+    .btn { min-height: 46px; padding: 11px 17px; border: 0; border-radius: 13px; font-weight: 800; transition: transform .15s ease, box-shadow .15s ease, background .15s ease; }
     .btn:active { transform: scale(.97); }
     .primary { background: #ff6333; color: white; box-shadow: 0 8px 18px rgba(255,99,51,.25); }
     .primary:hover { background: #ef5324; }
     .secondary { background: white; color: #24283b; border: 1px solid #e3e5eb; }
-    .success { background: #e5f8ed; color: #087a42; border: 1px solid #c7efd9; }
-    .danger { background: #ffe7e7; color: #b42318; border: 1px solid #ffcaca; }
     .large-btn { min-height: 52px; padding: 13px 25px; border-radius: 16px; font-size: 16px; }
 
-    /* CARDS */
+    /* CARDS & FEATURES */
     .card { background: white; border: 1px solid #eceef4; border-radius: 22px; padding: 20px; margin-bottom: 16px; box-shadow: 0 7px 25px rgba(20,30,60,.045); }
     .card h2 { margin-top: 0; font-size: 21px; letter-spacing: -.4px; }
     .card h3 { margin-bottom: 7px; }
     .muted { color: #687386; font-size: 14px; line-height: 1.65; }
 
-    /* FEATURES */
     .features { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 16px; }
     .feature { background: white; border: 1px solid #eceef4; border-radius: 20px; padding: 18px; box-shadow: 0 6px 20px rgba(20,30,60,.04); }
     .feature-icon { width: 42px; height: 42px; border-radius: 13px; background: #fff2ec; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 12px; }
     .feature b { display: block; margin-bottom: 5px; }
     .feature span { color: #687386; font-size: 13px; }
 
-    /* GRID & TASK CARDS */
     .grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; }
     .task-card { position: relative; background: white; border: 1px solid #eceef4; border-radius: 21px; padding: 18px; box-shadow: 0 7px 25px rgba(20,30,60,.05); }
     .task-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
@@ -78,33 +74,29 @@
     .task-card h3 { font-size: 17px; margin-top: 14px; }
     .task-card .btn { width: 100%; margin-top: 12px; }
 
-    /* STATS & NAV */
     .stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 16px; }
     .stat { background: white; border: 1px solid #eceef4; border-radius: 18px; padding: 16px; box-shadow: 0 5px 18px rgba(20,30,60,.04); }
     .stat small { color: #788195; font-size: 12px; }
     .stat b { display: block; margin-top: 5px; font-size: 19px; }
+
     .nav { display: flex; gap: 8px; overflow-x: auto; padding: 3px 1px 10px; margin-bottom: 4px; scrollbar-width: none; }
     .nav::-webkit-scrollbar { display: none; }
     .nav .btn { flex-shrink: 0; }
 
     /* FORM & AUTH */
     .form { display: grid; gap: 11px; width: 100%; max-width: 520px; }
-    .input, textarea, select { width: 100%; min-height: 48px; padding: 12px 14px; background: #fbfcff; border: 1px solid #dfe2ea; border-radius: 13px; outline: none; color: #171b2d; }
-    .input:focus, textarea:focus, select:focus { border-color: #ff6b35; box-shadow: 0 0 0 3px rgba(255,107,53,.1); }
-    textarea { min-height: 100px; resize: vertical; }
-    .auth-wrap { min-height: 58vh; display: flex; align-items: center; justify-content: center; }
+    .input { width: 100%; min-height: 48px; padding: 12px 14px; background: #fbfcff; border: 1px solid #dfe2ea; border-radius: 13px; outline: none; color: #171b2d; }
+    .input:focus { border-color: #ff6b35; box-shadow: 0 0 0 3px rgba(255,107,53,.1); }
+    .auth-wrap { min-height: 50vh; display: flex; align-items: center; justify-content: center; padding: 20px 0; }
     .auth-card { width: 100%; max-width: 460px; background: white; border: 1px solid #eceef4; border-radius: 26px; padding: 25px; box-shadow: 0 15px 45px rgba(20,30,60,.08); }
     .auth-logo { width: 55px; height: 55px; border-radius: 17px; background: linear-gradient(135deg,#ff6b35,#ff3d6e); color: white; display: flex; align-items: center; justify-content: center; font-size: 25px; font-weight: 900; margin-bottom: 15px; }
-    .auth-card h2 { font-size: 27px; margin: 0 0 7px; }
 
-    /* STATUS & ADMIN */
     .notice { background: #fff8df; border: 1px solid #f5e6a8; color: #6c5200; padding: 13px 15px; border-radius: 14px; margin-bottom: 15px; font-size: 13px; }
     .status { display: inline-flex; padding: 6px 9px; border-radius: 999px; font-size: 11px; font-weight: 800; text-transform: capitalize; }
     .pending { background: #fff3cd; color: #856404; }
     .approved { background: #dff6e8; color: #087a42; }
     .rejected { background: #ffe1e1; color: #b42318; }
     .admin-box { border: 1px solid #e7e9ef; border-radius: 16px; padding: 15px; margin-bottom: 11px; background: #fff; }
-    .task-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
     .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
     .empty { text-align: center; padding: 35px 20px; color: #687386; }
 
@@ -116,7 +108,6 @@
     @media (min-width: 800px) { .container { padding-top: 24px; } .hero { padding: 55px 45px; } .card { padding: 24px; } }
     @media (max-width: 700px) {
       body { padding-bottom: 72px; }
-      .header-inner { padding: 9px 12px; }
       .container { padding: 11px; padding-bottom: 25px; }
       .hero { padding: 27px 19px; border-radius: 24px; }
       .hero h1 { font-size: 31px; letter-spacing: -1px; }
@@ -129,7 +120,7 @@
       .stat { padding: 13px 10px; text-align: center; }
       .stat b { font-size: 16px; }
       .mobile-bottom-nav { position: fixed; display: flex; left: 10px; right: 10px; bottom: 10px; height: 60px; z-index: 1500; background: rgba(255,255,255,.96); backdrop-filter: blur(18px); border: 1px solid #e7e9ef; border-radius: 20px; box-shadow: 0 12px 35px rgba(20,30,60,.16); align-items: center; justify-content: space-around; padding: 5px; }
-      .bottom-item { border: 0; background: transparent; height: 50px; min-width: 65px; border-radius: 15px; color: #70798b; font-size: 10px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+      .bottom-item { border: 0; background: transparent; height: 50px; min-width: 65px; border-radius: 15px; color: #70798b; font-size: 10px; font-weight: 700; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
       .bottom-item span:first-child { font-size: 20px; }
       .bottom-item.active { background: #fff1eb; color: #ff5d2e; }
     }
@@ -140,21 +131,21 @@
 
 <header class="header">
   <div class="header-inner">
-    <div class="logo-container" onclick="goHome()">
+    <div class="logo-container" id="btnLogo">
       <div class="logo-icon">T</div>
       <div class="logo">TaskEarn</div>
     </div>
 
     <div class="header-right">
       <div id="balance" class="balance">₹0.00</div>
-      <button class="menu-btn" onclick="toggleMenu()" aria-label="Menu">☰</button>
+      <button class="menu-btn" id="btnToggleMenu" aria-label="Menu">☰</button>
 
       <div id="dropdownMenu" class="dropdown-menu">
-        <div class="dropdown-item" onclick="handleMenuClick('login')">🔑 Login / Register</div>
-        <div class="dropdown-item" onclick="handleMenuClick('about')">ℹ️ About Us</div>
-        <div class="dropdown-item" onclick="handleMenuClick('terms')">📜 Terms & Conditions</div>
-        <div class="dropdown-item" onclick="handleMenuClick('contact')">📞 Contact Us</div>
-        <div class="dropdown-item" onclick="handleMenuClick('privacy')">🔒 Privacy Policy</div>
+        <div class="dropdown-item" id="menuLogin">🔑 Login / Register</div>
+        <div class="dropdown-item" id="menuAbout">ℹ️ About Us</div>
+        <div class="dropdown-item" id="menuTerms">📜 Terms & Conditions</div>
+        <div class="dropdown-item" id="menuContact">📞 Contact Us</div>
+        <div class="dropdown-item" id="menuPrivacy">🔒 Privacy Policy</div>
       </div>
     </div>
   </div>
@@ -169,8 +160,8 @@
       <h1>Earn money by completing simple online tasks</h1>
       <p>Discover eligible tasks, complete requirements, submit work, and receive approved rewards.</p>
       <div class="hero-actions">
-        <button class="btn primary large-btn" onclick="showLogin()">🔐 Login</button>
-        <button class="btn secondary large-btn" onclick="showRegister()">✨ Create Account</button>
+        <button class="btn primary large-btn" id="btnHeroLogin">🔐 Login</button>
+        <button class="btn secondary large-btn" id="btnHeroRegister">✨ Create Account</button>
       </div>
     </div>
 
@@ -200,7 +191,7 @@
       </ol>
     </section>
 
-    <section id="aboutSection" class="card">
+    <section class="card">
       <h2>About TaskEarn</h2>
       <p class="muted">TaskEarn provides a simple interface for discovering tasks, submitting work, and managing rewards.</p>
     </section>
@@ -216,15 +207,15 @@
     </section>
   </section>
 
-  <!-- ACCOUNT CONTAINER -->
+  <!-- DYNAMIC VIEW AREA -->
   <section id="accountArea"></section>
 
   <footer class="footer">
     <div class="footer-links">
-      <a onclick="showPrivacy()">Privacy</a>
-      <a onclick="showTerms()">Terms</a>
-      <a onclick="showAbout()">About</a>
-      <a onclick="showContact()">Contact</a>
+      <a id="ftPrivacy">Privacy</a>
+      <a id="ftTerms">Terms</a>
+      <a id="ftAbout">About</a>
+      <a id="ftContact">Contact</a>
     </div>
     © 2026 TaskEarn. All rights reserved.
   </footer>
@@ -233,10 +224,10 @@
 
 <!-- MOBILE NAVIGATION -->
 <div id="mobileBottomNav" class="mobile-bottom-nav">
-  <button class="bottom-item active" onclick="mobileHome()"><span>🏠</span><span>Home</span></button>
-  <button class="bottom-item" onclick="mobileTasks()"><span>📋</span><span>Tasks</span></button>
-  <button class="bottom-item" onclick="mobileWallet()"><span>💰</span><span>Wallet</span></button>
-  <button class="bottom-item" onclick="mobileProfile()"><span>👤</span><span>Account</span></button>
+  <button class="bottom-item active" id="mbHome"><span>🏠</span><span>Home</span></button>
+  <button class="bottom-item" id="mbTasks"><span>📋</span><span>Tasks</span></button>
+  <button class="bottom-item" id="mbWallet"><span>💰</span><span>Wallet</span></button>
+  <button class="bottom-item" id="mbProfile"><span>👤</span><span>Account</span></button>
 </div>
 
 <script>
@@ -259,45 +250,25 @@ function formatDate(val) {
   try { return new Date(val).toLocaleString(); } catch (e) { return val; }
 }
 
-/* NAVIGATION & MENU */
-function toggleMenu() {
-  document.getElementById("dropdownMenu").classList.toggle("show");
-}
-
-window.addEventListener("click", function(e) {
-  if (!e.target.closest(".header-right")) {
-    const menu = document.getElementById("dropdownMenu");
-    if (menu) menu.classList.remove("show");
-  }
-});
-
-function handleMenuClick(action) {
-  document.getElementById("dropdownMenu")?.classList.remove("show");
-  if (action === "login") showLogin();
-  if (action === "about") showAbout();
-  if (action === "terms") showTerms();
-  if (action === "contact") showContact();
-  if (action === "privacy") showPrivacy();
-}
-
+/* NAVIGATION ENGINE */
 function goHome() {
   document.getElementById("homeArea").style.display = "block";
   document.getElementById("accountArea").innerHTML = "";
+  toggleDropdown(false);
   showBottomNav(false);
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-function scrollAccount() {
+function scrollToView() {
   document.getElementById("accountArea").scrollIntoView({ behavior: "smooth" });
 }
 
-/* STARTUP */
-async function startApp() {
-  try {
-    const user = await api("/api/me");
-    if (user) await dashboard(user);
-  } catch (error) {
-    console.log("Public homepage ready.");
+function toggleDropdown(forceState) {
+  const menu = document.getElementById("dropdownMenu");
+  if (typeof forceState === "boolean") {
+    menu.classList.toggle("show", forceState);
+  } else {
+    menu.classList.toggle("show");
   }
 }
 
@@ -313,13 +284,18 @@ function showLogin() {
         <div class="form">
           <input id="loginEmail" class="input" type="email" placeholder="Email address" autocomplete="email">
           <input id="loginPassword" class="input" type="password" placeholder="Password" autocomplete="current-password">
-          <button class="btn primary large-btn" onclick="login()">Login</button>
-          <button class="btn secondary" onclick="showRegister()">Create a new account</button>
+          <button class="btn primary large-btn" id="btnLoginSubmit">Login</button>
+          <button class="btn secondary" id="btnGotoRegister">Create a new account</button>
         </div>
       </div>
     </div>`;
+  
+  toggleDropdown(false);
   showBottomNav(false);
-  scrollAccount();
+  scrollToView();
+
+  document.getElementById("btnLoginSubmit").onclick = login;
+  document.getElementById("btnGotoRegister").onclick = showRegister;
 }
 
 function showRegister() {
@@ -334,13 +310,18 @@ function showRegister() {
           <input id="registerName" class="input" placeholder="Full name" autocomplete="name">
           <input id="registerEmail" class="input" type="email" placeholder="Email address" autocomplete="email">
           <input id="registerPassword" class="input" type="password" placeholder="Password" autocomplete="new-password">
-          <button class="btn primary large-btn" onclick="register()">Create Account</button>
-          <button class="btn secondary" onclick="showLogin()">Already have an account? Login</button>
+          <button class="btn primary large-btn" id="btnRegisterSubmit">Create Account</button>
+          <button class="btn secondary" id="btnGotoLogin">Already have an account? Login</button>
         </div>
       </div>
     </div>`;
+  
+  toggleDropdown(false);
   showBottomNav(false);
-  scrollAccount();
+  scrollToView();
+
+  document.getElementById("btnRegisterSubmit").onclick = register;
+  document.getElementById("btnGotoLogin").onclick = showLogin;
 }
 
 async function login() {
@@ -382,7 +363,7 @@ async function dashboard(user) {
           <p class="muted" style="margin:0;">Welcome back</p>
           <h2 style="margin:4px 0 0;">Hi, ${escapeHtml(user.name)} 👋</h2>
         </div>
-        <button class="btn secondary" onclick="logout()">Logout</button>
+        <button class="btn secondary" id="btnLogout">Logout</button>
       </div>
     </div>
 
@@ -393,19 +374,23 @@ async function dashboard(user) {
     </div>
 
     <div class="nav">
-      <button class="btn primary" onclick="tasksPage()">📋 Tasks</button>
-      <button class="btn secondary" onclick="walletPage()">💰 Wallet</button>
-      <button class="btn secondary" onclick="submissionsPage()">📄 Submissions</button>
-      ${user.role === "admin" ? `<button class="btn secondary" onclick="adminPage()">🛠️ Admin</button>` : ""}
+      <button class="btn primary" id="navTasks">📋 Tasks</button>
+      <button class="btn secondary" id="navWallet">💰 Wallet</button>
+      <button class="btn secondary" id="navSubmissions">📄 Submissions</button>
     </div>
 
     <div id="screen"></div>`;
+
+  document.getElementById("btnLogout").onclick = logout;
+  document.getElementById("navTasks").onclick = tasksPage;
+  document.getElementById("navWallet").onclick = walletPage;
+  document.getElementById("navSubmissions").onclick = submissionsPage;
 
   showBottomNav(true);
   await tasksPage();
 }
 
-/* TASK & SUBMISSION PAGES */
+/* PAGES */
 async function tasksPage() {
   try {
     const tasks = await api("/api/tasks");
@@ -470,7 +455,6 @@ async function submissionsPage() {
   setActiveBottom("submissions");
 }
 
-/* WALLET & WITHDRAWAL */
 async function walletPage() {
   const wallet = await api("/api/wallet");
   document.getElementById("screen").innerHTML = `
@@ -481,7 +465,7 @@ async function walletPage() {
       <div class="form">
         <input id="amount" class="input" type="number" min="100" placeholder="Amount">
         <input id="method" class="input" value="UPI" placeholder="Payment Method">
-        <button class="btn primary large-btn" onclick="withdraw()">Request Withdrawal</button>
+        <button class="btn primary large-btn" id="btnWithdraw">Request Withdrawal</button>
       </div>
     </div>
     <div class="card">
@@ -496,6 +480,8 @@ async function walletPage() {
         </div>
       `).join('') : `<p class="muted">No withdrawals yet.</p>`}
     </div>`;
+  
+  document.getElementById("btnWithdraw").onclick = withdraw;
   setActiveBottom("wallet");
 }
 
@@ -510,72 +496,27 @@ async function withdraw() {
   } catch (err) { alert(err.message); }
 }
 
-/* INFORMATIONAL PAGES */
-function showTerms() {
+/* INFO PAGES */
+function showInfoPage(title, content) {
   document.getElementById("homeArea").style.display = "none";
   document.getElementById("accountArea").innerHTML = `
     <div class="card">
-      <h2>Terms & Conditions 📜</h2>
-      <p class="muted">Users must complete tasks honestly and maintain account security.</p>
-      <button class="btn secondary" onclick="goHome()">← Back</button>
+      <h2>${title}</h2>
+      <p class="muted">${content}</p>
+      <button class="btn secondary" id="btnBackHome">← Back to Home</button>
     </div>`;
+  
+  document.getElementById("btnBackHome").onclick = goHome;
+  toggleDropdown(false);
   showBottomNav(false);
-  scrollAccount();
+  scrollToView();
 }
 
-function showPrivacy() {
-  document.getElementById("homeArea").style.display = "none";
-  document.getElementById("accountArea").innerHTML = `
-    <div class="card">
-      <h2>Privacy Policy 🔒</h2>
-      <p class="muted">We respect user data and collect minimal information necessary for service delivery.</p>
-      <button class="btn secondary" onclick="goHome()">← Back</button>
-    </div>`;
-  showBottomNav(false);
-  scrollAccount();
-}
-
-function showContact() {
-  document.getElementById("homeArea").style.display = "none";
-  document.getElementById("accountArea").innerHTML = `
-    <div class="card">
-      <h2>Contact Us 📞</h2>
-      <p class="muted">Support Email: support@taskearn.demo</p>
-      <button class="btn secondary" onclick="goHome()">← Back</button>
-    </div>`;
-  showBottomNav(false);
-  scrollAccount();
-}
-
-function showAbout() {
-  document.getElementById("homeArea").style.display = "none";
-  document.getElementById("accountArea").innerHTML = `
-    <div class="card">
-      <h2>About TaskEarn</h2>
-      <p class="muted">TaskEarn offers simple daily tasks and reward tracking.</p>
-      <button class="btn secondary" onclick="goHome()">← Back</button>
-    </div>`;
-  showBottomNav(false);
-  scrollAccount();
-}
-
-/* MOBILE NAV CONTROLS */
+/* MOBILE NAV */
 function showBottomNav(show) {
   const nav = document.getElementById("mobileBottomNav");
   if (!nav) return;
   nav.style.display = (show && window.innerWidth <= 700) ? "flex" : "none";
-}
-
-function mobileHome() { goHome(); }
-function mobileTasks() { tasksPage(); window.scrollTo({ top: 0, behavior: "smooth" }); }
-function mobileWallet() { walletPage(); window.scrollTo({ top: 0, behavior: "smooth" }); }
-async function mobileProfile() {
-  try {
-    const user = await api("/api/me");
-    if (user) await dashboard(user);
-  } catch (e) {
-    showLogin();
-  }
 }
 
 function setActiveBottom(name) {
@@ -586,7 +527,60 @@ function setActiveBottom(name) {
   if (name === "submissions") items[1]?.classList.add("active");
 }
 
-startApp();
+/* EVENT LISTENERS ATTACHMENT */
+document.addEventListener("DOMContentLoaded", () => {
+  // Header Elements
+  document.getElementById("btnLogo").onclick = goHome;
+  document.getElementById("btnToggleMenu").onclick = () => toggleDropdown();
+
+  // Menu Dropdown Items
+  document.getElementById("menuLogin").onclick = showLogin;
+  document.getElementById("menuAbout").onclick = () => showInfoPage("About Us ℹ️", "TaskEarn offers simple daily tasks and reward tracking.");
+  document.getElementById("menuTerms").onclick = () => showInfoPage("Terms & Conditions 📜", "Users must complete tasks honestly and maintain account security.");
+  document.getElementById("menuContact").onclick = () => showInfoPage("Contact Us 📞", "Support Email: support@taskearn.demo");
+  document.getElementById("menuPrivacy").onclick = () => showInfoPage("Privacy Policy 🔒", "We respect user data and collect minimal information necessary for service delivery.");
+
+  // Hero Actions
+  document.getElementById("btnHeroLogin").onclick = showLogin;
+  document.getElementById("btnHeroRegister").onclick = showRegister;
+
+  // Footer Links
+  document.getElementById("ftPrivacy").onclick = () => showInfoPage("Privacy Policy 🔒", "We respect user data and collect minimal information necessary for service delivery.");
+  document.getElementById("ftTerms").onclick = () => showInfoPage("Terms & Conditions 📜", "Users must complete tasks honestly and maintain account security.");
+  document.getElementById("ftAbout").onclick = () => showInfoPage("About Us ℹ️", "TaskEarn offers simple daily tasks and reward tracking.");
+  document.getElementById("ftContact").onclick = () => showInfoPage("Contact Us 📞", "Support Email: support@taskearn.demo");
+
+  // Mobile Navigation
+  document.getElementById("mbHome").onclick = goHome;
+  document.getElementById("mbTasks").onclick = () => { tasksPage(); window.scrollTo({ top: 0, behavior: "smooth" }); };
+  document.getElementById("mbWallet").onclick = () => { walletPage(); window.scrollTo({ top: 0, behavior: "smooth" }); };
+  document.getElementById("mbProfile").onclick = async () => {
+    try {
+      const user = await api("/api/me");
+      if (user) await dashboard(user);
+    } catch (e) {
+      showLogin();
+    }
+  };
+
+  // Close Menu Outside Click
+  window.addEventListener("click", (e) => {
+    if (!e.target.closest(".header-right")) {
+      toggleDropdown(false);
+    }
+  });
+
+  startApp();
+});
+
+async function startApp() {
+  try {
+    const user = await api("/api/me");
+    if (user) await dashboard(user);
+  } catch (error) {
+    console.log("Guest mode active.");
+  }
+}
 </script>
 </body>
 </html>
