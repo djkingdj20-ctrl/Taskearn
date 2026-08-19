@@ -19,13 +19,19 @@ app.use(
       "taskearn-demo-secret-change-this",
 
     resave: false,
+
     saveUninitialized: false,
 
     cookie: {
       httpOnly: true,
+
       sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 7 * 24 * 60 * 60 * 1000
+
+      secure:
+        process.env.NODE_ENV === "production",
+
+      maxAge:
+        7 * 24 * 60 * 60 * 1000
     }
   })
 );
@@ -36,6 +42,7 @@ app.use(
 ========================= */
 
 const users = [
+
   {
     id: 1,
     name: "Demo User",
@@ -55,6 +62,7 @@ const users = [
     balance: 0,
     completed: 0
   }
+
 ];
 
 let nextUserId = 3;
@@ -65,6 +73,7 @@ let nextUserId = 3;
 ========================= */
 
 let tasks = [
+
   {
     id: 1,
     title: "Read a short description",
@@ -104,6 +113,7 @@ let tasks = [
     reward: 5,
     active: true
   }
+
 ];
 
 let nextTaskId = 5;
@@ -114,6 +124,7 @@ let nextTaskId = 5;
 ========================= */
 
 let submissions = [];
+
 let nextSubmissionId = 1;
 
 
@@ -122,6 +133,7 @@ let nextSubmissionId = 1;
 ========================= */
 
 let withdrawals = [];
+
 let nextWithdrawalId = 1;
 
 
@@ -130,26 +142,39 @@ let nextWithdrawalId = 1;
 ========================= */
 
 function getUser(id) {
+
   return users.find(
-    user => user.id === Number(id)
+    user =>
+      user.id === Number(id)
   );
+
 }
 
 
 function getTask(id) {
+
   return tasks.find(
-    task => task.id === Number(id)
+    task =>
+      task.id === Number(id)
   );
+
 }
 
 
 function publicUser(user) {
+
   return {
+
     id: user.id,
+
     name: user.name,
+
     email: user.email,
+
     role: user.role
+
   };
+
 }
 
 
@@ -160,14 +185,21 @@ function publicUser(user) {
 function auth(req, res, next) {
 
   if (!req.session.user) {
+
     return res.status(401).json({
       error: "Login required"
     });
+
   }
 
   next();
+
 }
 
+
+/* =========================
+   ADMIN MIDDLEWARE
+========================= */
 
 function admin(req, res, next) {
 
@@ -175,252 +207,327 @@ function admin(req, res, next) {
     !req.session.user ||
     req.session.user.role !== "admin"
   ) {
+
     return res.status(403).json({
       error: "Admin only"
     });
+
   }
 
   next();
+
 }
 
 
 /* =========================
-   HEALTH CHECK
+   HEALTH
 ========================= */
 
-app.get("/health", (req, res) => {
+app.get(
+  "/health",
+  (req, res) => {
 
-  res.json({
-    ok: true,
-    service: "TaskEarn"
-  });
+    res.json({
+      ok: true,
+      service: "TaskEarn"
+    });
 
-});
+  }
+);
 
 
 /* =========================
    CURRENT USER
 ========================= */
 
-app.get("/api/me", (req, res) => {
+app.get(
+  "/api/me",
+  (req, res) => {
 
-  res.json(
-    req.session.user || null
-  );
+    res.json(
+      req.session.user || null
+    );
 
-});
+  }
+);
 
 
 /* =========================
    LOGIN
 ========================= */
 
-app.post("/api/login", (req, res) => {
+app.post(
+  "/api/login",
+  (req, res) => {
 
-  const email =
-    String(req.body.email || "")
-      .trim()
-      .toLowerCase();
+    const email =
+      String(
+        req.body.email || ""
+      )
+        .trim()
+        .toLowerCase();
 
-  const password =
-    String(req.body.password || "");
-
-  if (!email || !password) {
-    return res.status(400).json({
-      error: "Email and password are required"
-    });
-  }
-
-  const user =
-    users.find(
-      item =>
-        item.email.toLowerCase() === email &&
-        item.password === password
-    );
-
-  if (!user) {
-    return res.status(401).json({
-      error: "Invalid email or password"
-    });
-  }
-
-  req.session.user = publicUser(user);
-
-  req.session.save(err => {
-
-    if (err) {
-
-      console.error(
-        "Session save error:",
-        err
+    const password =
+      String(
+        req.body.password || ""
       );
 
-      return res.status(500).json({
+    if (!email || !password) {
+
+      return res.status(400).json({
         error:
-          "Login session could not be saved"
+          "Email and password are required"
       });
 
     }
 
-    res.json({
-      ok: true,
-      user: req.session.user
-    });
+    const user =
+      users.find(
+        item =>
+          item.email.toLowerCase() ===
+            email &&
+          item.password === password
+      );
 
-  });
+    if (!user) {
 
-});
+      return res.status(401).json({
+        error:
+          "Invalid email or password"
+      });
+
+    }
+
+    req.session.user =
+      publicUser(user);
+
+    req.session.save(
+      err => {
+
+        if (err) {
+
+          console.error(
+            "Session save error:",
+            err
+          );
+
+          return res.status(500).json({
+            error:
+              "Login session could not be saved"
+          });
+
+        }
+
+        res.json({
+
+          ok: true,
+
+          user:
+            req.session.user
+
+        });
+
+      }
+    );
+
+  }
+);
 
 
 /* =========================
    REGISTER
 ========================= */
 
-app.post("/api/register", (req, res) => {
+app.post(
+  "/api/register",
+  (req, res) => {
 
-  const name =
-    String(req.body.name || "")
-      .trim();
+    const name =
+      String(
+        req.body.name || ""
+      ).trim();
 
-  const email =
-    String(req.body.email || "")
-      .trim()
-      .toLowerCase();
+    const email =
+      String(
+        req.body.email || ""
+      )
+        .trim()
+        .toLowerCase();
 
-  const password =
-    String(req.body.password || "");
-
-  if (!name || !email || !password) {
-
-    return res.status(400).json({
-      error: "All fields are required"
-    });
-
-  }
-
-  if (password.length < 6) {
-
-    return res.status(400).json({
-      error:
-        "Password must be at least 6 characters"
-    });
-
-  }
-
-  if (
-    users.some(
-      user =>
-        user.email.toLowerCase() === email
-    )
-  ) {
-
-    return res.status(400).json({
-      error: "Email already exists"
-    });
-
-  }
-
-  const user = {
-
-    id: nextUserId++,
-    name,
-    email,
-    password,
-    role: "user",
-    balance: 0,
-    completed: 0
-
-  };
-
-  users.push(user);
-
-  req.session.user =
-    publicUser(user);
-
-  req.session.save(err => {
-
-    if (err) {
-
-      console.error(
-        "Registration session error:",
-        err
+    const password =
+      String(
+        req.body.password || ""
       );
 
-      return res.status(500).json({
+    if (!name || !email || !password) {
+
+      return res.status(400).json({
         error:
-          "Account created but login session failed"
+          "All fields are required"
       });
 
     }
 
-    res.json({
-      ok: true,
-      user: req.session.user
-    });
+    if (password.length < 6) {
 
-  });
+      return res.status(400).json({
+        error:
+          "Password must be at least 6 characters"
+      });
 
-});
+    }
+
+    if (
+      users.some(
+        user =>
+          user.email.toLowerCase() ===
+          email
+      )
+    ) {
+
+      return res.status(400).json({
+        error:
+          "Email already exists"
+      });
+
+    }
+
+    const user = {
+
+      id:
+        nextUserId++,
+
+      name,
+
+      email,
+
+      password,
+
+      role:
+        "user",
+
+      balance:
+        0,
+
+      completed:
+        0
+
+    };
+
+    users.push(user);
+
+    req.session.user =
+      publicUser(user);
+
+    req.session.save(
+      err => {
+
+        if (err) {
+
+          console.error(
+            "Registration session error:",
+            err
+          );
+
+          return res.status(500).json({
+            error:
+              "Account created but login session failed"
+          });
+
+        }
+
+        res.json({
+
+          ok: true,
+
+          user:
+            req.session.user
+
+        });
+
+      }
+    );
+
+  }
+);
 
 
 /* =========================
    LOGOUT
 ========================= */
 
-app.post("/api/logout", (req, res) => {
+app.post(
+  "/api/logout",
+  (req, res) => {
 
-  req.session.destroy(err => {
+    req.session.destroy(
+      err => {
 
-    if (err) {
+        if (err) {
 
-      return res.status(500).json({
-        error: "Logout failed"
-      });
+          return res.status(500).json({
+            error:
+              "Logout failed"
+          });
 
-    }
+        }
 
-    res.clearCookie("connect.sid");
+        res.clearCookie(
+          "connect.sid"
+        );
 
-    res.json({
-      ok: true
-    });
+        res.json({
+          ok: true
+        });
 
-  });
+      }
+    );
 
-});
+  }
+);
 
 
 /* =========================
    TASKS
 ========================= */
 
-app.get("/api/tasks", (req, res) => {
+app.get(
+  "/api/tasks",
+  (req, res) => {
 
-  res.json(
-    tasks.filter(
-      task => task.active
-    )
-  );
-
-});
-
-
-app.get("/api/tasks/:id", (req, res) => {
-
-  const task =
-    getTask(req.params.id);
-
-  if (!task) {
-
-    return res.status(404).json({
-      error: "Task not found"
-    });
+    res.json(
+      tasks.filter(
+        task =>
+          task.active
+      )
+    );
 
   }
+);
 
-  res.json(task);
 
-});
+app.get(
+  "/api/tasks/:id",
+  (req, res) => {
+
+    const task =
+      getTask(
+        req.params.id
+      );
+
+    if (!task) {
+
+      return res.status(404).json({
+        error:
+          "Task not found"
+      });
+
+    }
+
+    res.json(task);
+
+  }
+);
 
 
 /* =========================
@@ -433,15 +540,20 @@ app.post(
   (req, res) => {
 
     const user =
-      getUser(req.session.user.id);
+      getUser(
+        req.session.user.id
+      );
 
     const task =
-      getTask(req.params.id);
+      getTask(
+        req.params.id
+      );
 
     if (!user) {
 
       return res.status(404).json({
-        error: "User not found"
+        error:
+          "User not found"
       });
 
     }
@@ -449,7 +561,8 @@ app.post(
     if (!task || !task.active) {
 
       return res.status(404).json({
-        error: "Task not available"
+        error:
+          "Task not available"
       });
 
     }
@@ -478,19 +591,26 @@ app.post(
 
     const submission = {
 
-      id: nextSubmissionId++,
+      id:
+        nextSubmissionId++,
 
-      userId: user.id,
+      userId:
+        user.id,
 
-      userName: user.name,
+      userName:
+        user.name,
 
-      taskId: task.id,
+      taskId:
+        task.id,
 
-      taskTitle: task.title,
+      taskTitle:
+        task.title,
 
-      reward: Number(task.reward),
+      reward:
+        Number(task.reward),
 
-      status: "pending",
+      status:
+        "pending",
 
       submittedAt:
         new Date().toISOString()
@@ -545,12 +665,15 @@ app.get(
   (req, res) => {
 
     const user =
-      getUser(req.session.user.id);
+      getUser(
+        req.session.user.id
+      );
 
     if (!user) {
 
       return res.status(404).json({
-        error: "User not found"
+        error:
+          "User not found"
       });
 
     }
@@ -585,28 +708,37 @@ app.post(
   (req, res) => {
 
     const user =
-      getUser(req.session.user.id);
+      getUser(
+        req.session.user.id
+      );
 
     if (!user) {
 
       return res.status(404).json({
-        error: "User not found"
+        error:
+          "User not found"
       });
 
     }
 
     const amount =
-      Number(req.body.amount);
+      Number(
+        req.body.amount
+      );
 
     const method =
       String(
-        req.body.method || "UPI"
+        req.body.method ||
+        "UPI"
       ).trim();
 
-    if (!Number.isFinite(amount)) {
+    if (
+      !Number.isFinite(amount)
+    ) {
 
       return res.status(400).json({
-        error: "Invalid amount"
+        error:
+          "Invalid amount"
       });
 
     }
@@ -629,21 +761,35 @@ app.post(
 
     }
 
-    user.balance -= amount;
+    if (!method) {
+
+      return res.status(400).json({
+        error:
+          "Payment method is required"
+      });
+
+    }
+
+    user.balance -=
+      amount;
 
     withdrawals.push({
 
-      id: nextWithdrawalId++,
+      id:
+        nextWithdrawalId++,
 
-      userId: user.id,
+      userId:
+        user.id,
 
-      name: user.name,
+      name:
+        user.name,
 
       amount,
 
       method,
 
-      status: "pending",
+      status:
+        "pending",
 
       createdAt:
         new Date().toISOString()
@@ -651,9 +797,12 @@ app.post(
     });
 
     res.json({
+
       ok: true,
+
       message:
         "Withdrawal request submitted"
+
     });
 
   }
@@ -735,7 +884,9 @@ app.post(
       ).trim();
 
     const reward =
-      Number(req.body.reward);
+      Number(
+        req.body.reward
+      );
 
     if (
       !title ||
@@ -756,14 +907,16 @@ app.post(
     ) {
 
       return res.status(400).json({
-        error: "Invalid reward"
+        error:
+          "Invalid reward"
       });
 
     }
 
     const task = {
 
-      id: nextTaskId++,
+      id:
+        nextTaskId++,
 
       title,
 
@@ -773,7 +926,8 @@ app.post(
 
       reward,
 
-      active: true
+      active:
+        true
 
     };
 
@@ -795,12 +949,15 @@ app.put(
   (req, res) => {
 
     const task =
-      getTask(req.params.id);
+      getTask(
+        req.params.id
+      );
 
     if (!task) {
 
       return res.status(404).json({
-        error: "Task not found"
+        error:
+          "Task not found"
       });
 
     }
@@ -848,7 +1005,8 @@ app.put(
     ) {
 
       return res.status(400).json({
-        error: "Invalid reward"
+        error:
+          "Invalid reward"
       });
 
     }
@@ -891,12 +1049,15 @@ app.delete(
   (req, res) => {
 
     const task =
-      getTask(req.params.id);
+      getTask(
+        req.params.id
+      );
 
     if (!task) {
 
       return res.status(404).json({
-        error: "Task not found"
+        error:
+          "Task not found"
       });
 
     }
@@ -940,7 +1101,9 @@ app.post(
       submissions.find(
         item =>
           item.id ===
-          Number(req.params.id)
+          Number(
+            req.params.id
+          )
       );
 
     if (!submission) {
@@ -975,7 +1138,8 @@ app.post(
     ) {
 
       return res.status(400).json({
-        error: "Invalid status"
+        error:
+          "Invalid status"
       });
 
     }
@@ -988,7 +1152,8 @@ app.post(
     if (!user) {
 
       return res.status(404).json({
-        error: "User not found"
+        error:
+          "User not found"
       });
 
     }
@@ -1010,8 +1175,11 @@ app.post(
     }
 
     res.json({
+
       ok: true,
+
       status
+
     });
 
   }
@@ -1027,7 +1195,9 @@ app.get(
   admin,
   (req, res) => {
 
-    res.json(withdrawals);
+    res.json(
+      withdrawals
+    );
 
   }
 );
@@ -1046,7 +1216,9 @@ app.post(
       withdrawals.find(
         item =>
           item.id ===
-          Number(req.params.id)
+          Number(
+            req.params.id
+          )
       );
 
     if (!withdrawal) {
@@ -1081,7 +1253,8 @@ app.post(
     ) {
 
       return res.status(400).json({
-        error: "Invalid status"
+        error:
+          "Invalid status"
       });
 
     }
@@ -1094,7 +1267,8 @@ app.post(
     if (!user) {
 
       return res.status(404).json({
-        error: "User not found"
+        error:
+          "User not found"
       });
 
     }
@@ -1114,29 +1288,48 @@ app.post(
     }
 
     res.json({
+
       ok: true,
+
       status
+
     });
 
   }
 );
 
 
+/* =========================================================
+   INFORMATION / LEGAL PAGES
+========================================================= */
+
+
 /* =========================
-   PRIVACY
+   PRIVACY POLICY
 ========================= */
 
-app.get("/privacy", (req, res) => {
+app.get(
+  "/privacy",
+  (req, res) => {
 
-  res.send(`
+    res.send(`
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
+
 <meta name="viewport"
 content="width=device-width,initial-scale=1">
+
+<meta name="description"
+content="TaskEarn Privacy Policy">
+
 <title>Privacy Policy - TaskEarn</title>
+
 <style>
+
 body{
 margin:0;
 font-family:Arial,sans-serif;
@@ -1144,231 +1337,646 @@ background:#f4f6fb;
 color:#172033;
 line-height:1.7;
 }
+
 .header{
-background:linear-gradient(135deg,#5b45f5,#795cff);
+background:linear-gradient(
+135deg,
+#ff6b35,
+#ff8b5c
+);
 color:white;
-padding:20px;
+padding:25px 20px;
 }
+
 .header h1{
 max-width:850px;
 margin:auto;
 }
+
 .container{
 max-width:850px;
 margin:auto;
 padding:20px;
 }
+
 .card{
 background:white;
 padding:25px;
 border-radius:18px;
 box-shadow:0 5px 22px rgba(0,0,0,.06);
 }
+
+h2{
+margin-top:28px;
+}
+
 a{
-color:#5b45f5;
+color:#ff6b35;
 font-weight:bold;
 text-decoration:none;
 }
+
+.back{
+display:inline-block;
+margin-top:20px;
+}
+
 </style>
+
 </head>
+
 <body>
+
 <header class="header">
-<h1>TaskEarn - Privacy Policy</h1>
+
+<h1>
+TaskEarn - Privacy Policy
+</h1>
+
 </header>
+
 <main class="container">
+
 <div class="card">
 
-<h2>Information We Collect</h2>
-
 <p>
-TaskEarn may collect information such as your
-name, email address, account information,
-task submissions and withdrawal requests.
+<strong>Last updated:</strong>
+August 19, 2026
 </p>
 
-<h2>How We Use Information</h2>
+<h2>1. Introduction</h2>
 
 <p>
-Information may be used to provide account
-services, manage tasks, process submissions,
-maintain platform security and improve the
-website.
+TaskEarn respects the privacy of people who
+use the website. This Privacy Policy explains
+what information may be collected and how
+that information may be used.
 </p>
 
-<h2>Advertising</h2>
+<h2>2. Information We May Collect</h2>
+
+<p>
+Depending on how you use the website, TaskEarn
+may collect information such as your name,
+email address, account details, task submissions,
+account activity and withdrawal requests.
+</p>
+
+<h2>3. How We Use Information</h2>
+
+<p>
+Information may be used to create and maintain
+accounts, provide task-related services,
+review submissions, manage rewards, process
+withdrawal requests, prevent abuse and improve
+the website.
+</p>
+
+<h2>4. Login Sessions and Cookies</h2>
+
+<p>
+TaskEarn may use cookies or similar technologies
+to maintain login sessions and support essential
+website functionality.
+</p>
+
+<h2>5. Advertising</h2>
+
+<p>
+TaskEarn may display advertisements through
+third-party advertising services. Advertising
+providers may use cookies or similar technologies
+according to their own policies and applicable
+settings.
+</p>
+
+<h2>6. Google AdSense</h2>
+
+<p>
+The website may use Google AdSense to display
+advertisements. Google and its partners may
+use cookies or other technologies to provide
+and measure advertising in accordance with
+their applicable policies.
+</p>
+
+<h2>7. Third-Party Services</h2>
+
+<p>
+TaskEarn may use third-party services for
+hosting, advertising, analytics, security or
+other website functions. Those services may
+have their own privacy policies.
+</p>
+
+<h2>8. Data Security</h2>
+
+<p>
+Reasonable measures may be used to protect
+information associated with user accounts.
+However, no internet service can guarantee
+absolute security.
+</p>
+
+<h2>9. Data Retention</h2>
+
+<p>
+Information may be retained for as long as
+reasonably necessary to provide services,
+maintain records, prevent abuse or comply
+with applicable obligations.
+</p>
+
+<h2>10. Children's Privacy</h2>
+
+<p>
+TaskEarn is not intended to encourage children
+to participate in activities that are not
+appropriate for their age. Users should comply
+with applicable age requirements and laws.
+</p>
+
+<h2>11. Changes to This Policy</h2>
+
+<p>
+This Privacy Policy may be updated from time
+to time. Changes will be reflected on this
+page.
+</p>
+
+<h2>12. Contact</h2>
+
+<p>
+For privacy-related questions, please visit
+the Contact Us page.
+</p>
+
+<a class="back" href="/">
+← Back to TaskEarn
+</a>
+
+</div>
+
+</main>
+
+</body>
+</html>
+    `);
+
+  }
+);
+
+
+/* =========================
+   TERMS & CONDITIONS
+========================= */
+
+app.get(
+  "/terms",
+  (req, res) => {
+
+    res.send(`
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width,initial-scale=1">
+
+<meta name="description"
+content="TaskEarn Terms and Conditions">
+
+<title>Terms & Conditions - TaskEarn</title>
+
+<style>
+
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:#f4f6fb;
+color:#172033;
+line-height:1.7;
+}
+
+.header{
+background:linear-gradient(
+135deg,
+#ff6b35,
+#ff8b5c
+);
+color:white;
+padding:25px 20px;
+}
+
+.header h1{
+max-width:850px;
+margin:auto;
+}
+
+.container{
+max-width:850px;
+margin:auto;
+padding:20px;
+}
+
+.card{
+background:white;
+padding:25px;
+border-radius:18px;
+box-shadow:0 5px 22px rgba(0,0,0,.06);
+}
+
+h2{
+margin-top:28px;
+}
+
+a{
+color:#ff6b35;
+font-weight:bold;
+text-decoration:none;
+}
+
+.back{
+display:inline-block;
+margin-top:20px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header class="header">
+
+<h1>
+TaskEarn - Terms & Conditions
+</h1>
+
+</header>
+
+<main class="container">
+
+<div class="card">
+
+<p>
+<strong>Last updated:</strong>
+August 19, 2026
+</p>
+
+<h2>1. Acceptance of Terms</h2>
+
+<p>
+By using TaskEarn, you agree to follow these
+Terms & Conditions and applicable laws.
+If you do not agree with these terms, please
+do not use the platform.
+</p>
+
+<h2>2. Account Registration</h2>
+
+<p>
+Users should provide accurate information when
+creating an account and are responsible for
+protecting their login credentials.
+</p>
+
+<h2>3. One Account</h2>
+
+<p>
+Unless expressly permitted by the platform,
+users should not create or operate multiple
+accounts for the purpose of obtaining additional
+rewards or bypassing platform rules.
+</p>
+
+<h2>4. Tasks</h2>
+
+<p>
+Task availability, requirements and rewards may
+change. Users should carefully read the current
+requirements before completing a task.
+</p>
+
+<h2>5. Task Submissions</h2>
+
+<p>
+Submitting a task does not automatically
+guarantee payment. Submissions may be reviewed
+and may be approved or rejected according to
+the applicable task requirements.
+</p>
+
+<h2>6. Rewards</h2>
+
+<p>
+Rewards are credited only when a submission is
+approved. Reward amounts displayed on the
+platform may change depending on the task.
+</p>
+
+<h2>7. Earnings Are Not Guaranteed</h2>
+
+<p>
+TaskEarn does not guarantee a specific income,
+number of tasks or amount of earnings. Actual
+results depend on task availability, eligibility,
+completion and approval.
+</p>
+
+<h2>8. Withdrawals</h2>
+
+<p>
+Withdrawal requests are subject to the minimum
+withdrawal amount, available balance, account
+eligibility and platform review.
+</p>
+
+<p>
+The current demo configuration uses a minimum
+withdrawal amount of ₹100.
+</p>
+
+<h2>9. Prohibited Activities</h2>
+
+<p>
+Users must not engage in fraud, fake submissions,
+automated abuse, manipulation, spam, exploitation
+of technical vulnerabilities, payment abuse or
+other activity intended to improperly obtain
+rewards.
+</p>
+
+<h2>10. Account Suspension</h2>
+
+<p>
+TaskEarn may restrict, suspend or terminate an
+account where there is suspected abuse, fraud,
+violation of these terms or other activity that
+may harm the platform or its users.
+</p>
+
+<h2>11. Advertisements</h2>
+
+<p>
+The website may display advertisements from
+third-party advertising providers. TaskEarn
+does not necessarily endorse every third-party
+advertisement or external website.
+</p>
+
+<h2>12. External Links</h2>
+
+<p>
+The website may contain links or references to
+third-party websites. TaskEarn is not responsible
+for the content, policies or practices of
+third-party websites.
+</p>
+
+<h2>13. Changes to the Platform</h2>
+
+<p>
+TaskEarn may modify, update, suspend or
+discontinue features, tasks or services when
+necessary.
+</p>
+
+<h2>14. Changes to These Terms</h2>
+
+<p>
+These Terms & Conditions may be updated from
+time to time. Continued use of the platform
+after an update may constitute acceptance of
+the updated terms.
+</p>
+
+<h2>15. Contact</h2>
+
+<p>
+For questions about these terms, please use
+the Contact Us page.
+</p>
+
+<a class="back" href="/">
+← Back to TaskEarn
+</a>
+
+</div>
+
+</main>
+
+</body>
+</html>
+    `);
+
+  }
+);
+
+
+/* =========================
+   DISCLAIMER
+========================= */
+
+app.get(
+  "/disclaimer",
+  (req, res) => {
+
+    res.send(`
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width,initial-scale=1">
+
+<meta name="description"
+content="TaskEarn Disclaimer">
+
+<title>Disclaimer - TaskEarn</title>
+
+<style>
+
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:#f4f6fb;
+color:#172033;
+line-height:1.7;
+}
+
+.header{
+background:linear-gradient(
+135deg,
+#ff6b35,
+#ff8b5c
+);
+color:white;
+padding:25px 20px;
+}
+
+.header h1{
+max-width:850px;
+margin:auto;
+}
+
+.container{
+max-width:850px;
+margin:auto;
+padding:20px;
+}
+
+.card{
+background:white;
+padding:25px;
+border-radius:18px;
+box-shadow:0 5px 22px rgba(0,0,0,.06);
+}
+
+h2{
+margin-top:28px;
+}
+
+a{
+color:#ff6b35;
+font-weight:bold;
+text-decoration:none;
+}
+
+.back{
+display:inline-block;
+margin-top:20px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header class="header">
+
+<h1>
+TaskEarn - Disclaimer
+</h1>
+
+</header>
+
+<main class="container">
+
+<div class="card">
+
+<p>
+<strong>Last updated:</strong>
+August 19, 2026
+</p>
+
+<h2>General Information</h2>
+
+<p>
+TaskEarn provides information and tools for
+discovering eligible online tasks, submitting
+work and managing task-related rewards.
+</p>
+
+<h2>No Guaranteed Income</h2>
+
+<p>
+TaskEarn does not guarantee employment, income,
+profit or a particular amount of money. The
+availability of tasks and rewards may vary.
+</p>
+
+<h2>Task Approval</h2>
+
+<p>
+A task submission may be reviewed before a
+reward is credited. Completing or submitting
+a task does not guarantee approval.
+</p>
+
+<h2>Third-Party Advertisements</h2>
 
 <p>
 TaskEarn may display advertisements from
-third-party advertising providers such as
-Google AdSense.
+third-party advertising providers. TaskEarn
+does not guarantee the accuracy, availability
+or quality of products and services advertised
+by third parties.
 </p>
 
-<h2>Cookies</h2>
+<h2>External Websites</h2>
 
 <p>
-TaskEarn may use cookies to maintain login
-sessions and support website functionality.
-</p>
-
-<h2>Data Security</h2>
-
-<p>
-We take reasonable steps to protect
-information associated with user accounts.
+TaskEarn may reference or link to external
+websites. Users should review the terms and
+privacy policies of external websites before
+using them.
 </p>
 
 <h2>Changes</h2>
 
 <p>
-This Privacy Policy may be updated from
-time to time.
+Information, tasks, rewards and features may
+change without notice when necessary.
 </p>
 
+<h2>Use of the Website</h2>
+
 <p>
-<a href="/">← Back to TaskEarn</a>
+Users are responsible for ensuring that their
+use of TaskEarn complies with applicable laws,
+rules and platform requirements.
 </p>
+
+<a class="back" href="/">
+← Back to TaskEarn
+</a>
 
 </div>
+
 </main>
+
 </body>
 </html>
-  `);
+    `);
 
-});
-
-
-/* =========================
-   TERMS
-========================= */
-
-app.get("/terms", (req, res) => {
-
-  res.send(`
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport"
-content="width=device-width,initial-scale=1">
-<title>Terms & Conditions - TaskEarn</title>
-<style>
-body{
-margin:0;
-font-family:Arial,sans-serif;
-background:#f4f6fb;
-color:#172033;
-line-height:1.7;
-}
-.header{
-background:linear-gradient(135deg,#5b45f5,#795cff);
-color:white;
-padding:20px;
-}
-.header h1{
-max-width:850px;
-margin:auto;
-}
-.container{
-max-width:850px;
-margin:auto;
-padding:20px;
-}
-.card{
-background:white;
-padding:25px;
-border-radius:18px;
-box-shadow:0 5px 22px rgba(0,0,0,.06);
-}
-a{
-color:#5b45f5;
-font-weight:bold;
-text-decoration:none;
-}
-</style>
-</head>
-<body>
-<header class="header">
-<h1>TaskEarn - Terms & Conditions</h1>
-</header>
-
-<main class="container">
-<div class="card">
-
-<h2>Accounts</h2>
-
-<p>
-Users are responsible for providing accurate
-account information and protecting their
-login credentials.
-</p>
-
-<h2>Tasks</h2>
-
-<p>
-Users must complete tasks according to the
-requirements displayed on the platform.
-</p>
-
-<h2>Task Submissions</h2>
-
-<p>
-Submitting a task does not automatically
-guarantee a reward. Submissions may be
-reviewed before rewards are credited.
-</p>
-
-<h2>Rewards</h2>
-
-<p>
-Rewards are subject to task eligibility,
-platform rules and approval.
-</p>
-
-<h2>Withdrawals</h2>
-
-<p>
-Withdrawal requests are subject to the
-applicable minimum withdrawal amount and
-platform review.
-</p>
-
-<h2>Prohibited Activity</h2>
-
-<p>
-Fraud, fake submissions, automated abuse,
-manipulation, multiple-account abuse and
-attempts to exploit the platform are
-prohibited.
-</p>
-
-<p>
-<a href="/">← Back to TaskEarn</a>
-</p>
-
-</div>
-</main>
-</body>
-</html>
-  `);
-
-});
+  }
+);
 
 
 /* =========================
    ABOUT
 ========================= */
 
-app.get("/about", (req, res) => {
+app.get(
+  "/about",
+  (req, res) => {
 
-  res.send(`
+    res.send(`
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
+
 <meta name="viewport"
 content="width=device-width,initial-scale=1">
+
+<meta name="description"
+content="About TaskEarn">
+
 <title>About TaskEarn</title>
+
 <style>
+
 body{
 margin:0;
 font-family:Arial,sans-serif;
@@ -1376,40 +1984,66 @@ background:#f4f6fb;
 color:#172033;
 line-height:1.7;
 }
+
 .header{
-background:linear-gradient(135deg,#5b45f5,#795cff);
+background:linear-gradient(
+135deg,
+#ff6b35,
+#ff8b5c
+);
 color:white;
-padding:20px;
+padding:25px 20px;
 }
+
 .header h1{
 max-width:850px;
 margin:auto;
 }
+
 .container{
 max-width:850px;
 margin:auto;
 padding:20px;
 }
+
 .card{
 background:white;
 padding:25px;
 border-radius:18px;
 box-shadow:0 5px 22px rgba(0,0,0,.06);
 }
+
+h2{
+margin-top:28px;
+}
+
 a{
-color:#5b45f5;
+color:#ff6b35;
 font-weight:bold;
 text-decoration:none;
 }
+
+.back{
+display:inline-block;
+margin-top:20px;
+}
+
 </style>
+
 </head>
+
 <body>
 
 <header class="header">
-<h1>About TaskEarn</h1>
+
+<h1>
+About TaskEarn
+</h1>
+
 </header>
 
 <main class="container">
+
 <div class="card">
 
 <h2>What is TaskEarn?</h2>
@@ -1417,63 +2051,84 @@ text-decoration:none;
 <p>
 TaskEarn is an online platform designed to
 provide a simple interface for discovering
-eligible tasks, submitting completed work
-and managing approved task-related rewards.
+eligible tasks, submitting completed work and
+managing approved task-related rewards.
 </p>
 
 <h2>Our Goal</h2>
 
 <p>
-Our goal is to provide users with a simple
-and transparent task discovery and submission
-experience.
+Our goal is to provide users with a simple,
+clear and transparent task discovery and
+submission experience.
 </p>
 
 <h2>How It Works</h2>
 
 <p>
 Users can create an account, browse available
-tasks, complete eligible tasks and submit
-them for review.
+tasks, read task requirements, complete
+eligible tasks and submit them for review.
+</p>
+
+<h2>Rewards</h2>
+
+<p>
+Rewards are dependent on available tasks,
+eligibility and approval. TaskEarn does not
+guarantee a specific level of income.
 </p>
 
 <h2>Important Information</h2>
 
 <p>
-Task availability and rewards can change.
-Earnings are not guaranteed and depend on
-available tasks, eligibility and applicable
-conditions.
+Task availability, requirements and rewards
+can change. Users should always review the
+current task information before participating.
 </p>
 
-<p>
-<a href="/">← Back to TaskEarn</a>
-</p>
+<a class="back" href="/">
+← Back to TaskEarn
+</a>
 
 </div>
+
 </main>
+
 </body>
 </html>
-  `);
+    `);
 
-});
+  }
+);
 
 
 /* =========================
    CONTACT
 ========================= */
 
-app.get("/contact", (req, res) => {
+app.get(
+  "/contact",
+  (req, res) => {
 
-  res.send(`
+    res.send(`
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
+
 <meta name="viewport"
 content="width=device-width,initial-scale=1">
+
+<meta name="description"
+content="Contact TaskEarn">
+
 <title>Contact TaskEarn</title>
+
 <style>
+
 body{
 margin:0;
 font-family:Arial,sans-serif;
@@ -1481,52 +2136,78 @@ background:#f4f6fb;
 color:#172033;
 line-height:1.7;
 }
+
 .header{
-background:linear-gradient(135deg,#5b45f5,#795cff);
+background:linear-gradient(
+135deg,
+#ff6b35,
+#ff8b5c
+);
 color:white;
-padding:20px;
+padding:25px 20px;
 }
+
 .header h1{
 max-width:850px;
 margin:auto;
 }
+
 .container{
 max-width:850px;
 margin:auto;
 padding:20px;
 }
+
 .card{
 background:white;
 padding:25px;
 border-radius:18px;
 box-shadow:0 5px 22px rgba(0,0,0,.06);
 }
+
+h2{
+margin-top:28px;
+}
+
 a{
-color:#5b45f5;
+color:#ff6b35;
 font-weight:bold;
 text-decoration:none;
 }
+
+.back{
+display:inline-block;
+margin-top:20px;
+}
+
 </style>
+
 </head>
+
 <body>
 
 <header class="header">
-<h1>Contact TaskEarn</h1>
+
+<h1>
+Contact TaskEarn
+</h1>
+
 </header>
 
 <main class="container">
+
 <div class="card">
 
 <h2>Get in Touch</h2>
 
 <p>
 If you have questions, feedback or need
-support regarding TaskEarn, please contact
-the TaskEarn support team using the official
-contact method provided by the platform.
+support regarding TaskEarn, please use the
+official support contact provided by the
+platform.
 </p>
 
-<h2>Support</h2>
+<h2>Account Support</h2>
 
 <p>
 For account, task or withdrawal questions,
@@ -1534,7 +2215,7 @@ please provide enough information for the
 support team to understand your request.
 </p>
 
-<h2>Important</h2>
+<h2>Security</h2>
 
 <p>
 Never share your password, payment PIN,
@@ -1542,17 +2223,27 @@ OTP or other confidential security
 information with anyone.
 </p>
 
+<h2>Support Information</h2>
+
 <p>
-<a href="/">← Back to TaskEarn</a>
+Support availability and contact methods
+may change as the platform develops.
 </p>
 
+<a class="back" href="/">
+← Back to TaskEarn
+</a>
+
 </div>
+
 </main>
+
 </body>
 </html>
-  `);
+    `);
 
-});
+  }
+);
 
 
 /* =========================
@@ -1568,7 +2259,8 @@ app.listen(
   () => {
 
     console.log(
-      `TaskEarn running on port ${PORT}`
+      "TaskEarn running on port " +
+      PORT
     );
 
   }
