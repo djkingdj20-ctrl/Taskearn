@@ -4,138 +4,23 @@ const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
-const Database = require("better-sqlite3");
 
 const app = express();
 
-app.set("trust proxy", 1);
-
 /* =====================================================
-   CONFIGURATION
+   BASIC CONFIG
 ===================================================== */
+
+app.set("trust proxy", 1);
 
 const PORT = process.env.PORT || 10000;
 
 const SESSION_SECRET =
   process.env.SESSION_SECRET ||
-  crypto.randomBytes(32).toString("hex");
-
-const DATA_DIR = path.join(__dirname, "data");
-
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-}
-
-const DB_FILE = path.join(DATA_DIR, "taskearn.db");
+  "taskearn-change-this-session-secret";
 
 /* =====================================================
-   DATABASE
-===================================================== */
-
-const db = new Database(DB_FILE);
-
-db.pragma("journal_mode = WAL");
-db.pragma("foreign_keys = ON");
-
-db.exec(`
-  CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    email TEXT NOT NULL UNIQUE,
-    password_hash TEXT NOT NULL,
-    role TEXT NOT NULL DEFAULT 'Member',
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-  );
-
-  CREATE TABLE IF NOT EXISTS tasks (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL,
-    description TEXT NOT NULL,
-    type TEXT NOT NULL DEFAULT 'General',
-    reward REAL NOT NULL DEFAULT 0,
-    active INTEGER NOT NULL DEFAULT 1,
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-  );
-
-  CREATE TABLE IF NOT EXISTS submissions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    task_id INTEGER NOT NULL,
-    task_title TEXT NOT NULL,
-    reward REAL NOT NULL DEFAULT 0,
-    status TEXT NOT NULL DEFAULT 'pending',
-    submitted_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    reviewed_at TEXT,
-    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE
-  );
-
-  CREATE TABLE IF NOT EXISTS wallets (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL UNIQUE,
-    balance REAL NOT NULL DEFAULT 0,
-    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
-  );
-
-  CREATE TABLE IF NOT EXISTS withdrawals (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    amount REAL NOT NULL,
-    method TEXT NOT NULL,
-    status TEXT NOT NULL DEFAULT 'pending',
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
-  );
-`);
-
-/* =====================================================
-   DEFAULT TASKS
-===================================================== */
-
-const taskCount =
-  db.prepare(
-    "SELECT COUNT(*) AS count FROM tasks"
-  ).get().count;
-
-if (taskCount === 0) {
-
-  const insertTask =
-    db.prepare(`
-      INSERT INTO tasks
-      (title, description, type, reward)
-      VALUES (?, ?, ?, ?)
-    `);
-
-  const addTasks = db.transaction(() => {
-
-    insertTask.run(
-      "Social Media Task",
-      "Complete the social media activity according to the task requirements.",
-      "Social",
-      10
-    );
-
-    insertTask.run(
-      "Website Visit",
-      "Visit the required website and complete the instructions.",
-      "Website",
-      5
-    );
-
-    insertTask.run(
-      "Simple Research",
-      "Complete the research task and submit it for review.",
-      "Research",
-      15
-    );
-
-  });
-
-  addTasks();
-}
-
-/* =====================================================
-   EXPRESS MIDDLEWARE
+   MIDDLEWARE
 ===================================================== */
 
 app.use(
@@ -151,81 +36,202 @@ app.use(
   })
 );
 
-/* =====================================================
-   SESSION
-===================================================== */
-
 app.use(
   session({
-    name: "taskearn.sid",
-
     secret: SESSION_SECRET,
 
     resave: false,
 
     saveUninitialized: false,
 
-    rolling: true,
-
     cookie: {
       httpOnly: true,
-
-      secure:
-        process.env.NODE_ENV === "production",
-
       sameSite: "lax",
-
-      maxAge:
-        1000 *
-        60 *
-        60 *
-        24 *
-        7
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 7 * 24 * 60 * 60 * 1000
     }
   })
 );
 
 /* =====================================================
-   STATIC FILES
+   DATABASE
 ===================================================== */
 
-app.use(
-  express.static(
-    path.join(__dirname, "public")
-  )
+const DATA_DIR = path.join(
+  __dirname,
+  "data"
 );
 
+const DB_FILE = path.join(
+  DATA_DIR,
+  "taskearn.json"
+);
+
+if (!fs.existsSync(DATA_DIR)) {
+  fs.mkdirSync(DATA_DIR, {
+    recursive: true
+  });
+}
+
+function createEmptyDatabase() {
+  return {
+    users: [],
+    tasks: [],
+    submissions: [],
+    withdrawals: []
+  };
+}
+
+function loadDatabase() {
+  try {
+    if (!fs.existsSync(DB_FILE)) {
+      const db = createEmptyDatabase();
+      saveDatabase(db);
+      return db;
+    }
+
+    const raw = fs.readFileSync(
+      DB_FILE,
+      "utf8"
+    );
+
+    const db = JSON.parse(raw);
+
+    return {
+      users: Array.isArray(db.users)
+        ? db.users
+        : [],
+
+      tasks: Array.isArray(db.tasks)
+        ? db.tasks
+        : [],
+
+      submissions: Array.isArray(db.submissions)
+        ? db.submissions
+        : [],
+
+      withdrawals: Array.isArray(db.withdrawals)
+        ? db.withdrawals
+        : []
+    };
+
+  } catch (error) {
+
+    console.error(
+      "Database load error:",
+      error
+    );
+
+    return createEmptyDatabase();
+  }
+}
+
+function saveDatabase(db) {
+
+  const tempFile =
+    DB_FILE + ".tmp";
+
+  fs.writeFileSync(
+    tempFile,
+    JSON.stringify(
+      db,
+      null,
+      2
+    ),
+    "utf8"
+  );
+
+  fs.renameSync(
+    tempFile,
+    DB_FILE
+  );
+}
+
+let db = loadDatabase();
+
 /* =====================================================
-   SECURITY HELPERS
+   DEFAULT ADMIN
 ===================================================== */
 
-function normalizeEmail(email) {
+async function createDefaultAdmin() {
 
-  return String(email || "")
-    .trim()
-    .toLowerCase();
+  const adminEmail =
+    process.env.ADMIN_EMAIL ||
+    "admin@taskearn.com";
 
+  const adminPassword =
+    process.env.ADMIN_PASSWORD ||
+    "Admin@12345";
+
+  const existingAdmin =
+    db.users.find(
+      user =>
+        user.email.toLowerCase() ===
+        adminEmail.toLowerCase()
+    );
+
+  if (existingAdmin) {
+
+    if (existingAdmin.role !== "admin") {
+
+      existingAdmin.role =
+        "admin";
+
+      saveDatabase(db);
+    }
+
+    return;
+  }
+
+  const passwordHash =
+    await bcrypt.hash(
+      adminPassword,
+      12
+    );
+
+  db.users.push({
+
+    id: crypto
+      .randomUUID(),
+
+    name: "TaskEarn Admin",
+
+    email:
+      adminEmail.toLowerCase(),
+
+    passwordHash,
+
+    role: "admin",
+
+    balance: 0,
+
+    createdAt:
+      new Date().toISOString()
+
+  });
+
+  saveDatabase(db);
+
+  console.log(
+    "Default admin created:"
+  );
+
+  console.log(
+    "Email:",
+    adminEmail
+  );
+
+  console.log(
+    "Password:",
+    adminPassword
+  );
 }
 
+/* =====================================================
+   HELPERS
+===================================================== */
 
-function cleanName(name) {
-
-  return String(name || "")
-    .trim()
-    .replace(/\s+/g, " ");
-
-}
-
-
-function isValidEmail(email) {
-
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    .test(email);
-
-}
-
-
-function safeUser(user) {
+function cleanUser(user) {
 
   if (!user) {
     return null;
@@ -233,47 +239,180 @@ function safeUser(user) {
 
   return {
     id: user.id,
-    name: user.name,
-    email: user.email,
-    role: user.role,
-    createdAt: user.created_at
-  };
 
+    name: user.name,
+
+    email: user.email,
+
+    role:
+      user.role || "member",
+
+    balance:
+      Number(user.balance || 0),
+
+    createdAt:
+      user.createdAt || null
+  };
 }
 
-/* =====================================================
-   AUTH MIDDLEWARE
-===================================================== */
+function findUserById(id) {
 
-function requireLogin(req, res, next) {
+  return db.users.find(
+    user =>
+      user.id === id
+  );
+}
+
+function findUserByEmail(email) {
+
+  return db.users.find(
+    user =>
+      user.email.toLowerCase() ===
+      email.toLowerCase()
+  );
+}
+
+function requireLogin(
+  req,
+  res,
+  next
+) {
 
   if (!req.session.userId) {
 
     return res.status(401).json({
-      error: "Please login first."
+      error:
+        "Please login first."
     });
 
   }
 
-  next();
+  const user =
+    findUserById(
+      req.session.userId
+    );
 
+  if (!user) {
+
+    req.session.destroy(
+      () => {}
+    );
+
+    return res.status(401).json({
+      error:
+        "Session expired. Please login again."
+    });
+  }
+
+  req.user = user;
+
+  next();
 }
 
+function requireAdmin(
+  req,
+  res,
+  next
+) {
+
+  if (!req.session.userId) {
+
+    return res.status(401).json({
+      error:
+        "Please login first."
+    });
+  }
+
+  const user =
+    findUserById(
+      req.session.userId
+    );
+
+  if (!user) {
+
+    return res.status(401).json({
+      error:
+        "Invalid session."
+    });
+  }
+
+  if (user.role !== "admin") {
+
+    return res.status(403).json({
+      error:
+        "Admin access required."
+    });
+  }
+
+  req.user = user;
+
+  next();
+}
+
+function safeNumber(
+  value,
+  fallback = 0
+) {
+
+  const number =
+    Number(value);
+
+  if (
+    !Number.isFinite(number)
+  ) {
+    return fallback;
+  }
+
+  return number;
+}
 
 /* =====================================================
-   USER WALLET
+   HEALTH
 ===================================================== */
 
-function ensureWallet(userId) {
+app.get(
+  "/health",
+  (req, res) => {
 
-  db.prepare(`
-    INSERT OR IGNORE INTO wallets
-    (user_id, balance)
-    VALUES (?, 0)
-  `).run(userId);
+    res.json({
+      ok: true,
+      service: "TaskEarn",
+      time:
+        new Date().toISOString()
+    });
 
-}
+  }
+);
 
+/* =====================================================
+   SESSION / CURRENT USER
+===================================================== */
+
+app.get(
+  "/api/me",
+  (req, res) => {
+
+    if (!req.session.userId) {
+
+      return res.json(null);
+    }
+
+    const user =
+      findUserById(
+        req.session.userId
+      );
+
+    if (!user) {
+
+      return res.json(null);
+    }
+
+    res.json(
+      cleanUser(user)
+    );
+
+  }
+);
 
 /* =====================================================
    REGISTER
@@ -286,34 +425,45 @@ app.post(
     try {
 
       const name =
-        cleanName(req.body.name);
+        String(
+          req.body.name || ""
+        ).trim();
 
       const email =
-        normalizeEmail(req.body.email);
+        String(
+          req.body.email || ""
+        )
+          .trim()
+          .toLowerCase();
 
       const password =
-        String(req.body.password || "");
+        String(
+          req.body.password || ""
+        );
 
       if (!name) {
 
         return res.status(400).json({
-          error: "Please enter your name."
+          error:
+            "Please enter your name."
         });
 
       }
 
-      if (name.length > 100) {
+      if (!email) {
 
         return res.status(400).json({
-          error: "Name is too long."
+          error:
+            "Please enter your email."
         });
 
       }
 
-      if (!isValidEmail(email)) {
+      if (!email.includes("@")) {
 
         return res.status(400).json({
-          error: "Please enter a valid email address."
+          error:
+            "Please enter a valid email address."
         });
 
       }
@@ -322,25 +472,15 @@ app.post(
 
         return res.status(400).json({
           error:
-            "Password must be at least 6 characters."
-        });
-
-      }
-
-      if (password.length > 100) {
-
-        return res.status(400).json({
-          error: "Password is too long."
+            "Password must contain at least 6 characters."
         });
 
       }
 
       const existing =
-        db.prepare(`
-          SELECT id
-          FROM users
-          WHERE email = ?
-        `).get(email);
+        findUserByEmail(
+          email
+        );
 
       if (existing) {
 
@@ -357,51 +497,45 @@ app.post(
           12
         );
 
-      const result =
-        db.prepare(`
-          INSERT INTO users
-          (name, email, password_hash, role)
-          VALUES (?, ?, ?, 'Member')
-        `).run(
-          name,
-          email,
-          passwordHash
-        );
+      const user = {
 
-      const userId =
-        result.lastInsertRowid;
+        id:
+          crypto.randomUUID(),
 
-      ensureWallet(userId);
+        name,
+
+        email,
+
+        passwordHash,
+
+        role: "member",
+
+        balance: 0,
+
+        createdAt:
+          new Date().toISOString()
+
+      };
+
+      db.users.push(
+        user
+      );
+
+      saveDatabase(db);
 
       req.session.userId =
-        userId;
+        user.id;
 
-      const user =
-        db.prepare(`
-          SELECT
-            id,
-            name,
-            email,
-            role,
-            created_at
-          FROM users
-          WHERE id = ?
-        `).get(userId);
-
-      req.session.save(() => {
-
-        res.json(
-          safeUser(user)
-        );
-
-      });
+      res.json(
+        cleanUser(user)
+      );
 
     }
 
     catch (error) {
 
       console.error(
-        "REGISTER ERROR:",
+        "Register error:",
         error
       );
 
@@ -415,7 +549,6 @@ app.post(
   }
 );
 
-
 /* =====================================================
    LOGIN
 ===================================================== */
@@ -427,9 +560,11 @@ app.post(
     try {
 
       const email =
-        normalizeEmail(
-          req.body.email
-        );
+        String(
+          req.body.email || ""
+        )
+          .trim()
+          .toLowerCase();
 
       const password =
         String(
@@ -446,11 +581,9 @@ app.post(
       }
 
       const user =
-        db.prepare(`
-          SELECT *
-          FROM users
-          WHERE email = ?
-        `).get(email);
+        findUserByEmail(
+          email
+        );
 
       if (!user) {
 
@@ -461,13 +594,13 @@ app.post(
 
       }
 
-      const passwordValid =
+      const valid =
         await bcrypt.compare(
           password,
-          user.password_hash
+          user.passwordHash
         );
 
-      if (!passwordValid) {
+      if (!valid) {
 
         return res.status(401).json({
           error:
@@ -476,53 +609,11 @@ app.post(
 
       }
 
-      ensureWallet(user.id);
+      req.session.userId =
+        user.id;
 
-      req.session.regenerate(
-        err => {
-
-          if (err) {
-
-            console.error(
-              "SESSION ERROR:",
-              err
-            );
-
-            return res.status(500).json({
-              error:
-                "Unable to create secure session."
-            });
-
-          }
-
-          req.session.userId =
-            user.id;
-
-          req.session.save(
-            saveError => {
-
-              if (saveError) {
-
-                console.error(
-                  "SESSION SAVE ERROR:",
-                  saveError
-                );
-
-                return res.status(500).json({
-                  error:
-                    "Unable to save session."
-                });
-
-              }
-
-              res.json(
-                safeUser(user)
-              );
-
-            }
-          );
-
-        }
+      res.json(
+        cleanUser(user)
       );
 
     }
@@ -530,7 +621,7 @@ app.post(
     catch (error) {
 
       console.error(
-        "LOGIN ERROR:",
+        "Login error:",
         error
       );
 
@@ -544,53 +635,6 @@ app.post(
   }
 );
 
-
-/* =====================================================
-   CURRENT USER
-===================================================== */
-
-app.get(
-  "/api/me",
-  (req, res) => {
-
-    if (!req.session.userId) {
-
-      return res.json(null);
-
-    }
-
-    const user =
-      db.prepare(`
-        SELECT
-          id,
-          name,
-          email,
-          role,
-          created_at
-        FROM users
-        WHERE id = ?
-      `).get(
-        req.session.userId
-      );
-
-    if (!user) {
-
-      req.session.destroy(
-        () => {}
-      );
-
-      return res.json(null);
-
-    }
-
-    res.json(
-      safeUser(user)
-    );
-
-  }
-);
-
-
 /* =====================================================
    LOGOUT
 ===================================================== */
@@ -600,14 +644,9 @@ app.post(
   (req, res) => {
 
     req.session.destroy(
-      err => {
+      error => {
 
-        if (err) {
-
-          console.error(
-            "LOGOUT ERROR:",
-            err
-          );
+        if (error) {
 
           return res.status(500).json({
             error:
@@ -617,12 +656,11 @@ app.post(
         }
 
         res.clearCookie(
-          "taskearn.sid"
+          "connect.sid"
         );
 
         res.json({
-          message:
-            "Logged out successfully."
+          success: true
         });
 
       }
@@ -630,444 +668,6 @@ app.post(
 
   }
 );
-
-
-/* =====================================================
-   TASKS
-===================================================== */
-
-app.get(
-  "/api/tasks",
-  requireLogin,
-  (req, res) => {
-
-    try {
-
-      const tasks =
-        db.prepare(`
-          SELECT
-            id,
-            title,
-            description,
-            type,
-            reward,
-            created_at
-          FROM tasks
-          WHERE active = 1
-          ORDER BY id DESC
-        `).all();
-
-      res.json(tasks);
-
-    }
-
-    catch (error) {
-
-      console.error(
-        "TASKS ERROR:",
-        error
-      );
-
-      res.status(500).json({
-        error:
-          "Unable to load tasks."
-      });
-
-    }
-
-  }
-);
-
-
-/* =====================================================
-   SUBMIT TASK
-===================================================== */
-
-app.post(
-  "/api/tasks/:id/submit",
-  requireLogin,
-  (req, res) => {
-
-    try {
-
-      const taskId =
-        Number(
-          req.params.id
-        );
-
-      if (
-        !Number.isInteger(taskId) ||
-        taskId <= 0
-      ) {
-
-        return res.status(400).json({
-          error:
-            "Invalid task."
-        });
-
-      }
-
-      const task =
-        db.prepare(`
-          SELECT *
-          FROM tasks
-          WHERE id = ?
-          AND active = 1
-        `).get(taskId);
-
-      if (!task) {
-
-        return res.status(404).json({
-          error:
-            "Task not found."
-        });
-
-      }
-
-      const alreadySubmitted =
-        db.prepare(`
-          SELECT id
-          FROM submissions
-          WHERE user_id = ?
-          AND task_id = ?
-          AND status = 'pending'
-        `).get(
-          req.session.userId,
-          taskId
-        );
-
-      if (alreadySubmitted) {
-
-        return res.status(409).json({
-          error:
-            "You already submitted this task and it is under review."
-        });
-
-      }
-
-      db.prepare(`
-        INSERT INTO submissions
-        (
-          user_id,
-          task_id,
-          task_title,
-          reward,
-          status
-        )
-        VALUES (?, ?, ?, ?, 'pending')
-      `).run(
-        req.session.userId,
-        task.id,
-        task.title,
-        Number(task.reward)
-      );
-
-      res.json({
-        message:
-          "Task submitted for review!"
-      });
-
-    }
-
-    catch (error) {
-
-      console.error(
-        "TASK SUBMISSION ERROR:",
-        error
-      );
-
-      res.status(500).json({
-        error:
-          "Unable to submit task."
-      });
-
-    }
-
-  }
-);
-
-
-/* =====================================================
-   MY SUBMISSIONS
-===================================================== */
-
-app.get(
-  "/api/my-submissions",
-  requireLogin,
-  (req, res) => {
-
-    try {
-
-      const submissions =
-        db.prepare(`
-          SELECT
-            id,
-            task_id AS taskId,
-            task_title AS taskTitle,
-            reward,
-            status,
-            submitted_at AS submittedAt,
-            reviewed_at AS reviewedAt
-          FROM submissions
-          WHERE user_id = ?
-          ORDER BY id DESC
-        `).all(
-          req.session.userId
-        );
-
-      res.json(
-        submissions
-      );
-
-    }
-
-    catch (error) {
-
-      console.error(
-        "SUBMISSIONS ERROR:",
-        error
-      );
-
-      res.status(500).json({
-        error:
-          "Unable to load submissions."
-      });
-
-    }
-
-  }
-);
-
-
-/* =====================================================
-   WALLET
-===================================================== */
-
-app.get(
-  "/api/wallet",
-  requireLogin,
-  (req, res) => {
-
-    try {
-
-      ensureWallet(
-        req.session.userId
-      );
-
-      const wallet =
-        db.prepare(`
-          SELECT
-            balance
-          FROM wallets
-          WHERE user_id = ?
-        `).get(
-          req.session.userId
-        );
-
-      const completed =
-        db.prepare(`
-          SELECT COUNT(*) AS count
-          FROM submissions
-          WHERE user_id = ?
-          AND status = 'approved'
-        `).get(
-          req.session.userId
-        );
-
-      const withdrawals =
-        db.prepare(`
-          SELECT
-            id,
-            amount,
-            method,
-            status,
-            created_at AS createdAt
-          FROM withdrawals
-          WHERE user_id = ?
-          ORDER BY id DESC
-        `).all(
-          req.session.userId
-        );
-
-      res.json({
-
-        balance:
-          Number(
-            wallet?.balance || 0
-          ),
-
-        completed:
-          Number(
-            completed?.count || 0
-          ),
-
-        withdrawals
-
-      });
-
-    }
-
-    catch (error) {
-
-      console.error(
-        "WALLET ERROR:",
-        error
-      );
-
-      res.status(500).json({
-        error:
-          "Unable to load wallet."
-      });
-
-    }
-
-  }
-);
-
-
-/* =====================================================
-   WITHDRAWAL
-===================================================== */
-
-app.post(
-  "/api/withdraw",
-  requireLogin,
-  (req, res) => {
-
-    try {
-
-      const amount =
-        Number(
-          req.body.amount
-        );
-
-      const method =
-        String(
-          req.body.method || ""
-        )
-        .trim();
-
-      if (
-        !Number.isFinite(amount) ||
-        amount < 100
-      ) {
-
-        return res.status(400).json({
-          error:
-            "Minimum withdrawal amount is ₹100."
-        });
-
-      }
-
-      if (amount > 1000000) {
-
-        return res.status(400).json({
-          error:
-            "Invalid withdrawal amount."
-        });
-
-      }
-
-      if (!method) {
-
-        return res.status(400).json({
-          error:
-            "Please enter payment method."
-        });
-
-      }
-
-      if (method.length > 100) {
-
-        return res.status(400).json({
-          error:
-            "Payment method is too long."
-        });
-
-      }
-
-      ensureWallet(
-        req.session.userId
-      );
-
-      const wallet =
-        db.prepare(`
-          SELECT balance
-          FROM wallets
-          WHERE user_id = ?
-        `).get(
-          req.session.userId
-        );
-
-      const balance =
-        Number(
-          wallet?.balance || 0
-        );
-
-      if (amount > balance) {
-
-        return res.status(400).json({
-          error:
-            "Insufficient wallet balance."
-        });
-
-      }
-
-      const transaction =
-        db.transaction(() => {
-
-          db.prepare(`
-            UPDATE wallets
-            SET balance = balance - ?
-            WHERE user_id = ?
-          `).run(
-            amount,
-            req.session.userId
-          );
-
-          db.prepare(`
-            INSERT INTO withdrawals
-            (
-              user_id,
-              amount,
-              method,
-              status
-            )
-            VALUES (?, ?, ?, 'pending')
-          `).run(
-            req.session.userId,
-            amount,
-            method
-          );
-
-        });
-
-      transaction();
-
-      res.json({
-        message:
-          "Withdrawal request submitted successfully."
-      });
-
-    }
-
-    catch (error) {
-
-      console.error(
-        "WITHDRAW ERROR:",
-        error
-      );
-
-      res.status(500).json({
-        error:
-          "Unable to submit withdrawal request."
-      });
-
-    }
-
-  }
-);
-
 
 /* =====================================================
    ACCOUNT DETAILS
@@ -1078,112 +678,1248 @@ app.get(
   requireLogin,
   (req, res) => {
 
-    try {
+    const user =
+      req.user;
 
-      const user =
-        db.prepare(`
-          SELECT
-            id,
-            name,
-            email,
-            role,
-            created_at
-          FROM users
-          WHERE id = ?
-        `).get(
-          req.session.userId
-        );
-
-      if (!user) {
-
-        return res.status(404).json({
-          error:
-            "Account not found."
-        });
-
-      }
-
-      res.json({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        createdAt: user.created_at
-      });
-
-    }
-
-    catch (error) {
-
-      console.error(
-        "ACCOUNT ERROR:",
-        error
+    const submissions =
+      db.submissions.filter(
+        item =>
+          item.userId ===
+          user.id
       );
 
-      res.status(500).json({
-        error:
-          "Unable to load account details."
-      });
+    const withdrawals =
+      db.withdrawals.filter(
+        item =>
+          item.userId ===
+          user.id
+      );
 
-    }
-
-  }
-);
-
-
-/* =====================================================
-   HEALTH CHECK
-===================================================== */
-
-app.get(
-  "/health",
-  (req, res) => {
+    const completed =
+      submissions.filter(
+        item =>
+          item.status ===
+          "approved"
+      ).length;
 
     res.json({
-      status: "ok",
-      service: "TaskEarn",
-      time: new Date().toISOString()
+
+      id:
+        user.id,
+
+      name:
+        user.name,
+
+      email:
+        user.email,
+
+      role:
+        user.role || "member",
+
+      balance:
+        Number(
+          user.balance || 0
+        ),
+
+      completed,
+
+      totalSubmissions:
+        submissions.length,
+
+      totalWithdrawals:
+        withdrawals.length,
+
+      createdAt:
+        user.createdAt
+
     });
 
   }
 );
 
-
 /* =====================================================
-   FRONTEND FALLBACK
+   UPDATE ACCOUNT DETAILS
 ===================================================== */
 
-app.get(
-  "*",
+app.put(
+  "/api/account",
+  requireLogin,
   (req, res) => {
 
-    res.sendFile(
-      path.join(
-        __dirname,
-        "public",
-        "index.html"
+    const name =
+      String(
+        req.body.name || ""
+      ).trim();
+
+    if (!name) {
+
+      return res.status(400).json({
+        error:
+          "Name cannot be empty."
+      });
+
+    }
+
+    req.user.name =
+      name;
+
+    saveDatabase(db);
+
+    res.json(
+      cleanUser(
+        req.user
       )
     );
 
   }
 );
 
+/* =====================================================
+   TASKS
+===================================================== */
+
+app.get(
+  "/api/tasks",
+  requireLogin,
+  (req, res) => {
+
+    const tasks =
+      db.tasks
+        .filter(
+          task =>
+            task.active !== false
+        )
+        .map(task => ({
+
+          id:
+            task.id,
+
+          title:
+            task.title,
+
+          description:
+            task.description,
+
+          type:
+            task.type || "General",
+
+          reward:
+            Number(
+              task.reward || 0
+            ),
+
+          createdAt:
+            task.createdAt
+
+        }));
+
+    res.json(
+      tasks
+    );
+
+  }
+);
+
+/* =====================================================
+   TASK DETAILS
+===================================================== */
+
+app.get(
+  "/api/tasks/:id",
+  requireLogin,
+  (req, res) => {
+
+    const task =
+      db.tasks.find(
+        item =>
+          String(item.id) ===
+          String(req.params.id)
+      );
+
+    if (!task) {
+
+      return res.status(404).json({
+        error:
+          "Task not found."
+      });
+
+    }
+
+    res.json(
+      task
+    );
+
+  }
+);
+
+/* =====================================================
+   SUBMIT TASK
+===================================================== */
+
+app.post(
+  "/api/tasks/:id/submit",
+  requireLogin,
+  (req, res) => {
+
+    const task =
+      db.tasks.find(
+        item =>
+          String(item.id) ===
+          String(req.params.id)
+      );
+
+    if (!task) {
+
+      return res.status(404).json({
+        error:
+          "Task not found."
+      });
+
+    }
+
+    if (task.active === false) {
+
+      return res.status(400).json({
+        error:
+          "This task is no longer available."
+      });
+
+    }
+
+    const existing =
+      db.submissions.find(
+        item =>
+          item.userId ===
+            req.user.id &&
+          String(item.taskId) ===
+            String(task.id) &&
+          item.status ===
+            "pending"
+      );
+
+    if (existing) {
+
+      return res.status(400).json({
+        error:
+          "You already submitted this task."
+      });
+
+    }
+
+    const submission = {
+
+      id:
+        crypto.randomUUID(),
+
+      userId:
+        req.user.id,
+
+      taskId:
+        task.id,
+
+      taskTitle:
+        task.title,
+
+      reward:
+        Number(
+          task.reward || 0
+        ),
+
+      status:
+        "pending",
+
+      submittedAt:
+        new Date().toISOString(),
+
+      reviewedAt:
+        null
+
+    };
+
+    db.submissions.push(
+      submission
+    );
+
+    saveDatabase(db);
+
+    res.json({
+
+      success: true,
+
+      message:
+        "Task submitted for review!",
+
+      submission
+
+    });
+
+  }
+);
+
+/* =====================================================
+   MY SUBMISSIONS
+===================================================== */
+
+app.get(
+  "/api/my-submissions",
+  requireLogin,
+  (req, res) => {
+
+    const submissions =
+      db.submissions
+        .filter(
+          item =>
+            item.userId ===
+            req.user.id
+        )
+        .sort(
+          (a, b) =>
+            new Date(b.submittedAt) -
+            new Date(a.submittedAt)
+        );
+
+    res.json(
+      submissions
+    );
+
+  }
+);
+
+/* =====================================================
+   WALLET
+===================================================== */
+
+app.get(
+  "/api/wallet",
+  requireLogin,
+  (req, res) => {
+
+    const submissions =
+      db.submissions.filter(
+        item =>
+          item.userId ===
+          req.user.id
+      );
+
+    const completed =
+      submissions.filter(
+        item =>
+          item.status ===
+          "approved"
+      ).length;
+
+    const withdrawals =
+      db.withdrawals
+        .filter(
+          item =>
+            item.userId ===
+            req.user.id
+        )
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt) -
+            new Date(a.createdAt)
+        );
+
+    res.json({
+
+      balance:
+        Number(
+          req.user.balance || 0
+        ),
+
+      completed,
+
+      withdrawals
+
+    });
+
+  }
+);
+
+/* =====================================================
+   WITHDRAWAL
+===================================================== */
+
+app.post(
+  "/api/withdraw",
+  requireLogin,
+  (req, res) => {
+
+    const amount =
+      safeNumber(
+        req.body.amount
+      );
+
+    const method =
+      String(
+        req.body.method || ""
+      ).trim();
+
+    if (
+      !Number.isFinite(amount) ||
+      amount < 100
+    ) {
+
+      return res.status(400).json({
+        error:
+          "Minimum withdrawal amount is ₹100."
+      });
+
+    }
+
+    if (!method) {
+
+      return res.status(400).json({
+        error:
+          "Please enter payment method."
+      });
+
+    }
+
+    if (
+      amount >
+      Number(req.user.balance || 0)
+    ) {
+
+      return res.status(400).json({
+        error:
+          "Insufficient wallet balance."
+      });
+
+    }
+
+    const withdrawal = {
+
+      id:
+        crypto.randomUUID(),
+
+      userId:
+        req.user.id,
+
+      amount:
+
+        Math.round(
+          amount * 100
+        ) / 100,
+
+      method,
+
+      status:
+        "pending",
+
+      createdAt:
+        new Date().toISOString(),
+
+      reviewedAt:
+        null
+
+    };
+
+    /*
+      Reserve the requested amount
+      immediately so the user cannot
+      request the same money twice.
+    */
+
+    req.user.balance =
+      Math.round(
+        (
+          Number(
+            req.user.balance || 0
+          ) - amount
+        ) * 100
+      ) / 100;
+
+    db.withdrawals.push(
+      withdrawal
+    );
+
+    saveDatabase(db);
+
+    res.json({
+
+      success: true,
+
+      message:
+        "Withdrawal request submitted.",
+
+      withdrawal,
+
+      balance:
+        req.user.balance
+
+    });
+
+  }
+);
+
+/* =====================================================
+   ADMIN - STATS
+===================================================== */
+
+app.get(
+  "/api/admin/stats",
+  requireAdmin,
+  (req, res) => {
+
+    const pendingSubmissions =
+      db.submissions.filter(
+        item =>
+          item.status ===
+          "pending"
+      ).length;
+
+    const pendingWithdrawals =
+      db.withdrawals.filter(
+        item =>
+          item.status ===
+          "pending"
+      ).length;
+
+    res.json({
+
+      users:
+        db.users.length,
+
+      tasks:
+        db.tasks.length,
+
+      submissions:
+        db.submissions.length,
+
+      pendingSubmissions,
+
+      withdrawals:
+        db.withdrawals.length,
+
+      pendingWithdrawals
+
+    });
+
+  }
+);
+
+/* =====================================================
+   ADMIN - USERS
+===================================================== */
+
+app.get(
+  "/api/admin/users",
+  requireAdmin,
+  (req, res) => {
+
+    res.json(
+      db.users.map(
+        cleanUser
+      )
+    );
+
+  }
+);
+
+/* =====================================================
+   ADMIN - TASKS
+===================================================== */
+
+app.get(
+  "/api/admin/tasks",
+  requireAdmin,
+  (req, res) => {
+
+    res.json(
+      db.tasks
+    );
+
+  }
+);
+
+/* =====================================================
+   ADMIN - CREATE TASK
+===================================================== */
+
+app.post(
+  "/api/admin/tasks",
+  requireAdmin,
+  (req, res) => {
+
+    const title =
+      String(
+        req.body.title || ""
+      ).trim();
+
+    const description =
+      String(
+        req.body.description || ""
+      ).trim();
+
+    const type =
+      String(
+        req.body.type || "General"
+      ).trim();
+
+    const reward =
+      safeNumber(
+        req.body.reward
+      );
+
+    if (!title) {
+
+      return res.status(400).json({
+        error:
+          "Task title is required."
+      });
+
+    }
+
+    if (reward <= 0) {
+
+      return res.status(400).json({
+        error:
+          "Reward must be greater than zero."
+      });
+
+    }
+
+    const task = {
+
+      id:
+        Date.now(),
+
+      title,
+
+      description,
+
+      type,
+
+      reward:
+
+        Math.round(
+          reward * 100
+        ) / 100,
+
+      active:
+        true,
+
+      createdAt:
+        new Date().toISOString()
+
+    };
+
+    db.tasks.push(
+      task
+    );
+
+    saveDatabase(db);
+
+    res.json(
+      task
+    );
+
+  }
+);
+
+/* =====================================================
+   ADMIN - UPDATE TASK
+===================================================== */
+
+app.put(
+  "/api/admin/tasks/:id",
+  requireAdmin,
+  (req, res) => {
+
+    const task =
+      db.tasks.find(
+        item =>
+          String(item.id) ===
+          String(req.params.id)
+      );
+
+    if (!task) {
+
+      return res.status(404).json({
+        error:
+          "Task not found."
+      });
+
+    }
+
+    if (
+      req.body.title !==
+      undefined
+    ) {
+
+      task.title =
+        String(
+          req.body.title
+        ).trim();
+
+    }
+
+    if (
+      req.body.description !==
+      undefined
+    ) {
+
+      task.description =
+        String(
+          req.body.description
+        ).trim();
+
+    }
+
+    if (
+      req.body.type !==
+      undefined
+    ) {
+
+      task.type =
+        String(
+          req.body.type
+        ).trim();
+
+    }
+
+    if (
+      req.body.reward !==
+      undefined
+    ) {
+
+      const reward =
+        safeNumber(
+          req.body.reward
+        );
+
+      if (reward <= 0) {
+
+        return res.status(400).json({
+          error:
+            "Invalid reward."
+        });
+
+      }
+
+      task.reward =
+        Math.round(
+          reward * 100
+        ) / 100;
+
+    }
+
+    if (
+      req.body.active !==
+      undefined
+    ) {
+
+      task.active =
+        Boolean(
+          req.body.active
+        );
+
+    }
+
+    saveDatabase(db);
+
+    res.json(
+      task
+    );
+
+  }
+);
+
+/* =====================================================
+   ADMIN - DELETE TASK
+===================================================== */
+
+app.delete(
+  "/api/admin/tasks/:id",
+  requireAdmin,
+  (req, res) => {
+
+    const index =
+      db.tasks.findIndex(
+        item =>
+          String(item.id) ===
+          String(req.params.id)
+      );
+
+    if (index === -1) {
+
+      return res.status(404).json({
+        error:
+          "Task not found."
+      });
+
+    }
+
+    db.tasks.splice(
+      index,
+      1
+    );
+
+    saveDatabase(db);
+
+    res.json({
+      success: true
+    });
+
+  }
+);
+
+/* =====================================================
+   ADMIN - SUBMISSIONS
+===================================================== */
+
+app.get(
+  "/api/admin/submissions",
+  requireAdmin,
+  (req, res) => {
+
+    const list =
+      db.submissions.map(
+        item => {
+
+          const user =
+            findUserById(
+              item.userId
+            );
+
+          return {
+
+            ...item,
+
+            userName:
+              user
+                ? user.name
+                : "Unknown",
+
+            userEmail:
+              user
+                ? user.email
+                : "Unknown"
+
+          };
+
+        }
+      );
+
+    res.json(
+      list
+    );
+
+  }
+);
+
+/* =====================================================
+   ADMIN - REVIEW SUBMISSION
+===================================================== */
+
+app.post(
+  "/api/admin/submissions/:id/review",
+  requireAdmin,
+  (req, res) => {
+
+    const submission =
+      db.submissions.find(
+        item =>
+          String(item.id) ===
+          String(req.params.id)
+      );
+
+    if (!submission) {
+
+      return res.status(404).json({
+        error:
+          "Submission not found."
+      });
+
+    }
+
+    if (
+      submission.status !==
+      "pending"
+    ) {
+
+      return res.status(400).json({
+        error:
+          "This submission has already been reviewed."
+      });
+
+    }
+
+    const decision =
+      String(
+        req.body.status || ""
+      ).toLowerCase();
+
+    if (
+      decision !== "approved" &&
+      decision !== "rejected"
+    ) {
+
+      return res.status(400).json({
+        error:
+          "Status must be approved or rejected."
+      });
+
+    }
+
+    const user =
+      findUserById(
+        submission.userId
+      );
+
+    if (!user) {
+
+      return res.status(404).json({
+        error:
+          "User not found."
+      });
+
+    }
+
+    submission.status =
+      decision;
+
+    submission.reviewedAt =
+      new Date().toISOString();
+
+    /*
+      Add reward only once
+      when approved.
+    */
+
+    if (
+      decision ===
+      "approved"
+    ) {
+
+      user.balance =
+        Math.round(
+          (
+            Number(
+              user.balance || 0
+            ) +
+            Number(
+              submission.reward || 0
+            )
+          ) * 100
+        ) / 100;
+
+    }
+
+    saveDatabase(db);
+
+    res.json({
+
+      success: true,
+
+      submission,
+
+      user:
+        cleanUser(user)
+
+    });
+
+  }
+);
+
+/* =====================================================
+   ADMIN - WITHDRAWALS
+===================================================== */
+
+app.get(
+  "/api/admin/withdrawals",
+  requireAdmin,
+  (req, res) => {
+
+    const list =
+      db.withdrawals.map(
+        item => {
+
+          const user =
+            findUserById(
+              item.userId
+            );
+
+          return {
+
+            ...item,
+
+            userName:
+              user
+                ? user.name
+                : "Unknown",
+
+            userEmail:
+              user
+                ? user.email
+                : "Unknown"
+
+          };
+
+        }
+      );
+
+    res.json(
+      list
+    );
+
+  }
+);
+
+/* =====================================================
+   ADMIN - REVIEW WITHDRAWAL
+===================================================== */
+
+app.post(
+  "/api/admin/withdrawals/:id/review",
+  requireAdmin,
+  (req, res) => {
+
+    const withdrawal =
+      db.withdrawals.find(
+        item =>
+          String(item.id) ===
+          String(req.params.id)
+      );
+
+    if (!withdrawal) {
+
+      return res.status(404).json({
+        error:
+          "Withdrawal not found."
+      });
+
+    }
+
+    if (
+      withdrawal.status !==
+      "pending"
+    ) {
+
+      return res.status(400).json({
+        error:
+          "This withdrawal has already been reviewed."
+      });
+
+    }
+
+    const decision =
+      String(
+        req.body.status || ""
+      ).toLowerCase();
+
+    if (
+      decision !== "approved" &&
+      decision !== "rejected"
+    ) {
+
+      return res.status(400).json({
+        error:
+          "Status must be approved or rejected."
+      });
+
+    }
+
+    const user =
+      findUserById(
+        withdrawal.userId
+      );
+
+    if (!user) {
+
+      return res.status(404).json({
+        error:
+          "User not found."
+      });
+
+    }
+
+    withdrawal.status =
+      decision;
+
+    withdrawal.reviewedAt =
+      new Date().toISOString();
+
+    /*
+      We already reserved the money
+      when the withdrawal was created.
+
+      If admin rejects the withdrawal,
+      return the money to the wallet.
+    */
+
+    if (
+      decision ===
+      "rejected"
+    ) {
+
+      user.balance =
+        Math.round(
+          (
+            Number(
+              user.balance || 0
+            ) +
+            Number(
+              withdrawal.amount || 0
+            )
+          ) * 100
+        ) / 100;
+
+    }
+
+    saveDatabase(db);
+
+    res.json({
+
+      success: true,
+
+      withdrawal,
+
+      user:
+        cleanUser(user)
+
+    });
+
+  }
+);
+
+/* =====================================================
+   PUBLIC INFORMATION APIs
+===================================================== */
+
+app.get(
+  "/api/about",
+  (req, res) => {
+
+    res.json({
+      title:
+        "About TaskEarn",
+
+      content:
+        "TaskEarn is an online task and reward platform designed to provide users with access to eligible tasks, task submissions, reward tracking and account management features."
+    });
+
+  }
+);
+
+app.get(
+  "/api/terms",
+  (req, res) => {
+
+    res.json({
+      title:
+        "Terms & Conditions",
+
+      content:
+        "Users must use TaskEarn honestly and lawfully. Task submissions are subject to review and approval. TaskEarn does not guarantee fixed income or continuous task availability."
+    });
+
+  }
+);
+
+app.get(
+  "/api/privacy",
+  (req, res) => {
+
+    res.json({
+      title:
+        "Privacy Policy",
+
+      content:
+        "TaskEarn may collect account, task and transaction information required to provide and secure the service."
+    });
+
+  }
+);
+
+app.get(
+  "/api/contact",
+  (req, res) => {
+
+    res.json({
+      title:
+        "Contact Us",
+
+      email:
+        "support@taskearn.demo"
+    });
+
+  }
+);
+
+/* =====================================================
+   STATIC WEBSITE
+===================================================== */
+
+const PUBLIC_DIR =
+  path.join(
+    __dirname,
+    "public"
+  );
+
+app.use(
+  express.static(
+    PUBLIC_DIR
+  )
+);
+
+/* =====================================================
+   SPA FALLBACK
+===================================================== */
+
+app.get(
+  "*",
+  (req, res) => {
+
+    const indexFile =
+      path.join(
+        PUBLIC_DIR,
+        "index.html"
+      );
+
+    if (
+      fs.existsSync(
+        indexFile
+      )
+    ) {
+
+      return res.sendFile(
+        indexFile
+      );
+
+    }
+
+    res.status(404).send(
+      "TaskEarn website is not configured correctly."
+    );
+
+  }
+);
 
 /* =====================================================
    ERROR HANDLER
 ===================================================== */
 
 app.use(
-  (err, req, res, next) => {
+  (
+    error,
+    req,
+    res,
+    next
+  ) => {
 
     console.error(
-      "SERVER ERROR:",
-      err
+      "Server error:",
+      error
     );
 
-    if (res.headersSent) {
+    if (
+      res.headersSent
+    ) {
 
-      return next(err);
+      return next(error);
 
     }
 
@@ -1195,56 +1931,48 @@ app.use(
   }
 );
 
-
 /* =====================================================
    START SERVER
 ===================================================== */
 
-app.listen(
-  PORT,
-  "0.0.0.0",
-  () => {
+createDefaultAdmin()
+  .then(() => {
 
-    console.log(
-      `TaskEarn server running on port ${PORT}`
+    app.listen(
+      PORT,
+      "0.0.0.0",
+      () => {
+
+        console.log(
+          "================================="
+        );
+
+        console.log(
+          "TaskEarn server started"
+        );
+
+        console.log(
+          "Port:",
+          PORT
+        );
+
+        console.log(
+          "================================="
+        );
+
+      }
     );
 
-  }
-);
+  })
+  .catch(
+    error => {
 
+      console.error(
+        "Startup error:",
+        error
+      );
 
-/* =====================================================
-   SAFE SHUTDOWN
-===================================================== */
+      process.exit(1);
 
-function shutdown() {
-
-  console.log(
-    "Shutting down TaskEarn..."
+    }
   );
-
-  try {
-
-    db.close();
-
-  }
-
-  catch (e) {
-
-    console.error(e);
-
-  }
-
-  process.exit(0);
-
-}
-
-process.on(
-  "SIGTERM",
-  shutdown
-);
-
-process.on(
-  "SIGINT",
-  shutdown
-);
