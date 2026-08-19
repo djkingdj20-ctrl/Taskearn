@@ -1,5 +1,8 @@
 const express = require("express");
 const session = require("express-session");
+const path = require("path");
+const fs = require("fs");
+const crypto = require("crypto");
 
 const app = express();
 
@@ -7,17 +10,128 @@ app.set("trust proxy", 1);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static("public"));
 
-/* =========================
+/* =====================================================
+   DATABASE FILE
+===================================================== */
+
+const DATA_DIR = path.join(__dirname, "data");
+const DATA_FILE = path.join(DATA_DIR, "database.json");
+
+if (!fs.existsSync(DATA_DIR)) {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+}
+
+/* =====================================================
+   DEFAULT DATABASE
+===================================================== */
+
+const defaultDatabase = {
+  users: [
+    {
+      id: 1,
+      name: "Demo User",
+      email: "user@taskearn.demo",
+      password: "123456",
+      role: "user",
+      balance: 0,
+      createdAt: new Date().toISOString()
+    },
+    {
+      id: 2,
+      name: "TaskEarn Admin",
+      email: "admin@taskearn.demo",
+      password: "admin123",
+      role: "admin",
+      balance: 0,
+      createdAt: new Date().toISOString()
+    }
+  ],
+
+  tasks: [
+    {
+      id: 1,
+      title: "Welcome Task",
+      description:
+        "Complete the basic TaskEarn welcome activity and submit it for review.",
+      type: "Welcome",
+      reward: 5,
+      active: true,
+      createdAt: new Date().toISOString()
+    },
+    {
+      id: 2,
+      title: "Website Feedback",
+      description:
+        "Review the website and provide useful feedback about your experience.",
+      type: "Feedback",
+      reward: 10,
+      active: true,
+      createdAt: new Date().toISOString()
+    }
+  ],
+
+  submissions: [],
+
+  withdrawals: []
+};
+
+/* =====================================================
+   DATABASE HELPERS
+===================================================== */
+
+function loadDatabase() {
+  try {
+    if (!fs.existsSync(DATA_FILE)) {
+      fs.writeFileSync(
+        DATA_FILE,
+        JSON.stringify(defaultDatabase, null, 2)
+      );
+
+      return defaultDatabase;
+    }
+
+    const data = JSON.parse(
+      fs.readFileSync(DATA_FILE, "utf8")
+    );
+
+    return {
+      users: Array.isArray(data.users) ? data.users : [],
+      tasks: Array.isArray(data.tasks) ? data.tasks : [],
+      submissions: Array.isArray(data.submissions)
+        ? data.submissions
+        : [],
+      withdrawals: Array.isArray(data.withdrawals)
+        ? data.withdrawals
+        : []
+    };
+  } catch (error) {
+    console.error("Database load error:", error);
+
+    return JSON.parse(
+      JSON.stringify(defaultDatabase)
+    );
+  }
+}
+
+let db = loadDatabase();
+
+function saveDatabase() {
+  fs.writeFileSync(
+    DATA_FILE,
+    JSON.stringify(db, null, 2)
+  );
+}
+
+/* =====================================================
    SESSION
-========================= */
+===================================================== */
 
 app.use(
   session({
     secret:
       process.env.SESSION_SECRET ||
-      "taskearn-demo-secret-change-this",
+      "taskearn-change-this-secret",
 
     resave: false,
 
@@ -25,1410 +139,547 @@ app.use(
 
     cookie: {
       httpOnly: true,
-      sameSite: "lax",
-      secure:
-        process.env.NODE_ENV === "production",
-      maxAge:
-        7 * 24 * 60 * 60 * 1000
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 1000 * 60 * 60 * 24 * 7
     }
   })
 );
 
+/* =====================================================
+   STATIC WEBSITE
+===================================================== */
 
-/* =========================
-   USERS
-========================= */
+app.use(
+  express.static(
+    path.join(__dirname, "public")
+  )
+);
 
-const users = [
-  {
-    id: 1,
-    name: "Demo User",
-    email: "user@taskearn.demo",
-    password: "123456",
-    role: "user",
-    balance: 0,
-    completed: 0
-  },
-
-  {
-    id: 2,
-    name: "Admin",
-    email: "admin@taskearn.demo",
-    password: "admin123",
-    role: "admin",
-    balance: 0,
-    completed: 0
-  }
-];
-
-let nextUserId = 3;
-
-
-/* =========================
-   TASKS
-========================= */
-
-let tasks = [
-  {
-    id: 1,
-    title: "Read a short description",
-    description:
-      "Read a short product description and submit the correct category.",
-    type: "Content",
-    reward: 6,
-    active: true
-  },
-
-  {
-    id: 2,
-    title: "Test a mobile website",
-    description:
-      "Test two buttons and submit your result.",
-    type: "Testing",
-    reward: 20,
-    active: true
-  },
-
-  {
-    id: 3,
-    title: "Daily check-in",
-    description:
-      "Complete the daily check-in and submit it for review.",
-    type: "Check-in",
-    reward: 2,
-    active: true
-  },
-
-  {
-    id: 4,
-    title: "Visit a sponsor page",
-    description:
-      "Open the sponsor page and confirm one simple detail.",
-    type: "Visit",
-    reward: 5,
-    active: true
-  }
-];
-
-let nextTaskId = 5;
-
-
-/* =========================
-   SUBMISSIONS
-========================= */
-
-let submissions = [];
-
-let nextSubmissionId = 1;
-
-
-/* =========================
-   WITHDRAWALS
-========================= */
-
-let withdrawals = [];
-
-let nextWithdrawalId = 1;
-
-
-/* =========================
+/* =====================================================
    HELPERS
-========================= */
+===================================================== */
 
-function getUser(id) {
-  return users.find(
-    user => user.id === Number(id)
+function getCurrentUser(req) {
+  if (!req.session.userId) {
+    return null;
+  }
+
+  return db.users.find(
+    user => user.id === req.session.userId
+  ) || null;
+}
+
+function requireLogin(req, res, next) {
+  const user = getCurrentUser(req);
+
+  if (!user) {
+    return res.status(401).json({
+      error: "Please login first."
+    });
+  }
+
+  req.user = user;
+
+  next();
+}
+
+function requireAdmin(req, res, next) {
+  const user = getCurrentUser(req);
+
+  if (!user) {
+    return res.status(401).json({
+      error: "Please login first."
+    });
+  }
+
+  if (user.role !== "admin") {
+    return res.status(403).json({
+      error: "Admin access required."
+    });
+  }
+
+  req.user = user;
+
+  next();
+}
+
+function nextId(array) {
+  if (!array.length) {
+    return 1;
+  }
+
+  return (
+    Math.max(
+      ...array.map(item => Number(item.id) || 0)
+    ) + 1
   );
 }
 
+function safeUser(user) {
+  if (!user) {
+    return null;
+  }
 
-function getTask(id) {
-  return tasks.find(
-    task => task.id === Number(id)
-  );
-}
-
-
-function publicUser(user) {
   return {
     id: user.id,
     name: user.name,
     email: user.email,
-    role: user.role
+    role: user.role,
+    balance: Number(user.balance || 0),
+    createdAt: user.createdAt
   };
 }
 
-
-/* =========================
-   AUTH MIDDLEWARE
-========================= */
-
-function auth(req, res, next) {
-
-  if (!req.session.user) {
-
-    return res.status(401).json({
-      error: "Login required"
-    });
-
-  }
-
-  next();
-}
-
-
-function admin(req, res, next) {
-
-  if (
-    !req.session.user ||
-    req.session.user.role !== "admin"
-  ) {
-
-    return res.status(403).json({
-      error: "Admin only"
-    });
-
-  }
-
-  next();
-}
-
-
-/* =========================
-   HOME
-========================= */
-
-app.get("/", (req, res) => {
-
-  res.sendFile(
-    __dirname + "/public/index.html"
-  );
-
-});
-
-
-/* =========================
-   LOGIN PAGE
-========================= */
-
-app.get("/login", (req, res) => {
-
-  res.send(`
-
-<!DOCTYPE html>
-
-<html lang="en">
-
-<head>
-
-<meta charset="UTF-8">
-
-<meta
-name="viewport"
-content="width=device-width,initial-scale=1.0">
-
-<title>Login - TaskEarn</title>
-
-<style>
-
-*{
-box-sizing:border-box;
-}
-
-body{
-
-margin:0;
-
-font-family:
--apple-system,
-BlinkMacSystemFont,
-"Segoe UI",
-Roboto,
-Arial,
-sans-serif;
-
-background:
-linear-gradient(
-135deg,
-#fff7ed,
-#e8f4ff
-);
-
-min-height:100vh;
-
-display:flex;
-
-align-items:center;
-
-justify-content:center;
-
-padding:20px;
-
-color:#172033;
-
-}
-
-.card{
-
-background:#ffffff;
-
-width:100%;
-
-max-width:430px;
-
-padding:30px;
-
-border-radius:25px;
-
-box-shadow:
-0 15px 40px
-rgba(0,0,0,.10);
-
-}
-
-.logo{
-
-text-align:center;
-
-font-size:30px;
-
-font-weight:800;
-
-margin-bottom:8px;
-
-}
-
-.logo span{
-
-color:#ff6b35;
-
-}
-
-.subtitle{
-
-text-align:center;
-
-color:#687386;
-
-margin-bottom:25px;
-
-}
-
-.form{
-
-display:grid;
-
-gap:13px;
-
-}
-
-input{
-
-width:100%;
-
-padding:15px;
-
-border:1px solid #ddd;
-
-border-radius:13px;
-
-font-size:16px;
-
-outline:none;
-
-}
-
-input:focus{
-
-border-color:#ff6b35;
-
-box-shadow:
-0 0 0 3px
-rgba(255,107,53,.10);
-
-}
-
-button{
-
-width:100%;
-
-padding:15px;
-
-border:0;
-
-border-radius:13px;
-
-background:#ff6b35;
-
-color:white;
-
-font-size:16px;
-
-font-weight:bold;
-
-cursor:pointer;
-
-}
-
-button:hover{
-
-background:#f25822;
-
-}
-
-.demo{
-
-margin-top:20px;
-
-padding:14px;
-
-background:#fff7ed;
-
-border-radius:13px;
-
-font-size:13px;
-
-color:#687386;
-
-line-height:1.6;
-
-}
-
-.links{
-
-text-align:center;
-
-margin-top:20px;
-
-line-height:2;
-
-}
-
-a{
-
-color:#ff6b35;
-
-font-weight:bold;
-
-text-decoration:none;
-
-}
-
-.back{
-
-display:block;
-
-text-align:center;
-
-margin-top:20px;
-
-color:#687386;
-
-}
-
-</style>
-
-</head>
-
-<body>
-
-<div class="card">
-
-<div class="logo">
-Task<span>Earn</span>
-</div>
-
-<div class="subtitle">
-Login to your TaskEarn account
-</div>
-
-<form
-class="form"
-onsubmit="login(event)">
-
-<input
-id="email"
-type="email"
-placeholder="Email"
-autocomplete="email"
-required>
-
-<input
-id="password"
-type="password"
-placeholder="Password"
-autocomplete="current-password"
-required>
-
-<button type="submit">
-Login
-</button>
-
-</form>
-
-<div class="demo">
-
-<strong>Demo User</strong><br>
-
-user@taskearn.demo<br>
-
-Password: 123456
-
-<br><br>
-
-<strong>Admin</strong><br>
-
-admin@taskearn.demo<br>
-
-Password: admin123
-
-</div>
-
-<div class="links">
-
-Don't have an account?
-
-<a href="/register">
-Create Account
-</a>
-
-</div>
-
-<a
-class="back"
-href="/">
-
-← Back to TaskEarn
-
-</a>
-
-</div>
-
-
-<script>
-
-async function login(event){
-
-event.preventDefault();
-
-const email =
-document.getElementById("email").value.trim();
-
-const password =
-document.getElementById("password").value;
-
-try{
-
-const response =
-await fetch("/api/login",{
-
-method:"POST",
-
-headers:{
-"Content-Type":
-"application/json"
-},
-
-body:JSON.stringify({
-email,
-password
-})
-
-});
-
-const data =
-await response.json();
-
-if(!response.ok){
-
-throw new Error(
-data.error ||
-"Login failed"
-);
-
-}
-
-window.location.href="/";
-
-}catch(error){
-
-alert(error.message);
-
-}
-
-}
-
-</script>
-
-</body>
-
-</html>
-
-  `);
-
-});
-
-
-/* =========================
-   REGISTER PAGE
-========================= */
-
-app.get("/register", (req, res) => {
-
-  res.send(`
-
-<!DOCTYPE html>
-
-<html lang="en">
-
-<head>
-
-<meta charset="UTF-8">
-
-<meta
-name="viewport"
-content="width=device-width,initial-scale=1.0">
-
-<title>Create Account - TaskEarn</title>
-
-<style>
-
-*{
-box-sizing:border-box;
-}
-
-body{
-
-margin:0;
-
-font-family:
--apple-system,
-BlinkMacSystemFont,
-"Segoe UI",
-Roboto,
-Arial,
-sans-serif;
-
-background:
-linear-gradient(
-135deg,
-#fff7ed,
-#e8f4ff
-);
-
-min-height:100vh;
-
-display:flex;
-
-align-items:center;
-
-justify-content:center;
-
-padding:20px;
-
-color:#172033;
-
-}
-
-.card{
-
-background:#ffffff;
-
-width:100%;
-
-max-width:430px;
-
-padding:30px;
-
-border-radius:25px;
-
-box-shadow:
-0 15px 40px
-rgba(0,0,0,.10);
-
-}
-
-.logo{
-
-text-align:center;
-
-font-size:30px;
-
-font-weight:800;
-
-margin-bottom:8px;
-
-}
-
-.logo span{
-
-color:#ff6b35;
-
-}
-
-.subtitle{
-
-text-align:center;
-
-color:#687386;
-
-margin-bottom:25px;
-
-}
-
-.form{
-
-display:grid;
-
-gap:13px;
-
-}
-
-input{
-
-width:100%;
-
-padding:15px;
-
-border:1px solid #ddd;
-
-border-radius:13px;
-
-font-size:16px;
-
-outline:none;
-
-}
-
-input:focus{
-
-border-color:#ff6b35;
-
-box-shadow:
-0 0 0 3px
-rgba(255,107,53,.10);
-
-}
-
-button{
-
-width:100%;
-
-padding:15px;
-
-border:0;
-
-border-radius:13px;
-
-background:#ff6b35;
-
-color:white;
-
-font-size:16px;
-
-font-weight:bold;
-
-cursor:pointer;
-
-}
-
-button:hover{
-
-background:#f25822;
-
-}
-
-.note{
-
-margin-top:15px;
-
-font-size:12px;
-
-color:#687386;
-
-line-height:1.6;
-
-}
-
-.links{
-
-text-align:center;
-
-margin-top:20px;
-
-line-height:2;
-
-}
-
-a{
-
-color:#ff6b35;
-
-font-weight:bold;
-
-text-decoration:none;
-
-}
-
-.back{
-
-display:block;
-
-text-align:center;
-
-margin-top:20px;
-
-color:#687386;
-
-}
-
-</style>
-
-</head>
-
-<body>
-
-<div class="card">
-
-<div class="logo">
-Task<span>Earn</span>
-</div>
-
-<div class="subtitle">
-Create your TaskEarn account
-</div>
-
-<form
-class="form"
-onsubmit="registerUser(event)">
-
-<input
-id="name"
-type="text"
-placeholder="Your name"
-autocomplete="name"
-maxlength="60"
-required>
-
-<input
-id="email"
-type="email"
-placeholder="Email"
-autocomplete="email"
-required>
-
-<input
-id="password"
-type="password"
-placeholder="Password - minimum 6 characters"
-autocomplete="new-password"
-minlength="6"
-required>
-
-<button type="submit">
-Create Account
-</button>
-
-</form>
-
-<div class="note">
-
-By creating an account, you agree to the
-TaskEarn
-
-<a href="/terms">
-Terms & Conditions
-</a>
-
-and
-
-<a href="/privacy">
-Privacy Policy
-</a>.
-
-</div>
-
-<div class="links">
-
-Already have an account?
-
-<a href="/login">
-Login
-</a>
-
-</div>
-
-<a
-class="back"
-href="/">
-
-← Back to TaskEarn
-
-</a>
-
-</div>
-
-
-<script>
-
-async function registerUser(event){
-
-event.preventDefault();
-
-const name =
-document.getElementById("name").value.trim();
-
-const email =
-document.getElementById("email").value.trim();
-
-const password =
-document.getElementById("password").value;
-
-try{
-
-const response =
-await fetch("/api/register",{
-
-method:"POST",
-
-headers:{
-"Content-Type":
-"application/json"
-},
-
-body:JSON.stringify({
-name,
-email,
-password
-})
-
-});
-
-const data =
-await response.json();
-
-if(!response.ok){
-
-throw new Error(
-data.error ||
-"Registration failed"
-);
-
-}
-
-alert(
-"Account created successfully!"
-);
-
-window.location.href="/";
-
-}catch(error){
-
-alert(error.message);
-
-}
-
-}
-
-</script>
-
-</body>
-
-</html>
-
-  `);
-
-});
-
-
-/* =========================
+/* =====================================================
    HEALTH CHECK
-========================= */
+===================================================== */
 
 app.get("/health", (req, res) => {
-
   res.json({
-    ok: true,
-    service: "TaskEarn"
+    success: true,
+    message: "TaskEarn server is running.",
+    time: new Date().toISOString()
   });
-
 });
 
-
-/* =========================
+/* =====================================================
    CURRENT USER
-========================= */
+===================================================== */
 
 app.get("/api/me", (req, res) => {
-
-  res.json(
-    req.session.user || null
-  );
-
-});
-
-
-/* =========================
-   LOGIN API
-========================= */
-
-app.post("/api/login", (req, res) => {
-
-  const email =
-    String(req.body.email || "")
-      .trim()
-      .toLowerCase();
-
-  const password =
-    String(req.body.password || "");
-
-  if (!email || !password) {
-
-    return res.status(400).json({
-      error:
-        "Email and password are required"
-    });
-
-  }
-
-  const user =
-    users.find(
-      item =>
-        item.email.toLowerCase() === email &&
-        item.password === password
-    );
+  const user = getCurrentUser(req);
 
   if (!user) {
-
-    return res.status(401).json({
-      error:
-        "Invalid email or password"
-    });
-
+    return res.json(null);
   }
-
-  req.session.user =
-    publicUser(user);
-
-  req.session.save(err => {
-
-    if (err) {
-
-      console.error(
-        "Session save error:",
-        err
-      );
-
-      return res.status(500).json({
-        error:
-          "Login session could not be saved"
-      });
-
-    }
-
-    res.json({
-
-      ok: true,
-
-      user:
-        req.session.user
-
-    });
-
-  });
-
-});
-
-
-/* =========================
-   REGISTER API
-========================= */
-
-app.post("/api/register", (req, res) => {
-
-  const name =
-    String(req.body.name || "")
-      .trim();
-
-  const email =
-    String(req.body.email || "")
-      .trim()
-      .toLowerCase();
-
-  const password =
-    String(req.body.password || "");
-
-  if (!name || !email || !password) {
-
-    return res.status(400).json({
-      error:
-        "All fields are required"
-    });
-
-  }
-
-  if (name.length < 2) {
-
-    return res.status(400).json({
-      error:
-        "Name must be at least 2 characters"
-    });
-
-  }
-
-  if (password.length < 6) {
-
-    return res.status(400).json({
-      error:
-        "Password must be at least 6 characters"
-    });
-
-  }
-
-  if (
-    users.some(
-      user =>
-        user.email.toLowerCase() === email
-    )
-  ) {
-
-    return res.status(400).json({
-      error:
-        "Email already exists"
-    });
-
-  }
-
-  const user = {
-
-    id: nextUserId++,
-
-    name,
-
-    email,
-
-    password,
-
-    role: "user",
-
-    balance: 0,
-
-    completed: 0
-
-  };
-
-  users.push(user);
-
-  req.session.user =
-    publicUser(user);
-
-  req.session.save(err => {
-
-    if (err) {
-
-      console.error(
-        "Registration session error:",
-        err
-      );
-
-      return res.status(500).json({
-        error:
-          "Account created but login session failed"
-      });
-
-    }
-
-    res.json({
-
-      ok: true,
-
-      user:
-        req.session.user
-
-    });
-
-  });
-
-});
-
-
-/* =========================
-   LOGOUT
-========================= */
-
-app.post("/api/logout", (req, res) => {
-
-  req.session.destroy(err => {
-
-    if (err) {
-
-      return res.status(500).json({
-        error: "Logout failed"
-      });
-
-    }
-
-    res.clearCookie("connect.sid");
-
-    res.json({
-      ok: true
-    });
-
-  });
-
-});
-
-
-/* =========================
-   TASKS
-========================= */
-
-app.get("/api/tasks", (req, res) => {
 
   res.json(
-    tasks.filter(
-      task => task.active
-    )
+    safeUser(user)
   );
-
 });
 
+/* =====================================================
+   REGISTER
+===================================================== */
 
-app.get("/api/tasks/:id", (req, res) => {
+app.post("/api/register", (req, res) => {
+  try {
+    const name =
+      String(req.body.name || "").trim();
 
-  const task =
-    getTask(req.params.id);
+    const email =
+      String(req.body.email || "")
+        .trim()
+        .toLowerCase();
 
-  if (!task) {
+    const password =
+      String(req.body.password || "");
 
-    return res.status(404).json({
-      error: "Task not found"
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        error:
+          "Please complete all fields."
+      });
+    }
+
+    if (name.length < 2) {
+      return res.status(400).json({
+        error:
+          "Please enter a valid name."
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        error:
+          "Password must contain at least 6 characters."
+      });
+    }
+
+    const existingUser =
+      db.users.find(
+        user => user.email === email
+      );
+
+    if (existingUser) {
+      return res.status(400).json({
+        error:
+          "An account with this email already exists."
+      });
+    }
+
+    const user = {
+      id: nextId(db.users),
+      name,
+      email,
+      password,
+      role: "user",
+      balance: 0,
+      createdAt: new Date().toISOString()
+    };
+
+    db.users.push(user);
+
+    saveDatabase();
+
+    req.session.userId = user.id;
+
+    res.json({
+      success: true,
+      user: safeUser(user)
     });
 
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      error:
+        "Registration failed."
+    });
   }
-
-  res.json(task);
-
 });
 
+/* =====================================================
+   LOGIN
+===================================================== */
 
-/* =========================
+app.post("/api/login", (req, res) => {
+  try {
+    const email =
+      String(req.body.email || "")
+        .trim()
+        .toLowerCase();
+
+    const password =
+      String(req.body.password || "");
+
+    if (!email || !password) {
+      return res.status(400).json({
+        error:
+          "Please enter email and password."
+      });
+    }
+
+    const user =
+      db.users.find(
+        item =>
+          item.email === email &&
+          item.password === password
+      );
+
+    if (!user) {
+      return res.status(401).json({
+        error:
+          "Invalid email or password."
+      });
+    }
+
+    req.session.userId = user.id;
+
+    res.json({
+      success: true,
+      user: safeUser(user)
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      error:
+        "Login failed."
+    });
+  }
+});
+
+/* =====================================================
+   LOGOUT
+===================================================== */
+
+app.post("/api/logout", (req, res) => {
+  req.session.destroy(() => {
+    res.json({
+      success: true,
+      message: "Logged out successfully."
+    });
+  });
+});
+
+/* =====================================================
+   GET TASKS
+===================================================== */
+
+app.get(
+  "/api/tasks",
+  requireLogin,
+  (req, res) => {
+
+    const tasks =
+      db.tasks.filter(
+        task => task.active
+      );
+
+    res.json(tasks);
+  }
+);
+
+/* =====================================================
+   GET SINGLE TASK
+===================================================== */
+
+app.get(
+  "/api/tasks/:id",
+  requireLogin,
+  (req, res) => {
+
+    const id =
+      Number(req.params.id);
+
+    const task =
+      db.tasks.find(
+        item => item.id === id
+      );
+
+    if (!task) {
+      return res.status(404).json({
+        error:
+          "Task not found."
+      });
+    }
+
+    res.json(task);
+  }
+);
+
+/* =====================================================
    SUBMIT TASK
-========================= */
+===================================================== */
 
 app.post(
   "/api/tasks/:id/submit",
-  auth,
+  requireLogin,
   (req, res) => {
 
-    const user =
-      getUser(req.session.user.id);
+    const taskId =
+      Number(req.params.id);
 
     const task =
-      getTask(req.params.id);
-
-    if (!user) {
-
-      return res.status(404).json({
-        error: "User not found"
-      });
-
-    }
-
-    if (!task || !task.active) {
-
-      return res.status(404).json({
-        error: "Task not available"
-      });
-
-    }
-
-    const existing =
-      submissions.find(
+      db.tasks.find(
         item =>
-          item.userId === user.id &&
-          item.taskId === task.id &&
-          (
-            item.status === "pending" ||
-            item.status === "approved"
-          )
+          item.id === taskId &&
+          item.active
       );
 
-    if (existing) {
-
-      return res.status(400).json({
-
+    if (!task) {
+      return res.status(404).json({
         error:
-          existing.status === "approved"
-            ? "Task already approved"
-            : "Task already submitted"
-
+          "Task is not available."
       });
-
     }
 
-    submissions.push({
+    const alreadySubmitted =
+      db.submissions.find(
+        item =>
+          item.userId === req.user.id &&
+          item.taskId === task.id &&
+          item.status === "pending"
+      );
 
-      id:
-        nextSubmissionId++,
+    if (alreadySubmitted) {
+      return res.status(400).json({
+        error:
+          "You already submitted this task and it is waiting for review."
+      });
+    }
 
-      userId:
-        user.id,
+    const submission = {
+      id: nextId(db.submissions),
 
-      userName:
-        user.name,
+      userId: req.user.id,
 
-      taskId:
-        task.id,
+      taskId: task.id,
 
-      taskTitle:
-        task.title,
+      taskTitle: task.title,
 
-      reward:
-        Number(task.reward),
+      reward: Number(task.reward),
 
-      status:
-        "pending",
+      status: "pending",
 
       submittedAt:
         new Date().toISOString()
+    };
 
-    });
+    db.submissions.push(
+      submission
+    );
+
+    saveDatabase();
 
     res.json({
-
-      ok: true,
-
+      success: true,
       message:
         "Task submitted for review."
-
     });
-
   }
 );
 
-
-/* =========================
+/* =====================================================
    MY SUBMISSIONS
-========================= */
+===================================================== */
 
 app.get(
   "/api/my-submissions",
-  auth,
+  requireLogin,
   (req, res) => {
 
-    res.json(
-      submissions.filter(
-        item =>
-          item.userId ===
-          req.session.user.id
-      )
-    );
+    const submissions =
+      db.submissions
+        .filter(
+          item =>
+            item.userId ===
+            req.user.id
+        )
+        .sort(
+          (a, b) =>
+            new Date(b.submittedAt) -
+            new Date(a.submittedAt)
+        );
 
+    res.json(submissions);
   }
 );
 
-
-/* =========================
+/* =====================================================
    WALLET
-========================= */
+===================================================== */
 
 app.get(
   "/api/wallet",
-  auth,
+  requireLogin,
   (req, res) => {
 
     const user =
-      getUser(req.session.user.id);
+      db.users.find(
+        item =>
+          item.id === req.user.id
+      );
 
-    if (!user) {
+    const completed =
+      db.submissions.filter(
+        item =>
+          item.userId === user.id &&
+          item.status === "approved"
+      ).length;
 
-      return res.status(404).json({
-        error: "User not found"
-      });
-
-    }
-
-    res.json({
-
-      balance:
-        Number(user.balance),
-
-      completed:
-        Number(user.completed),
-
-      withdrawals:
-        withdrawals.filter(
+    const withdrawals =
+      db.withdrawals
+        .filter(
           item =>
             item.userId === user.id
         )
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt) -
+            new Date(a.createdAt)
+        );
 
+    res.json({
+      balance:
+        Number(user.balance || 0),
+
+      completed,
+
+      withdrawals
     });
-
   }
 );
 
-
-/* =========================
-   WITHDRAW
-========================= */
+/* =====================================================
+   WITHDRAWAL REQUEST
+===================================================== */
 
 app.post(
   "/api/withdraw",
-  auth,
+  requireLogin,
   (req, res) => {
-
-    const user =
-      getUser(req.session.user.id);
-
-    if (!user) {
-
-      return res.status(404).json({
-        error: "User not found"
-      });
-
-    }
 
     const amount =
       Number(req.body.amount);
 
     const method =
       String(
-        req.body.method || "UPI"
+        req.body.method || ""
       ).trim();
 
-    if (!Number.isFinite(amount)) {
+    const MIN_WITHDRAWAL = 100;
 
-      return res.status(400).json({
-        error: "Invalid amount"
-      });
-
-    }
-
-    if (amount < 100) {
-
+    if (
+      !Number.isFinite(amount) ||
+      amount <= 0
+    ) {
       return res.status(400).json({
         error:
-          "Minimum withdrawal is ₹100"
+          "Please enter a valid withdrawal amount."
       });
-
     }
 
-    if (amount > user.balance) {
-
+    if (amount < MIN_WITHDRAWAL) {
       return res.status(400).json({
         error:
-          "Insufficient balance"
+          "Minimum withdrawal amount is ₹100."
       });
-
     }
 
-    user.balance -= amount;
+    if (!method) {
+      return res.status(400).json({
+        error:
+          "Please enter a payment method."
+      });
+    }
 
-    withdrawals.push({
+    const user =
+      db.users.find(
+        item =>
+          item.id === req.user.id
+      );
 
+    if (!user) {
+      return res.status(404).json({
+        error:
+          "User not found."
+      });
+    }
+
+    if (
+      Number(user.balance || 0) <
+      amount
+    ) {
+      return res.status(400).json({
+        error:
+          "Insufficient balance."
+      });
+    }
+
+    const pending =
+      db.withdrawals.find(
+        item =>
+          item.userId === user.id &&
+          item.status === "pending"
+      );
+
+    if (pending) {
+      return res.status(400).json({
+        error:
+          "You already have a pending withdrawal request."
+      });
+    }
+
+    user.balance =
+      Number(user.balance || 0) -
+      amount;
+
+    const withdrawal = {
       id:
-        nextWithdrawalId++,
+        nextId(db.withdrawals),
 
       userId:
         user.id,
@@ -1445,17 +696,634 @@ app.post(
 
       createdAt:
         new Date().toISOString()
+    };
 
-    });
+    db.withdrawals.push(
+      withdrawal
+    );
+
+    saveDatabase();
 
     res.json({
-
-      ok: true,
+      success: true,
 
       message:
-        "Withdrawal request submitted"
-
+        "Withdrawal request submitted."
     });
+  }
+);
+
+/* =====================================================
+   ADMIN STATS
+===================================================== */
+
+app.get(
+  "/api/admin/stats",
+  requireAdmin,
+  (req, res) => {
+
+    const pendingSubmissions =
+      db.submissions.filter(
+        item =>
+          item.status ===
+          "pending"
+      ).length;
+
+    const pendingWithdrawals =
+      db.withdrawals.filter(
+        item =>
+          item.status ===
+          "pending"
+      ).length;
+
+    res.json({
+      users:
+        db.users.filter(
+          user =>
+            user.role !== "admin"
+        ).length,
+
+      tasks:
+        db.tasks.length,
+
+      submissions:
+        pendingSubmissions,
+
+      pending:
+        pendingWithdrawals
+    });
+  }
+);
+
+/* =====================================================
+   ADMIN GET TASKS
+===================================================== */
+
+app.get(
+  "/api/admin/tasks",
+  requireAdmin,
+  (req, res) => {
+
+    res.json(
+      db.tasks.sort(
+        (a, b) =>
+          b.id - a.id
+      )
+    );
+  }
+);
+
+/* =====================================================
+   ADMIN ADD TASK
+===================================================== */
+
+app.post(
+  "/api/admin/tasks",
+  requireAdmin,
+  (req, res) => {
+
+    const title =
+      String(
+        req.body.title || ""
+      ).trim();
+
+    const description =
+      String(
+        req.body.description || ""
+      ).trim();
+
+    const type =
+      String(
+        req.body.type || ""
+      ).trim();
+
+    const reward =
+      Number(req.body.reward);
+
+    if (!title) {
+      return res.status(400).json({
+        error:
+          "Task title is required."
+      });
+    }
+
+    if (!description) {
+      return res.status(400).json({
+        error:
+          "Task description is required."
+      });
+    }
+
+    if (!type) {
+      return res.status(400).json({
+        error:
+          "Task type is required."
+      });
+    }
+
+    if (
+      !Number.isFinite(reward) ||
+      reward <= 0
+    ) {
+      return res.status(400).json({
+        error:
+          "Enter a valid reward."
+      });
+    }
+
+    const task = {
+      id:
+        nextId(db.tasks),
+
+      title,
+
+      description,
+
+      type,
+
+      reward,
+
+      active: true,
+
+      createdAt:
+        new Date().toISOString()
+    };
+
+    db.tasks.push(task);
+
+    saveDatabase();
+
+    res.json({
+      success: true,
+      task
+    });
+  }
+);
+
+/* =====================================================
+   ADMIN UPDATE TASK
+===================================================== */
+
+app.put(
+  "/api/admin/tasks/:id",
+  requireAdmin,
+  (req, res) => {
+
+    const id =
+      Number(req.params.id);
+
+    const task =
+      db.tasks.find(
+        item =>
+          item.id === id
+      );
+
+    if (!task) {
+      return res.status(404).json({
+        error:
+          "Task not found."
+      });
+    }
+
+    const title =
+      String(
+        req.body.title || ""
+      ).trim();
+
+    const description =
+      String(
+        req.body.description || ""
+      ).trim();
+
+    const type =
+      String(
+        req.body.type || ""
+      ).trim();
+
+    const reward =
+      Number(req.body.reward);
+
+    if (!title) {
+      return res.status(400).json({
+        error:
+          "Task title is required."
+      });
+    }
+
+    if (!description) {
+      return res.status(400).json({
+        error:
+          "Task description is required."
+      });
+    }
+
+    if (!type) {
+      return res.status(400).json({
+        error:
+          "Task type is required."
+      });
+    }
+
+    if (
+      !Number.isFinite(reward) ||
+      reward <= 0
+    ) {
+      return res.status(400).json({
+        error:
+          "Invalid reward."
+      });
+    }
+
+    task.title =
+      title;
+
+    task.description =
+      description;
+
+    task.type =
+      type;
+
+    task.reward =
+      reward;
+
+    task.active =
+      req.body.active !== false;
+
+    task.updatedAt =
+      new Date().toISOString();
+
+    saveDatabase();
+
+    res.json({
+      success: true,
+      task
+    });
+  }
+);
+
+/* =====================================================
+   ADMIN DISABLE TASK
+===================================================== */
+
+app.delete(
+  "/api/admin/tasks/:id",
+  requireAdmin,
+  (req, res) => {
+
+    const id =
+      Number(req.params.id);
+
+    const task =
+      db.tasks.find(
+        item =>
+          item.id === id
+      );
+
+    if (!task) {
+      return res.status(404).json({
+        error:
+          "Task not found."
+      });
+    }
+
+    task.active =
+      false;
+
+    task.updatedAt =
+      new Date().toISOString();
+
+    saveDatabase();
+
+    res.json({
+      success: true,
+      message:
+        "Task disabled."
+    });
+  }
+);
+
+/* =====================================================
+   ADMIN SUBMISSIONS
+===================================================== */
+
+app.get(
+  "/api/admin/submissions",
+  requireAdmin,
+  (req, res) => {
+
+    const submissions =
+      db.submissions
+        .map(item => {
+
+          const user =
+            db.users.find(
+              u =>
+                u.id ===
+                item.userId
+            );
+
+          return {
+            ...item,
+
+            userName:
+              user
+                ? user.name
+                : "Unknown User",
+
+            userEmail:
+              user
+                ? user.email
+                : ""
+          };
+        })
+        .sort(
+          (a, b) =>
+            new Date(b.submittedAt) -
+            new Date(a.submittedAt)
+        );
+
+    res.json(
+      submissions
+    );
+  }
+);
+
+/* =====================================================
+   ADMIN REVIEW SUBMISSION
+===================================================== */
+
+app.post(
+  "/api/admin/submissions/:id",
+  requireAdmin,
+  (req, res) => {
+
+    const id =
+      Number(req.params.id);
+
+    const status =
+      String(
+        req.body.status || ""
+      ).trim();
+
+    if (
+      status !== "approved" &&
+      status !== "rejected"
+    ) {
+      return res.status(400).json({
+        error:
+          "Invalid review status."
+      });
+    }
+
+    const submission =
+      db.submissions.find(
+        item =>
+          item.id === id
+      );
+
+    if (!submission) {
+      return res.status(404).json({
+        error:
+          "Submission not found."
+      });
+    }
+
+    if (
+      submission.status !==
+      "pending"
+    ) {
+      return res.status(400).json({
+        error:
+          "This submission has already been reviewed."
+      });
+    }
+
+    const user =
+      db.users.find(
+        item =>
+          item.id ===
+          submission.userId
+      );
+
+    if (!user) {
+      return res.status(404).json({
+        error:
+          "User not found."
+      });
+    }
+
+    if (
+      status === "approved"
+    ) {
+
+      user.balance =
+        Number(user.balance || 0) +
+        Number(submission.reward || 0);
+
+    }
+
+    submission.status =
+      status;
+
+    submission.reviewedAt =
+      new Date().toISOString();
+
+    submission.reviewedBy =
+      req.user.id;
+
+    saveDatabase();
+
+    res.json({
+      success: true,
+
+      message:
+        status === "approved"
+          ? "Submission approved."
+          : "Submission rejected."
+    });
+  }
+);
+
+/* =====================================================
+   ADMIN WITHDRAWALS
+===================================================== */
+
+app.get(
+  "/api/admin/withdrawals",
+  requireAdmin,
+  (req, res) => {
+
+    const withdrawals =
+      db.withdrawals
+        .map(item => {
+
+          const user =
+            db.users.find(
+              u =>
+                u.id ===
+                item.userId
+            );
+
+          return {
+            ...item,
+
+            name:
+              user
+                ? user.name
+                : item.name,
+
+            email:
+              user
+                ? user.email
+                : ""
+          };
+        })
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt) -
+            new Date(a.createdAt)
+        );
+
+    res.json(
+      withdrawals
+    );
+  }
+);
+
+/* =====================================================
+   ADMIN REVIEW WITHDRAWAL
+===================================================== */
+
+app.post(
+  "/api/admin/withdrawals/:id",
+  requireAdmin,
+  (req, res) => {
+
+    const id =
+      Number(req.params.id);
+
+    const status =
+      String(
+        req.body.status || ""
+      ).trim();
+
+    if (
+      status !== "approved" &&
+      status !== "rejected"
+    ) {
+      return res.status(400).json({
+        error:
+          "Invalid withdrawal status."
+      });
+    }
+
+    const withdrawal =
+      db.withdrawals.find(
+        item =>
+          item.id === id
+      );
+
+    if (!withdrawal) {
+      return res.status(404).json({
+        error:
+          "Withdrawal not found."
+      });
+    }
+
+    if (
+      withdrawal.status !==
+      "pending"
+    ) {
+      return res.status(400).json({
+        error:
+          "This withdrawal has already been reviewed."
+      });
+    }
+
+    const user =
+      db.users.find(
+        item =>
+          item.id ===
+          withdrawal.userId
+      );
+
+    if (!user) {
+      return res.status(404).json({
+        error:
+          "User not found."
+      });
+    }
+
+    if (
+      status === "rejected"
+    ) {
+
+      user.balance =
+        Number(user.balance || 0) +
+        Number(withdrawal.amount || 0);
+
+    }
+
+    withdrawal.status =
+      status;
+
+    withdrawal.reviewedAt =
+      new Date().toISOString();
+
+    withdrawal.reviewedBy =
+      req.user.id;
+
+    saveDatabase();
+
+    res.json({
+      success: true,
+
+      message:
+        status === "approved"
+          ? "Withdrawal approved."
+          : "Withdrawal rejected and balance returned."
+    });
+  }
+);
+
+/* =====================================================
+   FRONTEND FALLBACK
+===================================================== */
+
+app.get("*", (req, res) => {
+
+  res.sendFile(
+    path.join(
+      __dirname,
+      "public",
+      "index.html"
+    )
+  );
+
+});
+
+/* =====================================================
+   SERVER
+===================================================== */
+
+const PORT =
+  process.env.PORT || 3000;
+
+app.listen(
+  PORT,
+  "0.0.0.0",
+  () => {
+
+    console.log(
+      `TaskEarn server running on port ${PORT}`
+    );
+
+    console.log(
+      `Environment: ${
+        process.env.NODE_ENV ||
+        "development"
+      }`
+    );
 
   }
 );
