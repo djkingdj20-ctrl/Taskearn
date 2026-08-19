@@ -20,9 +20,7 @@ const DATA_DIR = path.join(__dirname, "data");
 const DB_FILE = path.join(DATA_DIR, "database.json");
 
 if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, {
-    recursive: true
-  });
+  fs.mkdirSync(DATA_DIR, { recursive: true });
 }
 
 function defaultDatabase() {
@@ -109,6 +107,9 @@ function loadDB() {
       user.emailVerified ??= false;
       user.mobileVerified ??= false;
 
+      user.googleId ??= "";
+      user.authProvider ??= user.googleId ? "google" : "local";
+
       user.balance ??= 0;
       user.role ??= "Member";
     });
@@ -149,7 +150,6 @@ app.use(
 
     cookie: {
       httpOnly: true,
-
       sameSite: "lax",
 
       secure:
@@ -166,7 +166,7 @@ app.use(
 );
 
 /* =====================================================
-   SECURITY / HELPERS
+   HELPERS
 ===================================================== */
 
 function cleanText(value, maxLength = 200) {
@@ -195,32 +195,19 @@ function validMobile(mobile) {
 }
 
 function publicUser(user) {
-  if (!user) {
-    return null;
-  }
+  if (!user) return null;
 
   return {
     id: user.id,
-
-    name: user.name,
-
-    email: user.email,
-
+    name: user.name || "",
+    email: user.email || "",
     role: user.role || "Member",
-
     mobile: user.mobile || "",
-
     city: user.city || "",
-
-    profileImage:
-      user.profileImage || "",
-
-    emailVerified:
-      Boolean(user.emailVerified),
-
-    mobileVerified:
-      Boolean(user.mobileVerified),
-
+    profileImage: user.profileImage || "",
+    emailVerified: Boolean(user.emailVerified),
+    mobileVerified: Boolean(user.mobileVerified),
+    authProvider: user.authProvider || "local",
     createdAt: user.createdAt
   };
 }
@@ -252,16 +239,12 @@ function requireLogin(req, res, next) {
   }
 
   req.user = user;
-
   next();
 }
 
 function randomOtp() {
   return String(
-    crypto.randomInt(
-      100000,
-      1000000
-    )
+    crypto.randomInt(100000, 1000000)
   );
 }
 
@@ -332,14 +315,9 @@ async function sendEmailOtp(
       padding:25px;
       color:#171b2d;
     ">
+      <h2>TaskEarn Email Verification</h2>
 
-      <h2>
-        TaskEarn Email Verification
-      </h2>
-
-      <p>
-        Your TaskEarn verification code is:
-      </p>
+      <p>Your TaskEarn verification code is:</p>
 
       <div style="
         font-size:32px;
@@ -350,15 +328,12 @@ async function sendEmailOtp(
         ${otp}
       </div>
 
-      <p>
-        This code expires in 10 minutes.
-      </p>
+      <p>This code expires in 10 minutes.</p>
 
       <p>
         If you did not request this code,
         you can safely ignore this email.
       </p>
-
     </div>
   `;
 
@@ -377,11 +352,8 @@ async function sendEmailOtp(
 
       body: JSON.stringify({
         from,
-
         to: [email],
-
         subject,
-
         html
       })
     }
@@ -433,10 +405,7 @@ async function sendSmsOtp(
   const params =
     new URLSearchParams();
 
-  params.append(
-    "To",
-    mobile
-  );
+  params.append("To", mobile);
 
   params.append(
     "From",
@@ -483,7 +452,7 @@ async function sendSmsOtp(
 }
 
 /* =====================================================
-   OTP RECORD
+   OTP RECORDS
 ===================================================== */
 
 function createOtpRecord(
@@ -492,7 +461,6 @@ function createOtpRecord(
   purpose
 ) {
   const otp = randomOtp();
-
   const now = Date.now();
 
   const record = {
@@ -578,10 +546,6 @@ function deleteOtpRecord(
   saveDB(db);
 }
 
-/* =====================================================
-   SEND OTP
-===================================================== */
-
 async function sendOtpFor(
   user,
   type,
@@ -645,7 +609,7 @@ async function sendOtpFor(
 }
 
 /* =====================================================
-   START VERIFICATION
+   VERIFICATION FLOW
 ===================================================== */
 
 async function startVerification(
@@ -655,19 +619,11 @@ async function startVerification(
 ) {
   req.session.verification = {
     userId: user.id,
-
     purpose,
-
     emailVerified:
-      Boolean(
-        user.emailVerified
-      ),
-
+      Boolean(user.emailVerified),
     mobileVerified:
-      Boolean(
-        user.mobileVerified
-      ),
-
+      Boolean(user.mobileVerified),
     createdAt: Date.now()
   };
 
@@ -702,10 +658,6 @@ async function startVerification(
   return "complete";
 }
 
-/* =====================================================
-   COMPLETE LOGIN
-===================================================== */
-
 function completeLogin(
   req,
   user,
@@ -715,6 +667,8 @@ function completeLogin(
     user.id;
 
   delete req.session.verification;
+
+  delete req.session.remember;
 
   req.session.cookie.maxAge =
     remember
@@ -728,6 +682,244 @@ function completeLogin(
         60 *
         12;
 }
+
+/* =====================================================
+   GOOGLE SIGN-IN
+===================================================== */
+
+async function verifyGoogleIdToken(
+  idToken
+) {
+  const clientId =
+    process.env.GOOGLE_CLIENT_ID;
+
+  if (!clientId) {
+    throw new Error(
+      "Google Sign-In is not configured. Please add GOOGLE_CLIENT_ID."
+    );
+  }
+
+  if (!idToken) {
+    throw new Error(
+      "Google authentication token is missing."
+    );
+  }
+
+  const url =
+    "https://oauth2.googleapis.com/tokeninfo?id_token=" +
+    encodeURIComponent(idToken);
+
+  const response =
+    await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(
+      "Invalid Google authentication token."
+    );
+  }
+
+  const data =
+    await response.json();
+
+  if (
+    data.aud !== clientId
+  ) {
+    throw new Error(
+      "Google client ID does not match."
+    );
+  }
+
+  if (
+    data.email_verified !==
+      "true" &&
+    data.email_verified !==
+      true
+  ) {
+    throw new Error(
+      "Your Google email is not verified."
+    );
+  }
+
+  if (!validEmail(data.email)) {
+    throw new Error(
+      "Google account email is invalid."
+    );
+  }
+
+  return {
+    googleId:
+      cleanText(
+        data.sub,
+        200
+      ),
+
+    email:
+      normalizeEmail(
+        data.email
+      ),
+
+    name:
+      cleanText(
+        data.name ||
+          data.email.split("@")[0],
+        80
+      ),
+
+    picture:
+      cleanText(
+        data.picture || "",
+        1000
+      )
+  };
+}
+
+/* =====================================================
+   GOOGLE LOGIN / REGISTER
+===================================================== */
+
+app.post(
+  "/api/auth/google",
+  async (req, res) => {
+    try {
+      const google =
+        await verifyGoogleIdToken(
+          req.body.credential
+        );
+
+      let user =
+        db.users.find(
+          (u) =>
+            u.googleId &&
+            String(u.googleId) ===
+              String(google.googleId)
+        );
+
+      if (!user) {
+        user =
+          db.users.find(
+            (u) =>
+              normalizeEmail(
+                u.email
+              ) === google.email
+          );
+      }
+
+      if (!user) {
+        user = {
+          id:
+            crypto.randomUUID(),
+
+          name:
+            google.name,
+
+          email:
+            google.email,
+
+          passwordHash:
+            "",
+
+          role:
+            "Member",
+
+          mobile:
+            "",
+
+          city:
+            "",
+
+          profileImage:
+            google.picture,
+
+          emailVerified:
+            true,
+
+          mobileVerified:
+            false,
+
+          googleId:
+            google.googleId,
+
+          authProvider:
+            "google",
+
+          balance:
+            0,
+
+          createdAt:
+            new Date().toISOString()
+        };
+
+        db.users.push(user);
+      } else {
+        user.googleId =
+          google.googleId;
+
+        user.emailVerified =
+          true;
+
+        user.authProvider =
+          "google";
+
+        if (
+          !user.profileImage &&
+          google.picture
+        ) {
+          user.profileImage =
+            google.picture;
+        }
+
+        if (
+          !user.name &&
+          google.name
+        ) {
+          user.name =
+            google.name;
+        }
+      }
+
+      saveDB(db);
+
+      /*
+        Google has already verified
+        the Gmail address.
+
+        We therefore do NOT ask for
+        Email OTP again.
+
+        We also do NOT force mobile OTP
+        for Google login.
+      */
+
+      completeLogin(
+        req,
+        user,
+        true
+      );
+
+      return res.json({
+        success:
+          true,
+
+        message:
+          "Google login successful.",
+
+        user:
+          publicUser(user)
+      });
+    } catch (error) {
+      console.error(
+        "Google authentication error:",
+        error
+      );
+
+      return res.status(401).json({
+        error:
+          error.message ||
+          "Google login failed."
+      });
+    }
+  }
+);
 
 /* =====================================================
    BASIC ROUTES
@@ -824,13 +1016,15 @@ app.post(
       const existingEmail =
         db.users.find(
           (u) =>
-            u.email === email
+            normalizeEmail(
+              u.email
+            ) === email
         );
 
       if (existingEmail) {
         return res.status(409).json({
           error:
-            "An account with this email already exists."
+            "An account with this email already exists. Please login with Google or your password."
         });
       }
 
@@ -863,19 +1057,30 @@ app.post(
 
         passwordHash,
 
-        role: "Member",
+        role:
+          "Member",
 
         mobile,
 
         city,
 
-        profileImage: "",
+        profileImage:
+          "",
 
-        emailVerified: false,
+        emailVerified:
+          false,
 
-        mobileVerified: false,
+        mobileVerified:
+          false,
 
-        balance: 0,
+        googleId:
+          "",
+
+        authProvider:
+          "local",
+
+        balance:
+          0,
 
         createdAt:
           new Date().toISOString()
@@ -957,13 +1162,27 @@ app.post(
       const user =
         db.users.find(
           (u) =>
-            u.email === email
+            normalizeEmail(
+              u.email
+            ) === email
         );
 
       if (!user) {
         return res.status(401).json({
           error:
             "Invalid email or password."
+        });
+      }
+
+      /*
+        Google-only account does not have
+        a local password.
+      */
+
+      if (!user.passwordHash) {
+        return res.status(401).json({
+          error:
+            "This account uses Google Sign-In. Please continue with Google."
         });
       }
 
@@ -977,13 +1196,6 @@ app.post(
         return res.status(401).json({
           error:
             "Invalid email or password."
-        });
-      }
-
-      if (!user.mobile) {
-        return res.status(400).json({
-          error:
-            "Please add a mobile number to your account before verification."
         });
       }
 
@@ -1195,7 +1407,8 @@ app.post(
           verification;
 
         return res.json({
-          step: "mobile",
+          step:
+            "mobile",
 
           email:
             user.email,
@@ -1216,7 +1429,8 @@ app.post(
       saveDB(db);
 
       return res.json({
-        step: "complete",
+        step:
+          "complete",
 
         user:
           publicUser(user)
@@ -1305,10 +1519,6 @@ app.get(
     const user =
       currentUser(req);
 
-    if (!user) {
-      return res.json(null);
-    }
-
     return res.json(
       publicUser(user)
     );
@@ -1351,7 +1561,6 @@ app.post(
 
 /* =====================================================
    PROFILE UPDATE
-   FIXED: async callback
 ===================================================== */
 
 app.put(
@@ -1392,7 +1601,10 @@ app.put(
         });
       }
 
-      if (!validMobile(mobile)) {
+      if (
+        mobile &&
+        !validMobile(mobile)
+      ) {
         return res.status(400).json({
           error:
             "Please enter a valid mobile number."
@@ -1420,26 +1632,34 @@ app.put(
         mobile !== user.mobile;
 
       if (mobileChanged) {
-        const duplicate =
-          db.users.find(
-            (u) =>
-              String(u.id) !==
-                String(user.id) &&
-              u.mobile === mobile
-          );
+        if (!mobile) {
+          user.mobile =
+            "";
 
-        if (duplicate) {
-          return res.status(409).json({
-            error:
-              "This mobile number is already registered."
-          });
+          user.mobileVerified =
+            false;
+        } else {
+          const duplicate =
+            db.users.find(
+              (u) =>
+                String(u.id) !==
+                  String(user.id) &&
+                u.mobile === mobile
+            );
+
+          if (duplicate) {
+            return res.status(409).json({
+              error:
+                "This mobile number is already registered."
+            });
+          }
+
+          user.mobile =
+            mobile;
+
+          user.mobileVerified =
+            false;
         }
-
-        user.mobile =
-          mobile;
-
-        user.mobileVerified =
-          false;
       }
 
       user.name =
@@ -1453,13 +1673,9 @@ app.put(
 
       saveDB(db);
 
-      /*
-        If mobile was changed,
-        send new verification OTP.
-      */
-
       if (
         mobileChanged &&
+        user.mobile &&
         !user.mobileVerified
       ) {
         req.session.profileVerification =
@@ -1489,7 +1705,7 @@ app.put(
 
           return res.status(503).json({
             error:
-              "Mobile number changed, but verification SMS could not be sent. Please try again later."
+              "Mobile number changed, but verification SMS could not be sent."
           });
         }
 
@@ -1746,7 +1962,8 @@ app.get(
         )
         .map(
           (t) => ({
-            id: t.id,
+            id:
+              t.id,
 
             title:
               t.title,
@@ -2084,19 +2301,11 @@ app.post(
 
         paymentDetails = {
           accountHolderName,
-
           accountNumber,
-
           ifscCode,
-
           bankName
         };
       }
-
-      /*
-        Deduct balance immediately
-        when withdrawal request is created.
-      */
 
       req.user.balance =
         Number(
@@ -2155,8 +2364,12 @@ app.get(
   "/api/health",
   (req, res) => {
     return res.json({
-      status: "ok",
-      service: "TaskEarn",
+      status:
+        "ok",
+
+      service:
+        "TaskEarn",
+
       time:
         new Date().toISOString()
     });
