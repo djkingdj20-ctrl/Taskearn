@@ -1870,31 +1870,21 @@ app.use(
 ===================================================== */
 
 app.get(
-  "*",
+  "/{*splat}",
   (req, res) => {
 
-    const indexFile =
-      path.join(
-        PUBLIC_DIR,
-        "index.html"
-      );
-
-    if (
-      fs.existsSync(
-        indexFile
-      )
-    ) {
-
-      return res.sendFile(
-        indexFile
-      );
-
-    }
-
-    res.status(404).send(
-      "TaskEarn website is not configured correctly."
+    const indexFile = path.join(
+      PUBLIC_DIR,
+      "index.html"
     );
 
+    if (fs.existsSync(indexFile)) {
+      return res.sendFile(indexFile);
+    }
+
+    return res.status(404).send(
+      "TaskEarn website is not configured correctly."
+    );
   }
 );
 
