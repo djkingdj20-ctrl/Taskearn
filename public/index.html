@@ -4,23 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-  <meta
-    name="google-adsense-account"
-    content="ca-pub-5877718538170577"
-  >
+  <meta name="google-adsense-account" content="ca-pub-5877718538170577">
 
   <meta
     name="description"
-    content="TaskEarn - Discover eligible online tasks, submit completed work and manage approved rewards."
+    content="TaskEarn is an online task and rewards platform where users can discover eligible tasks, submit completed work and track approved rewards."
   >
 
-  <title>TaskEarn - Tasks & Rewards</title>
+  <meta name="robots" content="index, follow">
+
+  <title>TaskEarn - Online Tasks & Rewards</title>
 
   <style>
-
-    /* =====================================================
-       RESET
-    ===================================================== */
 
     * {
       box-sizing: border-box;
@@ -64,10 +59,6 @@
       text-decoration: none;
       cursor: pointer;
     }
-
-    /* =====================================================
-       HEADER
-    ===================================================== */
 
     .header {
       position: sticky;
@@ -126,8 +117,6 @@
       position: relative;
     }
 
-    /* BALANCE HIDDEN BY DEFAULT */
-
     .balance {
       display: none;
       background: #f0fdf7;
@@ -147,7 +136,6 @@
     .menu-btn {
       width: 42px;
       height: 42px;
-      border: 0;
       border-radius: 12px;
       background: #f4f5f9;
       font-size: 21px;
@@ -161,15 +149,11 @@
       transform: scale(.95);
     }
 
-    /* =====================================================
-       DROPDOWN
-    ===================================================== */
-
     .dropdown-menu {
       position: absolute;
       top: 50px;
       right: 0;
-      width: 225px;
+      width: 240px;
       background: white;
       border: 1px solid #eceef4;
       border-radius: 18px;
@@ -193,7 +177,6 @@
       border-bottom: 1px solid #f1f2f6;
       font-size: 14px;
       font-weight: 600;
-      cursor: pointer;
       color: #171b2d;
     }
 
@@ -206,10 +189,6 @@
       color: #ff5b32;
     }
 
-    /* =====================================================
-       MAIN
-    ===================================================== */
-
     .container {
       width: 100%;
       max-width: 1050px;
@@ -217,10 +196,6 @@
       padding: 16px;
       padding-bottom: 90px;
     }
-
-    /* =====================================================
-       HERO
-    ===================================================== */
 
     .hero {
       position: relative;
@@ -252,7 +227,7 @@
     .hero h1 {
       position: relative;
       z-index: 1;
-      max-width: 600px;
+      max-width: 650px;
       margin: 0 0 12px;
       font-size: clamp(30px,7vw,48px);
       line-height: 1.08;
@@ -263,7 +238,7 @@
     .hero p {
       position: relative;
       z-index: 1;
-      max-width: 560px;
+      max-width: 600px;
       margin: 0 0 22px;
       color: #5f6879;
       font-size: 15px;
@@ -277,14 +252,9 @@
       flex-wrap: wrap;
     }
 
-    /* =====================================================
-       BUTTONS
-    ===================================================== */
-
     .btn {
       min-height: 46px;
       padding: 11px 17px;
-      border: 0;
       border-radius: 13px;
       font-weight: 800;
       transition:
@@ -323,10 +293,6 @@
       font-size: 16px;
     }
 
-    /* =====================================================
-       CARDS
-    ===================================================== */
-
     .card {
       background: white;
       border: 1px solid #eceef4;
@@ -349,12 +315,8 @@
     .muted {
       color: #687386;
       font-size: 14px;
-      line-height: 1.65;
+      line-height: 1.7;
     }
-
-    /* =====================================================
-       FEATURES
-    ===================================================== */
 
     .features {
       display: grid;
@@ -392,10 +354,6 @@
       color: #687386;
       font-size: 13px;
     }
-
-    /* =====================================================
-       TASKS
-    ===================================================== */
 
     .grid {
       display: grid;
@@ -446,10 +404,6 @@
       margin-top: 12px;
     }
 
-    /* =====================================================
-       STATS
-    ===================================================== */
-
     .stats {
       display: grid;
       grid-template-columns: repeat(3,1fr);
@@ -476,10 +430,6 @@
       font-size: 19px;
     }
 
-    /* =====================================================
-       NAV
-    ===================================================== */
-
     .nav {
       display: flex;
       gap: 8px;
@@ -496,10 +446,6 @@
     .nav .btn {
       flex-shrink: 0;
     }
-
-    /* =====================================================
-       FORM
-    ===================================================== */
 
     .form {
       display: grid;
@@ -523,10 +469,6 @@
       border-color: #ff6b35;
       box-shadow: 0 0 0 3px rgba(255,107,53,.1);
     }
-
-    /* =====================================================
-       AUTH
-    ===================================================== */
 
     .auth-wrap {
       min-height: 50vh;
@@ -559,10 +501,6 @@
       font-weight: 900;
       margin-bottom: 15px;
     }
-
-    /* =====================================================
-       OTHER
-    ===================================================== */
 
     .notice {
       background: #fff8df;
@@ -619,10 +557,6 @@
       color: #687386;
     }
 
-    /* =====================================================
-       FOOTER
-    ===================================================== */
-
     .footer {
       text-align: center;
       padding: 28px 10px;
@@ -638,10 +572,13 @@
       margin-bottom: 12px;
     }
 
-    /* =====================================================
-       MOBILE NAV
-       ONLY SHOWN AFTER LOGIN
-    ===================================================== */
+    .footer-links a {
+      font-weight: 700;
+    }
+
+    .footer-links a:hover {
+      color: #ff6333;
+    }
 
     .mobile-bottom-nav {
       display: none;
@@ -660,6 +597,7 @@
       .card {
         padding: 24px;
       }
+
     }
 
     @media (max-width: 700px) {
@@ -725,7 +663,6 @@
 
       .mobile-bottom-nav {
         position: fixed;
-        display: none;
         left: 10px;
         right: 10px;
         bottom: 10px;
@@ -769,6 +706,7 @@
         background: #fff1eb;
         color: #ff5d2e;
       }
+
     }
 
   </style>
@@ -776,15 +714,14 @@
 
 <body>
 
-<!-- =====================================================
-     HEADER
-===================================================== -->
-
 <header class="header">
 
   <div class="header-inner">
 
-    <div class="logo-container" onclick="handleLogoClick()">
+    <div
+      class="logo-container"
+      onclick="handleLogoClick()"
+    >
 
       <div class="logo-icon">T</div>
 
@@ -796,7 +733,6 @@
 
     <div class="header-right">
 
-      <!-- ONLY LOGGED-IN USER -->
       <div id="balance" class="balance">
         ₹0.00
       </div>
@@ -820,40 +756,28 @@
 
         <button
           class="dropdown-item"
-          onclick="showInfoPage(
-            'About Us ℹ️',
-            'TaskEarn offers simple daily tasks and reward tracking.'
-          )"
+          onclick="showInfoPage('about')"
         >
           ℹ️ About Us
         </button>
 
         <button
           class="dropdown-item"
-          onclick="showInfoPage(
-            'Terms & Conditions 📜',
-            'Users must complete tasks honestly and maintain account security.'
-          )"
+          onclick="showInfoPage('terms')"
         >
           📜 Terms & Conditions
         </button>
 
         <button
           class="dropdown-item"
-          onclick="showInfoPage(
-            'Contact Us 📞',
-            'Support Email: support@taskearn.demo'
-          )"
+          onclick="showInfoPage('contact')"
         >
           📞 Contact Us
         </button>
 
         <button
           class="dropdown-item"
-          onclick="showInfoPage(
-            'Privacy Policy 🔒',
-            'We respect user data and collect minimal information necessary for service delivery.'
-          )"
+          onclick="showInfoPage('privacy')"
         >
           🔒 Privacy Policy
         </button>
@@ -867,31 +791,25 @@
 </header>
 
 
-<!-- =====================================================
-     MAIN
-===================================================== -->
-
 <main class="container">
 
-  <!-- PUBLIC HOME -->
   <section id="homeArea">
 
     <div class="hero">
 
       <div class="hero-badge">
-        ⚡ Simple tasks • Easy tracking
+        ⚡ Simple tasks • Transparent rewards
       </div>
 
       <h1>
-        Earn money by completing simple online tasks
+        Complete tasks. Submit your work. Track your rewards.
       </h1>
 
       <p>
-        Discover eligible tasks, complete requirements,
-        submit work, and receive approved rewards.
+        TaskEarn provides a simple platform for discovering
+        eligible online tasks, completing requirements,
+        submitting work for review, and tracking approved rewards.
       </p>
-
-      <!-- THESE BUTTONS ARE ONLY FOR LOGGED-OUT USERS -->
 
       <div
         id="publicHeroButtons"
@@ -926,9 +844,9 @@
         </div>
 
         <div>
-          <b>Simple Tasks</b>
+          <b>Eligible Tasks</b>
           <span>
-            Browse available tasks easily.
+            Discover available tasks and review their requirements.
           </span>
         </div>
 
@@ -942,9 +860,9 @@
         </div>
 
         <div>
-          <b>Track Rewards</b>
+          <b>Reward Tracking</b>
           <span>
-            Monitor approved rewards.
+            Track approved rewards and withdrawal requests.
           </span>
         </div>
 
@@ -958,9 +876,9 @@
         </div>
 
         <div>
-          <b>Secure Account</b>
+          <b>Account Security</b>
           <span>
-            Manage your account securely.
+            Manage your TaskEarn account securely.
           </span>
         </div>
 
@@ -986,11 +904,15 @@
         </li>
 
         <li>
-          Read requirements carefully and complete the work.
+          Read the task requirements carefully.
         </li>
 
         <li>
-          Submit completed task for review.
+          Complete the task and submit your work.
+        </li>
+
+        <li>
+          Wait for the submission to be reviewed.
         </li>
 
         <li>
@@ -1009,9 +931,18 @@
       </h2>
 
       <p class="muted">
-        TaskEarn provides a simple interface for discovering
-        tasks, submitting work, and managing rewards.
+        TaskEarn is designed to make task-based opportunities
+        easier to discover, complete and manage. Users can
+        access eligible tasks, submit completed work and track
+        approved rewards from one account.
       </p>
+
+      <button
+        class="btn secondary"
+        onclick="showInfoPage('about')"
+      >
+        Learn More About Us
+      </button>
 
     </section>
 
@@ -1027,7 +958,8 @@
       </h3>
 
       <p class="muted">
-        Browse available tasks and complete them according to requirements.
+        Browse available tasks and complete them according
+        to the requirements provided for each task.
       </p>
 
       <h3>
@@ -1035,15 +967,26 @@
       </h3>
 
       <p class="muted">
-        No. Earnings depend on task availability and approval.
+        No. Earnings depend on task availability,
+        successful completion and approval of submitted work.
       </p>
 
       <h3>
-        Minimum withdrawal?
+        When are rewards credited?
       </h3>
 
       <p class="muted">
-        The minimum withdrawal amount is ₹100.
+        Rewards are credited after the applicable task
+        submission has been reviewed and approved.
+      </p>
+
+      <h3>
+        What is the minimum withdrawal?
+      </h3>
+
+      <p class="muted">
+        The current minimum withdrawal amount is ₹100,
+        subject to applicable platform requirements.
       </p>
 
     </section>
@@ -1051,51 +994,27 @@
   </section>
 
 
-  <!-- DYNAMIC AREA -->
-
   <section id="accountArea"></section>
 
-
-  <!-- FOOTER -->
 
   <footer class="footer">
 
     <div class="footer-links">
 
-      <a
-        onclick="showInfoPage(
-          'Privacy Policy 🔒',
-          'We respect user data.'
-        )"
-      >
-        Privacy
+      <a onclick="showInfoPage('privacy')">
+        Privacy Policy
       </a>
 
-      <a
-        onclick="showInfoPage(
-          'Terms & Conditions 📜',
-          'Users must complete tasks honestly.'
-        )"
-      >
-        Terms
+      <a onclick="showInfoPage('terms')">
+        Terms & Conditions
       </a>
 
-      <a
-        onclick="showInfoPage(
-          'About Us ℹ️',
-          'TaskEarn offers simple tasks.'
-        )"
-      >
-        About
+      <a onclick="showInfoPage('about')">
+        About Us
       </a>
 
-      <a
-        onclick="showInfoPage(
-          'Contact Us 📞',
-          'Email: support@taskearn.demo'
-        )"
-      >
-        Contact
+      <a onclick="showInfoPage('contact')">
+        Contact Us
       </a>
 
     </div>
@@ -1107,17 +1026,11 @@
 </main>
 
 
-<!-- =====================================================
-     MOBILE NAVIGATION
-     ONLY LOGGED-IN USERS
-===================================================== -->
-
 <div
   id="mobileBottomNav"
   class="mobile-bottom-nav"
 >
 
-  <!-- HOME -->
   <button
     class="bottom-item active"
     onclick="homeForLoggedInUser()"
@@ -1126,8 +1039,6 @@
     <span>Home</span>
   </button>
 
-
-  <!-- ACCOUNT -->
   <button
     class="bottom-item"
     onclick="handleProfileClick()"
@@ -1140,10 +1051,6 @@
 
 
 <script>
-
-/* =====================================================
-   GLOBAL USER STATE
-===================================================== */
 
 let currentUser = null;
 
@@ -1179,11 +1086,9 @@ async function api(url, options = {}) {
   }
 
   if (!response.ok) {
-
     throw new Error(
       data.error || "Something went wrong"
     );
-
   }
 
   return data;
@@ -1211,20 +1116,16 @@ function formatDate(val) {
   if (!val) return "-";
 
   try {
-
     return new Date(val).toLocaleString();
-
   } catch (e) {
-
     return val;
-
   }
 
 }
 
 
 /* =====================================================
-   UI STATE
+   LOGIN UI
 ===================================================== */
 
 function setLoggedInUI(user) {
@@ -1242,68 +1143,31 @@ function setLoggedInUI(user) {
 
   if (currentUser) {
 
-    /*
-      SHOW BALANCE
-    */
-
     if (balance) {
-
       balance.classList.add("visible");
-
     }
-
-    /*
-      SHOW MOBILE NAV
-    */
 
     if (nav) {
-
       nav.classList.add("logged-in");
-
     }
 
-    /*
-      HIDE LOGIN / REGISTER BUTTONS
-    */
-
     if (heroButtons) {
-
       heroButtons.style.display = "none";
-
     }
 
   } else {
 
-    /*
-      HIDE BALANCE
-    */
-
     if (balance) {
-
       balance.classList.remove("visible");
-
       balance.innerText = "₹0.00";
-
     }
-
-    /*
-      HIDE MOBILE NAV
-    */
 
     if (nav) {
-
       nav.classList.remove("logged-in");
-
     }
 
-    /*
-      SHOW LOGIN / REGISTER
-    */
-
     if (heroButtons) {
-
       heroButtons.style.display = "flex";
-
     }
 
   }
@@ -1317,8 +1181,6 @@ function setLoggedInUI(user) {
 
 function goPublicHome() {
 
-  currentUser = null;
-
   setLoggedInUI(null);
 
   document.getElementById("homeArea").style.display = "block";
@@ -1326,6 +1188,8 @@ function goPublicHome() {
   document.getElementById("accountArea").innerHTML = "";
 
   closeDropdown();
+
+  setActiveBottom("home");
 
   window.scrollTo({
     top: 0,
@@ -1339,8 +1203,9 @@ function homeForLoggedInUser() {
 
   /*
     IMPORTANT:
-    LOGGED-IN USER MUST NOT GO
-    TO PUBLIC LOGIN PAGE.
+    Logged-in users stay inside
+    their dashboard.
+    They do NOT go to login page.
   */
 
   if (currentUser) {
@@ -1378,15 +1243,15 @@ function handleLogoClick() {
 function toggleDropdown(e) {
 
   if (e) {
-
     e.stopPropagation();
-
   }
 
   const menu =
     document.getElementById("dropdownMenu");
 
-  menu.classList.toggle("show");
+  if (menu) {
+    menu.classList.toggle("show");
+  }
 
 }
 
@@ -1397,9 +1262,7 @@ function closeDropdown() {
     document.getElementById("dropdownMenu");
 
   if (menu) {
-
     menu.classList.remove("show");
-
   }
 
 }
@@ -1414,13 +1277,9 @@ function handleLoginMenu() {
   closeDropdown();
 
   if (currentUser) {
-
     dashboard(currentUser);
-
   } else {
-
     showLogin();
-
   }
 
 }
@@ -1434,17 +1293,9 @@ function showLogin() {
 
   closeDropdown();
 
-  /*
-    If already logged in,
-    don't show login page.
-  */
-
   if (currentUser) {
-
     dashboard(currentUser);
-
     return;
-
   }
 
   document.getElementById("homeArea").style.display = "none";
@@ -1464,7 +1315,7 @@ function showLogin() {
         </h2>
 
         <p class="muted">
-          Login to continue to your account.
+          Login to continue to your TaskEarn account.
         </p>
 
         <div class="form">
@@ -1473,6 +1324,7 @@ function showLogin() {
             id="loginEmail"
             class="input"
             type="email"
+            autocomplete="email"
             placeholder="Email address"
           >
 
@@ -1480,6 +1332,7 @@ function showLogin() {
             id="loginPassword"
             class="input"
             type="password"
+            autocomplete="current-password"
             placeholder="Password"
           >
 
@@ -1513,7 +1366,6 @@ function showLogin() {
   `;
 
   showBottomNav(false);
-
   scrollToView();
 
 }
@@ -1528,11 +1380,8 @@ function showRegister() {
   closeDropdown();
 
   if (currentUser) {
-
     dashboard(currentUser);
-
     return;
-
   }
 
   document.getElementById("homeArea").style.display = "none";
@@ -1552,7 +1401,7 @@ function showRegister() {
         </h2>
 
         <p class="muted">
-          Join TaskEarn and discover online tasks.
+          Join TaskEarn and discover eligible online tasks.
         </p>
 
         <div class="form">
@@ -1560,6 +1409,7 @@ function showRegister() {
           <input
             id="registerName"
             class="input"
+            autocomplete="name"
             placeholder="Full name"
           >
 
@@ -1567,6 +1417,7 @@ function showRegister() {
             id="registerEmail"
             class="input"
             type="email"
+            autocomplete="email"
             placeholder="Email address"
           >
 
@@ -1574,6 +1425,7 @@ function showRegister() {
             id="registerPassword"
             class="input"
             type="password"
+            autocomplete="new-password"
             placeholder="Password"
           >
 
@@ -1607,7 +1459,6 @@ function showRegister() {
   `;
 
   showBottomNav(false);
-
   scrollToView();
 
 }
@@ -1632,7 +1483,6 @@ async function login() {
     );
 
     return;
-
   }
 
   try {
@@ -1685,7 +1535,6 @@ async function register() {
     );
 
     return;
-
   }
 
   try {
@@ -1751,6 +1600,8 @@ async function logout() {
 
   closeDropdown();
 
+  setActiveBottom("home");
+
   window.scrollTo({
     top: 0,
     behavior: "smooth"
@@ -1766,11 +1617,8 @@ async function logout() {
 async function dashboard(user) {
 
   if (!user) {
-
     showLogin();
-
     return;
-
   }
 
   currentUser = user;
@@ -1823,9 +1671,7 @@ async function dashboard(user) {
             Welcome back
           </p>
 
-          <h2
-            style="margin:4px 0 0;"
-          >
+          <h2 style="margin:4px 0 0;">
             Hi,
             ${escapeHtml(user.name)}
             👋
@@ -1888,11 +1734,6 @@ async function dashboard(user) {
     </div>
 
 
-    <!--
-      TASKS / WALLET / SUBMISSIONS
-      EXIST ONLY INSIDE ACCOUNT
-    -->
-
     <div class="nav">
 
       <button
@@ -1937,11 +1778,8 @@ async function dashboard(user) {
 async function tasksPage() {
 
   if (!currentUser) {
-
     showLogin();
-
     return;
-
   }
 
   let tasks = [];
@@ -1961,12 +1799,6 @@ async function tasksPage() {
 
   }
 
-  /*
-    IMPORTANT:
-    NO FAKE TASKS NOW.
-    Backend tasks only.
-  */
-
   const screen =
     document.getElementById("screen");
 
@@ -1980,9 +1812,7 @@ async function tasksPage() {
 
         <div class="empty">
 
-          <div
-            style="font-size:40px;"
-          >
+          <div style="font-size:40px;">
             📋
           </div>
 
@@ -2003,7 +1833,6 @@ async function tasksPage() {
     setActiveBottom("account");
 
     return;
-
   }
 
   screen.innerHTML = `
@@ -2068,11 +1897,8 @@ async function tasksPage() {
 async function submitTask(id) {
 
   if (!currentUser) {
-
     showLogin();
-
     return;
-
   }
 
   if (
@@ -2080,9 +1906,7 @@ async function submitTask(id) {
       "Have you completed this task according to requirements?"
     )
   ) {
-
     return;
-
   }
 
   try {
@@ -2118,11 +1942,8 @@ async function submitTask(id) {
 async function submissionsPage() {
 
   if (!currentUser) {
-
     showLogin();
-
     return;
-
   }
 
   let submissions = [];
@@ -2159,9 +1980,7 @@ async function submissionsPage() {
 
         <div class="empty">
 
-          <div
-            style="font-size:40px;"
-          >
+          <div style="font-size:40px;">
             📄
           </div>
 
@@ -2178,7 +1997,6 @@ async function submissionsPage() {
     setActiveBottom("account");
 
     return;
-
   }
 
   screen.innerHTML = `
@@ -2241,11 +2059,8 @@ async function submissionsPage() {
 async function walletPage() {
 
   if (!currentUser) {
-
     showLogin();
-
     return;
-
   }
 
   let wallet = {
@@ -2329,6 +2144,7 @@ async function walletPage() {
       ${
         wallet.withdrawals &&
         wallet.withdrawals.length
+
         ?
 
         wallet.withdrawals.map(w => `
@@ -2383,11 +2199,8 @@ async function walletPage() {
 async function withdraw() {
 
   if (!currentUser) {
-
     showLogin();
-
     return;
-
   }
 
   const amount =
@@ -2405,7 +2218,6 @@ async function withdraw() {
     );
 
     return;
-
   }
 
   if (!method) {
@@ -2415,7 +2227,6 @@ async function withdraw() {
     );
 
     return;
-
   }
 
   try {
@@ -2448,12 +2259,367 @@ async function withdraw() {
 
 
 /* =====================================================
-   INFO PAGES
+   INFORMATION PAGES
 ===================================================== */
 
-function showInfoPage(title, content) {
+const infoPages = {
+
+  about: {
+
+    title: "About TaskEarn ℹ️",
+
+    content: `
+
+      <p class="muted">
+        TaskEarn is an online task and rewards platform designed
+        to provide users with a simple way to discover eligible
+        tasks, complete required activities, submit their work,
+        and track approved rewards.
+      </p>
+
+      <h3>Our Purpose</h3>
+
+      <p class="muted">
+        Our goal is to make task-based opportunities easier to
+        understand and manage through a simple and user-friendly
+        platform.
+      </p>
+
+      <h3>How TaskEarn Works</h3>
+
+      <p class="muted">
+        Registered users can view available tasks, review the
+        requirements, complete eligible tasks, and submit their
+        work for review. Rewards are credited only when a
+        submission is approved according to the applicable task
+        requirements.
+      </p>
+
+      <h3>Task Availability</h3>
+
+      <p class="muted">
+        Task availability may change depending on the tasks
+        currently published on the platform. Reward amounts,
+        requirements and approval conditions may also vary.
+      </p>
+
+      <h3>Our Commitment</h3>
+
+      <p class="muted">
+        We aim to provide clear task information, responsible
+        account management, and a straightforward user experience.
+      </p>
+
+      <div class="notice">
+        Important: TaskEarn does not promise guaranteed income.
+        Earnings depend on available tasks and successful approval
+        of submitted work.
+      </div>
+
+    `
+
+  },
+
+
+  terms: {
+
+    title: "Terms & Conditions 📜",
+
+    content: `
+
+      <p class="muted">
+        Welcome to TaskEarn. By creating an account or using the
+        TaskEarn website, you agree to follow these Terms &
+        Conditions. Please read them carefully.
+      </p>
+
+      <h3>1. Eligibility</h3>
+
+      <p class="muted">
+        You must provide accurate information when creating your
+        account and must use the platform only for lawful purposes
+        and in accordance with applicable laws.
+      </p>
+
+      <h3>2. Account Responsibility</h3>
+
+      <p class="muted">
+        You are responsible for maintaining the confidentiality
+        of your account credentials and for activity performed
+        through your account.
+      </p>
+
+      <h3>3. Task Completion</h3>
+
+      <p class="muted">
+        Tasks must be completed honestly and according to the
+        instructions provided. Users must not submit false,
+        misleading, duplicated, automated, or fraudulent work.
+      </p>
+
+      <h3>4. Task Approval</h3>
+
+      <p class="muted">
+        Submission of a task does not guarantee approval or payment.
+        Rewards are credited only after the submitted work has
+        been reviewed and approved according to the applicable
+        task requirements.
+      </p>
+
+      <h3>5. Rewards</h3>
+
+      <p class="muted">
+        Reward amounts may differ between tasks. Task availability
+        and reward availability may change at any time.
+      </p>
+
+      <h3>6. Withdrawals</h3>
+
+      <p class="muted">
+        Withdrawal requests are subject to the requirements,
+        minimum withdrawal amount, account status, and applicable
+        verification or review procedures of the platform.
+      </p>
+
+      <h3>7. Prohibited Activities</h3>
+
+      <p class="muted">
+        Users must not attempt to abuse, manipulate, attack,
+        interfere with, or gain unauthorized access to the
+        TaskEarn platform or another user's account.
+      </p>
+
+      <h3>8. Account Suspension</h3>
+
+      <p class="muted">
+        TaskEarn may restrict, suspend, or terminate an account
+        when there is reasonable evidence of fraud, abuse,
+        prohibited activity, or violation of these Terms.
+      </p>
+
+      <h3>9. No Guaranteed Income</h3>
+
+      <p class="muted">
+        TaskEarn does not guarantee a fixed income, minimum earnings
+        or a specific number of tasks. Earnings depend on task
+        availability, completion and approval.
+      </p>
+
+      <h3>10. Changes to These Terms</h3>
+
+      <p class="muted">
+        These Terms & Conditions may be updated when necessary.
+        Changes will be reflected on this page.
+      </p>
+
+      <h3>11. Contact</h3>
+
+      <p class="muted">
+        If you have questions regarding these Terms, please use
+        the official contact information provided by TaskEarn.
+      </p>
+
+    `
+
+  },
+
+
+  privacy: {
+
+    title: "Privacy Policy 🔒",
+
+    content: `
+
+      <p class="muted">
+        TaskEarn respects your privacy. This Privacy Policy
+        explains what information may be collected, why it may
+        be used, and how we aim to protect it when you use the
+        TaskEarn website.
+      </p>
+
+      <h3>1. Information We May Collect</h3>
+
+      <p class="muted">
+        Depending on how you use the platform, we may collect
+        information such as your name, email address, account
+        information, task activity, submission information,
+        withdrawal information, and technical information required
+        for security and website operation.
+      </p>
+
+      <h3>2. How We Use Information</h3>
+
+      <p class="muted">
+        Information may be used to create and manage accounts,
+        provide tasks, process submissions, maintain wallet and
+        withdrawal records, provide customer support, improve the
+        website, prevent fraud, and maintain platform security.
+      </p>
+
+      <h3>3. Account Security</h3>
+
+      <p class="muted">
+        We take reasonable measures to protect account information.
+        However, no online service can guarantee absolute security.
+        Users should keep their passwords confidential and avoid
+        sharing account credentials with others.
+      </p>
+
+      <h3>4. Cookies and Sessions</h3>
+
+      <p class="muted">
+        TaskEarn may use cookies, sessions, or similar technologies
+        necessary for login, authentication, security, preferences
+        and website functionality.
+      </p>
+
+      <h3>5. Advertising</h3>
+
+      <p class="muted">
+        TaskEarn may display advertisements through third-party
+        advertising services. Advertising providers may use
+        cookies or similar technologies according to their own
+        privacy policies and applicable requirements.
+      </p>
+
+      <h3>6. Third-Party Services</h3>
+
+      <p class="muted">
+        The website may use third-party services for hosting,
+        analytics, advertising, payment-related services, or
+        other operational purposes. Those services may process
+        information according to their respective policies.
+      </p>
+
+      <h3>7. Data Retention</h3>
+
+      <p class="muted">
+        Information may be retained for as long as reasonably
+        necessary to provide services, maintain records, comply
+        with legal obligations, resolve disputes, and protect
+        the platform.
+      </p>
+
+      <h3>8. User Requests</h3>
+
+      <p class="muted">
+        Where applicable, users may contact TaskEarn regarding
+        questions about their personal information or privacy.
+        Requests may be subject to identity verification and
+        applicable legal requirements.
+      </p>
+
+      <h3>9. Children's Privacy</h3>
+
+      <p class="muted">
+        TaskEarn is not intended to be used in violation of
+        applicable age restrictions or child-protection laws.
+        Users should provide accurate information regarding their
+        eligibility to use the service.
+      </p>
+
+      <h3>10. Policy Updates</h3>
+
+      <p class="muted">
+        This Privacy Policy may be updated from time to time.
+        Changes will be reflected on this page.
+      </p>
+
+      <h3>11. Contact</h3>
+
+      <p class="muted">
+        For privacy-related questions or requests, please use
+        the official contact information provided by TaskEarn.
+      </p>
+
+    `
+
+  },
+
+
+  contact: {
+
+    title: "Contact TaskEarn 📞",
+
+    content: `
+
+      <p class="muted">
+        Have a question about your account, tasks, submissions,
+        rewards, or withdrawals? You can contact the TaskEarn
+        support team using the official contact information
+        provided by the website.
+      </p>
+
+      <h3>Customer Support</h3>
+
+      <p class="muted">
+        For support, please use the official TaskEarn support
+        email address configured by the website owner.
+      </p>
+
+      <div class="notice">
+
+        📧 Official support email will be added here once
+        the TaskEarn support email address is finalized.
+
+      </div>
+
+      <h3>Before Contacting Support</h3>
+
+      <p class="muted">
+        Please include your registered email address and a clear
+        description of the issue. Never send your password,
+        one-time password, payment PIN, or other confidential
+        security credentials to support.
+      </p>
+
+      <h3>Support Topics</h3>
+
+      <ul class="muted">
+
+        <li>Account and login problems</li>
+
+        <li>Task availability questions</li>
+
+        <li>Task submission questions</li>
+
+        <li>Reward or approval questions</li>
+
+        <li>Withdrawal-related questions</li>
+
+        <li>Privacy-related requests</li>
+
+        <li>Technical problems with the website</li>
+
+      </ul>
+
+      <h3>Response Time</h3>
+
+      <p class="muted">
+        Support response times may vary depending on the nature
+        and volume of requests.
+      </p>
+
+    `
+
+  }
+
+};
+
+
+/* =====================================================
+   SHOW INFORMATION PAGE
+===================================================== */
+
+function showInfoPage(pageKey) {
 
   closeDropdown();
+
+  const page = infoPages[pageKey];
+
+  if (!page) {
+    return;
+  }
 
   document.getElementById("homeArea").style.display = "none";
 
@@ -2461,17 +2627,29 @@ function showInfoPage(title, content) {
 
     <div class="card">
 
+      <div
+        style="
+          font-size:12px;
+          color:#ff6333;
+          font-weight:800;
+          margin-bottom:8px;
+        "
+      >
+        TaskEarn
+      </div>
+
       <h2>
-        ${escapeHtml(title)}
+        ${escapeHtml(page.title)}
       </h2>
 
-      <p class="muted">
-        ${escapeHtml(content)}
-      </p>
+      <div>
+        ${page.content}
+      </div>
 
       <button
         class="btn secondary"
         onclick="goBackFromInfo()"
+        style="margin-top:10px;"
       >
         ← Back
       </button>
@@ -2486,6 +2664,10 @@ function showInfoPage(title, content) {
 
 }
 
+
+/* =====================================================
+   BACK FROM INFORMATION PAGE
+===================================================== */
 
 function goBackFromInfo() {
 
@@ -2645,12 +2827,6 @@ async function checkSession() {
 
       setLoggedInUI(user);
 
-      /*
-        IMPORTANT:
-        If session is still active,
-        directly show dashboard.
-      */
-
       dashboard(user);
 
     } else {
@@ -2677,7 +2853,7 @@ async function checkSession() {
 
 
 /* =====================================================
-   GLOBAL OUTSIDE CLICK
+   OUTSIDE CLICK
 ===================================================== */
 
 window.addEventListener(
@@ -2736,4 +2912,4 @@ document.addEventListener(
 </script>
 
 </body>
-  </html>
+</html>
