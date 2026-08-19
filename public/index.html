@@ -4,682 +4,882 @@
 
 <meta charset="UTF-8">
 
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
->
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<meta
-  name="google-adsense-account"
-  content="ca-pub-5877718538170577"
->
+<meta name="google-adsense-account"
+      content="ca-pub-5877718538170577">
 
-<meta
-  name="description"
-  content="TaskEarn - Discover eligible online tasks, submit completed work and manage approved rewards."
->
+<meta name="description"
+      content="TaskEarn - Discover eligible online tasks, submit completed work and manage approved rewards.">
 
 <title>TaskEarn - Tasks & Rewards</title>
 
 <style>
 
-*{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
+/* =====================================================
+   RESET
+===================================================== */
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+  background: #f7f8fc;
+  color: #171b2d;
+  line-height: 1.5;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  touch-action: manipulation;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: rgba(255,255,255,.94);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-bottom: 1px solid #eceef4;
+}
+
+.header-inner {
+  max-width: 1050px;
+  margin: auto;
+  min-height: 64px;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.logo-icon {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 19px;
+  font-weight: 900;
+  background: linear-gradient(135deg,#ff6b35,#ff3d6e);
+  box-shadow: 0 7px 18px rgba(255,91,73,.25);
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: -.5px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.balance {
+  display: none;
+  background: #f0fdf7;
+  color: #087a42;
+  border: 1px solid #d5f3e2;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.balance.visible {
+  display: block;
+}
+
+.menu-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #f4f5f9;
+  font-size: 21px;
+  color: #20243a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-btn:active {
+  transform: scale(.95);
+}
+
+/* =====================================================
+   DROPDOWN
+===================================================== */
+
+.dropdown-menu {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  width: 225px;
+  background: white;
+  border: 1px solid #eceef4;
+  border-radius: 18px;
+  box-shadow: 0 18px 50px rgba(20,25,50,.16);
+  overflow: hidden;
+  display: none;
+  z-index: 2000;
+}
+
+.dropdown-menu.show {
+  display: block;
+}
+
+.dropdown-item {
+  width: 100%;
+  text-align: left;
+  padding: 15px 17px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid #f1f2f6;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #171b2d;
+}
+
+.dropdown-item:last-child {
+  border-bottom: 0;
+}
+
+.dropdown-item:active {
+  background: #fff4ef;
+  color: #ff5b32;
+}
+
+/* =====================================================
+   MAIN
+===================================================== */
+
+.container {
+  width: 100%;
+  max-width: 1050px;
+  margin: auto;
+  padding: 16px;
+  padding-bottom: 90px;
+}
+
+/* =====================================================
+   HERO
+===================================================== */
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding: 30px 22px;
+  border-radius: 28px;
+  background:
+    linear-gradient(
+      135deg,
+      #fff7ed 0%,
+      #ffe8d8 48%,
+      #e9f4ff 100%
+    );
+  box-shadow: 0 12px 35px rgba(30,40,70,.06);
+  margin-bottom: 18px;
+}
+
+.hero-badge {
+  display: inline-flex;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.72);
+  color: #b94c24;
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 13px;
+}
+
+.hero h1 {
+  position: relative;
+  z-index: 1;
+  max-width: 600px;
+  margin: 0 0 12px;
+  font-size: clamp(30px,7vw,48px);
+  line-height: 1.08;
+  letter-spacing: -1.4px;
+  font-weight: 900;
+}
+
+.hero p {
+  position: relative;
+  z-index: 1;
+  max-width: 560px;
+  margin: 0 0 22px;
+  color: #5f6879;
+  font-size: 15px;
+}
+
+.hero-actions {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+
+.btn {
+  min-height: 46px;
+  padding: 11px 17px;
+  border-radius: 13px;
+  font-weight: 800;
+  transition:
+    transform .15s ease,
+    box-shadow .15s ease,
+    background .15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-html{
-  scroll-behavior:smooth;
+.btn:active {
+  transform: scale(.97);
 }
 
-body{
-  margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
-  background:#f7f8fc;
-  color:#171b2d;
-  line-height:1.5;
+.primary {
+  background: #ff6333;
+  color: white;
+  box-shadow: 0 8px 18px rgba(255,99,51,.25);
 }
 
-button,input,textarea,select{
-  font:inherit;
+.primary:hover {
+  background: #ef5324;
 }
 
-button{
-  touch-action:manipulation;
-  cursor:pointer;
-  border:0;
-  background:none;
-}
-
-a{
-  color:inherit;
-  text-decoration:none;
-  cursor:pointer;
+.secondary {
+  background: white;
+  color: #24283b;
+  border: 1px solid #e3e5eb;
 }
-
-/* HEADER */
 
-.header{
-  position:sticky;
-  top:0;
-  z-index:1000;
-  background:rgba(255,255,255,.94);
-  backdrop-filter:blur(15px);
-  -webkit-backdrop-filter:blur(15px);
-  border-bottom:1px solid #eceef4;
-}
-
-.header-inner{
-  max-width:1050px;
-  margin:auto;
-  min-height:64px;
-  padding:10px 16px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-}
-
-.logo-container{
-  display:flex;
-  align-items:center;
-  gap:9px;
-  cursor:pointer;
+.large-btn {
+  min-height: 52px;
+  padding: 13px 25px;
+  border-radius: 16px;
+  font-size: 16px;
 }
 
-.logo-icon{
-  width:38px;
-  height:38px;
-  border-radius:12px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#fff;
-  font-size:19px;
-  font-weight:900;
-  background:linear-gradient(135deg,#ff6b35,#ff3d6e);
-  box-shadow:0 7px 18px rgba(255,91,73,.25);
-}
-
-.logo{
-  font-size:20px;
-  font-weight:900;
-  letter-spacing:-.5px;
-}
-
-.header-right{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  position:relative;
-}
-
-.balance{
-  display:none;
-  background:#f0fdf7;
-  color:#087a42;
-  border:1px solid #d5f3e2;
-  padding:8px 12px;
-  border-radius:999px;
-  font-size:13px;
-  font-weight:800;
-}
+/* =====================================================
+   CARDS
+===================================================== */
 
-.balance.visible{
-  display:block;
-}
-
-.menu-btn{
-  width:42px;
-  height:42px;
-  border-radius:12px;
-  background:#f4f5f9;
-  font-size:21px;
-  color:#20243a;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.dropdown-menu{
-  position:absolute;
-  top:50px;
-  right:0;
-  width:225px;
-  background:#fff;
-  border:1px solid #eceef4;
-  border-radius:18px;
-  box-shadow:0 18px 50px rgba(20,25,50,.16);
-  overflow:hidden;
-  display:none;
-  z-index:2000;
-}
-
-.dropdown-menu.show{
-  display:block;
-}
-
-.dropdown-item{
-  width:100%;
-  text-align:left;
-  padding:15px 17px;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  border-bottom:1px solid #f1f2f6;
-  font-size:14px;
-  font-weight:600;
-  color:#171b2d;
-}
-
-/* MAIN */
-
-.container{
-  width:100%;
-  max-width:1050px;
-  margin:auto;
-  padding:16px;
-  padding-bottom:90px;
+.card {
+  background: white;
+  border: 1px solid #eceef4;
+  border-radius: 22px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 7px 25px rgba(20,30,60,.045);
 }
 
-/* HERO */
+.card h2 {
+  margin-top: 0;
+  font-size: 21px;
+  letter-spacing: -.4px;
+}
 
-.hero{
-  position:relative;
-  overflow:hidden;
-  padding:30px 22px;
-  border-radius:28px;
-  background:linear-gradient(
-    135deg,
-    #fff7ed 0%,
-    #ffe8d8 48%,
-    #e9f4ff 100%
-  );
-  box-shadow:0 12px 35px rgba(30,40,70,.06);
-  margin-bottom:18px;
+.card h3 {
+  margin-bottom: 7px;
 }
 
-.hero-badge{
-  display:inline-flex;
-  padding:7px 11px;
-  border-radius:999px;
-  background:rgba(255,255,255,.72);
-  color:#b94c24;
-  font-size:12px;
-  font-weight:800;
-  margin-bottom:13px;
+.muted {
+  color: #687386;
+  font-size: 14px;
+  line-height: 1.65;
 }
 
-.hero h1{
-  margin:0 0 12px;
-  font-size:clamp(30px,7vw,48px);
-  line-height:1.08;
-  letter-spacing:-1.4px;
-  font-weight:900;
+/* =====================================================
+   FEATURES
+===================================================== */
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
-.hero p{
-  max-width:560px;
-  margin:0 0 22px;
-  color:#5f6879;
-  font-size:15px;
+.feature {
+  background: white;
+  border: 1px solid #eceef4;
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: 0 6px 20px rgba(20,30,60,.04);
 }
 
-.hero-actions{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
+.feature-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  background: #fff2ec;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin-bottom: 12px;
 }
 
-/* BUTTONS */
+.feature b {
+  display: block;
+  margin-bottom: 5px;
+}
 
-.btn{
-  min-height:46px;
-  padding:11px 17px;
-  border-radius:13px;
-  font-weight:800;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
+.feature span {
+  color: #687386;
+  font-size: 13px;
 }
+
+/* =====================================================
+   TASKS
+===================================================== */
 
-.primary{
-  background:#ff6333;
-  color:#fff;
-  box-shadow:0 8px 18px rgba(255,99,51,.25);
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 14px;
 }
 
-.secondary{
-  background:#fff;
-  color:#24283b;
-  border:1px solid #e3e5eb;
+.task-card {
+  position: relative;
+  background: white;
+  border: 1px solid #eceef4;
+  border-radius: 21px;
+  padding: 18px;
+  box-shadow: 0 7px 25px rgba(20,30,60,.05);
 }
 
-.large-btn{
-  min-height:52px;
-  padding:13px 25px;
-  border-radius:16px;
-  font-size:16px;
+.task-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
 }
 
-/* CARDS */
+.tag {
+  display: inline-flex;
+  background: #f0efff;
+  color: #5541d9;
+  padding: 6px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+}
 
-.card{
-  background:#fff;
-  border:1px solid #eceef4;
-  border-radius:22px;
-  padding:20px;
-  margin-bottom:16px;
-  box-shadow:0 7px 25px rgba(20,30,60,.045);
+.earn {
+  color: #078b4b;
+  font-size: 20px;
+  font-weight: 900;
+  white-space: nowrap;
 }
 
-.card h2{
-  margin-top:0;
-  font-size:21px;
+.task-card h3 {
+  font-size: 17px;
+  margin-top: 14px;
 }
 
-.muted{
-  color:#687386;
-  font-size:14px;
-  line-height:1.65;
+.task-card .btn {
+  width: 100%;
+  margin-top: 12px;
 }
 
-/* FEATURES */
+/* =====================================================
+   STATS
+===================================================== */
 
-.features{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:12px;
-  margin-bottom:16px;
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 10px;
+  margin-bottom: 16px;
 }
 
-.feature{
-  background:#fff;
-  border:1px solid #eceef4;
-  border-radius:20px;
-  padding:18px;
+.stat {
+  background: white;
+  border: 1px solid #eceef4;
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 5px 18px rgba(20,30,60,.04);
 }
 
-.feature-icon{
-  width:42px;
-  height:42px;
-  border-radius:13px;
-  background:#fff2ec;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:20px;
-  margin-bottom:12px;
+.stat small {
+  color: #788195;
+  font-size: 12px;
 }
 
-/* TASKS */
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:14px;
+.stat b {
+  display: block;
+  margin-top: 5px;
+  font-size: 19px;
 }
+
+/* =====================================================
+   ACCOUNT MENU
+===================================================== */
 
-.task-card{
-  background:#fff;
-  border:1px solid #eceef4;
-  border-radius:21px;
-  padding:18px;
-  box-shadow:0 7px 25px rgba(20,30,60,.05);
+.account-menu {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 12px;
+  margin-bottom: 18px;
 }
 
-.task-top{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  gap:10px;
+.account-option {
+  background: white;
+  border: 1px solid #eceef4;
+  border-radius: 20px;
+  padding: 20px 14px;
+  text-align: center;
+  box-shadow: 0 7px 22px rgba(20,30,60,.05);
+  transition: transform .15s ease;
 }
 
-.tag{
-  display:inline-flex;
-  background:#f0efff;
-  color:#5541d9;
-  padding:6px 9px;
-  border-radius:999px;
-  font-size:11px;
-  font-weight:800;
+.account-option:active {
+  transform: scale(.97);
 }
 
-.earn{
-  color:#078b4b;
-  font-size:20px;
-  font-weight:900;
-  white-space:nowrap;
+.account-option .icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 10px;
+  border-radius: 15px;
+  background: #fff1eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 23px;
 }
 
-.task-card h3{
-  font-size:17px;
-  margin-top:14px;
+.account-option b {
+  display: block;
+  font-size: 14px;
 }
 
-.task-card .btn{
-  width:100%;
-  margin-top:12px;
+.account-option span {
+  display: block;
+  color: #788195;
+  font-size: 11px;
+  margin-top: 3px;
 }
 
-/* ACCOUNT */
+/* =====================================================
+   PAGE HEADER
+===================================================== */
 
-.account-menu{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:12px;
-  margin-bottom:16px;
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
-.account-option{
-  background:#fff;
-  border:1px solid #eceef4;
-  border-radius:20px;
-  padding:20px;
-  text-align:left;
-  box-shadow:0 7px 25px rgba(20,30,60,.04);
+.back-btn {
+  min-width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: white;
+  border: 1px solid #e3e5eb;
+  font-size: 18px;
 }
 
-.account-option-icon{
-  font-size:28px;
-  margin-bottom:10px;
+.page-header h2 {
+  margin: 0;
+  font-size: 22px;
 }
 
-.account-option b{
-  display:block;
-  font-size:16px;
-  margin-bottom:4px;
-}
+/* =====================================================
+   NAV
+===================================================== */
 
-.account-option span{
-  color:#687386;
-  font-size:13px;
+.nav {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 3px 1px 10px;
+  margin-bottom: 4px;
+  scrollbar-width: none;
 }
 
-/* STATS */
+.nav::-webkit-scrollbar {
+  display: none;
+}
 
-.stats{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:10px;
-  margin-bottom:16px;
+.nav .btn {
+  flex-shrink: 0;
 }
+
+/* =====================================================
+   FORM
+===================================================== */
 
-.stat{
-  background:#fff;
-  border:1px solid #eceef4;
-  border-radius:18px;
-  padding:16px;
+.form {
+  display: grid;
+  gap: 11px;
+  width: 100%;
+  max-width: 520px;
 }
 
-.stat small{
-  color:#788195;
-  font-size:12px;
+.input {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  background: #fbfcff;
+  border: 1px solid #dfe2ea;
+  border-radius: 13px;
+  outline: none;
+  color: #171b2d;
 }
 
-.stat b{
-  display:block;
-  margin-top:5px;
-  font-size:19px;
+.input:focus {
+  border-color: #ff6b35;
+  box-shadow: 0 0 0 3px rgba(255,107,53,.1);
 }
 
-/* FORMS */
+/* =====================================================
+   REMEMBER ME
+===================================================== */
 
-.form{
-  display:grid;
-  gap:11px;
-  width:100%;
-  max-width:520px;
+.remember-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 2px 2px;
+  color: #596274;
+  font-size: 13px;
+  font-weight: 600;
 }
 
-.input{
-  width:100%;
-  min-height:48px;
-  padding:12px 14px;
-  background:#fbfcff;
-  border:1px solid #dfe2ea;
-  border-radius:13px;
-  outline:none;
-  color:#171b2d;
+.remember-row input {
+  width: 18px;
+  height: 18px;
+  accent-color: #ff6333;
+  cursor: pointer;
 }
 
-/* AUTH */
+/* =====================================================
+   AUTH
+===================================================== */
 
-.auth-wrap{
-  min-height:50vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:20px 0;
+.auth-wrap {
+  min-height: 50vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 0;
 }
 
-.auth-card{
-  width:100%;
-  max-width:460px;
-  background:#fff;
-  border:1px solid #eceef4;
-  border-radius:26px;
-  padding:25px;
-  box-shadow:0 15px 45px rgba(20,30,60,.08);
+.auth-card {
+  width: 100%;
+  max-width: 460px;
+  background: white;
+  border: 1px solid #eceef4;
+  border-radius: 26px;
+  padding: 25px;
+  box-shadow: 0 15px 45px rgba(20,30,60,.08);
 }
 
-.auth-logo{
-  width:55px;
-  height:55px;
-  border-radius:17px;
-  background:linear-gradient(135deg,#ff6b35,#ff3d6e);
-  color:#fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:25px;
-  font-weight:900;
-  margin-bottom:15px;
+.auth-logo {
+  width: 55px;
+  height: 55px;
+  border-radius: 17px;
+  background: linear-gradient(135deg,#ff6b35,#ff3d6e);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 25px;
+  font-weight: 900;
+  margin-bottom: 15px;
 }
 
-/* OTHER */
+/* =====================================================
+   OTHER
+===================================================== */
 
-.notice{
-  background:#fff8df;
-  border:1px solid #f5e6a8;
-  color:#6c5200;
-  padding:13px 15px;
-  border-radius:14px;
-  margin-bottom:15px;
-  font-size:13px;
+.notice {
+  background: #fff8df;
+  border: 1px solid #f5e6a8;
+  color: #6c5200;
+  padding: 13px 15px;
+  border-radius: 14px;
+  margin-bottom: 15px;
+  font-size: 13px;
 }
 
-.status{
-  display:inline-flex;
-  padding:6px 9px;
-  border-radius:999px;
-  font-size:11px;
-  font-weight:800;
-  text-transform:capitalize;
+.status {
+  display: inline-flex;
+  padding: 6px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: capitalize;
 }
 
-.pending{
-  background:#fff3cd;
-  color:#856404;
+.pending {
+  background: #fff3cd;
+  color: #856404;
 }
 
-.approved{
-  background:#dff6e8;
-  color:#087a42;
+.approved {
+  background: #dff6e8;
+  color: #087a42;
 }
 
-.rejected{
-  background:#ffe1e1;
-  color:#b42318;
+.rejected {
+  background: #ffe1e1;
+  color: #b42318;
 }
 
-.admin-box{
-  border:1px solid #e7e9ef;
-  border-radius:16px;
-  padding:15px;
-  margin-bottom:11px;
-  background:#fff;
+.admin-box {
+  border: 1px solid #e7e9ef;
+  border-radius: 16px;
+  padding: 15px;
+  margin-bottom: 11px;
+  background: #fff;
 }
 
-.row{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
 }
 
-.empty{
-  text-align:center;
-  padding:35px 20px;
-  color:#687386;
+.empty {
+  text-align: center;
+  padding: 35px 20px;
+  color: #687386;
 }
 
-/* FOOTER */
+/* =====================================================
+   FOOTER
+===================================================== */
 
-.footer{
-  text-align:center;
-  padding:28px 10px;
-  color:#7b8495;
-  font-size:12px;
+.footer {
+  text-align: center;
+  padding: 28px 10px;
+  color: #7b8495;
+  font-size: 12px;
 }
 
-.footer-links{
-  display:flex;
-  justify-content:center;
-  flex-wrap:wrap;
-  gap:15px;
-  margin-bottom:12px;
+.footer-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 12px;
 }
 
-/* MOBILE NAV */
+/* =====================================================
+   MOBILE NAV
+===================================================== */
 
-.mobile-bottom-nav{
-  display:none;
+.mobile-bottom-nav {
+  display: none;
 }
 
-@media(min-width:800px){
+@media (min-width: 800px) {
 
-  .container{
-    padding-top:24px;
+  .container {
+    padding-top: 24px;
   }
 
-  .hero{
-    padding:55px 45px;
+  .hero {
+    padding: 55px 45px;
   }
 
-  .card{
-    padding:24px;
+  .card {
+    padding: 24px;
   }
 
 }
 
-@media(max-width:700px){
+@media (max-width: 700px) {
 
-  body{
-    padding-bottom:72px;
+  body {
+    padding-bottom: 72px;
   }
 
-  .container{
-    padding:11px;
-    padding-bottom:25px;
+  .container {
+    padding: 11px;
+    padding-bottom: 25px;
   }
 
-  .hero{
-    padding:27px 19px;
-    border-radius:24px;
+  .hero {
+    padding: 27px 19px;
+    border-radius: 24px;
   }
 
-  .hero h1{
-    font-size:31px;
+  .hero h1 {
+    font-size: 31px;
+    letter-spacing: -1px;
   }
 
-  .hero-actions{
-    display:grid;
-    grid-template-columns:1fr;
-    width:100%;
+  .hero-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
   }
 
-  .features{
-    grid-template-columns:1fr;
-    gap:9px;
+  .features {
+    grid-template-columns: 1fr;
+    gap: 9px;
   }
 
-  .feature{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    padding:14px;
+  .feature {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
   }
 
-  .feature-icon{
-    flex-shrink:0;
-    margin:0;
+  .feature-icon {
+    flex-shrink: 0;
+    margin: 0;
   }
 
-  .grid{
-    grid-template-columns:1fr;
+  .grid {
+    grid-template-columns: 1fr;
   }
 
-  .account-menu{
-    grid-template-columns:1fr;
+  .stats {
+    gap: 7px;
   }
 
-  .stats{
-    gap:7px;
+  .stat {
+    padding: 13px 10px;
+    text-align: center;
   }
 
-  .stat{
-    padding:13px 10px;
-    text-align:center;
+  .stat b {
+    font-size: 16px;
   }
 
-  .stat b{
-    font-size:16px;
+  .account-menu {
+    grid-template-columns: 1fr;
+    gap: 9px;
   }
 
-  .mobile-bottom-nav{
-    position:fixed;
-    display:none;
-    left:10px;
-    right:10px;
-    bottom:10px;
-    height:60px;
-    z-index:1500;
-    background:rgba(255,255,255,.96);
-    backdrop-filter:blur(18px);
-    border:1px solid #e7e9ef;
-    border-radius:20px;
-    box-shadow:0 12px 35px rgba(20,30,60,.16);
-    align-items:center;
-    justify-content:space-around;
-    padding:5px;
+  .account-option {
+    display: flex;
+    align-items: center;
+    text-align: left;
+    gap: 12px;
+    padding: 14px;
   }
 
-  .mobile-bottom-nav.logged-in{
-    display:flex;
+  .account-option .icon {
+    flex-shrink: 0;
+    margin: 0;
   }
 
-  .bottom-item{
-    height:50px;
-    min-width:75px;
-    border-radius:15px;
-    color:#70798b;
-    font-size:10px;
-    font-weight:700;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:2px;
+  .account-option span {
+    margin-top: 2px;
   }
 
-  .bottom-item span:first-child{
-    font-size:20px;
+  .mobile-bottom-nav {
+    position: fixed;
+    display: none;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    height: 60px;
+    z-index: 1500;
+    background: rgba(255,255,255,.96);
+    backdrop-filter: blur(18px);
+    border: 1px solid #e7e9ef;
+    border-radius: 20px;
+    box-shadow: 0 12px 35px rgba(20,30,60,.16);
+    align-items: center;
+    justify-content: space-around;
+    padding: 5px;
   }
 
-  .bottom-item.active{
-    background:#fff1eb;
-    color:#ff5d2e;
+  .mobile-bottom-nav.logged-in {
+    display: flex;
+  }
+
+  .bottom-item {
+    border: 0;
+    background: transparent;
+    height: 50px;
+    min-width: 75px;
+    border-radius: 15px;
+    color: #70798b;
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+  }
+
+  .bottom-item span:first-child {
+    font-size: 20px;
+  }
+
+  .bottom-item.active {
+    background: #fff1eb;
+    color: #ff5d2e;
   }
 
 }
@@ -689,78 +889,66 @@ a{
 
 <body>
 
-<!-- HEADER -->
+<!-- =====================================================
+     HEADER
+===================================================== -->
 
 <header class="header">
 
   <div class="header-inner">
 
-    <div
-      class="logo-container"
-      onclick="handleLogoClick()"
-    >
+    <div class="logo-container"
+         onclick="handleLogoClick()">
 
-      <div class="logo-icon">T</div>
+      <div class="logo-icon">
+        T
+      </div>
 
-      <div class="logo">TaskEarn</div>
+      <div class="logo">
+        TaskEarn
+      </div>
 
     </div>
 
     <div class="header-right">
 
-      <div
-        id="balance"
-        class="balance"
-      >
+      <div id="balance"
+           class="balance">
         ₹0.00
       </div>
 
-      <button
-        class="menu-btn"
-        onclick="toggleDropdown(event)"
-        aria-label="Menu"
-      >
+      <button class="menu-btn"
+              onclick="toggleDropdown(event)"
+              aria-label="Menu">
         ☰
       </button>
 
-      <div
-        id="dropdownMenu"
-        class="dropdown-menu"
-      >
+      <div id="dropdownMenu"
+           class="dropdown-menu">
 
-        <button
-          id="loginMenuItem"
-          class="dropdown-item"
-          onclick="handleLoginMenu()"
-        >
+        <button id="loginMenuItem"
+                class="dropdown-item"
+                onclick="handleLoginMenu()">
           🔑 Login / Register
         </button>
 
-        <button
-          class="dropdown-item"
-          onclick="showAboutPage()"
-        >
+        <button class="dropdown-item"
+                onclick="showAboutPage()">
           ℹ️ About Us
         </button>
 
-        <button
-          class="dropdown-item"
-          onclick="showTermsPage()"
-        >
+        <button class="dropdown-item"
+                onclick="showTermsPage()">
           📜 Terms & Conditions
         </button>
 
-        <button
-          class="dropdown-item"
-          onclick="showContactPage()"
-        >
+        <button class="dropdown-item"
+                onclick="showContactPage()">
           📞 Contact Us
         </button>
 
-        <button
-          class="dropdown-item"
-          onclick="showPrivacyPage()"
-        >
+        <button class="dropdown-item"
+                onclick="showPrivacyPage()">
           🔒 Privacy Policy
         </button>
 
@@ -773,215 +961,207 @@ a{
 </header>
 
 
-<!-- MAIN -->
+<!-- =====================================================
+     MAIN
+===================================================== -->
 
 <main class="container">
 
-  <!-- PUBLIC HOME / LOGGED-IN TASK HOME -->
+  <!-- PUBLIC HOME -->
 
   <section id="homeArea">
 
-    <!-- PUBLIC HOME -->
+    <div class="hero">
 
-    <div id="publicHome">
-
-      <div class="hero">
-
-        <div class="hero-badge">
-          ⚡ Simple tasks • Easy tracking
-        </div>
-
-        <h1>
-          Earn money by completing simple online tasks
-        </h1>
-
-        <p>
-          Discover eligible tasks, complete requirements,
-          submit work, and receive approved rewards.
-        </p>
-
-        <div
-          id="publicHeroButtons"
-          class="hero-actions"
-        >
-
-          <button
-            class="btn primary large-btn"
-            onclick="showLogin()"
-          >
-            🔐 Login
-          </button>
-
-          <button
-            class="btn secondary large-btn"
-            onclick="showRegister()"
-          >
-            ✨ Create Account
-          </button>
-
-        </div>
-
+      <div class="hero-badge">
+        ⚡ Simple tasks • Easy tracking
       </div>
 
+      <h1>
+        Earn money by completing simple online tasks
+      </h1>
 
-      <div class="features">
+      <p>
+        Discover eligible tasks, complete requirements,
+        submit work, and receive approved rewards.
+      </p>
 
-        <div class="feature">
+      <div id="publicHeroButtons"
+           class="hero-actions">
 
-          <div class="feature-icon">📋</div>
+        <button class="btn primary large-btn"
+                onclick="showLogin()">
+          🔐 Login
+        </button>
 
-          <div>
-
-            <b>Simple Tasks</b>
-
-            <span>
-              Browse available tasks easily.
-            </span>
-
-          </div>
-
-        </div>
-
-
-        <div class="feature">
-
-          <div class="feature-icon">💰</div>
-
-          <div>
-
-            <b>Track Rewards</b>
-
-            <span>
-              Monitor approved rewards.
-            </span>
-
-          </div>
-
-        </div>
-
-
-        <div class="feature">
-
-          <div class="feature-icon">🔒</div>
-
-          <div>
-
-            <b>Secure Account</b>
-
-            <span>
-              Manage your account securely.
-            </span>
-
-          </div>
-
-        </div>
+        <button class="btn secondary large-btn"
+                onclick="showRegister()">
+          ✨ Create Account
+        </button>
 
       </div>
-
-
-      <section class="card">
-
-        <h2>How TaskEarn Works</h2>
-
-        <ol>
-
-          <li>Create your TaskEarn account.</li>
-
-          <li>Browse available tasks.</li>
-
-          <li>Read requirements carefully and complete the work.</li>
-
-          <li>Submit completed task for review.</li>
-
-          <li>Approved rewards are added to your wallet.</li>
-
-        </ol>
-
-      </section>
-
-
-      <section class="card">
-
-        <h2>About TaskEarn</h2>
-
-        <p class="muted">
-          TaskEarn is an online task and reward platform
-          designed to provide users with access to eligible
-          tasks, task submissions, reward tracking and
-          account management features.
-        </p>
-
-      </section>
-
-
-      <section class="card">
-
-        <h2>Frequently Asked Questions</h2>
-
-        <h3>How do I earn?</h3>
-
-        <p class="muted">
-          Browse available tasks and complete them according
-          to the requirements provided for each task.
-        </p>
-
-        <h3>Is income guaranteed?</h3>
-
-        <p class="muted">
-          No. Earnings are not guaranteed and depend on
-          task availability, successful completion and
-          approval of submitted work.
-        </p>
-
-        <h3>What is the minimum withdrawal?</h3>
-
-        <p class="muted">
-          The current minimum withdrawal amount is ₹100,
-          subject to the applicable account and payment rules.
-        </p>
-
-      </section>
 
     </div>
 
 
-    <!-- LOGGED-IN TASK HOME -->
+    <div class="features">
 
-    <div
-      id="taskHome"
-      style="display:none;"
-    >
+      <div class="feature">
 
-      <div class="hero">
-
-        <div class="hero-badge">
-          📋 Available Tasks
+        <div class="feature-icon">
+          📋
         </div>
 
-        <h1>
-          Complete Tasks & Earn
-        </h1>
+        <div>
 
-        <p>
-          Choose an available task, complete the
-          requirements and submit it for review.
-        </p>
+          <b>
+            Simple Tasks
+          </b>
+
+          <span>
+            Browse available tasks easily.
+          </span>
+
+        </div>
 
       </div>
 
-      <div id="taskScreen"></div>
+
+      <div class="feature">
+
+        <div class="feature-icon">
+          💰
+        </div>
+
+        <div>
+
+          <b>
+            Track Rewards
+          </b>
+
+          <span>
+            Monitor approved rewards.
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <div class="feature">
+
+        <div class="feature-icon">
+          🔒
+        </div>
+
+        <div>
+
+          <b>
+            Secure Account
+          </b>
+
+          <span>
+            Manage your account securely.
+          </span>
+
+        </div>
+
+      </div>
 
     </div>
+
+
+    <section class="card">
+
+      <h2>
+        How TaskEarn Works
+      </h2>
+
+      <ol>
+
+        <li>
+          Create your TaskEarn account.
+        </li>
+
+        <li>
+          Browse available tasks.
+        </li>
+
+        <li>
+          Read requirements carefully and complete the work.
+        </li>
+
+        <li>
+          Submit completed task for review.
+        </li>
+
+        <li>
+          Approved rewards are added to your wallet.
+        </li>
+
+      </ol>
+
+    </section>
+
+
+    <section class="card">
+
+      <h2>
+        About TaskEarn
+      </h2>
+
+      <p class="muted">
+        TaskEarn is an online task and reward platform
+        designed to provide users with access to eligible
+        tasks, task submissions, reward tracking and
+        account management features.
+      </p>
+
+    </section>
+
+
+    <section class="card">
+
+      <h2>
+        Frequently Asked Questions
+      </h2>
+
+      <h3>
+        How do I earn?
+      </h3>
+
+      <p class="muted">
+        Browse available tasks and complete them according
+        to the requirements provided for each task.
+      </p>
+
+      <h3>
+        Is income guaranteed?
+      </h3>
+
+      <p class="muted">
+        No. Earnings are not guaranteed and depend on
+        task availability, successful completion and
+        approval of submitted work.
+      </p>
+
+      <h3>
+        What is the minimum withdrawal?
+      </h3>
+
+      <p class="muted">
+        The current minimum withdrawal amount is ₹100,
+        subject to the applicable account and payment rules.
+      </p>
+
+    </section>
 
   </section>
 
 
-  <!-- ACCOUNT AREA -->
+  <!-- DYNAMIC AREA -->
 
-  <section
-    id="accountArea"
-    style="display:none;"
-  ></section>
+  <section id="accountArea"></section>
 
 
   <!-- FOOTER -->
@@ -990,13 +1170,21 @@ a{
 
     <div class="footer-links">
 
-      <a onclick="showPrivacyPage()">Privacy</a>
+      <a onclick="showPrivacyPage()">
+        Privacy
+      </a>
 
-      <a onclick="showTermsPage()">Terms</a>
+      <a onclick="showTermsPage()">
+        Terms
+      </a>
 
-      <a onclick="showAboutPage()">About</a>
+      <a onclick="showAboutPage()">
+        About
+      </a>
 
-      <a onclick="showContactPage()">Contact</a>
+      <a onclick="showContactPage()">
+        Contact
+      </a>
 
     </div>
 
@@ -1007,33 +1195,37 @@ a{
 </main>
 
 
-<!-- MOBILE NAV -->
+<!-- =====================================================
+     MOBILE NAVIGATION
+===================================================== -->
 
-<div
-  id="mobileBottomNav"
-  class="mobile-bottom-nav"
->
+<div id="mobileBottomNav"
+     class="mobile-bottom-nav">
 
-  <button
-    class="bottom-item active"
-    onclick="homeForLoggedInUser()"
-  >
+  <button class="bottom-item active"
+          onclick="homeForLoggedInUser()">
 
-    <span>🏠</span>
+    <span>
+      🏠
+    </span>
 
-    <span>Home</span>
+    <span>
+      Home
+    </span>
 
   </button>
 
 
-  <button
-    class="bottom-item"
-    onclick="handleProfileClick()"
-  >
+  <button class="bottom-item"
+          onclick="handleProfileClick()">
 
-    <span>👤</span>
+    <span>
+      👤
+    </span>
 
-    <span>Account</span>
+    <span>
+      Account
+    </span>
 
   </button>
 
@@ -1057,7 +1249,7 @@ async function api(url, options = {}) {
 
   const headers = Object.assign(
     {
-      "Content-Type":"application/json"
+      "Content-Type": "application/json"
     },
     options.headers || {}
   );
@@ -1067,7 +1259,7 @@ async function api(url, options = {}) {
     {
       ...options,
       headers,
-      credentials:"same-origin"
+      credentials: "same-origin"
     }
   );
 
@@ -1077,11 +1269,11 @@ async function api(url, options = {}) {
     data = await response.json();
   }
 
-  catch(e) {
+  catch (e) {
     data = {};
   }
 
-  if(!response.ok) {
+  if (!response.ok) {
     throw new Error(
       data.error || "Something went wrong"
     );
@@ -1096,7 +1288,7 @@ async function api(url, options = {}) {
    UTILITIES
 ===================================================== */
 
-function escapeHtml(val){
+function escapeHtml(val) {
 
   return String(val || "")
     .replaceAll("&","&amp;")
@@ -1108,15 +1300,15 @@ function escapeHtml(val){
 }
 
 
-function formatDate(val){
+function formatDate(val) {
 
-  if(!val) return "-";
+  if (!val) return "-";
 
-  try{
+  try {
     return new Date(val).toLocaleString();
   }
 
-  catch(e){
+  catch (e) {
     return val;
   }
 
@@ -1124,10 +1316,10 @@ function formatDate(val){
 
 
 /* =====================================================
-   LOGIN UI
+   LOGIN UI STATE
 ===================================================== */
 
-function setLoggedInUI(user){
+function setLoggedInUI(user) {
 
   currentUser = user || null;
 
@@ -1137,40 +1329,49 @@ function setLoggedInUI(user){
   const nav =
     document.getElementById("mobileBottomNav");
 
+  const heroButtons =
+    document.getElementById("publicHeroButtons");
+
   const loginMenuItem =
     document.getElementById("loginMenuItem");
 
 
-  if(currentUser){
+  if (currentUser) {
 
-    if(balance){
+    if (balance) {
       balance.classList.add("visible");
     }
 
-    if(nav){
+    if (nav) {
       nav.classList.add("logged-in");
     }
 
-    if(loginMenuItem){
+    if (heroButtons) {
+      heroButtons.style.display = "none";
+    }
+
+    if (loginMenuItem) {
       loginMenuItem.style.display = "none";
     }
 
   }
 
-  else{
+  else {
 
-    if(balance){
-
+    if (balance) {
       balance.classList.remove("visible");
       balance.innerText = "₹0.00";
-
     }
 
-    if(nav){
+    if (nav) {
       nav.classList.remove("logged-in");
     }
 
-    if(loginMenuItem){
+    if (heroButtons) {
+      heroButtons.style.display = "flex";
+    }
+
+    if (loginMenuItem) {
       loginMenuItem.style.display = "flex";
     }
 
@@ -1180,108 +1381,59 @@ function setLoggedInUI(user){
 
 
 /* =====================================================
-   PAGE VISIBILITY
-===================================================== */
-
-function showPublicHomeArea(){
-
-  document.getElementById("homeArea").style.display="block";
-
-  document.getElementById("publicHome").style.display="block";
-
-  document.getElementById("taskHome").style.display="none";
-
-  document.getElementById("accountArea").style.display="none";
-
-}
-
-
-function showTaskHomeArea(){
-
-  document.getElementById("homeArea").style.display="block";
-
-  document.getElementById("publicHome").style.display="none";
-
-  document.getElementById("taskHome").style.display="block";
-
-  document.getElementById("accountArea").style.display="none";
-
-}
-
-
-function showAccountArea(){
-
-  document.getElementById("homeArea").style.display="none";
-
-  document.getElementById("accountArea").style.display="block";
-
-}
-
-
-/* =====================================================
    PUBLIC HOME
 ===================================================== */
 
-function goPublicHome(){
+function goPublicHome() {
 
-  currentUser=null;
+  currentUser = null;
 
   setLoggedInUI(null);
 
-  showPublicHomeArea();
+  document.getElementById(
+    "homeArea"
+  ).style.display = "block";
+
+  document.getElementById(
+    "accountArea"
+  ).innerHTML = "";
 
   closeDropdown();
 
   setActiveBottom("home");
 
   window.scrollTo({
-    top:0,
-    behavior:"smooth"
+    top: 0,
+    behavior: "smooth"
   });
 
 }
 
 
-/* =====================================================
-   LOGGED-IN HOME
-   HOME = TASKS ONLY
-===================================================== */
+function homeForLoggedInUser() {
 
-async function homeForLoggedInUser(){
+  if (currentUser) {
 
-  if(!currentUser){
-
-    showLogin();
+    tasksHome();
 
     return;
 
   }
 
-  closeDropdown();
-
-  showTaskHomeArea();
-
-  setActiveBottom("home");
-
-  await loadTasks();
-
-  window.scrollTo({
-    top:0,
-    behavior:"smooth"
-  });
+  showLogin();
 
 }
 
 
-function handleLogoClick(){
+function handleLogoClick() {
 
-  if(currentUser){
+  if (currentUser) {
 
-    homeForLoggedInUser();
+    tasksHome();
 
   }
 
-  else{
+  else {
 
     goPublicHome();
 
@@ -1294,26 +1446,30 @@ function handleLogoClick(){
    DROPDOWN
 ===================================================== */
 
-function toggleDropdown(e){
+function toggleDropdown(e) {
 
-  if(e){
+  if (e) {
     e.stopPropagation();
   }
 
   const menu =
-    document.getElementById("dropdownMenu");
+    document.getElementById(
+      "dropdownMenu"
+    );
 
   menu.classList.toggle("show");
 
 }
 
 
-function closeDropdown(){
+function closeDropdown() {
 
   const menu =
-    document.getElementById("dropdownMenu");
+    document.getElementById(
+      "dropdownMenu"
+    );
 
-  if(menu){
+  if (menu) {
     menu.classList.remove("show");
   }
 
@@ -1324,20 +1480,16 @@ function closeDropdown(){
    LOGIN MENU
 ===================================================== */
 
-function handleLoginMenu(){
+function handleLoginMenu() {
 
   closeDropdown();
 
-  if(currentUser){
-
-    handleProfileClick();
-
+  if (currentUser) {
+    accountPage();
   }
 
-  else{
-
+  else {
     showLogin();
-
   }
 
 }
@@ -1347,21 +1499,22 @@ function handleLoginMenu(){
    LOGIN PAGE
 ===================================================== */
 
-function showLogin(){
+function showLogin() {
 
   closeDropdown();
 
-  if(currentUser){
-
-    handleProfileClick();
-
+  if (currentUser) {
+    accountPage();
     return;
-
   }
 
-  showAccountArea();
+  document.getElementById(
+    "homeArea"
+  ).style.display = "none";
 
-  document.getElementById("accountArea").innerHTML=`
+  document.getElementById(
+    "accountArea"
+  ).innerHTML = `
 
     <div class="auth-wrap">
 
@@ -1386,7 +1539,7 @@ function showLogin(){
             class="input"
             type="email"
             placeholder="Email address"
-            autocomplete="email"
+            autocomplete="username"
           >
 
           <input
@@ -1396,6 +1549,19 @@ function showLogin(){
             placeholder="Password"
             autocomplete="current-password"
           >
+
+          <label class="remember-row">
+
+            <input
+              id="rememberLogin"
+              type="checkbox"
+            >
+
+            <span>
+              Remember me
+            </span>
+
+          </label>
 
           <button
             class="btn primary large-btn"
@@ -1426,6 +1592,8 @@ function showLogin(){
 
   `;
 
+  loadRememberedEmail();
+
   showBottomNav(false);
 
   scrollToView();
@@ -1434,24 +1602,69 @@ function showLogin(){
 
 
 /* =====================================================
-   REGISTER
+   REMEMBERED EMAIL
 ===================================================== */
 
-function showRegister(){
+function loadRememberedEmail() {
 
-  closeDropdown();
+  try {
 
-  if(currentUser){
+    const savedEmail =
+      localStorage.getItem(
+        "taskearn_remembered_email"
+      );
 
-    handleProfileClick();
+    if (savedEmail) {
 
-    return;
+      const email =
+        document.getElementById(
+          "loginEmail"
+        );
+
+      const checkbox =
+        document.getElementById(
+          "rememberLogin"
+        );
+
+      if (email) {
+        email.value = savedEmail;
+      }
+
+      if (checkbox) {
+        checkbox.checked = true;
+      }
+
+    }
 
   }
 
-  showAccountArea();
+  catch (e) {
+    console.warn("Remember data unavailable");
+  }
 
-  document.getElementById("accountArea").innerHTML=`
+}
+
+
+/* =====================================================
+   REGISTER PAGE
+===================================================== */
+
+function showRegister() {
+
+  closeDropdown();
+
+  if (currentUser) {
+    accountPage();
+    return;
+  }
+
+  document.getElementById(
+    "homeArea"
+  ).style.display = "none";
+
+  document.getElementById(
+    "accountArea"
+  ).innerHTML = `
 
     <div class="auth-wrap">
 
@@ -1483,7 +1696,7 @@ function showRegister(){
             class="input"
             type="email"
             placeholder="Email address"
-            autocomplete="email"
+            autocomplete="username"
           >
 
           <input
@@ -1493,6 +1706,20 @@ function showRegister(){
             placeholder="Password"
             autocomplete="new-password"
           >
+
+          <label class="remember-row">
+
+            <input
+              id="rememberRegister"
+              type="checkbox"
+              checked
+            >
+
+            <span>
+              Remember me
+            </span>
+
+          </label>
 
           <button
             class="btn primary large-btn"
@@ -1534,51 +1761,86 @@ function showRegister(){
    LOGIN
 ===================================================== */
 
-async function login(){
+async function login() {
 
   const email =
-    document.getElementById("loginEmail").value.trim();
+    document.getElementById(
+      "loginEmail"
+    ).value.trim();
 
   const password =
-    document.getElementById("loginPassword").value;
+    document.getElementById(
+      "loginPassword"
+    ).value;
 
-  if(!email || !password){
+  const remember =
+    document.getElementById(
+      "rememberLogin"
+    )?.checked || false;
 
-    alert("Please enter email and password.");
+
+  if (!email || !password) {
+
+    alert(
+      "Please enter email and password."
+    );
 
     return;
 
   }
 
-  try{
+
+  try {
 
     const user =
       await api(
         "/api/login",
         {
-          method:"POST",
-          body:JSON.stringify({
+          method: "POST",
+
+          body: JSON.stringify({
             email,
-            password
+            password,
+            remember
           })
+
         }
       );
 
-    currentUser=user;
+
+    /*
+      We remember the EMAIL only.
+      The actual password should be
+      handled by the browser password manager.
+    */
+
+    if (remember) {
+
+      localStorage.setItem(
+        "taskearn_remembered_email",
+        email
+      );
+
+    }
+
+    else {
+
+      localStorage.removeItem(
+        "taskearn_remembered_email"
+      );
+
+    }
+
+
+    currentUser = user;
 
     setLoggedInUI(user);
 
-    /*
-      IMPORTANT:
-      AFTER LOGIN USER GOES DIRECTLY
-      TO HOME -> TASKS ONLY
-    */
-
-    await homeForLoggedInUser();
+    tasksHome();
 
   }
 
-  catch(err){
+  catch (err) {
 
     alert(err.message);
 
@@ -1591,54 +1853,78 @@ async function login(){
    REGISTER
 ===================================================== */
 
-async function register(){
+async function register() {
 
   const name =
-    document.getElementById("registerName").value.trim();
+    document.getElementById(
+      "registerName"
+    ).value.trim();
 
   const email =
-    document.getElementById("registerEmail").value.trim();
+    document.getElementById(
+      "registerEmail"
+    ).value.trim();
 
   const password =
-    document.getElementById("registerPassword").value;
+    document.getElementById(
+      "registerPassword"
+    ).value;
 
-  if(!name || !email || !password){
+  const remember =
+    document.getElementById(
+      "rememberRegister"
+    )?.checked || false;
 
-    alert("Please complete all fields.");
+
+  if (!name || !email || !password) {
+
+    alert(
+      "Please complete all fields."
+    );
 
     return;
 
   }
 
-  try{
+
+  try {
 
     const user =
       await api(
         "/api/register",
         {
-          method:"POST",
-          body:JSON.stringify({
+          method: "POST",
+
+          body: JSON.stringify({
             name,
             email,
-            password
+            password,
+            remember
           })
+
         }
       );
 
-    currentUser=user;
+
+    if (remember) {
+
+      localStorage.setItem(
+        "taskearn_remembered_email",
+        email
+      );
+
+    }
+
+
+    currentUser = user;
 
     setLoggedInUI(user);
 
-    /*
-      AFTER REGISTER:
-      HOME -> TASKS
-    */
-
-    await homeForLoggedInUser();
+    tasksHome();
 
   }
 
-  catch(err){
+  catch (err) {
 
     alert(err.message);
 
@@ -1651,20 +1937,20 @@ async function register(){
    LOGOUT
 ===================================================== */
 
-async function logout(){
+async function logout() {
 
-  try{
+  try {
 
     await api(
       "/api/logout",
       {
-        method:"POST"
+        method: "POST"
       }
     );
 
   }
 
-  catch(e){
+  catch (e) {
 
     console.warn(
       "Logout request failed:",
@@ -1673,25 +1959,39 @@ async function logout(){
 
   }
 
-  currentUser=null;
+
+  currentUser = null;
 
   setLoggedInUI(null);
 
+  document.getElementById(
+    "accountArea"
+  ).innerHTML = "";
+
+  document.getElementById(
+    "homeArea"
+  ).style.display = "block";
+
   closeDropdown();
 
-  goPublicHome();
+  setActiveBottom("home");
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
 
 }
 
 
 /* =====================================================
-   TASKS
-   HOME PAGE ONLY
+   TASK HOME
+   HOME = TASKS ONLY
 ===================================================== */
 
-async function loadTasks(){
+async function tasksHome() {
 
-  if(!currentUser){
+  if (!currentUser) {
 
     showLogin();
 
@@ -1699,24 +1999,60 @@ async function loadTasks(){
 
   }
 
-  const screen =
-    document.getElementById("taskScreen");
 
-  if(!screen) return;
+  closeDropdown();
 
-  screen.innerHTML=`
+  document.getElementById(
+    "homeArea"
+  ).style.display = "none";
 
-    <div class="card">
 
-      <div class="empty">
+  const area =
+    document.getElementById(
+      "accountArea"
+    );
 
-        <div style="font-size:38px;">
-          ⏳
+
+  area.innerHTML = `
+
+    <div class="page-header">
+
+      <button
+        class="back-btn"
+        onclick="accountPage()"
+      >
+        ←
+      </button>
+
+      <div>
+
+        <h2>
+          Available Tasks 📋
+        </h2>
+
+        <div class="muted">
+          Complete tasks and earn approved rewards.
         </div>
 
-        <p>
-          Loading available tasks...
-        </p>
+      </div>
+
+    </div>
+
+    <div id="taskScreen">
+
+      <div class="card">
+
+        <div class="empty">
+
+          <div style="font-size:40px;">
+            ⏳
+          </div>
+
+          <p>
+            Loading tasks...
+          </p>
+
+        </div>
 
       </div>
 
@@ -1724,16 +2060,27 @@ async function loadTasks(){
 
   `;
 
-  let tasks=[];
 
-  try{
+  showBottomNav(true);
+
+  setActiveBottom("home");
+
+  scrollToView();
+
+
+  let tasks = [];
+
+
+  try {
 
     tasks =
-      await api("/api/tasks");
+      await api(
+        "/api/tasks"
+      );
 
   }
 
-  catch(e){
+  catch (e) {
 
     console.warn(
       "Tasks API error:",
@@ -1742,9 +2089,19 @@ async function loadTasks(){
 
   }
 
-  if(!tasks || !tasks.length){
 
-    screen.innerHTML=`
+  const screen =
+    document.getElementById(
+      "taskScreen"
+    );
+
+
+  if (!screen) return;
+
+
+  if (!tasks || !tasks.length) {
+
+    screen.innerHTML = `
 
       <div class="card">
 
@@ -1768,13 +2125,12 @@ async function loadTasks(){
 
     `;
 
-    setActiveBottom("home");
-
     return;
 
   }
 
-  screen.innerHTML=`
+
+  screen.innerHTML = `
 
     <div class="notice">
 
@@ -1785,7 +2141,7 @@ async function loadTasks(){
 
     <div class="grid">
 
-      ${tasks.map(t=>`
+      ${tasks.map(t => `
 
         <div class="task-card">
 
@@ -1796,7 +2152,9 @@ async function loadTasks(){
             </span>
 
             <span class="earn">
-              +₹${Number(t.reward).toFixed(2)}
+              +₹${Number(
+                t.reward
+              ).toFixed(2)}
             </span>
 
           </div>
@@ -1824,8 +2182,6 @@ async function loadTasks(){
 
   `;
 
-  setActiveBottom("home");
-
 }
 
 
@@ -1833,9 +2189,9 @@ async function loadTasks(){
    SUBMIT TASK
 ===================================================== */
 
-async function submitTask(id){
+async function submitTask(id) {
 
-  if(!currentUser){
+  if (!currentUser) {
 
     showLogin();
 
@@ -1843,43 +2199,44 @@ async function submitTask(id){
 
   }
 
-  if(
+
+  if (
     !confirm(
       "Have you completed this task according to requirements?"
     )
-  ){
+  ) {
 
     return;
 
   }
 
-  try{
+
+  try {
 
     const result =
       await api(
-        "/api/tasks/"+id+"/submit",
+        "/api/tasks/" +
+        id +
+        "/submit",
         {
-          method:"POST",
-          body:JSON.stringify({})
+          method: "POST",
+
+          body: JSON.stringify({})
         }
       );
+
 
     alert(
       result.message ||
       "Task submitted for review!"
     );
 
-    /*
-      IMPORTANT:
-      AFTER SUBMISSION STAY ON HOME/TASKS.
-      USER CAN OPEN SUBMISSIONS FROM ACCOUNT.
-    */
 
-    await homeForLoggedInUser();
+    submissionsPage();
 
   }
 
-  catch(err){
+  catch (err) {
 
     alert(err.message);
 
@@ -1890,58 +2247,12 @@ async function submitTask(id){
 
 /* =====================================================
    ACCOUNT PAGE
-   NO TASKS HERE
+   ACCOUNT = ONLY ACCOUNT OPTIONS
 ===================================================== */
 
-async function handleProfileClick(){
+async function accountPage() {
 
-  if(!currentUser){
-
-    try{
-
-      const user =
-        await api("/api/me");
-
-      if(user){
-
-        currentUser=user;
-
-        setLoggedInUI(user);
-
-        accountPage();
-
-      }
-
-      else{
-
-        showLogin();
-
-      }
-
-    }
-
-    catch(e){
-
-      showLogin();
-
-    }
-
-    return;
-
-  }
-
-  accountPage();
-
-}
-
-
-/* =====================================================
-   ACCOUNT MAIN PAGE
-===================================================== */
-
-async function accountPage(){
-
-  if(!currentUser){
+  if (!currentUser) {
 
     showLogin();
 
@@ -1949,25 +2260,30 @@ async function accountPage(){
 
   }
 
+
   closeDropdown();
 
-  showAccountArea();
+  document.getElementById(
+    "homeArea"
+  ).style.display = "none";
 
-  setActiveBottom("account");
 
-  let wallet={
-    balance:0,
-    completed:0
+  let wallet = {
+    balance: 0,
+    completed: 0
   };
 
-  try{
+
+  try {
 
     wallet =
-      await api("/api/wallet");
+      await api(
+        "/api/wallet"
+      );
 
   }
 
-  catch(e){
+  catch (e) {
 
     console.warn(
       "Wallet API error:",
@@ -1976,13 +2292,22 @@ async function accountPage(){
 
   }
 
+
   const balanceValue =
-    Number(wallet.balance || 0).toFixed(2);
+    Number(
+      wallet.balance || 0
+    ).toFixed(2);
 
-  document.getElementById("balance").innerText=
-    "₹"+balanceValue;
 
-  document.getElementById("accountArea").innerHTML=`
+  document.getElementById(
+    "balance"
+  ).innerText =
+    "₹" + balanceValue;
+
+
+  document.getElementById(
+    "accountArea"
+  ).innerHTML = `
 
     <div class="card">
 
@@ -1994,11 +2319,13 @@ async function accountPage(){
             class="muted"
             style="margin:0;"
           >
-            Your Account
+            Welcome back
           </p>
 
           <h2 style="margin:4px 0 0;">
-            Hi, ${escapeHtml(currentUser.name)} 👋
+            Hi,
+            ${escapeHtml(userName())}
+            👋
           </h2>
 
         </div>
@@ -2020,7 +2347,7 @@ async function accountPage(){
       <div class="stat">
 
         <small>
-          Wallet Balance
+          Balance
         </small>
 
         <b>
@@ -2060,24 +2387,65 @@ async function accountPage(){
     </div>
 
 
+    <div class="card">
+
+      <h2>
+        My Account
+      </h2>
+
+      <p class="muted">
+        Manage your account, wallet and task submissions.
+      </p>
+
+    </div>
+
+
     <div class="account-menu">
+
+      <button
+        class="account-option"
+        onclick="accountDetailsPage()"
+      >
+
+        <div class="icon">
+          👤
+        </div>
+
+        <div>
+
+          <b>
+            Account Details
+          </b>
+
+          <span>
+            View your profile information
+          </span>
+
+        </div>
+
+      </button>
+
 
       <button
         class="account-option"
         onclick="walletPage()"
       >
 
-        <div class="account-option-icon">
+        <div class="icon">
           💰
         </div>
 
-        <b>
-          Wallet
-        </b>
+        <div>
 
-        <span>
-          Balance and withdrawal history
-        </span>
+          <b>
+            Wallet
+          </b>
+
+          <span>
+            Balance & withdrawals
+          </span>
+
+        </div>
 
       </button>
 
@@ -2087,79 +2455,55 @@ async function accountPage(){
         onclick="submissionsPage()"
       >
 
-        <div class="account-option-icon">
+        <div class="icon">
           📄
         </div>
 
-        <b>
-          My Submissions
-        </b>
+        <div>
 
-        <span>
-          Check your submitted tasks
-        </span>
+          <b>
+            My Submissions
+          </b>
 
-      </button>
+          <span>
+            View submitted tasks
+          </span>
 
-
-      <button
-        class="account-option"
-        onclick="profilePage()"
-      >
-
-        <div class="account-option-icon">
-          👤
         </div>
-
-        <b>
-          My Profile
-        </b>
-
-        <span>
-          View your account information
-        </span>
-
-      </button>
-
-
-      <button
-        class="account-option"
-        onclick="logout()"
-      >
-
-        <div class="account-option-icon">
-          🚪
-        </div>
-
-        <b>
-          Logout
-        </b>
-
-        <span>
-          Securely sign out
-        </span>
 
       </button>
 
     </div>
 
-
-    <div id="accountScreen"></div>
-
   `;
 
+
   showBottomNav(true);
+
+  setActiveBottom("account");
+
+  scrollToView();
+
+}
+
+
+function userName() {
+
+  return currentUser &&
+         currentUser.name
+    ? currentUser.name
+    : "Member";
 
 }
 
 
 /* =====================================================
-   WALLET
+   ACCOUNT DETAILS PAGE
 ===================================================== */
 
-async function walletPage(){
+function accountDetailsPage() {
 
-  if(!currentUser){
+  if (!currentUser) {
 
     showLogin();
 
@@ -2167,19 +2511,475 @@ async function walletPage(){
 
   }
 
-  let wallet={
-    balance:0,
-    withdrawals:[]
-  };
 
-  try{
+  document.getElementById(
+    "homeArea"
+  ).style.display = "none";
 
-    wallet =
-      await api("/api/wallet");
+
+  document.getElementById(
+    "accountArea"
+  ).innerHTML = `
+
+    <div class="page-header">
+
+      <button
+        class="back-btn"
+        onclick="accountPage()"
+      >
+        ←
+      </button>
+
+      <div>
+
+        <h2>
+          Account Details 👤
+        </h2>
+
+        <div class="muted">
+          Your TaskEarn account information
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="row"
+           style="margin-bottom:18px;">
+
+        <div
+          style="
+            width:58px;
+            height:58px;
+            border-radius:18px;
+            background:#fff1eb;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:27px;
+          "
+        >
+          👤
+        </div>
+
+        <div style="flex:1;">
+
+          <h2 style="margin:0;">
+            ${escapeHtml(
+              currentUser.name || "Member"
+            )}
+          </h2>
+
+          <p class="muted"
+             style="margin:2px 0 0;">
+            ${escapeHtml(
+              currentUser.role || "Member"
+            )}
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="admin-box">
+
+        <p class="muted"
+           style="margin:0;">
+          Full Name
+        </p>
+
+        <b>
+          ${escapeHtml(
+            currentUser.name || "-"
+          )}
+        </b>
+
+      </div>
+
+
+      <div class="admin-box">
+
+        <p class="muted"
+           style="margin:0;">
+          Email Address
+        </p>
+
+        <b>
+          ${escapeHtml(
+            currentUser.email || "-"
+          )}
+        </b>
+
+      </div>
+
+
+      <div class="admin-box">
+
+        <p class="muted"
+           style="margin:0;">
+          Account Type
+        </p>
+
+        <b>
+          ${escapeHtml(
+            currentUser.role || "Member"
+          )}
+        </b>
+
+      </div>
+
+
+      <div class="admin-box">
+
+        <p class="muted"
+           style="margin:0;">
+          Account ID
+        </p>
+
+        <b>
+          ${escapeHtml(
+            currentUser.id || "-"
+          )}
+        </b>
+
+      </div>
+
+    </div>
+
+
+    <button
+      class="btn secondary"
+      style="width:100%;"
+      onclick="accountPage()"
+    >
+      ← Back to Account
+    </button>
+
+  `;
+
+
+  showBottomNav(true);
+
+  setActiveBottom("account");
+
+  scrollToView();
+
+}
+
+
+/* =====================================================
+   SUBMISSIONS PAGE
+===================================================== */
+
+async function submissionsPage() {
+
+  if (!currentUser) {
+
+    showLogin();
+
+    return;
 
   }
 
-  catch(e){
+
+  document.getElementById(
+    "homeArea"
+  ).style.display = "none";
+
+
+  document.getElementById(
+    "accountArea"
+  ).innerHTML = `
+
+    <div class="page-header">
+
+      <button
+        class="back-btn"
+        onclick="accountPage()"
+      >
+        ←
+      </button>
+
+      <div>
+
+        <h2>
+          My Submissions 📄
+        </h2>
+
+        <div class="muted">
+          Your submitted tasks and review status
+        </div>
+
+      </div>
+
+    </div>
+
+    <div id="submissionScreen">
+
+      <div class="card">
+
+        <div class="empty">
+
+          <div style="font-size:40px;">
+            ⏳
+          </div>
+
+          <p>
+            Loading submissions...
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+
+  showBottomNav(true);
+
+  setActiveBottom("account");
+
+  scrollToView();
+
+
+  let submissions = [];
+
+
+  try {
+
+    submissions =
+      await api(
+        "/api/my-submissions"
+      );
+
+  }
+
+  catch (e) {
+
+    console.warn(
+      "Submission API error:",
+      e.message
+    );
+
+  }
+
+
+  const screen =
+    document.getElementById(
+      "submissionScreen"
+    );
+
+
+  if (!screen) return;
+
+
+  if (!submissions || !submissions.length) {
+
+    screen.innerHTML = `
+
+      <div class="card">
+
+        <div class="empty">
+
+          <div style="font-size:40px;">
+            📄
+          </div>
+
+          <h3>
+            No submissions yet
+          </h3>
+
+          <p class="muted">
+            You haven't submitted any tasks yet.
+          </p>
+
+          <button
+            class="btn primary"
+            onclick="tasksHome()"
+          >
+            Browse Tasks
+          </button>
+
+        </div>
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  screen.innerHTML = `
+
+    <div class="card">
+
+      <h2>
+        My Submissions
+      </h2>
+
+      ${submissions.map(item => `
+
+        <div class="admin-box">
+
+          <div class="row">
+
+            <div>
+
+              <b>
+                ${escapeHtml(
+                  item.taskTitle
+                )}
+              </b>
+
+              <p class="muted">
+                Reward:
+                ₹${Number(
+                  item.reward
+                ).toFixed(2)}
+              </p>
+
+            </div>
+
+            <span
+              class="status ${escapeHtml(
+                item.status
+              )}"
+            >
+              ${escapeHtml(
+                item.status
+              )}
+            </span>
+
+          </div>
+
+          <p class="muted">
+            Submitted:
+            ${formatDate(
+              item.submittedAt
+            )}
+          </p>
+
+        </div>
+
+      `).join("")}
+
+    </div>
+
+
+    <button
+      class="btn secondary"
+      style="width:100%;"
+      onclick="accountPage()"
+    >
+      ← Back to Account
+    </button>
+
+  `;
+
+}
+
+
+/* =====================================================
+   WALLET PAGE
+===================================================== */
+
+async function walletPage() {
+
+  if (!currentUser) {
+
+    showLogin();
+
+    return;
+
+  }
+
+
+  document.getElementById(
+    "homeArea"
+  ).style.display = "none";
+
+
+  document.getElementById(
+    "accountArea"
+  ).innerHTML = `
+
+    <div class="page-header">
+
+      <button
+        class="back-btn"
+        onclick="accountPage()"
+      >
+        ←
+      </button>
+
+      <div>
+
+        <h2>
+          Wallet 💰
+        </h2>
+
+        <div class="muted">
+          Manage your approved rewards and withdrawals
+        </div>
+
+      </div>
+
+    </div>
+
+    <div id="walletScreen">
+
+      <div class="card">
+
+        <div class="empty">
+
+          <div style="font-size:40px;">
+            ⏳
+          </div>
+
+          <p>
+            Loading wallet...
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+
+  showBottomNav(true);
+
+  setActiveBottom("account");
+
+  scrollToView();
+
+
+  let wallet = {
+    balance: 0,
+    withdrawals: []
+  };
+
+
+  try {
+
+    wallet =
+      await api(
+        "/api/wallet"
+      );
+
+  }
+
+  catch (e) {
 
     console.warn(
       "Wallet API error:",
@@ -2188,34 +2988,57 @@ async function walletPage(){
 
   }
 
+
   const screen =
-    document.getElementById("accountScreen");
+    document.getElementById(
+      "walletScreen"
+    );
 
-  if(!screen) return;
 
-  screen.innerHTML=`
+  if (!screen) return;
+
+
+  const balanceValue =
+    Number(
+      wallet.balance || 0
+    ).toFixed(2);
+
+
+  document.getElementById(
+    "balance"
+  ).innerText =
+    "₹" + balanceValue;
+
+
+  screen.innerHTML = `
 
     <div class="card">
-
-      <button
-        class="btn secondary"
-        onclick="accountPage()"
-      >
-        ← Account
-      </button>
-
-      <br><br>
 
       <p class="muted">
         Available Balance
       </p>
 
-      <h1 style="font-size:36px;margin:5px 0 8px;">
-        ₹${Number(wallet.balance || 0).toFixed(2)}
+      <h1
+        style="font-size:40px;margin:5px 0 8px;"
+      >
+        ₹${balanceValue}
       </h1>
 
       <p class="muted">
-        Minimum withdrawal: ₹100
+        This is your currently approved wallet balance.
+      </p>
+
+    </div>
+
+
+    <div class="card">
+
+      <h2>
+        Request Withdrawal
+      </h2>
+
+      <p class="muted">
+        Minimum withdrawal amount is ₹100.
       </p>
 
       <div class="form">
@@ -2225,7 +3048,7 @@ async function walletPage(){
           class="input"
           type="number"
           min="100"
-          placeholder="Amount"
+          placeholder="Enter amount"
         >
 
         <input
@@ -2259,28 +3082,42 @@ async function walletPage(){
 
         ?
 
-        wallet.withdrawals.map(w=>`
+        wallet.withdrawals.map(w => `
 
           <div class="admin-box">
 
             <div class="row">
 
               <span>
-                ₹${Number(w.amount).toFixed(2)}
+
+                ₹${Number(
+                  w.amount
+                ).toFixed(2)}
+
                 •
-                ${escapeHtml(w.method)}
+
+                ${escapeHtml(
+                  w.method
+                )}
+
               </span>
 
               <span
-                class="status ${escapeHtml(w.status)}"
+                class="status ${escapeHtml(
+                  w.status
+                )}"
               >
-                ${escapeHtml(w.status)}
+                ${escapeHtml(
+                  w.status
+                )}
               </span>
 
             </div>
 
             <p class="muted">
-              ${formatDate(w.createdAt)}
+              ${formatDate(
+                w.createdAt
+              )}
             </p>
 
           </div>
@@ -2292,9 +3129,19 @@ async function walletPage(){
         `<p class="muted">
           No withdrawals yet.
         </p>`
+
       }
 
     </div>
+
+
+    <button
+      class="btn secondary"
+      style="width:100%;"
+      onclick="accountPage()"
+    >
+      ← Back to Account
+    </button>
 
   `;
 
@@ -2305,9 +3152,9 @@ async function walletPage(){
    WITHDRAW
 ===================================================== */
 
-async function withdraw(){
+async function withdraw() {
 
-  if(!currentUser){
+  if (!currentUser) {
 
     showLogin();
 
@@ -2315,15 +3162,22 @@ async function withdraw(){
 
   }
 
+
   const amount =
     Number(
-      document.getElementById("amount").value
+      document.getElementById(
+        "amount"
+      ).value
     );
 
-  const method =
-    document.getElementById("method").value.trim();
 
-  if(!amount || amount<100){
+  const method =
+    document.getElementById(
+      "method"
+    ).value.trim();
+
+
+  if (!amount || amount < 100) {
 
     alert(
       "Minimum withdrawal amount is ₹100."
@@ -2333,7 +3187,8 @@ async function withdraw(){
 
   }
 
-  if(!method){
+
+  if (!method) {
 
     alert(
       "Please enter payment method."
@@ -2343,30 +3198,34 @@ async function withdraw(){
 
   }
 
-  try{
+
+  try {
 
     const result =
       await api(
         "/api/withdraw",
         {
-          method:"POST",
-          body:JSON.stringify({
+          method: "POST",
+
+          body: JSON.stringify({
             amount,
             method
           })
         }
       );
 
+
     alert(
       result.message ||
       "Withdrawal request submitted."
     );
 
-    accountPage();
+
+    walletPage();
 
   }
 
-  catch(err){
+  catch (err) {
 
     alert(err.message);
 
@@ -2376,229 +3235,21 @@ async function withdraw(){
 
 
 /* =====================================================
-   MY SUBMISSIONS
+   INFO PAGE
 ===================================================== */
 
-async function submissionsPage(){
-
-  if(!currentUser){
-
-    showLogin();
-
-    return;
-
-  }
-
-  let submissions=[];
-
-  try{
-
-    submissions =
-      await api("/api/my-submissions");
-
-  }
-
-  catch(e){
-
-    console.warn(
-      "Submission API error:",
-      e.message
-    );
-
-  }
-
-  const screen =
-    document.getElementById("accountScreen");
-
-  if(!screen) return;
-
-  if(!submissions.length){
-
-    screen.innerHTML=`
-
-      <div class="card">
-
-        <button
-          class="btn secondary"
-          onclick="accountPage()"
-        >
-          ← Account
-        </button>
-
-        <h2 style="margin-top:20px;">
-          My Submissions 📋
-        </h2>
-
-        <div class="empty">
-
-          <div style="font-size:40px;">
-            📄
-          </div>
-
-          <p>
-            You haven't submitted any tasks yet.
-          </p>
-
-        </div>
-
-      </div>
-
-    `;
-
-    return;
-
-  }
-
-  screen.innerHTML=`
-
-    <div class="card">
-
-      <button
-        class="btn secondary"
-        onclick="accountPage()"
-      >
-        ← Account
-      </button>
-
-      <h2 style="margin-top:20px;">
-        My Submissions 📋
-      </h2>
-
-      ${submissions.map(item=>`
-
-        <div class="admin-box">
-
-          <div class="row">
-
-            <div>
-
-              <b>
-                ${escapeHtml(item.taskTitle)}
-              </b>
-
-              <p class="muted">
-                Reward:
-                ₹${Number(item.reward).toFixed(2)}
-              </p>
-
-            </div>
-
-            <span
-              class="status ${escapeHtml(item.status)}"
-            >
-              ${escapeHtml(item.status)}
-            </span>
-
-          </div>
-
-          <p class="muted">
-            Submitted:
-            ${formatDate(item.submittedAt)}
-          </p>
-
-        </div>
-
-      `).join("")}
-
-    </div>
-
-  `;
-
-}
-
-
-/* =====================================================
-   PROFILE
-===================================================== */
-
-function profilePage(){
-
-  if(!currentUser){
-
-    showLogin();
-
-    return;
-
-  }
-
-  const screen =
-    document.getElementById("accountScreen");
-
-  if(!screen) return;
-
-  screen.innerHTML=`
-
-    <div class="card">
-
-      <button
-        class="btn secondary"
-        onclick="accountPage()"
-      >
-        ← Account
-      </button>
-
-      <h2 style="margin-top:20px;">
-        My Profile 👤
-      </h2>
-
-      <div class="admin-box">
-
-        <p>
-          <strong>Name</strong>
-        </p>
-
-        <p class="muted">
-          ${escapeHtml(currentUser.name)}
-        </p>
-
-      </div>
-
-
-      <div class="admin-box">
-
-        <p>
-          <strong>Email</strong>
-        </p>
-
-        <p class="muted">
-          ${escapeHtml(currentUser.email)}
-        </p>
-
-      </div>
-
-
-      <div class="admin-box">
-
-        <p>
-          <strong>Account Type</strong>
-        </p>
-
-        <p class="muted">
-          ${escapeHtml(
-            currentUser.role || "Member"
-          )}
-        </p>
-
-      </div>
-
-    </div>
-
-  `;
-
-}
-
-
-/* =====================================================
-   INFO PAGES
-===================================================== */
-
-function showInfoPage(title,content){
+function showInfoPage(title, content) {
 
   closeDropdown();
 
-  showAccountArea();
+  document.getElementById(
+    "homeArea"
+  ).style.display = "none";
 
-  document.getElementById("accountArea").innerHTML=`
+
+  document.getElementById(
+    "accountArea"
+  ).innerHTML = `
 
     <div class="card">
 
@@ -2623,6 +3274,7 @@ function showInfoPage(title,content){
 
   `;
 
+
   showBottomNav(false);
 
   scrollToView();
@@ -2630,7 +3282,11 @@ function showInfoPage(title,content){
 }
 
 
-function showAboutPage(){
+/* =====================================================
+   ABOUT
+===================================================== */
+
+function showAboutPage() {
 
   showInfoPage(
     "About Us ℹ️",
@@ -2665,13 +3321,18 @@ function showAboutPage(){
 }
 
 
-function showTermsPage(){
+/* =====================================================
+   TERMS
+===================================================== */
+
+function showTermsPage() {
 
   showInfoPage(
     "Terms & Conditions 📜",
 
     `
       <h3>1. Acceptance</h3>
+
       <p>
         By creating or using a TaskEarn account, you agree
         to follow these Terms & Conditions and use the
@@ -2679,6 +3340,7 @@ function showTermsPage(){
       </p>
 
       <h3>2. User Accounts</h3>
+
       <p>
         Users are responsible for keeping their login
         credentials secure and for all activity performed
@@ -2686,12 +3348,14 @@ function showTermsPage(){
       </p>
 
       <h3>3. Task Completion</h3>
+
       <p>
         Tasks must be completed according to the specific
         instructions provided.
       </p>
 
       <h3>4. Review and Rewards</h3>
+
       <p>
         Task submissions may be reviewed before rewards are
         approved. A submitted task does not guarantee a
@@ -2699,22 +3363,27 @@ function showTermsPage(){
       </p>
 
       <h3>5. Prohibited Activity</h3>
+
       <p>
         Fraud, abuse, multiple unauthorized accounts,
-        manipulation of tasks or misleading submissions
-        may result in account suspension or termination.
+        manipulation of tasks, misleading submissions or
+        attempts to exploit the platform may result in
+        suspension or termination.
       </p>
 
       <h3>6. Withdrawals</h3>
+
       <p>
-        Withdrawal requests are subject to available
-        balance and minimum withdrawal requirements.
+        Withdrawal requests are subject to the available
+        balance and applicable account requirements.
       </p>
 
       <h3>7. No Guaranteed Income</h3>
+
       <p>
         TaskEarn does not guarantee employment, fixed
-        earnings or continuous task availability.
+        earnings, a specific income or continuous task
+        availability.
       </p>
     `
   );
@@ -2722,7 +3391,11 @@ function showTermsPage(){
 }
 
 
-function showPrivacyPage(){
+/* =====================================================
+   PRIVACY
+===================================================== */
+
+function showPrivacyPage() {
 
   showInfoPage(
     "Privacy Policy 🔒",
@@ -2732,8 +3405,8 @@ function showPrivacyPage(){
 
       <p>
         TaskEarn may collect information required to create
-        and operate an account, such as name, email address,
-        account information, task activity and
+        and operate an account, such as your name, email
+        address, account information, task activity and
         transaction-related information.
       </p>
 
@@ -2741,7 +3414,7 @@ function showPrivacyPage(){
 
       <p>
         Information may be used to provide platform
-        features, manage accounts, process submissions,
+        features, manage accounts, process task submissions,
         maintain reward records and improve the platform.
       </p>
 
@@ -2749,7 +3422,7 @@ function showPrivacyPage(){
 
       <p>
         We take reasonable measures to protect account
-        information.
+        information. Users should never share passwords.
       </p>
 
       <h3>4. Cookies</h3>
@@ -2779,7 +3452,11 @@ function showPrivacyPage(){
 }
 
 
-function showContactPage(){
+/* =====================================================
+   CONTACT
+===================================================== */
+
+function showContactPage() {
 
   showInfoPage(
     "Contact Us 📞",
@@ -2799,6 +3476,11 @@ function showContactPage(){
       </p>
 
       <p>
+        Please include your registered email address and
+        relevant details when contacting support.
+      </p>
+
+      <p>
         Do not send your password or confidential account
         credentials by email.
       </p>
@@ -2808,15 +3490,19 @@ function showContactPage(){
 }
 
 
-function goBackFromInfo(){
+/* =====================================================
+   BACK FROM INFO
+===================================================== */
 
-  if(currentUser){
+function goBackFromInfo() {
+
+  if (currentUser) {
 
     accountPage();
 
   }
 
-  else{
+  else {
 
     goPublicHome();
 
@@ -2826,55 +3512,131 @@ function goBackFromInfo(){
 
 
 /* =====================================================
-   BOTTOM NAV
+   MOBILE NAV
 ===================================================== */
 
-function showBottomNav(show){
+function showBottomNav(show) {
 
   const nav =
-    document.getElementById("mobileBottomNav");
+    document.getElementById(
+      "mobileBottomNav"
+    );
 
-  if(!nav) return;
 
-  if(
+  if (!nav) return;
+
+
+  if (
     show &&
     currentUser &&
-    window.innerWidth<=700
-  ){
+    window.innerWidth <= 700
+  ) {
 
-    nav.classList.add("logged-in");
+    nav.classList.add(
+      "logged-in"
+    );
 
   }
 
-  else{
+  else {
 
-    nav.classList.remove("logged-in");
+    nav.classList.remove(
+      "logged-in"
+    );
 
   }
 
 }
 
 
-function setActiveBottom(name){
+/* =====================================================
+   ACTIVE MOBILE BUTTON
+===================================================== */
+
+function setActiveBottom(name) {
 
   document
-    .querySelectorAll(".bottom-item")
+    .querySelectorAll(
+      ".bottom-item"
+    )
     .forEach(
-      b=>b.classList.remove("active")
+      b =>
+        b.classList.remove(
+          "active"
+        )
     );
 
+
   const items =
-    document.querySelectorAll(".bottom-item");
+    document.querySelectorAll(
+      ".bottom-item"
+    );
 
-  if(name==="home"){
 
-    items[0]?.classList.add("active");
+  if (name === "home") {
+
+    items[0]?.classList.add(
+      "active"
+    );
 
   }
 
-  if(name==="account"){
 
-    items[1]?.classList.add("active");
+  if (name === "account") {
+
+    items[1]?.classList.add(
+      "active"
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   PROFILE / ACCOUNT
+===================================================== */
+
+async function handleProfileClick() {
+
+  if (currentUser) {
+
+    accountPage();
+
+    return;
+
+  }
+
+
+  try {
+
+    const user =
+      await api(
+        "/api/me"
+      );
+
+
+    if (user) {
+
+      currentUser = user;
+
+      setLoggedInUI(user);
+
+      accountPage();
+
+    }
+
+    else {
+
+      showLogin();
+
+    }
+
+  }
+
+  catch (e) {
+
+    showLogin();
 
   }
 
@@ -2885,15 +3647,18 @@ function setActiveBottom(name){
    SCROLL
 ===================================================== */
 
-function scrollToView(){
+function scrollToView() {
 
   const area =
-    document.getElementById("accountArea");
+    document.getElementById(
+      "accountArea"
+    );
 
-  if(area){
+
+  if (area) {
 
     area.scrollIntoView({
-      behavior:"smooth"
+      behavior: "smooth"
     });
 
   }
@@ -2902,34 +3667,32 @@ function scrollToView(){
 
 
 /* =====================================================
-   SESSION CHECK
+   INITIAL SESSION
 ===================================================== */
 
-async function checkSession(){
+async function checkSession() {
 
-  try{
+  try {
 
     const user =
-      await api("/api/me");
+      await api(
+        "/api/me"
+      );
 
-    if(user){
 
-      currentUser=user;
+    if (user) {
+
+      currentUser = user;
 
       setLoggedInUI(user);
 
-      /*
-        IMPORTANT:
-        Existing session opens HOME -> TASKS
-      */
-
-      await homeForLoggedInUser();
+      tasksHome();
 
     }
 
-    else{
+    else {
 
-      currentUser=null;
+      currentUser = null;
 
       setLoggedInUI(null);
 
@@ -2939,9 +3702,9 @@ async function checkSession(){
 
   }
 
-  catch(e){
+  catch (e) {
 
-    currentUser=null;
+    currentUser = null;
 
     setLoggedInUI(null);
 
@@ -2958,11 +3721,13 @@ async function checkSession(){
 
 window.addEventListener(
   "click",
-  function(e){
+  function(e) {
 
-    if(
-      !e.target.closest(".header-right")
-    ){
+    if (
+      !e.target.closest(
+        ".header-right"
+      )
+    ) {
 
       closeDropdown();
 
@@ -2978,15 +3743,15 @@ window.addEventListener(
 
 window.addEventListener(
   "resize",
-  function(){
+  function() {
 
-    if(currentUser){
+    if (currentUser) {
 
       showBottomNav(true);
 
     }
 
-    else{
+    else {
 
       showBottomNav(false);
 
@@ -2997,12 +3762,12 @@ window.addEventListener(
 
 
 /* =====================================================
-   START
+   START APP
 ===================================================== */
 
 document.addEventListener(
   "DOMContentLoaded",
-  function(){
+  function() {
 
     checkSession();
 
@@ -3012,4 +3777,4 @@ document.addEventListener(
 </script>
 
 </body>
-</html>
+  </html>
