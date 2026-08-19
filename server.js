@@ -3,11 +3,14 @@ const session = require("express-session");
 
 const app = express();
 
-/* Render / HTTPS session fix */
 app.set("trust proxy", 1);
 
 app.use(express.json());
 app.use(express.static("public"));
+
+/* =========================
+   SESSION
+========================= */
 
 app.use(
   session({
@@ -16,7 +19,6 @@ app.use(
       "taskearn-demo-secret-change-this",
 
     resave: false,
-
     saveUninitialized: false,
 
     cookie: {
@@ -53,6 +55,8 @@ const users = [
     completed: 0
   }
 ];
+
+let nextUserId = 3;
 
 
 /* =========================
@@ -101,13 +105,22 @@ let tasks = [
   }
 ];
 
+let nextTaskId = 5;
+
+
+/* =========================
+   SUBMISSIONS
+========================= */
 
 let submissions = [];
-let withdrawals = [];
-
-let nextUserId = 3;
-let nextTaskId = 5;
 let nextSubmissionId = 1;
+
+
+/* =========================
+   WITHDRAWALS
+========================= */
+
+let withdrawals = [];
 let nextWithdrawalId = 1;
 
 
@@ -146,7 +159,6 @@ function publicUser(user) {
 function auth(req, res, next) {
 
   if (!req.session.user) {
-
     return res.status(401).json({
       error: "Login required"
     });
@@ -162,7 +174,6 @@ function admin(req, res, next) {
     !req.session.user ||
     req.session.user.role !== "admin"
   ) {
-
     return res.status(403).json({
       error: "Admin only"
     });
@@ -182,6 +193,689 @@ app.get("/health", (req, res) => {
     ok: true,
     service: "TaskEarn"
   });
+
+});
+
+
+/* =========================================================
+   INFORMATION PAGES
+   Privacy / Terms / About / Contact
+========================================================= */
+
+
+/* =========================
+   PRIVACY POLICY
+========================= */
+
+app.get("/privacy", (req, res) => {
+
+  res.send(`
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  >
+
+  <meta
+    name="description"
+    content="TaskEarn Privacy Policy"
+  >
+
+  <title>Privacy Policy - TaskEarn</title>
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f6fb;
+      color: #172033;
+      line-height: 1.7;
+    }
+
+    .header {
+      background:
+        linear-gradient(
+          135deg,
+          #5b45f5,
+          #795cff
+        );
+
+      color: white;
+      padding: 20px;
+    }
+
+    .header h1 {
+      max-width: 850px;
+      margin: auto;
+    }
+
+    .container {
+      max-width: 850px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 25px;
+      border-radius: 18px;
+      box-shadow:
+        0 5px 22px rgba(0,0,0,.06);
+    }
+
+    a {
+      color: #5b45f5;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    h2 {
+      margin-top: 28px;
+    }
+
+    .back {
+      margin-top: 25px;
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <header class="header">
+
+    <h1>
+      TaskEarn - Privacy Policy
+    </h1>
+
+  </header>
+
+  <main class="container">
+
+    <div class="card">
+
+      <p>
+        Welcome to TaskEarn. We respect your privacy
+        and are committed to protecting information
+        provided by users of our website.
+      </p>
+
+      <h2>Information We Collect</h2>
+
+      <p>
+        TaskEarn may collect information such as your
+        name, email address, account information,
+        task submissions and withdrawal requests.
+      </p>
+
+      <h2>How We Use Information</h2>
+
+      <p>
+        Information may be used to provide account
+        services, manage tasks, process submissions,
+        maintain platform security and improve the
+        website.
+      </p>
+
+      <h2>Advertising</h2>
+
+      <p>
+        TaskEarn may display advertisements from
+        third-party advertising providers such as
+        Google AdSense.
+      </p>
+
+      <p>
+        Advertising providers may use cookies or
+        similar technologies according to their
+        own policies.
+      </p>
+
+      <h2>Cookies</h2>
+
+      <p>
+        TaskEarn may use cookies to maintain login
+        sessions and support website functionality.
+      </p>
+
+      <h2>Third-Party Services</h2>
+
+      <p>
+        Some services used by the website may be
+        provided by third parties. Their use of
+        information is governed by their respective
+        privacy policies.
+      </p>
+
+      <h2>Data Security</h2>
+
+      <p>
+        We take reasonable steps to protect
+        information associated with user accounts.
+        However, no internet service can guarantee
+        absolute security.
+      </p>
+
+      <h2>Changes to This Policy</h2>
+
+      <p>
+        This Privacy Policy may be updated from
+        time to time. Updated versions will be
+        published on this page.
+      </p>
+
+      <div class="back">
+
+        <a href="/">
+          ← Back to TaskEarn
+        </a>
+
+      </div>
+
+    </div>
+
+  </main>
+
+</body>
+
+</html>
+  `);
+
+});
+
+
+/* =========================
+   TERMS
+========================= */
+
+app.get("/terms", (req, res) => {
+
+  res.send(`
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  >
+
+  <title>Terms & Conditions - TaskEarn</title>
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f6fb;
+      color: #172033;
+      line-height: 1.7;
+    }
+
+    .header {
+      background:
+        linear-gradient(
+          135deg,
+          #5b45f5,
+          #795cff
+        );
+
+      color: white;
+      padding: 20px;
+    }
+
+    .header h1 {
+      max-width: 850px;
+      margin: auto;
+    }
+
+    .container {
+      max-width: 850px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 25px;
+      border-radius: 18px;
+      box-shadow:
+        0 5px 22px rgba(0,0,0,.06);
+    }
+
+    a {
+      color: #5b45f5;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    h2 {
+      margin-top: 28px;
+    }
+
+    .back {
+      margin-top: 25px;
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <header class="header">
+
+    <h1>
+      TaskEarn - Terms & Conditions
+    </h1>
+
+  </header>
+
+  <main class="container">
+
+    <div class="card">
+
+      <p>
+        By using TaskEarn, you agree to these
+        Terms and Conditions.
+      </p>
+
+      <h2>Accounts</h2>
+
+      <p>
+        Users are responsible for providing
+        accurate account information and protecting
+        their login credentials.
+      </p>
+
+      <h2>Tasks</h2>
+
+      <p>
+        Users must complete tasks according to
+        the requirements displayed on the platform.
+      </p>
+
+      <p>
+        Task availability and rewards may change
+        at any time.
+      </p>
+
+      <h2>Task Submissions</h2>
+
+      <p>
+        Submitting a task does not automatically
+        guarantee a reward. Submissions may be
+        reviewed before rewards are credited.
+      </p>
+
+      <h2>Rewards</h2>
+
+      <p>
+        Rewards are subject to task eligibility,
+        platform rules and approval.
+      </p>
+
+      <h2>Withdrawals</h2>
+
+      <p>
+        Withdrawal requests are subject to the
+        applicable minimum withdrawal amount and
+        platform review.
+      </p>
+
+      <h2>Prohibited Activity</h2>
+
+      <p>
+        Fraud, fake submissions, automated abuse,
+        manipulation, multiple-account abuse and
+        attempts to exploit the platform are
+        prohibited.
+      </p>
+
+      <h2>Changes</h2>
+
+      <p>
+        TaskEarn may update these Terms and
+        Conditions when necessary. Updated terms
+        will be published on this page.
+      </p>
+
+      <div class="back">
+
+        <a href="/">
+          ← Back to TaskEarn
+        </a>
+
+      </div>
+
+    </div>
+
+  </main>
+
+</body>
+
+</html>
+  `);
+
+});
+
+
+/* =========================
+   ABOUT
+========================= */
+
+app.get("/about", (req, res) => {
+
+  res.send(`
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  >
+
+  <title>About TaskEarn</title>
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f6fb;
+      color: #172033;
+      line-height: 1.7;
+    }
+
+    .header {
+      background:
+        linear-gradient(
+          135deg,
+          #5b45f5,
+          #795cff
+        );
+
+      color: white;
+      padding: 20px;
+    }
+
+    .header h1 {
+      max-width: 850px;
+      margin: auto;
+    }
+
+    .container {
+      max-width: 850px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 25px;
+      border-radius: 18px;
+      box-shadow:
+        0 5px 22px rgba(0,0,0,.06);
+    }
+
+    a {
+      color: #5b45f5;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    h2 {
+      margin-top: 28px;
+    }
+
+    .back {
+      margin-top: 25px;
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <header class="header">
+
+    <h1>
+      About TaskEarn
+    </h1>
+
+  </header>
+
+  <main class="container">
+
+    <div class="card">
+
+      <h2>What is TaskEarn?</h2>
+
+      <p>
+        TaskEarn is an online platform designed
+        to provide a simple interface for discovering
+        eligible tasks, submitting completed work
+        and managing approved task-related rewards.
+      </p>
+
+      <h2>Our Goal</h2>
+
+      <p>
+        Our goal is to provide users with a simple
+        and transparent task discovery and submission
+        experience.
+      </p>
+
+      <h2>How It Works</h2>
+
+      <p>
+        Users can create an account, browse available
+        tasks, complete eligible tasks according to
+        their requirements and submit them for review.
+      </p>
+
+      <p>
+        Approved rewards can be reflected in the
+        user's TaskEarn wallet according to the
+        platform's applicable rules.
+      </p>
+
+      <h2>Important Information</h2>
+
+      <p>
+        Task availability and rewards can change.
+        Earnings are not guaranteed and depend on
+        available tasks, eligibility and applicable
+        conditions.
+      </p>
+
+      <div class="back">
+
+        <a href="/">
+          ← Back to TaskEarn
+        </a>
+
+      </div>
+
+    </div>
+
+  </main>
+
+</body>
+
+</html>
+  `);
+
+});
+
+
+/* =========================
+   CONTACT
+========================= */
+
+app.get("/contact", (req, res) => {
+
+  res.send(`
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  >
+
+  <title>Contact TaskEarn</title>
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f6fb;
+      color: #172033;
+      line-height: 1.7;
+    }
+
+    .header {
+      background:
+        linear-gradient(
+          135deg,
+          #5b45f5,
+          #795cff
+        );
+
+      color: white;
+      padding: 20px;
+    }
+
+    .header h1 {
+      max-width: 850px;
+      margin: auto;
+    }
+
+    .container {
+      max-width: 850px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 25px;
+      border-radius: 18px;
+      box-shadow:
+        0 5px 22px rgba(0,0,0,.06);
+    }
+
+    a {
+      color: #5b45f5;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    h2 {
+      margin-top: 28px;
+    }
+
+    .back {
+      margin-top: 25px;
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <header class="header">
+
+    <h1>
+      Contact TaskEarn
+    </h1>
+
+  </header>
+
+  <main class="container">
+
+    <div class="card">
+
+      <h2>Get in Touch</h2>
+
+      <p>
+        If you have questions, feedback or need
+        support regarding TaskEarn, please contact
+        the TaskEarn support team using the official
+        contact method provided by the platform.
+      </p>
+
+      <h2>Support</h2>
+
+      <p>
+        For account, task or withdrawal questions,
+        please provide enough information for the
+        support team to understand your request.
+      </p>
+
+      <h2>Important</h2>
+
+      <p>
+        Never share your password, payment PIN,
+        OTP or other confidential security
+        information with anyone.
+      </p>
+
+      <div class="back">
+
+        <a href="/">
+          ← Back to TaskEarn
+        </a>
+
+      </div>
+
+    </div>
+
+  </main>
+
+</body>
+
+</html>
+  `);
 
 });
 
@@ -206,12 +900,16 @@ app.get("/api/me", (req, res) => {
 app.post("/api/login", (req, res) => {
 
   const email =
-    String(req.body.email || "")
+    String(
+      req.body.email || ""
+    )
       .trim()
       .toLowerCase();
 
   const password =
-    String(req.body.password || "");
+    String(
+      req.body.password || ""
+    );
 
   const user =
     users.find(
@@ -318,17 +1016,11 @@ app.post("/api/register", (req, res) => {
   const user = {
 
     id: nextUserId++,
-
     name,
-
     email,
-
     password,
-
     role: "user",
-
     balance: 0,
-
     completed: 0
 
   };
@@ -482,15 +1174,20 @@ app.post(
 
     const submission = {
 
-      id: nextSubmissionId++,
+      id:
+        nextSubmissionId++,
 
-      userId: user.id,
+      userId:
+        user.id,
 
-      userName: user.name,
+      userName:
+        user.name,
 
-      taskId: task.id,
+      taskId:
+        task.id,
 
-      taskTitle: task.title,
+      taskTitle:
+        task.title,
 
       reward:
         Number(task.reward),
@@ -521,7 +1218,7 @@ app.post(
 
 
 /* =========================
-   USER SUBMISSIONS
+   MY SUBMISSIONS
 ========================= */
 
 app.get(
@@ -783,13 +1480,9 @@ app.post(
         nextTaskId++,
 
       title,
-
       description,
-
       type,
-
       reward,
-
       active:
         true
 
@@ -1122,7 +1815,7 @@ app.post(
 
 
 /* =========================
-   SERVER
+   START SERVER
 ========================= */
 
 const PORT =
