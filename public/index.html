@@ -14,7 +14,7 @@
     html { scroll-behavior: smooth; }
     body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: #f7f8fc; color: #171b2d; line-height: 1.5; }
     button, input, textarea, select { font: inherit; }
-    button { touch-action: manipulation; cursor: pointer; }
+    button { touch-action: manipulation; cursor: pointer; border: none; background: none; }
     a { color: inherit; text-decoration: none; cursor: pointer; }
 
     /* HEADER */
@@ -25,13 +25,13 @@
     .logo { font-size: 20px; font-weight: 900; letter-spacing: -.5px; }
     .header-right { display: flex; align-items: center; gap: 8px; position: relative; }
     .balance { background: #f0fdf7; color: #087a42; border: 1px solid #d5f3e2; padding: 8px 12px; border-radius: 999px; font-size: 13px; font-weight: 800; white-space: nowrap; }
-    .menu-btn { width: 42px; height: 42px; border: 0; border-radius: 12px; background: #f4f5f9; font-size: 21px; color: #20243a; }
+    .menu-btn { width: 42px; height: 42px; border: 0; border-radius: 12px; background: #f4f5f9; font-size: 21px; color: #20243a; display: flex; align-items: center; justify-content: center; }
     .menu-btn:active { transform: scale(.95); }
 
     /* DROPDOWN */
     .dropdown-menu { position: absolute; top: 50px; right: 0; width: 225px; background: white; border: 1px solid #eceef4; border-radius: 18px; box-shadow: 0 18px 50px rgba(20,25,50,.16); overflow: hidden; opacity: 0; visibility: hidden; transform: translateY(-10px) scale(.96); transition: .2s ease; z-index: 2000; }
     .dropdown-menu.show { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
-    .dropdown-item { padding: 15px 17px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #f1f2f6; font-size: 14px; font-weight: 600; cursor: pointer; }
+    .dropdown-item { width: 100%; text-align: left; padding: 15px 17px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #f1f2f6; font-size: 14px; font-weight: 600; cursor: pointer; color: #171b2d; }
     .dropdown-item:last-child { border-bottom: 0; }
     .dropdown-item:active { background: #fff4ef; color: #ff5b32; }
 
@@ -40,14 +40,14 @@
 
     /* HERO */
     .hero { position: relative; overflow: hidden; padding: 30px 22px; border-radius: 28px; background: linear-gradient(135deg, #fff7ed 0%, #ffe8d8 48%, #e9f4ff 100%); box-shadow: 0 12px 35px rgba(30,40,70,.06); margin-bottom: 18px; }
-    .hero::after { content: ""; position: absolute; width: 160px; height: 160px; right: -70px; top: -70px; border-radius: 50%; background: rgba(255,255,255,.5); }
+    .hero::after { content: ""; position: absolute; width: 160px; height: 160px; right: -70px; top: -70px; border-radius: 50%; background: rgba(255,255,255,.5); pointer-events: none; }
     .hero-badge { display: inline-flex; padding: 7px 11px; border-radius: 999px; background: rgba(255,255,255,.72); color: #b94c24; font-size: 12px; font-weight: 800; margin-bottom: 13px; }
     .hero h1 { position: relative; z-index: 1; max-width: 600px; margin: 0 0 12px; font-size: clamp(30px,7vw,48px); line-height: 1.08; letter-spacing: -1.4px; font-weight: 900; }
     .hero p { position: relative; z-index: 1; max-width: 560px; margin: 0 0 22px; color: #5f6879; font-size: 15px; }
     .hero-actions { position: relative; z-index: 2; display: flex; gap: 10px; flex-wrap: wrap; }
 
     /* BUTTONS */
-    .btn { min-height: 46px; padding: 11px 17px; border: 0; border-radius: 13px; font-weight: 800; transition: transform .15s ease, box-shadow .15s ease, background .15s ease; }
+    .btn { min-height: 46px; padding: 11px 17px; border: 0; border-radius: 13px; font-weight: 800; transition: transform .15s ease, box-shadow .15s ease, background .15s ease; display: inline-flex; align-items: center; justify-content: center; }
     .btn:active { transform: scale(.97); }
     .primary { background: #ff6333; color: white; box-shadow: 0 8px 18px rgba(255,99,51,.25); }
     .primary:hover { background: #ef5324; }
@@ -141,11 +141,11 @@
       <button class="menu-btn" id="btnToggleMenu" aria-label="Menu">☰</button>
 
       <div id="dropdownMenu" class="dropdown-menu">
-        <div class="dropdown-item" id="menuLogin">🔑 Login / Register</div>
-        <div class="dropdown-item" id="menuAbout">ℹ️ About Us</div>
-        <div class="dropdown-item" id="menuTerms">📜 Terms & Conditions</div>
-        <div class="dropdown-item" id="menuContact">📞 Contact Us</div>
-        <div class="dropdown-item" id="menuPrivacy">🔒 Privacy Policy</div>
+        <button class="dropdown-item" id="menuLogin">🔑 Login / Register</button>
+        <button class="dropdown-item" id="menuAbout">ℹ️ About Us</button>
+        <button class="dropdown-item" id="menuTerms">📜 Terms & Conditions</button>
+        <button class="dropdown-item" id="menuContact">📞 Contact Us</button>
+        <button class="dropdown-item" id="menuPrivacy">🔒 Privacy Policy</button>
       </div>
     </div>
   </div>
@@ -254,16 +254,18 @@ function formatDate(val) {
 function goHome() {
   document.getElementById("homeArea").style.display = "block";
   document.getElementById("accountArea").innerHTML = "";
-  toggleDropdown(false);
+  toggleDropdown(null, false);
   showBottomNav(false);
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function scrollToView() {
-  document.getElementById("accountArea").scrollIntoView({ behavior: "smooth" });
+  const accountArea = document.getElementById("accountArea");
+  if (accountArea) accountArea.scrollIntoView({ behavior: "smooth" });
 }
 
-function toggleDropdown(forceState) {
+function toggleDropdown(e, forceState) {
+  if (e) e.stopPropagation();
   const menu = document.getElementById("dropdownMenu");
   if (typeof forceState === "boolean") {
     menu.classList.toggle("show", forceState);
@@ -290,7 +292,7 @@ function showLogin() {
       </div>
     </div>`;
   
-  toggleDropdown(false);
+  toggleDropdown(null, false);
   showBottomNav(false);
   scrollToView();
 
@@ -316,7 +318,7 @@ function showRegister() {
       </div>
     </div>`;
   
-  toggleDropdown(false);
+  toggleDropdown(null, false);
   showBottomNav(false);
   scrollToView();
 
@@ -353,8 +355,9 @@ async function logout() {
 /* DASHBOARD */
 async function dashboard(user) {
   document.getElementById("homeArea").style.display = "none";
-  const wallet = await api("/api/wallet");
-  document.getElementById("balance").innerText = "₹" + Number(wallet.balance).toFixed(2);
+  let wallet = { balance: 0, completed: 0 };
+  try { wallet = await api("/api/wallet"); } catch(e) {}
+  document.getElementById("balance").innerText = "₹" + Number(wallet.balance || 0).toFixed(2);
 
   document.getElementById("accountArea").innerHTML = `
     <div class="card">
@@ -368,9 +371,9 @@ async function dashboard(user) {
     </div>
 
     <div class="stats">
-      <div class="stat"><small>Balance</small><b>₹${Number(wallet.balance).toFixed(2)}</b></div>
-      <div class="stat"><small>Completed</small><b>${wallet.completed}</b></div>
-      <div class="stat"><small>Account</small><b>${escapeHtml(user.role)}</b></div>
+      <div class="stat"><small>Balance</small><b>₹${Number(wallet.balance || 0).toFixed(2)}</b></div>
+      <div class="stat"><small>Completed</small><b>${wallet.completed || 0}</b></div>
+      <div class="stat"><small>Account</small><b>${escapeHtml(user.role || 'User')}</b></div>
     </div>
 
     <div class="nav">
@@ -397,7 +400,7 @@ async function tasksPage() {
     const screen = document.getElementById("screen");
     if (!screen) return;
 
-    if (!tasks.length) {
+    if (!tasks || !tasks.length) {
       screen.innerHTML = `<div class="card empty"><h3>No tasks available</h3><p>Please check back later.</p></div>`;
       setActiveBottom("tasks");
       return;
@@ -419,7 +422,10 @@ async function tasksPage() {
         `).join('')}
       </div>`;
     setActiveBottom("tasks");
-  } catch (err) { alert(err.message); }
+  } catch (err) { 
+    const screen = document.getElementById("screen");
+    if (screen) screen.innerHTML = `<div class="card empty"><h3>No tasks available</h3></div>`;
+  }
 }
 
 async function submitTask(id) {
@@ -432,9 +438,10 @@ async function submitTask(id) {
 }
 
 async function submissionsPage() {
-  const submissions = await api("/api/my-submissions");
+  let submissions = [];
+  try { submissions = await api("/api/my-submissions"); } catch(e){}
   const screen = document.getElementById("screen");
-  if (!submissions.length) {
+  if (!submissions || !submissions.length) {
     screen.innerHTML = `<div class="card empty"><h3>No submissions yet</h3></div>`;
     setActiveBottom("submissions");
     return;
@@ -456,11 +463,12 @@ async function submissionsPage() {
 }
 
 async function walletPage() {
-  const wallet = await api("/api/wallet");
+  let wallet = { balance: 0, withdrawals: [] };
+  try { wallet = await api("/api/wallet"); } catch(e){}
   document.getElementById("screen").innerHTML = `
     <div class="card">
       <p class="muted">Available Balance</p>
-      <h1 style="font-size:36px;margin:5px 0 8px;">₹${Number(wallet.balance).toFixed(2)}</h1>
+      <h1 style="font-size:36px;margin:5px 0 8px;">₹${Number(wallet.balance || 0).toFixed(2)}</h1>
       <p class="muted">Minimum withdrawal: ₹100</p>
       <div class="form">
         <input id="amount" class="input" type="number" min="100" placeholder="Amount">
@@ -470,7 +478,7 @@ async function walletPage() {
     </div>
     <div class="card">
       <h3>Withdrawal History</h3>
-      ${wallet.withdrawals.length ? wallet.withdrawals.map(w => `
+      ${wallet.withdrawals && wallet.withdrawals.length ? wallet.withdrawals.map(w => `
         <div class="admin-box">
           <div class="row">
             <span>₹${Number(w.amount).toFixed(2)} • ${escapeHtml(w.method)}</span>
@@ -507,7 +515,7 @@ function showInfoPage(title, content) {
     </div>`;
   
   document.getElementById("btnBackHome").onclick = goHome;
-  toggleDropdown(false);
+  toggleDropdown(null, false);
   showBottomNav(false);
   scrollToView();
 }
@@ -527,11 +535,11 @@ function setActiveBottom(name) {
   if (name === "submissions") items[1]?.classList.add("active");
 }
 
-/* EVENT LISTENERS ATTACHMENT */
-document.addEventListener("DOMContentLoaded", () => {
+/* INITIALIZATION SAFE GUARD */
+function bindEvents() {
   // Header Elements
   document.getElementById("btnLogo").onclick = goHome;
-  document.getElementById("btnToggleMenu").onclick = () => toggleDropdown();
+  document.getElementById("btnToggleMenu").onclick = (e) => toggleDropdown(e);
 
   // Menu Dropdown Items
   document.getElementById("menuLogin").onclick = showLogin;
@@ -558,6 +566,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const user = await api("/api/me");
       if (user) await dashboard(user);
+      else showLogin();
     } catch (e) {
       showLogin();
     }
@@ -566,12 +575,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // Close Menu Outside Click
   window.addEventListener("click", (e) => {
     if (!e.target.closest(".header-right")) {
-      toggleDropdown(false);
+      toggleDropdown(null, false);
     }
   });
 
   startApp();
-});
+}
 
 async function startApp() {
   try {
@@ -580,6 +589,13 @@ async function startApp() {
   } catch (error) {
     console.log("Guest mode active.");
   }
+}
+
+// Check ReadyState to prevent missed DOMContentLoaded
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", bindEvents);
+} else {
+  bindEvents();
 }
 </script>
 </body>
