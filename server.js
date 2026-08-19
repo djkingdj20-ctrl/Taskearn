@@ -12,17 +12,12 @@ app.set("trust proxy", 1);
 app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: true, limit: "100kb" }));
 
-
 /* =====================================================
    DATABASE
 ===================================================== */
 
-const DATA_DIR =
-  path.join(__dirname, "data");
-
-const DB_FILE =
-  path.join(DATA_DIR, "database.json");
-
+const DATA_DIR = path.join(__dirname, "data");
+const DB_FILE = path.join(DATA_DIR, "database.json");
 
 if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, {
@@ -30,11 +25,8 @@ if (!fs.existsSync(DATA_DIR)) {
   });
 }
 
-
 function defaultDatabase() {
-
   return {
-
     users: [],
 
     tasks: [
@@ -47,7 +39,6 @@ function defaultDatabase() {
         reward: 10,
         active: true
       },
-
       {
         id: 2,
         title: "Social Media Engagement",
@@ -57,7 +48,6 @@ function defaultDatabase() {
         reward: 15,
         active: true
       },
-
       {
         id: 3,
         title: "Website Visit Task",
@@ -70,62 +60,48 @@ function defaultDatabase() {
     ],
 
     submissions: [],
-
-    withdrawals: []
-
+    withdrawals: [],
+    otpCodes: []
   };
 }
 
+function saveDB(database) {
+  const tempFile = DB_FILE + ".tmp";
+
+  fs.writeFileSync(
+    tempFile,
+    JSON.stringify(database, null, 2),
+    "utf8"
+  );
+
+  fs.renameSync(tempFile, DB_FILE);
+}
 
 function loadDB() {
-
   try {
-
     if (!fs.existsSync(DB_FILE)) {
-
-      const db =
-        defaultDatabase();
-
-      saveDB(db);
-
-      return db;
+      const database = defaultDatabase();
+      saveDB(database);
+      return database;
     }
 
-
-    const raw =
-      fs.readFileSync(
-        DB_FILE,
-        "utf8"
-      );
-
+    const raw = fs.readFileSync(DB_FILE, "utf8");
 
     if (!raw.trim()) {
-
-      const db =
-        defaultDatabase();
-
-      saveDB(db);
-
-      return db;
+      const database = defaultDatabase();
+      saveDB(database);
+      return database;
     }
 
+    const database = JSON.parse(raw);
 
-    const db =
-      JSON.parse(raw);
+    database.users ||= [];
+    database.tasks ||= [];
+    database.submissions ||= [];
+    database.withdrawals ||= [];
+    database.otpCodes ||= [];
 
-
-    db.users ||= [];
-    db.tasks ||= [];
-    db.submissions ||= [];
-    db.withdrawals ||= [];
-
-
-    /*
-      Upgrade older user records.
-    */
-
-    db.users.forEach(user => {
-
+    database.users.forEach((user) => {
       user.mobile ??= "";
       user.city ??= "";
       user.profileImage ??= "";
@@ -134,76 +110,44 @@ function loadDB() {
       user.mobileVerified ??= false;
 
       user.balance ??= 0;
-
+      user.role ??= "Member";
     });
 
-
-    return db;
-
+    return database;
   } catch (error) {
+    console.error("Database load error:", error);
 
-    console.error(
-      "Database load error:",
-      error
-    );
-
-    const db =
-      defaultDatabase();
+    const database = defaultDatabase();
 
     try {
-      saveDB(db);
-    } catch (e) {}
+      saveDB(database);
+    } catch (saveError) {
+      console.error("Database recovery error:", saveError);
+    }
 
-    return db;
+    return database;
   }
 }
 
-
-function saveDB(db) {
-
-  const temp =
-    DB_FILE + ".tmp";
-
-
-  fs.writeFileSync(
-    temp,
-    JSON.stringify(
-      db,
-      null,
-      2
-    ),
-    "utf8"
-  );
-
-
-  fs.renameSync(
-    temp,
-    DB_FILE
-  );
-}
-
-
-let db =
-  loadDB();
-
+let db = loadDB();
 
 /* =====================================================
    SESSION
 ===================================================== */
 
+const sessionSecret =
+  process.env.SESSION_SECRET ||
+  "CHANGE_THIS_TASKEARN_SECRET_2026";
+
 app.use(
   session({
-
-    secret:
-      process.env.SESSION_SECRET ||
-      "CHANGE_THIS_TASKEARN_SECRET_2026",
+    secret: sessionSecret,
 
     resave: false,
 
     saveUninitialized: false,
 
     cookie: {
-
       httpOnly: true,
 
       sameSite: "lax",
@@ -221,118 +165,74 @@ app.use(
   })
 );
 
-
 /* =====================================================
    SECURITY / HELPERS
 ===================================================== */
 
-function cleanText(
-  value,
-  maxLength = 200
-) {
-
+function cleanText(value, maxLength = 200) {
   return String(value || "")
     .trim()
-    .slice(
-      0,
-      maxLength
-    );
+    .slice(0, maxLength);
 }
-
 
 function normalizeEmail(value) {
-
-  return cleanText(
-    value,
-    160
-  ).toLowerCase();
+  return cleanText(value, 160).toLowerCase();
 }
-
 
 function validEmail(email) {
-
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    .test(email);
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-
 function normalizeMobile(value) {
-
-  return cleanText(
-    value,
-    20
-  ).replace(
+  return cleanText(value, 20).replace(
     /[\s()-]/g,
     ""
   );
 }
 
-
 function validMobile(mobile) {
-
-  return /^\+?[0-9]{7,15}$/
-    .test(mobile);
+  return /^\+?[0-9]{7,15}$/.test(mobile);
 }
 
-
 function publicUser(user) {
-
   if (!user) {
     return null;
   }
 
   return {
-
     id: user.id,
 
     name: user.name,
 
     email: user.email,
 
-    role:
-      user.role ||
-      "Member",
+    role: user.role || "Member",
 
-    mobile:
-      user.mobile ||
-      "",
+    mobile: user.mobile || "",
 
-    city:
-      user.city ||
-      "",
+    city: user.city || "",
 
     profileImage:
-      user.profileImage ||
-      "",
+      user.profileImage || "",
 
     emailVerified:
-      Boolean(
-        user.emailVerified
-      ),
+      Boolean(user.emailVerified),
 
     mobileVerified:
-      Boolean(
-        user.mobileVerified
-      ),
+      Boolean(user.mobileVerified),
 
-    createdAt:
-      user.createdAt
+    createdAt: user.createdAt
   };
 }
 
-
 function findUserById(id) {
-
   return db.users.find(
-    user =>
-      String(user.id) ===
-      String(id)
+    (user) =>
+      String(user.id) === String(id)
   );
 }
 
-
 function currentUser(req) {
-
   if (!req.session.userId) {
     return null;
   }
@@ -342,24 +242,13 @@ function currentUser(req) {
   );
 }
 
-
-function requireLogin(
-  req,
-  res,
-  next
-) {
-
-  const user =
-    currentUser(req);
+function requireLogin(req, res, next) {
+  const user = currentUser(req);
 
   if (!user) {
-
-    return res
-      .status(401)
-      .json({
-        error:
-          "Please login first."
-      });
+    return res.status(401).json({
+      error: "Please login first."
+    });
   }
 
   req.user = user;
@@ -367,9 +256,7 @@ function requireLogin(
   next();
 }
 
-
 function randomOtp() {
-
   return String(
     crypto.randomInt(
       100000,
@@ -378,37 +265,18 @@ function randomOtp() {
   );
 }
 
-
 function hashOtp(otp) {
-
   return crypto
     .createHash("sha256")
-    .update(
-      String(otp)
-    )
+    .update(String(otp))
     .digest("hex");
 }
 
+function safeCompare(a, b) {
+  const aa = Buffer.from(String(a));
+  const bb = Buffer.from(String(b));
 
-function safeCompare(
-  a,
-  b
-) {
-
-  const aa =
-    Buffer.from(
-      String(a)
-    );
-
-  const bb =
-    Buffer.from(
-      String(b)
-    );
-
-  if (
-    aa.length !==
-    bb.length
-  ) {
+  if (aa.length !== bb.length) {
     return false;
   }
 
@@ -417,7 +285,6 @@ function safeCompare(
     bb
   );
 }
-
 
 /* =====================================================
    OTP SETTINGS
@@ -429,59 +296,35 @@ const OTP_EXPIRY_MS =
 const OTP_RESEND_MS =
   60 * 1000;
 
-const OTP_MAX_ATTEMPTS =
-  5;
-
+const OTP_MAX_ATTEMPTS = 5;
 
 /* =====================================================
-   EMAIL / SMS DELIVERY
+   EMAIL OTP
 ===================================================== */
-
-/*
-  EMAIL:
-
-  Set these Render Environment Variables:
-
-  RESEND_API_KEY
-  EMAIL_FROM
-
-  Example:
-
-  EMAIL_FROM = TaskEarn <no-reply@yourdomain.com>
-
-  You need a verified sending domain/email in Resend.
-*/
-
 
 async function sendEmailOtp(
   email,
   otp,
   purpose
 ) {
-
   const apiKey =
     process.env.RESEND_API_KEY;
 
   const from =
     process.env.EMAIL_FROM;
 
-
   if (!apiKey || !from) {
-
     throw new Error(
       "Email verification service is not configured. Please contact the administrator."
     );
   }
-
 
   const subject =
     purpose === "login"
       ? "TaskEarn Login Verification Code"
       : "TaskEarn Email Verification Code";
 
-
   const html = `
-
     <div style="
       font-family:Arial,sans-serif;
       max-width:600px;
@@ -517,45 +360,34 @@ async function sendEmailOtp(
       </p>
 
     </div>
-
   `;
 
+  const response = await fetch(
+    "https://api.resend.com/emails",
+    {
+      method: "POST",
 
-  const response =
-    await fetch(
-      "https://api.resend.com/emails",
-      {
-        method: "POST",
+      headers: {
+        Authorization:
+          "Bearer " + apiKey,
 
-        headers: {
+        "Content-Type":
+          "application/json"
+      },
 
-          "Authorization":
-            "Bearer " +
-            apiKey,
+      body: JSON.stringify({
+        from,
 
-          "Content-Type":
-            "application/json"
-        },
+        to: [email],
 
-        body:
-          JSON.stringify({
+        subject,
 
-            from,
-
-            to: [
-              email
-            ],
-
-            subject,
-
-            html
-          })
-      }
-    );
-
+        html
+      })
+    }
+  );
 
   if (!response.ok) {
-
     const text =
       await response.text();
 
@@ -570,27 +402,14 @@ async function sendEmailOtp(
   }
 }
 
-
-/*
-  SMS:
-
-  Set:
-
-  TWILIO_ACCOUNT_SID
-  TWILIO_AUTH_TOKEN
-  TWILIO_PHONE_NUMBER
-
-  Example:
-
-  TWILIO_PHONE_NUMBER=+1234567890
-*/
-
+/* =====================================================
+   SMS OTP
+===================================================== */
 
 async function sendSmsOtp(
   mobile,
   otp
 ) {
-
   const sid =
     process.env.TWILIO_ACCOUNT_SID;
 
@@ -600,30 +419,16 @@ async function sendSmsOtp(
   const from =
     process.env.TWILIO_PHONE_NUMBER;
 
-
-  if (
-    !sid ||
-    !token ||
-    !from
-  ) {
-
+  if (!sid || !token || !from) {
     throw new Error(
       "Mobile verification service is not configured. Please contact the administrator."
     );
   }
 
-
   const auth =
-    Buffer
-      .from(
-        sid +
-        ":" +
-        token
-      )
-      .toString(
-        "base64"
-      );
-
+    Buffer.from(
+      sid + ":" + token
+    ).toString("base64");
 
   const params =
     new URLSearchParams();
@@ -643,33 +448,26 @@ async function sendSmsOtp(
     `TaskEarn verification code: ${otp}. This code expires in 10 minutes.`
   );
 
+  const response = await fetch(
+    `https://api.twilio.com/2010-04-01/Accounts/${encodeURIComponent(
+      sid
+    )}/Messages.json`,
+    {
+      method: "POST",
 
-  const response =
-    await fetch(
-      `https://api.twilio.com/2010-04-01/Accounts/${encodeURIComponent(
-        sid
-      )}/Messages.json`,
-      {
-        method: "POST",
+      headers: {
+        Authorization:
+          "Basic " + auth,
 
-        headers: {
+        "Content-Type":
+          "application/x-www-form-urlencoded"
+      },
 
-          "Authorization":
-            "Basic " +
-            auth,
-
-          "Content-Type":
-            "application/x-www-form-urlencoded"
-        },
-
-        body:
-          params.toString()
-      }
-    );
-
+      body: params.toString()
+    }
+  );
 
   if (!response.ok) {
-
     const text =
       await response.text();
 
@@ -684,7 +482,6 @@ async function sendSmsOtp(
   }
 }
 
-
 /* =====================================================
    OTP RECORD
 ===================================================== */
@@ -694,18 +491,12 @@ function createOtpRecord(
   type,
   purpose
 ) {
+  const otp = randomOtp();
 
-  const otp =
-    randomOtp();
-
-  const now =
-    Date.now();
-
+  const now = Date.now();
 
   const record = {
-
-    userId:
-      user.id,
+    userId: user.id,
 
     type,
 
@@ -715,100 +506,77 @@ function createOtpRecord(
       hashOtp(otp),
 
     createdAt:
-      new Date(
-        now
-      ).toISOString(),
+      new Date(now).toISOString(),
 
     expiresAt:
       new Date(
-        now +
-        OTP_EXPIRY_MS
+        now + OTP_EXPIRY_MS
       ).toISOString(),
 
     attempts: 0,
 
     lastSentAt:
-      new Date(
-        now
-      ).toISOString()
+      new Date(now).toISOString()
   };
 
-
-  /*
-    Only one active OTP for the same
-    user/type/purpose.
-  */
-
   db.otpCodes =
-    (db.otpCodes || [])
-      .filter(
-        item =>
-          !(
-            String(item.userId) ===
-              String(user.id) &&
-            item.type === type &&
-            item.purpose === purpose
-          )
-      );
+    (db.otpCodes || []).filter(
+      (item) =>
+        !(
+          String(item.userId) ===
+            String(user.id) &&
+          item.type === type &&
+          item.purpose === purpose
+        )
+    );
 
-
-  db.otpCodes.push(
-    record
-  );
+  db.otpCodes.push(record);
 
   saveDB(db);
 
-
   return otp;
 }
-
 
 function getOtpRecord(
   userId,
   type,
   purpose
 ) {
-
   db.otpCodes ||= [];
-
 
   return db.otpCodes
     .filter(
-      item =>
+      (item) =>
         String(item.userId) ===
           String(userId) &&
         item.type === type &&
         item.purpose === purpose
     )
     .sort(
-      (a,b) =>
+      (a, b) =>
         new Date(b.createdAt) -
         new Date(a.createdAt)
     )[0];
 }
-
 
 function deleteOtpRecord(
   userId,
   type,
   purpose
 ) {
-
   db.otpCodes =
-    (db.otpCodes || [])
-      .filter(
-        item =>
-          !(
-            String(item.userId) ===
-              String(userId) &&
-            item.type === type &&
-            item.purpose === purpose
-          )
-      );
+    (db.otpCodes || []).filter(
+      (item) =>
+        !(
+          String(item.userId) ===
+            String(userId) &&
+          item.type === type &&
+          item.purpose === purpose
+        )
+    );
 
   saveDB(db);
 }
-
 
 /* =====================================================
    SEND OTP
@@ -820,7 +588,6 @@ async function sendOtpFor(
   purpose,
   force = false
 ) {
-
   const existing =
     getOtpRecord(
       user.id,
@@ -828,24 +595,17 @@ async function sendOtpFor(
       purpose
     );
 
-
-  if (
-    existing &&
-    !force
-  ) {
-
+  if (existing && !force) {
     const lastSent =
       new Date(
         existing.lastSentAt
       ).getTime();
 
-
     if (
       Date.now() -
-      lastSent <
+        lastSent <
       OTP_RESEND_MS
     ) {
-
       const remaining =
         Math.ceil(
           (
@@ -863,7 +623,6 @@ async function sendOtpFor(
     }
   }
 
-
   const otp =
     createOtpRecord(
       user,
@@ -871,24 +630,19 @@ async function sendOtpFor(
       purpose
     );
 
-
   if (type === "email") {
-
     await sendEmailOtp(
       user.email,
       otp,
       purpose
     );
-
   } else {
-
     await sendSmsOtp(
       user.mobile,
       otp
     );
   }
 }
-
 
 /* =====================================================
    START VERIFICATION
@@ -899,11 +653,8 @@ async function startVerification(
   user,
   purpose
 ) {
-
   req.session.verification = {
-
-    userId:
-      user.id,
+    userId: user.id,
 
     purpose,
 
@@ -917,17 +668,10 @@ async function startVerification(
         user.mobileVerified
       ),
 
-    createdAt:
-      Date.now()
+    createdAt: Date.now()
   };
 
-
-  /*
-    Email first.
-  */
-
   if (!user.emailVerified) {
-
     await sendOtpFor(
       user,
       "email",
@@ -941,13 +685,7 @@ async function startVerification(
     return "email";
   }
 
-
-  /*
-    Mobile second.
-  */
-
   if (!user.mobileVerified) {
-
     await sendOtpFor(
       user,
       "mobile",
@@ -961,10 +699,8 @@ async function startVerification(
     return "mobile";
   }
 
-
   return "complete";
 }
-
 
 /* =====================================================
    COMPLETE LOGIN
@@ -975,7 +711,6 @@ function completeLogin(
   user,
   remember
 ) {
-
   req.session.userId =
     user.id;
 
@@ -994,26 +729,19 @@ function completeLogin(
         12;
 }
 
-
 /* =====================================================
    BASIC ROUTES
 ===================================================== */
 
-app.get(
-  "/",
-  (req, res) => {
-
-    res.sendFile(
-      path.join(
-        __dirname,
-        "public",
-        "index.html"
-      )
-    );
-
-  }
-);
-
+app.get("/", (req, res) => {
+  res.sendFile(
+    path.join(
+      __dirname,
+      "public",
+      "index.html"
+    )
+  );
+});
 
 app.use(
   express.static(
@@ -1024,7 +752,6 @@ app.use(
   )
 );
 
-
 /* =====================================================
    REGISTER
 ===================================================== */
@@ -1032,9 +759,7 @@ app.use(
 app.post(
   "/api/register",
   async (req, res) => {
-
     try {
-
       const name =
         cleanText(
           req.body.name,
@@ -1059,10 +784,8 @@ app.post(
 
       const password =
         String(
-          req.body.password ||
-          ""
+          req.body.password || ""
         );
-
 
       if (
         !name ||
@@ -1071,89 +794,58 @@ app.post(
         !city ||
         !password
       ) {
-
-        return res
-          .status(400)
-          .json({
-            error:
-              "Please complete all fields."
-          });
+        return res.status(400).json({
+          error:
+            "Please complete all fields."
+        });
       }
-
 
       if (!validEmail(email)) {
-
-        return res
-          .status(400)
-          .json({
-            error:
-              "Please enter a valid email address."
-          });
+        return res.status(400).json({
+          error:
+            "Please enter a valid email address."
+        });
       }
-
 
       if (!validMobile(mobile)) {
-
-        return res
-          .status(400)
-          .json({
-            error:
-              "Please enter a valid mobile number."
-          });
+        return res.status(400).json({
+          error:
+            "Please enter a valid mobile number."
+        });
       }
 
-
-      if (
-        password.length <
-        6
-      ) {
-
-        return res
-          .status(400)
-          .json({
-            error:
-              "Password must contain at least 6 characters."
-          });
+      if (password.length < 6) {
+        return res.status(400).json({
+          error:
+            "Password must contain at least 6 characters."
+        });
       }
-
 
       const existingEmail =
         db.users.find(
-          u =>
-            u.email ===
-            email
+          (u) =>
+            u.email === email
         );
 
-
       if (existingEmail) {
-
-        return res
-          .status(409)
-          .json({
-            error:
-              "An account with this email already exists."
-          });
+        return res.status(409).json({
+          error:
+            "An account with this email already exists."
+        });
       }
-
 
       const existingMobile =
         db.users.find(
-          u =>
-            u.mobile ===
-            mobile
+          (u) =>
+            u.mobile === mobile
         );
 
-
       if (existingMobile) {
-
-        return res
-          .status(409)
-          .json({
-            error:
-              "This mobile number is already registered."
-          });
+        return res.status(409).json({
+          error:
+            "This mobile number is already registered."
+        });
       }
-
 
       const passwordHash =
         await bcrypt.hash(
@@ -1161,9 +853,7 @@ app.post(
           12
         );
 
-
       const user = {
-
         id:
           crypto.randomUUID(),
 
@@ -1173,42 +863,32 @@ app.post(
 
         passwordHash,
 
-        role:
-          "Member",
+        role: "Member",
 
         mobile,
 
         city,
 
-        profileImage:
-          "",
+        profileImage: "",
 
-        emailVerified:
-          false,
+        emailVerified: false,
 
-        mobileVerified:
-          false,
+        mobileVerified: false,
 
-        balance:
-          0,
+        balance: 0,
 
         createdAt:
           new Date().toISOString()
       };
 
-
-      db.users.push(
-        user
-      );
+      db.users.push(user);
 
       saveDB(db);
-
 
       req.session.remember =
         Boolean(
           req.body.remember
         );
-
 
       const step =
         await startVerification(
@@ -1217,9 +897,7 @@ app.post(
           "register"
         );
 
-
       return res.json({
-
         verificationRequired:
           true,
 
@@ -1231,26 +909,20 @@ app.post(
         mobile:
           user.mobile
       });
-
-
     } catch (error) {
-
       console.error(
         "Register error:",
         error
       );
 
-      return res
-        .status(500)
-        .json({
-          error:
-            error.message ||
-            "Unable to create account."
-        });
+      return res.status(500).json({
+        error:
+          error.message ||
+          "Unable to create account."
+      });
     }
   }
 );
-
 
 /* =====================================================
    LOGIN
@@ -1259,9 +931,7 @@ app.post(
 app.post(
   "/api/login",
   async (req, res) => {
-
     try {
-
       const email =
         normalizeEmail(
           req.body.email
@@ -1269,8 +939,7 @@ app.post(
 
       const password =
         String(
-          req.body.password ||
-          ""
+          req.body.password || ""
         );
 
       const remember =
@@ -1278,39 +947,25 @@ app.post(
           req.body.remember
         );
 
-
-      if (
-        !email ||
-        !password
-      ) {
-
-        return res
-          .status(400)
-          .json({
-            error:
-              "Please enter email and password."
-          });
+      if (!email || !password) {
+        return res.status(400).json({
+          error:
+            "Please enter email and password."
+        });
       }
-
 
       const user =
         db.users.find(
-          u =>
-            u.email ===
-            email
+          (u) =>
+            u.email === email
         );
 
-
       if (!user) {
-
-        return res
-          .status(401)
-          .json({
-            error:
-              "Invalid email or password."
-          });
+        return res.status(401).json({
+          error:
+            "Invalid email or password."
+        });
       }
-
 
       const valid =
         await bcrypt.compare(
@@ -1318,32 +973,22 @@ app.post(
           user.passwordHash
         );
 
-
       if (!valid) {
-
-        return res
-          .status(401)
-          .json({
-            error:
-              "Invalid email or password."
-          });
+        return res.status(401).json({
+          error:
+            "Invalid email or password."
+        });
       }
-
 
       if (!user.mobile) {
-
-        return res
-          .status(400)
-          .json({
-            error:
-              "Please add a mobile number to your account before verification."
-          });
+        return res.status(400).json({
+          error:
+            "Please add a mobile number to your account before verification."
+        });
       }
-
 
       req.session.remember =
         remember;
-
 
       const step =
         await startVerification(
@@ -1352,12 +997,10 @@ app.post(
           "login"
         );
 
-
       if (
         step ===
         "complete"
       ) {
-
         completeLogin(
           req,
           user,
@@ -1370,9 +1013,7 @@ app.post(
         });
       }
 
-
       return res.json({
-
         verificationRequired:
           true,
 
@@ -1384,26 +1025,20 @@ app.post(
         mobile:
           user.mobile
       });
-
-
     } catch (error) {
-
       console.error(
         "Login error:",
         error
       );
 
-      return res
-        .status(500)
-        .json({
-          error:
-            error.message ||
-            "Unable to login."
-        });
+      return res.status(500).json({
+        error:
+          error.message ||
+          "Unable to login."
+      });
     }
   }
 );
-
 
 /* =====================================================
    VERIFY OTP
@@ -1412,40 +1047,28 @@ app.post(
 app.post(
   "/api/verify-otp",
   async (req, res) => {
-
     try {
-
       const verification =
         req.session.verification;
 
-
       if (!verification) {
-
-        return res
-          .status(400)
-          .json({
-            error:
-              "Verification session expired. Please login again."
-          });
+        return res.status(400).json({
+          error:
+            "Verification session expired. Please login again."
+        });
       }
-
 
       const user =
         findUserById(
           verification.userId
         );
 
-
       if (!user) {
-
-        return res
-          .status(404)
-          .json({
-            error:
-              "Account not found."
-          });
+        return res.status(404).json({
+          error:
+            "Account not found."
+        });
       }
-
 
       const otp =
         cleanText(
@@ -1453,25 +1076,19 @@ app.post(
           6
         );
 
-
       if (
         !/^\d{6}$/.test(
           otp
         )
       ) {
-
-        return res
-          .status(400)
-          .json({
-            error:
-              "Please enter the 6-digit OTP."
-          });
+        return res.status(400).json({
+          error:
+            "Please enter the 6-digit OTP."
+        });
       }
-
 
       const step =
         verification.step;
-
 
       const record =
         getOtpRecord(
@@ -1480,17 +1097,12 @@ app.post(
           verification.purpose
         );
 
-
       if (!record) {
-
-        return res
-          .status(400)
-          .json({
-            error:
-              "OTP not found. Please request a new OTP."
-          });
+        return res.status(400).json({
+          error:
+            "OTP not found. Please request a new OTP."
+        });
       }
-
 
       if (
         Date.now() >
@@ -1498,41 +1110,33 @@ app.post(
           record.expiresAt
         ).getTime()
       ) {
-
         deleteOtpRecord(
           user.id,
           step,
           verification.purpose
         );
 
-        return res
-          .status(400)
-          .json({
-            error:
-              "OTP has expired. Please request a new OTP."
-          });
+        return res.status(400).json({
+          error:
+            "OTP has expired. Please request a new OTP."
+        });
       }
-
 
       if (
         record.attempts >=
         OTP_MAX_ATTEMPTS
       ) {
-
         deleteOtpRecord(
           user.id,
           step,
           verification.purpose
         );
 
-        return res
-          .status(429)
-          .json({
-            error:
-              "Too many incorrect attempts. Please request a new OTP."
-          });
+        return res.status(429).json({
+          error:
+            "Too many incorrect attempts. Please request a new OTP."
+        });
       }
-
 
       const valid =
         safeCompare(
@@ -1540,21 +1144,16 @@ app.post(
           hashOtp(otp)
         );
 
-
       if (!valid) {
-
         record.attempts++;
 
         saveDB(db);
 
-        return res
-          .status(401)
-          .json({
-            error:
-              "Incorrect OTP."
-          });
+        return res.status(401).json({
+          error:
+            "Incorrect OTP."
+        });
       }
-
 
       deleteOtpRecord(
         user.id,
@@ -1562,43 +1161,26 @@ app.post(
         verification.purpose
       );
 
-
-      if (
-        step ===
-        "email"
-      ) {
-
+      if (step === "email") {
         user.emailVerified =
           true;
-
       } else {
-
         user.mobileVerified =
           true;
       }
 
-
       saveDB(db);
 
-
-      /*
-        After email verification,
-        send mobile OTP.
-      */
-
       if (
-        step ===
-        "email" &&
+        step === "email" &&
         !user.mobileVerified
       ) {
-
         await sendOtpFor(
           user,
           "mobile",
           verification.purpose,
           true
         );
-
 
         verification.emailVerified =
           true;
@@ -1609,15 +1191,11 @@ app.post(
         verification.step =
           "mobile";
 
-
         req.session.verification =
           verification;
 
-
         return res.json({
-
-          step:
-            "mobile",
+          step: "mobile",
 
           email:
             user.email,
@@ -1627,11 +1205,6 @@ app.post(
         });
       }
 
-
-      /*
-        Everything verified.
-      */
-
       completeLogin(
         req,
         user,
@@ -1640,38 +1213,28 @@ app.post(
         )
       );
 
-
       saveDB(db);
 
-
       return res.json({
-
-        step:
-          "complete",
+        step: "complete",
 
         user:
           publicUser(user)
       });
-
-
     } catch (error) {
-
       console.error(
         "Verify OTP error:",
         error
       );
 
-      return res
-        .status(500)
-        .json({
-          error:
-            error.message ||
-            "Unable to verify OTP."
-        });
+      return res.status(500).json({
+        error:
+          error.message ||
+          "Unable to verify OTP."
+      });
     }
   }
 );
-
 
 /* =====================================================
    RESEND OTP
@@ -1680,40 +1243,28 @@ app.post(
 app.post(
   "/api/resend-otp",
   async (req, res) => {
-
     try {
-
       const verification =
         req.session.verification;
 
-
       if (!verification) {
-
-        return res
-          .status(400)
-          .json({
-            error:
-              "Verification session expired. Please login again."
-          });
+        return res.status(400).json({
+          error:
+            "Verification session expired. Please login again."
+        });
       }
-
 
       const user =
         findUserById(
           verification.userId
         );
 
-
       if (!user) {
-
-        return res
-          .status(404)
-          .json({
-            error:
-              "Account not found."
-          });
+        return res.status(404).json({
+          error:
+            "Account not found."
+        });
       }
-
 
       await sendOtpFor(
         user,
@@ -1722,34 +1273,27 @@ app.post(
         false
       );
 
-
-      res.json({
-
+      return res.json({
         message:
-          verification.step === "email"
+          verification.step ===
+          "email"
             ? "A new email OTP has been sent."
             : "A new mobile OTP has been sent."
       });
-
-
     } catch (error) {
-
       console.error(
         "Resend OTP error:",
         error
       );
 
-      res
-        .status(400)
-        .json({
-          error:
-            error.message ||
-            "Unable to resend OTP."
-        });
+      return res.status(400).json({
+        error:
+          error.message ||
+          "Unable to resend OTP."
+      });
     }
   }
 );
-
 
 /* =====================================================
    CURRENT USER
@@ -1758,23 +1302,18 @@ app.post(
 app.get(
   "/api/me",
   (req, res) => {
-
     const user =
       currentUser(req);
 
     if (!user) {
-
-      return res.json(
-        null
-      );
+      return res.json(null);
     }
 
-    res.json(
+    return res.json(
       publicUser(user)
     );
   }
 );
-
 
 /* =====================================================
    LOGOUT
@@ -1783,40 +1322,45 @@ app.get(
 app.post(
   "/api/logout",
   (req, res) => {
-
     req.session.destroy(
-      () => {
+      (error) => {
+        if (error) {
+          console.error(
+            "Logout error:",
+            error
+          );
+
+          return res.status(500).json({
+            error:
+              "Unable to logout."
+          });
+        }
 
         res.clearCookie(
           "connect.sid"
         );
 
-        res.json({
-
+        return res.json({
           message:
             "Logged out successfully."
         });
-
       }
     );
   }
 );
 
-
 /* =====================================================
    PROFILE UPDATE
+   FIXED: async callback
 ===================================================== */
 
 app.put(
   "/api/profile",
   requireLogin,
-  (req, res) => {
-
+  async (req, res) => {
     try {
-
       const user =
         req.user;
-
 
       const name =
         cleanText(
@@ -1824,12 +1368,10 @@ app.put(
           80
         );
 
-
       const mobile =
         normalizeMobile(
           req.body.mobile
         );
-
 
       const city =
         cleanText(
@@ -1837,91 +1379,61 @@ app.put(
           80
         );
 
-
       const profileImage =
         String(
           req.body.profileImage ||
           ""
         );
 
-
       if (!name) {
-
-        return res
-          .status(400)
-          .json({
-            error:
-              "Name cannot be empty."
-          });
+        return res.status(400).json({
+          error:
+            "Name cannot be empty."
+        });
       }
-
 
       if (!validMobile(mobile)) {
-
-        return res
-          .status(400)
-          .json({
-            error:
-              "Please enter a valid mobile number."
-          });
+        return res.status(400).json({
+          error:
+            "Please enter a valid mobile number."
+        });
       }
-
 
       if (!city) {
-
-        return res
-          .status(400)
-          .json({
-            error:
-              "City cannot be empty."
-          });
+        return res.status(400).json({
+          error:
+            "City cannot be empty."
+        });
       }
-
 
       if (
         profileImage.length >
         1500000
       ) {
-
-        return res
-          .status(400)
-          .json({
-            error:
-              "Profile image is too large."
-          });
+        return res.status(400).json({
+          error:
+            "Profile image is too large."
+        });
       }
 
+      const mobileChanged =
+        mobile !== user.mobile;
 
-      /*
-        If mobile is changed,
-        require mobile verification again.
-      */
-
-      if (
-        mobile !==
-        user.mobile
-      ) {
-
+      if (mobileChanged) {
         const duplicate =
           db.users.find(
-            u =>
+            (u) =>
               String(u.id) !==
                 String(user.id) &&
-              u.mobile ===
-                mobile
+              u.mobile === mobile
           );
 
-
         if (duplicate) {
-
-          return res
-            .status(409)
-            .json({
-              error:
-                "This mobile number is already registered."
-            });
+          return res.status(409).json({
+            error:
+              "This mobile number is already registered."
+          });
         }
-
 
         user.mobile =
           mobile;
@@ -1929,7 +1441,6 @@ app.put(
         user.mobileVerified =
           false;
       }
-
 
       user.name =
         name;
@@ -1940,9 +1451,7 @@ app.put(
       user.profileImage =
         profileImage;
 
-
       saveDB(db);
-
 
       /*
         If mobile was changed,
@@ -1950,44 +1459,41 @@ app.put(
       */
 
       if (
+        mobileChanged &&
         !user.mobileVerified
       ) {
+        req.session.profileVerification =
+          {
+            userId:
+              user.id,
 
-        req.session.profileVerification = {
+            step:
+              "mobile",
 
-          userId:
-            user.id,
-
-          step:
-            "mobile",
-
-          purpose:
-            "profile"
-        };
-
+            purpose:
+              "profile"
+          };
 
         try {
-
           await sendOtpFor(
             user,
             "mobile",
             "profile",
             true
           );
-
         } catch (error) {
+          console.error(
+            "Profile mobile OTP error:",
+            error
+          );
 
-          return res
-            .status(503)
-            .json({
-              error:
-                "Mobile number changed, but verification SMS could not be sent. Please try again later."
-            });
+          return res.status(503).json({
+            error:
+              "Mobile number changed, but verification SMS could not be sent. Please try again later."
+          });
         }
 
-
         return res.json({
-
           verificationRequired:
             true,
 
@@ -1999,34 +1505,230 @@ app.put(
         });
       }
 
-
-      res.json({
-
+      return res.json({
         message:
           "Profile saved successfully.",
 
         user:
           publicUser(user)
       });
-
-
     } catch (error) {
-
       console.error(
         "Profile update error:",
         error
       );
 
-      res
-        .status(500)
-        .json({
-          error:
-            "Unable to save profile."
-        });
+      return res.status(500).json({
+        error:
+          "Unable to save profile."
+      });
     }
   }
 );
 
+/* =====================================================
+   PROFILE MOBILE OTP VERIFICATION
+===================================================== */
+
+app.post(
+  "/api/profile/verify-otp",
+  requireLogin,
+  async (req, res) => {
+    try {
+      const verification =
+        req.session.profileVerification;
+
+      if (!verification) {
+        return res.status(400).json({
+          error:
+            "Profile verification session expired."
+        });
+      }
+
+      if (
+        String(
+          verification.userId
+        ) !==
+        String(req.user.id)
+      ) {
+        return res.status(403).json({
+          error:
+            "Invalid verification session."
+        });
+      }
+
+      const otp =
+        cleanText(
+          req.body.otp,
+          6
+        );
+
+      if (
+        !/^\d{6}$/.test(
+          otp
+        )
+      ) {
+        return res.status(400).json({
+          error:
+            "Please enter the 6-digit OTP."
+        });
+      }
+
+      const record =
+        getOtpRecord(
+          req.user.id,
+          "mobile",
+          "profile"
+        );
+
+      if (!record) {
+        return res.status(400).json({
+          error:
+            "OTP not found. Please request a new OTP."
+        });
+      }
+
+      if (
+        Date.now() >
+        new Date(
+          record.expiresAt
+        ).getTime()
+      ) {
+        deleteOtpRecord(
+          req.user.id,
+          "mobile",
+          "profile"
+        );
+
+        return res.status(400).json({
+          error:
+            "OTP has expired. Please request a new OTP."
+        });
+      }
+
+      if (
+        record.attempts >=
+        OTP_MAX_ATTEMPTS
+      ) {
+        deleteOtpRecord(
+          req.user.id,
+          "mobile",
+          "profile"
+        );
+
+        return res.status(429).json({
+          error:
+            "Too many incorrect attempts. Please request a new OTP."
+        });
+      }
+
+      const valid =
+        safeCompare(
+          record.otpHash,
+          hashOtp(otp)
+        );
+
+      if (!valid) {
+        record.attempts++;
+
+        saveDB(db);
+
+        return res.status(401).json({
+          error:
+            "Incorrect OTP."
+        });
+      }
+
+      deleteOtpRecord(
+        req.user.id,
+        "mobile",
+        "profile"
+      );
+
+      req.user.mobileVerified =
+        true;
+
+      saveDB(db);
+
+      delete req.session.profileVerification;
+
+      return res.json({
+        message:
+          "Mobile number verified successfully.",
+
+        user:
+          publicUser(req.user)
+      });
+    } catch (error) {
+      console.error(
+        "Profile OTP verification error:",
+        error
+      );
+
+      return res.status(500).json({
+        error:
+          "Unable to verify mobile number."
+      });
+    }
+  }
+);
+
+/* =====================================================
+   PROFILE MOBILE OTP RESEND
+===================================================== */
+
+app.post(
+  "/api/profile/resend-otp",
+  requireLogin,
+  async (req, res) => {
+    try {
+      const verification =
+        req.session.profileVerification;
+
+      if (!verification) {
+        return res.status(400).json({
+          error:
+            "Profile verification session expired."
+        });
+      }
+
+      if (
+        String(
+          verification.userId
+        ) !==
+        String(req.user.id)
+      ) {
+        return res.status(403).json({
+          error:
+            "Invalid verification session."
+        });
+      }
+
+      await sendOtpFor(
+        req.user,
+        "mobile",
+        "profile",
+        false
+      );
+
+      return res.json({
+        message:
+          "A new mobile OTP has been sent."
+      });
+    } catch (error) {
+      console.error(
+        "Profile OTP resend error:",
+        error
+      );
+
+      return res.status(400).json({
+        error:
+          error.message ||
+          "Unable to resend OTP."
+      });
+    }
+  }
+);
 
 /* =====================================================
    TASKS
@@ -2036,19 +1738,15 @@ app.get(
   "/api/tasks",
   requireLogin,
   (req, res) => {
-
     const tasks =
       db.tasks
         .filter(
-          t =>
-            t.active !==
-            false
+          (t) =>
+            t.active !== false
         )
         .map(
-          t => ({
-
-            id:
-              t.id,
+          (t) => ({
+            id: t.id,
 
             title:
               t.title,
@@ -2066,13 +1764,9 @@ app.get(
           })
         );
 
-
-    res.json(
-      tasks
-    );
+    return res.json(tasks);
   }
 );
-
 
 /* =====================================================
    SUBMIT TASK
@@ -2082,61 +1776,48 @@ app.post(
   "/api/tasks/:id/submit",
   requireLogin,
   (req, res) => {
-
     try {
-
       const taskId =
         Number(
           req.params.id
         );
 
-
       const task =
         db.tasks.find(
-          t =>
+          (t) =>
             Number(t.id) ===
               taskId &&
-            t.active !==
-              false
+            t.active !== false
         );
 
-
       if (!task) {
-
-        return res
-          .status(404)
-          .json({
-            error:
-              "Task not found."
-          });
+        return res.status(404).json({
+          error:
+            "Task not found."
+        });
       }
-
 
       const alreadySubmitted =
         db.submissions.find(
-          s =>
+          (s) =>
             String(s.userId) ===
-              String(req.user.id) &&
+              String(
+                req.user.id
+              ) &&
             Number(s.taskId) ===
               taskId &&
             s.status ===
               "pending"
         );
 
-
       if (alreadySubmitted) {
-
-        return res
-          .status(409)
-          .json({
-            error:
-              "You already submitted this task and it is under review."
-          });
+        return res.status(409).json({
+          error:
+            "You already submitted this task and it is under review."
+        });
       }
 
-
       const submission = {
-
         id:
           crypto.randomUUID(),
 
@@ -2161,39 +1842,29 @@ app.post(
           new Date().toISOString()
       };
 
-
       db.submissions.push(
         submission
       );
 
-
       saveDB(db);
 
-
-      res.json({
-
+      return res.json({
         message:
           "Task submitted for review successfully."
       });
-
-
     } catch (error) {
-
       console.error(
         "Submit task error:",
         error
       );
 
-      res
-        .status(500)
-        .json({
-          error:
-            "Unable to submit task."
-        });
+      return res.status(500).json({
+        error:
+          "Unable to submit task."
+      });
     }
   }
 );
-
 
 /* =====================================================
    MY SUBMISSIONS
@@ -2203,16 +1874,15 @@ app.get(
   "/api/my-submissions",
   requireLogin,
   (req, res) => {
-
     const submissions =
       db.submissions
         .filter(
-          s =>
+          (s) =>
             String(s.userId) ===
             String(req.user.id)
         )
         .sort(
-          (a,b) =>
+          (a, b) =>
             new Date(
               b.submittedAt
             ) -
@@ -2221,13 +1891,11 @@ app.get(
             )
         );
 
-
-    res.json(
+    return res.json(
       submissions
     );
   }
 );
-
 
 /* =====================================================
    WALLET
@@ -2237,30 +1905,27 @@ app.get(
   "/api/wallet",
   requireLogin,
   (req, res) => {
-
     const user =
       req.user;
 
-
     const completed =
       db.submissions.filter(
-        s =>
+        (s) =>
           String(s.userId) ===
             String(user.id) &&
           s.status ===
             "approved"
       ).length;
 
-
     const withdrawals =
       db.withdrawals
         .filter(
-          w =>
+          (w) =>
             String(w.userId) ===
             String(user.id)
         )
         .sort(
-          (a,b) =>
+          (a, b) =>
             new Date(
               b.createdAt
             ) -
@@ -2269,23 +1934,18 @@ app.get(
             )
         );
 
-
-    res.json({
-
+    return res.json({
       balance:
         Number(
-          user.balance ||
-          0
+          user.balance || 0
         ),
 
       completed,
 
       withdrawals
-
     });
   }
 );
-
 
 /* =====================================================
    WITHDRAWAL
@@ -2295,14 +1955,11 @@ app.post(
   "/api/withdraw",
   requireLogin,
   (req, res) => {
-
     try {
-
       const amount =
         Number(
           req.body.amount
         );
-
 
       const method =
         cleanText(
@@ -2310,112 +1967,74 @@ app.post(
           30
         );
 
-
       const details =
         req.body.paymentDetails ||
         {};
-
 
       if (
         !Number.isFinite(
           amount
         )
       ) {
-
-        return res
-          .status(400)
-          .json({
-            error:
-              "Invalid amount."
-          });
+        return res.status(400).json({
+          error:
+            "Invalid amount."
+        });
       }
 
-
-      if (
-        amount < 100
-      ) {
-
-        return res
-          .status(400)
-          .json({
-            error:
-              "Minimum withdrawal amount is ₹100."
-          });
+      if (amount < 100) {
+        return res.status(400).json({
+          error:
+            "Minimum withdrawal amount is ₹100."
+        });
       }
-
 
       if (
         amount >
         Number(
-          req.user.balance ||
-          0
+          req.user.balance || 0
         )
       ) {
-
-        return res
-          .status(400)
-          .json({
-            error:
-              "Insufficient wallet balance."
-          });
+        return res.status(400).json({
+          error:
+            "Insufficient wallet balance."
+        });
       }
-
 
       if (
-        method !==
-          "UPI" &&
-        method !==
-          "Bank Account"
+        method !== "UPI" &&
+        method !== "Bank Account"
       ) {
-
-        return res
-          .status(400)
-          .json({
-            error:
-              "Please select a valid payment method."
-          });
+        return res.status(400).json({
+          error:
+            "Please select a valid payment method."
+        });
       }
-
 
       let paymentDetails;
 
-
-      if (
-        method ===
-        "UPI"
-      ) {
-
+      if (method === "UPI") {
         const upiId =
           cleanText(
             details.upiId,
             100
           );
 
-
         if (
-          !/^[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+$/
-            .test(
-              upiId
-            )
+          !/^[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+$/.test(
+            upiId
+          )
         ) {
-
-          return res
-            .status(400)
-            .json({
-              error:
-                "Please enter a valid UPI ID."
-            });
+          return res.status(400).json({
+            error:
+              "Please enter a valid UPI ID."
+          });
         }
 
-
         paymentDetails = {
-
           upiId
         };
-
-
       } else {
-
         const accountHolderName =
           cleanText(
             details.accountHolderName,
@@ -2440,41 +2059,30 @@ app.post(
             100
           );
 
-
         if (
           !accountHolderName ||
           !accountNumber ||
           !ifscCode ||
           !bankName
         ) {
-
-          return res
-            .status(400)
-            .json({
-              error:
-                "Please complete all bank account details."
-            });
+          return res.status(400).json({
+            error:
+              "Please complete all bank account details."
+          });
         }
-
 
         if (
-          !/^[A-Z]{4}0[A-Z0-9]{6}$/
-            .test(
-              ifscCode
-            )
+          !/^[A-Z]{4}0[A-Z0-9]{6}$/.test(
+            ifscCode
+          )
         ) {
-
-          return res
-            .status(400)
-            .json({
-              error:
-                "Please enter a valid IFSC code."
-            });
+          return res.status(400).json({
+            error:
+              "Please enter a valid IFSC code."
+          });
         }
 
-
         paymentDetails = {
-
           accountHolderName,
 
           accountNumber,
@@ -2485,7 +2093,6 @@ app.post(
         };
       }
 
-
       /*
         Deduct balance immediately
         when withdrawal request is created.
@@ -2493,14 +2100,10 @@ app.post(
 
       req.user.balance =
         Number(
-          req.user.balance ||
-          0
-        ) -
-        amount;
-
+          req.user.balance || 0
+        ) - amount;
 
       const withdrawal = {
-
         id:
           crypto.randomUUID(),
 
@@ -2520,39 +2123,45 @@ app.post(
           new Date().toISOString()
       };
 
-
       db.withdrawals.push(
         withdrawal
       );
 
-
       saveDB(db);
 
-
-      res.json({
-
+      return res.json({
         message:
           "Withdrawal request submitted successfully."
       });
-
-
     } catch (error) {
-
       console.error(
         "Withdrawal error:",
         error
       );
 
-      res
-        .status(500)
-        .json({
-          error:
-            "Unable to submit withdrawal."
-        });
+      return res.status(500).json({
+        error:
+          "Unable to submit withdrawal."
+      });
     }
   }
 );
 
+/* =====================================================
+   HEALTH CHECK
+===================================================== */
+
+app.get(
+  "/api/health",
+  (req, res) => {
+    return res.json({
+      status: "ok",
+      service: "TaskEarn",
+      time:
+        new Date().toISOString()
+    });
+  }
+);
 
 /* =====================================================
    ERROR HANDLER
@@ -2565,21 +2174,21 @@ app.use(
     res,
     next
   ) => {
-
     console.error(
       "Server error:",
       err
     );
 
-    res
-      .status(500)
-      .json({
-        error:
-          "Internal server error."
-      });
+    if (res.headersSent) {
+      return next(err);
+    }
+
+    return res.status(500).json({
+      error:
+        "Internal server error."
+    });
   }
 );
-
 
 /* =====================================================
    SERVER
@@ -2589,15 +2198,12 @@ const PORT =
   process.env.PORT ||
   10000;
 
-
 app.listen(
   PORT,
   "0.0.0.0",
   () => {
-
     console.log(
       `TaskEarn server running on port ${PORT}`
     );
-
   }
 );
