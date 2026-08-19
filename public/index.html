@@ -23,7 +23,7 @@
     body {
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: #faf8f2; /* Photo matching cream background */
+      background: #faf8f2;
       color: #1a1e28;
     }
 
@@ -31,7 +31,7 @@
       font: inherit;
     }
 
-    /* --- HEADER (Matching Design) --- */
+    /* --- HEADER & DROPDOWN MENU --- */
     .header {
       background: #faf8f2;
       color: #172033;
@@ -49,6 +49,7 @@
       justify-content: space-between;
       align-items: center;
       gap: 12px;
+      position: relative;
     }
 
     .logo-container {
@@ -81,6 +82,7 @@
       display: flex;
       align-items: center;
       gap: 12px;
+      position: relative;
     }
 
     .balance {
@@ -99,9 +101,68 @@
       font-size: 24px;
       cursor: pointer;
       color: #222;
-      padding: 0;
+      padding: 4px 8px;
+      border-radius: 8px;
       display: flex;
       align-items: center;
+      transition: background 0.2s ease;
+    }
+
+    .menu-btn:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    /* --- POPUP ANIMATED DROPDOWN MENU --- */
+    .dropdown-menu {
+      position: absolute;
+      top: 45px;
+      right: 0;
+      background: #ffffff;
+      min-width: 210px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+      border-radius: 18px;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+      z-index: 200;
+
+      /* Smooth Animation Setup */
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-12px) scale(0.92);
+      transform-origin: top right;
+      transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                  visibility 0.25s;
+    }
+
+    /* Active Animation State */
+    .dropdown-menu.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+    }
+
+    .dropdown-item {
+      padding: 13px 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #333;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      border-bottom: 1px solid #f5f5f5;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .dropdown-item:last-child {
+      border-bottom: none;
+    }
+
+    .dropdown-item:hover {
+      background: #fdf5f0;
+      color: #ff6b35;
     }
 
     .container {
@@ -119,7 +180,7 @@
       border: 1px solid rgba(0, 0, 0, 0.03);
     }
 
-    /* --- HERO SECTION (Exact Photo Styling) --- */
+    /* --- HERO SECTION --- */
     .hero-yandex-style {
       position: relative;
       background: linear-gradient(135deg, #fffbf0 0%, #ffe9d6 50%, #e3f2fd 100%);
@@ -157,7 +218,7 @@
     }
 
     .btn-start-orange {
-      background: #ff6b35; /* Photo matching vibrant orange */
+      background: #ff6b35;
       color: white;
       padding: 16px 42px;
       border-radius: 30px;
@@ -378,14 +439,24 @@
       </div>
       <div class="header-right">
         <div id="balance" class="balance">₹0.00</div>
-        <button class="menu-btn" aria-label="Menu">☰</button>
+        
+        <!-- Menu Button -->
+        <button class="menu-btn" onclick="toggleMenu()" aria-label="Menu">☰</button>
+        
+        <!-- Popup Menu -->
+        <div id="dropdownMenu" class="dropdown-menu">
+          <div class="dropdown-item" onclick="handleMenuClick('login')">🔑 Login / Register</div>
+          <div class="dropdown-item" onclick="handleMenuClick('about')">ℹ️ About Us</div>
+          <div class="dropdown-item" onclick="handleMenuClick('terms')">📜 Terms & Conditions</div>
+          <div class="dropdown-item" onclick="handleMenuClick('contact')">📞 Contact Us</div>
+        </div>
       </div>
     </div>
   </header>
 
   <main class="container">
 
-    <!-- PUBLIC HOME (YANDEX TASKS DESIGN MATCH) -->
+    <!-- PUBLIC HOME -->
     <section id="homeArea">
 
       <div class="hero-yandex-style">
@@ -416,7 +487,7 @@
         </ol>
       </section>
 
-      <section class="card">
+      <section id="aboutSection" class="card">
         <h2>About TaskEarn</h2>
         <p class="muted">
           TaskEarn provides a simple interface for discovering eligible online tasks and managing task submissions and eligible rewards.
@@ -462,6 +533,70 @@
   </main>
 
   <script>
+
+    /* =========================
+       MENU DROPDOWN HANDLER
+    ========================= */
+
+    function toggleMenu() {
+      const menu = document.getElementById("dropdownMenu");
+      menu.classList.toggle("show");
+    }
+
+    // Close menu when clicking outside
+    window.addEventListener("click", function(event) {
+      if (!event.target.closest('.header-right')) {
+        const menu = document.getElementById("dropdownMenu");
+        if (menu && menu.classList.contains('show')) {
+          menu.classList.remove('show');
+        }
+      }
+    });
+
+    function handleMenuClick(action) {
+      toggleMenu(); // Close dropdown
+
+      if (action === 'login') {
+        showLogin();
+      } else if (action === 'about') {
+        const about = document.getElementById("aboutSection");
+        if (about) {
+          about.scrollIntoView({ behavior: 'smooth' });
+        } else {
+          alert("About TaskEarn: A simple interface for discovering eligible online tasks and earning rewards.");
+        }
+      } else if (action === 'terms') {
+        showTerms();
+      } else if (action === 'contact') {
+        showContact();
+      }
+    }
+
+    function showTerms() {
+      document.getElementById("accountArea").innerHTML = `
+        <div class="card">
+          <h2>Terms & Conditions 📜</h2>
+          <p class="muted">1. Users must complete tasks honestly and according to guidelines.</p>
+          <p class="muted">2. Rewards are credited only after submission approval.</p>
+          <p class="muted">3. Fake or incomplete submissions will lead to rejection or account suspension.</p>
+          <p class="muted">4. Minimum withdrawal requirement applies as configured (e.g., ₹100).</p>
+        </div>
+      `;
+      scrollAccount();
+    }
+
+    function showContact() {
+      document.getElementById("accountArea").innerHTML = `
+        <div class="card">
+          <h2>Contact Us 📞</h2>
+          <p class="muted">Need help with your tasks or payouts?</p>
+          <p><strong>Email Support:</strong> support@taskearn.demo</p>
+          <p><strong>Working Hours:</strong> Mon - Fri (9:00 AM - 6:00 PM)</p>
+        </div>
+      `;
+      scrollAccount();
+    }
+
 
     /* =========================
        API HELPER
@@ -1082,7 +1217,7 @@
 
 
     /* =========================
-       START
+       START APP
     ========================= */
 
     startApp();
