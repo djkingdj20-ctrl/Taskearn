@@ -1,87 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 <meta charset="UTF-8">
 
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1.0"
+>
 
-<meta name="google-adsense-account"
-      content="ca-pub-5877718538170577">
+<title>TaskEarn</title>
 
-<meta name="description"
-      content="TaskEarn - Discover eligible online tasks, submit completed work and manage approved rewards.">
+<!-- =====================================================
+     GOOGLE IDENTITY SERVICES
+===================================================== -->
 
-<title>TaskEarn - Tasks & Rewards</title>
+<script
+  src="https://accounts.google.com/gsi/client"
+  async
+  defer
+></script>
 
 <style>
-
 * {
   box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
+html,
 body {
   margin: 0;
+  padding: 0;
   font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
     Arial,
+    Helvetica,
     sans-serif;
   background: #f7f8fc;
   color: #171b2d;
-  line-height: 1.5;
 }
 
 button,
 input,
-textarea,
-select {
+select,
+textarea {
   font: inherit;
 }
 
 button {
-  touch-action: manipulation;
-  cursor: pointer;
-  border: none;
-  background: none;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
   cursor: pointer;
 }
-
-/* =====================================================
-   HEADER
-===================================================== */
 
 .header {
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: rgba(255,255,255,.95);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  border-bottom: 1px solid #eceef4;
+  background: rgba(255,255,255,.96);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid #e8eaf0;
 }
 
 .header-inner {
-  max-width: 1050px;
+  max-width: 1100px;
   margin: auto;
-  min-height: 64px;
-  padding: 9px 16px;
+  min-height: 70px;
+  padding: 10px 18px;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: 900;
+  color: #ff5d2e;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav button {
+  border: 0;
+  background: transparent;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 700;
+  color: #596174;
+}
+
+.nav button:hover,
+.nav button.active {
+  background: #fff1eb;
+  color: #ff5d2e;
 }
 
 .header-profile {
@@ -91,887 +101,368 @@ a {
 .profile-avatar-button {
   width: 44px;
   height: 44px;
-  padding: 0;
+  border: 0;
   border-radius: 50%;
-  overflow: hidden;
-  background: linear-gradient(135deg,#ff6b35,#ff3d6e);
+  background: #ff5d2e;
   color: white;
   font-weight: 900;
-  font-size: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid white;
-  box-shadow: 0 5px 16px rgba(255,91,73,.25);
-}
-
-.profile-avatar-button img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
 }
 
 .header-profile-panel {
   position: absolute;
-  top: 53px;
   right: 0;
-  width: 245px;
+  top: 52px;
+  width: 230px;
   background: white;
-  border: 1px solid #eceef4;
-  border-radius: 19px;
-  box-shadow: 0 18px 50px rgba(20,25,50,.16);
-  overflow: hidden;
+  border: 1px solid #e7e9ef;
+  border-radius: 18px;
+  box-shadow: 0 15px 40px rgba(20,30,60,.16);
+  padding: 12px;
   display: none;
-  z-index: 3000;
 }
 
-.header-profile-panel.show {
+.header-profile-panel.open {
   display: block;
 }
 
-.profile-panel-user {
-  padding: 17px;
-  border-bottom: 1px solid #f0f1f5;
-  display: flex;
-  align-items: center;
-  gap: 11px;
-}
-
-.profile-panel-avatar {
-  width: 45px;
-  height: 45px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  overflow: hidden;
-  background: #fff1eb;
-  color: #ff5d2e;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 900;
-}
-
-.profile-panel-avatar img {
+.header-profile-panel button {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.profile-panel-user-name {
-  font-weight: 800;
-  font-size: 14px;
-}
-
-.profile-panel-user-email {
-  color: #788195;
-  font-size: 11px;
-  word-break: break-word;
-}
-
-.profile-panel-item {
-  width: 100%;
+  border: 0;
+  background: transparent;
   text-align: left;
-  padding: 14px 16px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  border-bottom: 1px solid #f1f2f6;
-  font-size: 14px;
-  font-weight: 650;
-  color: #171b2d;
+  padding: 12px;
+  border-radius: 12px;
+  font-weight: 700;
 }
 
-.profile-panel-item:last-child {
-  border-bottom: 0;
+.header-profile-panel button:hover {
+  background: #f5f6fa;
 }
-
-.profile-panel-item:active {
-  background: #fff4ef;
-  color: #ff5b32;
-}
-
-.profile-panel-logout {
-  color: #b42318;
-}
-
-/* =====================================================
-   MAIN
-===================================================== */
 
 .container {
-  width: 100%;
-  max-width: 1050px;
+  max-width: 1100px;
   margin: auto;
-  padding: 16px;
-  padding-bottom: 90px;
+  padding: 25px 18px 100px;
 }
-
-/* =====================================================
-   HERO
-===================================================== */
 
 .hero {
-  position: relative;
-  overflow: hidden;
-  padding: 30px 22px;
-  border-radius: 28px;
-  background:
-    linear-gradient(
-      135deg,
-      #fff7ed 0%,
-      #ffe8d8 48%,
-      #e9f4ff 100%
-    );
-  box-shadow: 0 12px 35px rgba(30,40,70,.06);
-  margin-bottom: 18px;
-}
-
-.hero-badge {
-  display: inline-flex;
-  padding: 7px 11px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.72);
-  color: #b94c24;
-  font-size: 12px;
-  font-weight: 800;
-  margin-bottom: 13px;
+  padding: 50px 0 30px;
 }
 
 .hero h1 {
-  position: relative;
-  z-index: 1;
-  max-width: 650px;
-  margin: 0 0 12px;
-  font-size: clamp(30px,7vw,48px);
-  line-height: 1.08;
-  letter-spacing: -1.4px;
-  font-weight: 900;
+  font-size: clamp(36px, 7vw, 68px);
+  line-height: 1;
+  margin: 0 0 18px;
+}
+
+.hero h1 span {
+  color: #ff5d2e;
 }
 
 .hero p {
-  position: relative;
-  z-index: 1;
-  max-width: 560px;
-  margin: 0 0 22px;
-  color: #5f6879;
-  font-size: 15px;
+  max-width: 680px;
+  color: #697286;
+  font-size: 17px;
+  line-height: 1.7;
 }
-
-.hero-actions {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-/* =====================================================
-   BUTTONS
-===================================================== */
-
-.btn {
-  min-height: 46px;
-  padding: 11px 17px;
-  border-radius: 13px;
-  font-weight: 800;
-  transition:
-    transform .15s ease,
-    box-shadow .15s ease,
-    background .15s ease;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.btn:active {
-  transform: scale(.97);
-}
-
-.primary {
-  background: #ff6333;
-  color: white;
-  box-shadow: 0 8px 18px rgba(255,99,51,.25);
-}
-
-.primary:hover {
-  background: #ef5324;
-}
-
-.secondary {
-  background: white;
-  color: #24283b;
-  border: 1px solid #e3e5eb;
-}
-
-.danger {
-  background: #b42318;
-  color: white;
-}
-
-.large-btn {
-  min-height: 52px;
-  padding: 13px 25px;
-  border-radius: 16px;
-  font-size: 16px;
-}
-
-/* =====================================================
-   CARDS
-===================================================== */
 
 .card {
   background: white;
-  border: 1px solid #eceef4;
-  border-radius: 22px;
-  padding: 20px;
-  margin-bottom: 16px;
-  box-shadow: 0 7px 25px rgba(20,30,60,.045);
-}
-
-.card h2 {
-  margin-top: 0;
-  font-size: 21px;
-  letter-spacing: -.4px;
-}
-
-.card h3 {
-  margin-bottom: 7px;
-}
-
-.muted {
-  color: #687386;
-  font-size: 14px;
-  line-height: 1.65;
-}
-
-/* =====================================================
-   FEATURES
-===================================================== */
-
-.features {
-  display: grid;
-  grid-template-columns: repeat(3,1fr);
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.feature {
-  background: white;
-  border: 1px solid #eceef4;
+  border: 1px solid #e7e9ef;
   border-radius: 20px;
-  padding: 18px;
-  box-shadow: 0 6px 20px rgba(20,30,60,.04);
+  padding: 22px;
+  margin-bottom: 18px;
+  box-shadow: 0 8px 25px rgba(20,30,60,.05);
 }
-
-.feature-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 13px;
-  background: #fff2ec;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  margin-bottom: 12px;
-}
-
-.feature b {
-  display: block;
-  margin-bottom: 5px;
-}
-
-.feature span {
-  color: #687386;
-  font-size: 13px;
-}
-
-/* =====================================================
-   TASKS
-===================================================== */
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(2,1fr);
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 14px;
 }
 
-.task-card {
+.full {
+  grid-column: 1 / -1;
+}
+
+label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 7px;
+  font-size: 14px;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid #dfe2e9;
+  border-radius: 12px;
+  outline: none;
   background: white;
-  border: 1px solid #eceef4;
-  border-radius: 21px;
-  padding: 18px;
-  box-shadow: 0 7px 25px rgba(20,30,60,.05);
 }
 
-.task-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 10px;
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #ff5d2e;
+  box-shadow: 0 0 0 3px rgba(255,93,46,.1);
 }
 
-.tag {
-  display: inline-flex;
-  background: #f0efff;
-  color: #5541d9;
-  padding: 6px 9px;
-  border-radius: 999px;
-  font-size: 11px;
+.primary {
+  width: 100%;
+  border: 0;
+  background: #ff5d2e;
+  color: white;
+  padding: 14px 18px;
+  border-radius: 13px;
   font-weight: 800;
 }
 
-.earn {
-  color: #078b4b;
-  font-size: 20px;
-  font-weight: 900;
-  white-space: nowrap;
+.primary:hover {
+  opacity: .92;
+}
+
+.secondary {
+  border: 1px solid #e0e3ea;
+  background: white;
+  color: #30374a;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.danger {
+  background: #fff0f0 !important;
+  color: #d73535 !important;
+}
+
+.muted {
+  color: #70798b;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.notice {
+  padding: 13px 15px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  font-weight: 700;
+}
+
+.notice.error {
+  background: #fff0f0;
+  color: #c92e2e;
+}
+
+.notice.success {
+  background: #ecfff3;
+  color: #168346;
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.auth-tabs button {
+  flex: 1;
+  padding: 12px;
+  border: 0;
+  border-radius: 12px;
+  background: #f1f3f7;
+  font-weight: 800;
+}
+
+.auth-tabs button.active {
+  background: #ff5d2e;
+  color: white;
+}
+
+.google-area {
+  margin-top: 15px;
+  text-align: center;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 18px 0;
+  color: #8a92a2;
+  font-size: 13px;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  height: 1px;
+  background: #e3e5eb;
+  flex: 1;
 }
 
 .task-card h3 {
-  font-size: 17px;
-  margin-top: 14px;
+  margin-top: 0;
 }
 
-.task-card .btn {
-  width: 100%;
-  margin-top: 12px;
-}
-
-/* =====================================================
-   STATS
-===================================================== */
-
-.stats {
-  display: grid;
-  grid-template-columns: repeat(3,1fr);
-  gap: 10px;
-  margin-bottom: 16px;
+.reward {
+  font-size: 20px;
+  font-weight: 900;
+  color: #13a05a;
 }
 
 .stat {
-  background: white;
-  border: 1px solid #eceef4;
-  border-radius: 18px;
-  padding: 16px;
-  box-shadow: 0 5px 18px rgba(20,30,60,.04);
-}
-
-.stat small {
-  color: #788195;
-  font-size: 12px;
+  text-align: center;
 }
 
 .stat b {
   display: block;
-  margin-top: 5px;
-  font-size: 19px;
+  font-size: 26px;
+  margin-top: 8px;
 }
-
-/* =====================================================
-   ACCOUNT
-===================================================== */
 
 .account-menu {
   display: grid;
-  grid-template-columns: repeat(3,1fr);
+  grid-template-columns: repeat(2,1fr);
   gap: 12px;
-  margin-bottom: 18px;
 }
 
 .account-option {
-  background: white;
-  border: 1px solid #eceef4;
-  border-radius: 20px;
-  padding: 20px 14px;
-  text-align: center;
-  box-shadow: 0 7px 22px rgba(20,30,60,.05);
-  transition: transform .15s ease;
-}
-
-.account-option:active {
-  transform: scale(.97);
-}
-
-.account-option .icon {
-  width: 48px;
-  height: 48px;
-  margin: 0 auto 10px;
-  border-radius: 15px;
-  background: #fff1eb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 23px;
-}
-
-.account-option b {
-  display: block;
-  font-size: 14px;
-}
-
-.account-option span {
-  display: block;
-  color: #788195;
-  font-size: 11px;
-  margin-top: 3px;
-}
-
-/* =====================================================
-   PAGE HEADER
-===================================================== */
-
-.page-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.back-btn {
-  min-width: 42px;
-  height: 42px;
-  border-radius: 12px;
-  background: white;
   border: 1px solid #e3e5eb;
-  font-size: 18px;
-}
-
-.page-header h2 {
-  margin: 0;
-  font-size: 22px;
-}
-
-/* =====================================================
-   FORM
-===================================================== */
-
-.form {
-  display: grid;
-  gap: 11px;
-  width: 100%;
-  max-width: 560px;
-}
-
-.input {
-  width: 100%;
-  min-height: 48px;
-  padding: 12px 14px;
-  background: #fbfcff;
-  border: 1px solid #dfe2ea;
-  border-radius: 13px;
-  outline: none;
-  color: #171b2d;
-}
-
-.input:focus {
-  border-color: #ff6b35;
-  box-shadow: 0 0 0 3px rgba(255,107,53,.1);
-}
-
-textarea.input {
-  min-height: 100px;
-  resize: vertical;
-}
-
-.input[readonly] {
-  background: #f1f3f7;
-  color: #667085;
-}
-
-/* =====================================================
-   REMEMBER
-===================================================== */
-
-.remember-row {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 2px;
-  color: #596274;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.remember-row input {
-  width: 18px;
-  height: 18px;
-  accent-color: #ff6333;
-}
-
-/* =====================================================
-   AUTH
-===================================================== */
-
-.auth-wrap {
-  min-height: 50vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px 0;
-}
-
-.auth-card {
-  width: 100%;
-  max-width: 460px;
   background: white;
-  border: 1px solid #eceef4;
-  border-radius: 26px;
-  padding: 25px;
-  box-shadow: 0 15px 45px rgba(20,30,60,.08);
-}
-
-.auth-logo {
-  width: 55px;
-  height: 55px;
-  border-radius: 17px;
-  background: linear-gradient(135deg,#ff6b35,#ff3d6e);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 25px;
-  font-weight: 900;
-  margin-bottom: 15px;
-}
-
-/* =====================================================
-   OTP
-===================================================== */
-
-.otp-input {
-  text-align: center;
-  letter-spacing: 8px;
-  font-size: 24px;
-  font-weight: 900;
-}
-
-.otp-info {
-  background: #eef7ff;
-  border: 1px solid #d6eaff;
-  color: #245a87;
-  padding: 13px 15px;
-  border-radius: 14px;
-  font-size: 13px;
-  margin-bottom: 12px;
-}
-
-.verify-badge {
-  display: inline-flex;
-  background: #e3f8eb;
-  color: #087a42;
-  border-radius: 999px;
-  padding: 6px 10px;
-  font-size: 11px;
+  border-radius: 15px;
+  padding: 17px;
   font-weight: 800;
 }
 
-/* =====================================================
-   PROFILE
-===================================================== */
-
-.profile-photo-box {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 18px;
+.account-option:hover {
+  border-color: #ff5d2e;
+  background: #fff8f5;
 }
 
-.profile-large-avatar {
-  width: 82px;
-  height: 82px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  overflow: hidden;
-  background: linear-gradient(135deg,#ff6b35,#ff3d6e);
-  color: white;
-  display: flex;
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(10,15,30,.55);
+  display: none;
   align-items: center;
   justify-content: center;
-  font-size: 27px;
-  font-weight: 900;
+  z-index: 2000;
+  padding: 18px;
 }
 
-.profile-large-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.modal.open {
+  display: flex;
 }
 
-.file-input {
-  width: 100%;
-  padding: 10px;
-  border: 1px dashed #ccd2df;
-  border-radius: 13px;
-  background: #fafbfe;
-}
-
-/* =====================================================
-   PAYMENT METHOD
-===================================================== */
-
-.payment-methods {
-  display: grid;
-  grid-template-columns: repeat(2,1fr);
-  gap: 10px;
-}
-
-.payment-option {
-  border: 2px solid #e1e4eb;
+.modal-box {
+  width: min(500px,100%);
+  max-height: 90vh;
+  overflow: auto;
   background: white;
-  border-radius: 16px;
-  padding: 15px;
-  text-align: center;
-  font-weight: 800;
-  transition: .15s ease;
+  border-radius: 22px;
+  padding: 22px;
 }
 
-.payment-option.selected {
-  border-color: #ff6333;
-  background: #fff6f1;
-  color: #d94315;
-  box-shadow: 0 5px 16px rgba(255,99,51,.12);
-}
-
-.payment-option .payment-icon {
-  display: block;
-  font-size: 25px;
-  margin-bottom: 5px;
-}
-
-/* =====================================================
-   OTHER
-===================================================== */
-
-.notice {
-  background: #fff8df;
-  border: 1px solid #f5e6a8;
-  color: #6c5200;
-  padding: 13px 15px;
-  border-radius: 14px;
-  margin-bottom: 15px;
-  font-size: 13px;
-}
-
-.status {
-  display: inline-flex;
-  padding: 6px 9px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 800;
-  text-transform: capitalize;
-}
-
-.pending {
-  background: #fff3cd;
-  color: #856404;
-}
-
-.approved {
-  background: #dff6e8;
-  color: #087a42;
-}
-
-.rejected {
-  background: #ffe1e1;
-  color: #b42318;
-}
-
-.admin-box {
-  border: 1px solid #e7e9ef;
-  border-radius: 16px;
-  padding: 15px;
-  margin-bottom: 11px;
-  background: #fff;
-}
-
-.row {
+.modal-head {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
   gap: 10px;
 }
 
-.empty {
-  text-align: center;
-  padding: 35px 20px;
-  color: #687386;
+.close {
+  border: 0;
+  background: #f1f3f7;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 20px;
 }
-
-/* =====================================================
-   FOOTER
-===================================================== */
-
-.footer {
-  text-align: center;
-  padding: 28px 10px;
-  color: #7b8495;
-  font-size: 12px;
-}
-
-.footer-links {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 15px;
-  margin-bottom: 12px;
-}
-
-/* =====================================================
-   MOBILE NAV
-===================================================== */
 
 .mobile-bottom-nav {
+  position: fixed;
   display: none;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  height: 60px;
+  z-index: 1500;
+  background: rgba(255,255,255,.96);
+  backdrop-filter: blur(18px);
+  border: 1px solid #e7e9ef;
+  border-radius: 20px;
+  box-shadow: 0 12px 35px rgba(20,30,60,.16);
+  align-items: center;
+  justify-content: space-around;
+  padding: 5px;
 }
 
-@media (min-width: 800px) {
-
-  .container {
-    padding-top: 24px;
-  }
-
-  .hero {
-    padding: 55px 45px;
-  }
-
-  .card {
-    padding: 24px;
-  }
-
+.mobile-bottom-nav.logged-in {
+  display: flex;
 }
 
-@media (max-width: 700px) {
+.bottom-item {
+  border: 0;
+  background: transparent;
+  height: 50px;
+  min-width: 75px;
+  border-radius: 15px;
+  color: #70798b;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
 
-  body {
-    padding-bottom: 72px;
-  }
+.bottom-item span:first-child {
+  font-size: 20px;
+}
 
-  .container {
-    padding: 11px;
-    padding-bottom: 25px;
-  }
+.bottom-item.active {
+  background: #fff1eb;
+  color: #ff5d2e;
+}
 
-  .hero {
-    padding: 27px 19px;
-    border-radius: 24px;
-  }
+@media(max-width:760px) {
 
-  .hero h1 {
-    font-size: 31px;
-    letter-spacing: -1px;
-  }
-
-  .hero-actions {
-    display: grid;
-    grid-template-columns: 1fr;
-    width: 100%;
-  }
-
-  .features {
-    grid-template-columns: 1fr;
-    gap: 9px;
-  }
-
-  .feature {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px;
-  }
-
-  .feature-icon {
-    flex-shrink: 0;
-    margin: 0;
+  .nav {
+    display: none;
   }
 
   .grid {
     grid-template-columns: 1fr;
   }
 
-  .stats {
-    gap: 7px;
+  .form-grid {
+    grid-template-columns: 1fr;
   }
 
-  .stat {
-    padding: 13px 10px;
-    text-align: center;
-  }
-
-  .stat b {
-    font-size: 16px;
+  .full {
+    grid-column: auto;
   }
 
   .account-menu {
     grid-template-columns: 1fr;
-    gap: 9px;
   }
 
-  .account-option {
-    display: flex;
-    align-items: center;
-    text-align: left;
-    gap: 12px;
-    padding: 14px;
+  .container {
+    padding-bottom: 90px;
   }
-
-  .account-option .icon {
-    flex-shrink: 0;
-    margin: 0;
-  }
-
-  .payment-methods {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .mobile-bottom-nav {
-    position: fixed;
-    display: none;
-    left: 10px;
-    right: 10px;
-    bottom: 10px;
-    height: 60px;
-    z-index: 1500;
-    background: rgba(255,255,255,.96);
-    backdrop-filter: blur(18px);
-    border: 1px solid #e7e9ef;
-    border-radius: 20px;
-    box-shadow: 0 12px 35px rgba(20,30,60,.16);
-    align-items: center;
-    justify-content: space-around;
-    padding: 5px;
-  }
-
-  .mobile-bottom-nav.logged-in {
-    display: flex;
-  }
-
-  .bottom-item {
-    border: 0;
-    background: transparent;
-    height: 50px;
-    min-width: 75px;
-    border-radius: 15px;
-    color: #70798b;
-    font-size: 10px;
-    font-weight: 700;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2px;
-  }
-
-  .bottom-item span:first-child {
-    font-size: 20px;
-  }
-
-  .bottom-item.active {
-    background: #fff1eb;
-    color: #ff5d2e;
-  }
-
 }
-
 </style>
 </head>
 
@@ -981,17 +472,54 @@ textarea.input {
 
   <div class="header-inner">
 
-    <div id="headerProfile"
-         class="header-profile"
-         style="display:none;">
+    <div
+      class="logo"
+      onclick="goPublicHome()"
+      style="cursor:pointer;"
+    >
+      TaskEarn
+    </div>
+
+    <nav
+      id="mainNav"
+      class="nav"
+    >
+      <button
+        onclick="tasksHome()"
+        id="navTasks"
+      >
+        Tasks
+      </button>
+
+      <button
+        onclick="walletHome()"
+        id="navWallet"
+      >
+        Wallet
+      </button>
+
+      <button
+        onclick="profileHome()"
+        id="navProfile"
+      >
+        Profile
+      </button>
+    </nav>
+
+    <div
+      id="headerProfile"
+      class="header-profile"
+      style="display:none;"
+    >
 
       <button
         id="headerAvatarButton"
         class="profile-avatar-button"
         onclick="toggleProfilePanel(event)"
-        aria-label="Profile"
       >
-        <span id="headerAvatarInitials">U</span>
+        <span id="headerAvatarInitials">
+          U
+        </span>
       </button>
 
       <div
@@ -999,326 +527,534 @@ textarea.input {
         class="header-profile-panel"
       >
 
-        <div class="profile-panel-user">
-
-          <div
-            id="panelAvatar"
-            class="profile-panel-avatar"
-          >
-            U
-          </div>
-
-          <div style="min-width:0;">
-
-            <div
-              id="panelUserName"
-              class="profile-panel-user-name"
-            >
-              Member
-            </div>
-
-            <div
-              id="panelUserEmail"
-              class="profile-panel-user-email"
-            >
-              -
-            </div>
-
-          </div>
-
+        <div
+          id="profilePanelName"
+          style="
+            font-weight:900;
+            padding:10px;
+          "
+        >
+          User
         </div>
 
-        <button
-          class="profile-panel-item"
-          onclick="profilePanelAccount()"
-        >
-          👤 Account
+        <div
+          id="profilePanelEmail"
+          class="muted"
+          style="
+            padding:0 10px 10px;
+            font-size:13px;
+          "
+        ></div>
+
+        <button onclick="profileHome()">
+          👤 Profile
+        </button>
+
+        <button onclick="walletHome()">
+          💰 Wallet
         </button>
 
         <button
-          class="profile-panel-item"
-          onclick="profilePanelAbout()"
-        >
-          ℹ️ About Us
-        </button>
-
-        <button
-          class="profile-panel-item"
-          onclick="profilePanelTerms()"
-        >
-          📜 Terms & Conditions
-        </button>
-
-        <button
-          class="profile-panel-item"
-          onclick="profilePanelPrivacy()"
-        >
-          🔒 Privacy Policy
-        </button>
-
-        <button
-          class="profile-panel-item"
-          onclick="profilePanelContact()"
-        >
-          📞 Contact Us
-        </button>
-
-        <button
-          class="profile-panel-item profile-panel-logout"
-          onclick="profilePanelLogout()"
+          class="danger"
+          onclick="logoutUser()"
         >
           🚪 Logout
         </button>
 
       </div>
-
     </div>
 
   </div>
 
 </header>
 
-
 <main class="container">
 
-  <section id="homeArea">
+<!-- =====================================================
+     PUBLIC HOME
+===================================================== -->
 
-    <div id="publicHero"
-         class="hero">
+<section
+  id="homeArea"
+>
 
-      <div class="hero-badge">
-        ⚡ Simple tasks • Easy tracking
-      </div>
+  <div
+    id="publicHero"
+    class="hero"
+  >
 
-      <h1>
-        Earn money by completing simple online tasks
-      </h1>
+    <h1>
+      Complete Tasks.<br>
+      <span>Earn Rewards.</span>
+    </h1>
 
-      <p>
-        Discover eligible tasks, complete requirements,
-        submit work, and receive approved rewards.
-      </p>
-
-      <div
-        id="publicHeroButtons"
-        class="hero-actions"
-      >
-
-        <button
-          class="btn primary large-btn"
-          onclick="showLogin()"
-        >
-          🔐 Login
-        </button>
-
-        <button
-          class="btn secondary large-btn"
-          onclick="showRegister()"
-        >
-          ✨ Create Account
-        </button>
-
-      </div>
-
-    </div>
-
+    <p>
+      Welcome to TaskEarn. Complete available
+      tasks, submit them for review and earn
+      approved rewards.
+    </p>
 
     <div
-      id="loggedInWelcome"
-      style="display:none;"
+      style="
+        display:flex;
+        gap:10px;
+        flex-wrap:wrap;
+        margin-top:20px;
+      "
+    >
+
+      <button
+        class="primary"
+        style="width:auto;"
+        onclick="openAuth('register')"
+      >
+        Get Started
+      </button>
+
+      <button
+        class="secondary"
+        onclick="openAuth('login')"
+      >
+        Login
+      </button>
+
+    </div>
+
+  </div>
+
+  <div
+    id="loggedInWelcome"
+    style="display:none;"
+  ></div>
+
+  <div class="features">
+
+    <div class="grid">
+
+      <div class="card">
+        <h3>📋 Tasks</h3>
+        <p class="muted">
+          Find available online tasks.
+        </p>
+      </div>
+
+      <div class="card">
+        <h3>💰 Rewards</h3>
+        <p class="muted">
+          Earn rewards for approved work.
+        </p>
+      </div>
+
+      <div class="card">
+        <h3>🔐 Secure</h3>
+        <p class="muted">
+          Email OTP and Google authentication.
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<!-- =====================================================
+     AUTH AREA
+===================================================== -->
+
+<section
+  id="authArea"
+  class="hidden"
+>
+
+  <div
+    class="card"
+    style="max-width:520px;margin:25px auto;"
+  >
+
+    <div class="auth-tabs">
+
+      <button
+        id="loginTab"
+        onclick="showAuthMode('login')"
+      >
+        Login
+      </button>
+
+      <button
+        id="registerTab"
+        onclick="showAuthMode('register')"
+      >
+        Register
+      </button>
+
+    </div>
+
+    <div
+      id="authMessage"
+      class="hidden"
     ></div>
 
+    <!-- LOGIN -->
 
-    <div class="features">
+    <form
+      id="loginForm"
+      onsubmit="loginUser(event)"
+    >
 
-      <div class="feature">
+      <h2>Welcome Back 👋</h2>
 
-        <div class="feature-icon">
-          📋
-        </div>
+      <p class="muted">
+        Login using your email or Google account.
+      </p>
 
-        <div>
+      <label>
+        Email
+      </label>
 
-          <b>
-            Simple Tasks
-          </b>
+      <input
+        id="loginEmail"
+        type="email"
+        required
+        autocomplete="email"
+      >
 
-          <span>
-            Browse available tasks easily.
-          </span>
+      <br><br>
 
-        </div>
+      <label>
+        Password
+      </label>
 
+      <input
+        id="loginPassword"
+        type="password"
+        required
+        autocomplete="current-password"
+      >
+
+      <br>
+
+      <label
+        style="
+          display:flex;
+          gap:8px;
+          align-items:center;
+          font-weight:600;
+        "
+      >
+
+        <input
+          id="loginRemember"
+          type="checkbox"
+          style="width:auto;"
+        >
+
+        Remember me
+
+      </label>
+
+      <br>
+
+      <button
+        class="primary"
+        type="submit"
+      >
+        Login
+      </button>
+
+      <div class="divider">
+        OR
       </div>
 
+      <div
+        id="googleLoginButton"
+        class="google-area"
+      ></div>
 
-      <div class="feature">
+    </form>
 
-        <div class="feature-icon">
-          💰
-        </div>
+    <!-- REGISTER -->
 
-        <div>
+    <form
+      id="registerForm"
+      class="hidden"
+      onsubmit="registerUser(event)"
+    >
 
-          <b>
-            Track Rewards
-          </b>
+      <h2>Create Account 🚀</h2>
 
-          <span>
-            Monitor approved rewards.
-          </span>
+      <p class="muted">
+        Create your TaskEarn account.
+      </p>
 
-        </div>
+      <label>
+        Full Name
+      </label>
 
+      <input
+        id="registerName"
+        type="text"
+        required
+        maxlength="80"
+        autocomplete="name"
+      >
+
+      <br><br>
+
+      <label>
+        Gmail / Email
+      </label>
+
+      <input
+        id="registerEmail"
+        type="email"
+        required
+        autocomplete="email"
+      >
+
+      <br><br>
+
+      <label>
+        Mobile Number
+      </label>
+
+      <input
+        id="registerMobile"
+        type="tel"
+        required
+        placeholder="+919876543210"
+        autocomplete="tel"
+      >
+
+      <br><br>
+
+      <label>
+        City
+      </label>
+
+      <input
+        id="registerCity"
+        type="text"
+        required
+        maxlength="80"
+        autocomplete="address-level2"
+      >
+
+      <br><br>
+
+      <label>
+        Password
+      </label>
+
+      <input
+        id="registerPassword"
+        type="password"
+        required
+        minlength="6"
+        autocomplete="new-password"
+      >
+
+      <br>
+
+      <label
+        style="
+          display:flex;
+          gap:8px;
+          align-items:center;
+          font-weight:600;
+        "
+      >
+
+        <input
+          id="registerRemember"
+          type="checkbox"
+          style="width:auto;"
+        >
+
+        Remember me
+
+      </label>
+
+      <br>
+
+      <button
+        class="primary"
+        type="submit"
+      >
+        Create Account
+      </button>
+
+      <div class="divider">
+        OR
       </div>
 
+      <div
+        id="googleRegisterButton"
+        class="google-area"
+      ></div>
 
-      <div class="feature">
-
-        <div class="feature-icon">
-          🔒
-        </div>
-
-        <div>
-
-          <b>
-            Secure Account
-          </b>
-
-          <span>
-            Manage your account securely.
-          </span>
-
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <section class="card">
-
-      <h2>
-        How TaskEarn Works
-      </h2>
-
-      <ol>
-
-        <li>
-          Create your TaskEarn account.
-        </li>
-
-        <li>
-          Verify your email and mobile number.
-        </li>
-
-        <li>
-          Browse available tasks.
-        </li>
-
-        <li>
-          Complete the requirements honestly.
-        </li>
-
-        <li>
-          Submit completed task for review.
-        </li>
-
-        <li>
-          Approved rewards are added to your wallet.
-        </li>
-
-      </ol>
-
-    </section>
-
-
-    <section class="card">
-
-      <h2>
-        About TaskEarn
-      </h2>
-
-      <p class="muted">
-        TaskEarn is an online task and reward platform
-        designed to provide users with access to eligible
-        tasks, task submissions, reward tracking and
-        account management features.
+      <p
+        class="muted"
+        style="font-size:12px;"
+      >
+        Google registration verifies your Gmail
+        automatically. You can add your mobile
+        number and city later from Profile.
       </p>
 
-    </section>
+    </form>
 
+  </div>
 
-    <section class="card">
+</section>
 
-      <h2>
-        Frequently Asked Questions
-      </h2>
+<!-- =====================================================
+     APP AREA
+===================================================== -->
 
-      <h3>
-        How do I earn?
-      </h3>
+<section
+  id="appArea"
+  class="hidden"
+>
 
-      <p class="muted">
-        Browse available tasks and complete them according
-        to the requirements provided for each task.
-      </p>
+  <div
+    id="appContent"
+  ></div>
 
-      <h3>
-        Is income guaranteed?
-      </h3>
-
-      <p class="muted">
-        No. Earnings are not guaranteed and depend on
-        task availability, successful completion and
-        approval of submitted work.
-      </p>
-
-      <h3>
-        What is the minimum withdrawal?
-      </h3>
-
-      <p class="muted">
-        The current minimum withdrawal amount is ₹100,
-        subject to applicable account and payment rules.
-      </p>
-
-    </section>
-
-  </section>
-
-
-  <section id="accountArea"></section>
-
-
-  <footer class="footer">
-
-    <div class="footer-links">
-
-      <a onclick="showPrivacyPage()">
-        Privacy
-      </a>
-
-      <a onclick="showTermsPage()">
-        Terms
-      </a>
-
-      <a onclick="showAboutPage()">
-        About
-      </a>
-
-      <a onclick="showContactPage()">
-        Contact
-      </a>
-
-    </div>
-
-    © 2026 TaskEarn. All rights reserved.
-
-  </footer>
+</section>
 
 </main>
 
+<!-- =====================================================
+     OTP MODAL
+===================================================== -->
+
+<div
+  id="otpModal"
+  class="modal"
+>
+
+  <div class="modal-box">
+
+    <div class="modal-head">
+
+      <h2 id="otpTitle">
+        Verify OTP
+      </h2>
+
+      <button
+        class="close"
+        onclick="closeOtpModal()"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <div
+      id="otpMessage"
+      class="muted"
+      style="margin-bottom:15px;"
+    >
+      Enter the OTP sent to you.
+    </div>
+
+    <input
+      id="otpInput"
+      type="text"
+      inputmode="numeric"
+      maxlength="6"
+      placeholder="6-digit OTP"
+      autocomplete="one-time-code"
+    >
+
+    <br><br>
+
+    <button
+      class="primary"
+      onclick="verifyOtp()"
+    >
+      Verify OTP
+    </button>
+
+    <br><br>
+
+    <button
+      class="secondary"
+      style="width:100%;"
+      onclick="resendOtp()"
+    >
+      Resend OTP
+    </button>
+
+  </div>
+
+</div>
+
+<!-- =====================================================
+     PROFILE OTP MODAL
+===================================================== -->
+
+<div
+  id="profileOtpModal"
+  class="modal"
+>
+
+  <div class="modal-box">
+
+    <div class="modal-head">
+
+      <h2>
+        Verify Mobile
+      </h2>
+
+      <button
+        class="close"
+        onclick="closeProfileOtp()"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <p class="muted">
+      Enter the OTP sent to your new mobile number.
+    </p>
+
+    <input
+      id="profileOtpInput"
+      type="text"
+      inputmode="numeric"
+      maxlength="6"
+      placeholder="6-digit OTP"
+    >
+
+    <br><br>
+
+    <button
+      class="primary"
+      onclick="verifyProfileOtp()"
+    >
+      Verify Mobile
+    </button>
+
+    <br><br>
+
+    <button
+      class="secondary"
+      style="width:100%;"
+      onclick="resendProfileOtp()"
+    >
+      Resend OTP
+    </button>
+
+  </div>
+
+</div>
+
+<!-- =====================================================
+     MOBILE NAV
+===================================================== -->
 
 <div
   id="mobileBottomNav"
@@ -1327,283 +1063,140 @@ textarea.input {
 
   <button
     class="bottom-item active"
-    onclick="homeForLoggedInUser()"
+    onclick="tasksHome()"
   >
     <span>🏠</span>
-    <span>Home</span>
+    <span>Tasks</span>
   </button>
 
   <button
     class="bottom-item"
-    onclick="handleProfileClick()"
+    onclick="walletHome()"
+  >
+    <span>💰</span>
+    <span>Wallet</span>
+  </button>
+
+  <button
+    class="bottom-item"
+    onclick="profileHome()"
   >
     <span>👤</span>
-    <span>Account</span>
+    <span>Profile</span>
   </button>
 
 </div>
 
-
 <script>
 
 /* =====================================================
-   GLOBAL STATE
+   STATE
 ===================================================== */
 
 let currentUser = null;
-let currentVerification = null;
-
+let currentAuthMode = "login";
 
 /* =====================================================
-   API
+   HELPERS
 ===================================================== */
 
-async function api(url, options = {}) {
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
 
-  const headers = Object.assign(
-    {
-      "Content-Type": "application/json"
-    },
-    options.headers || {}
-  );
+async function api(
+  url,
+  options = {}
+) {
+  const response =
+    await fetch(
+      url,
+      {
+        credentials: "same-origin",
+        ...options,
+        headers: {
+          "Content-Type":
+            "application/json",
+          ...(options.headers || {})
+        }
+      }
+    );
 
-  const response = await fetch(
-    url,
-    {
-      ...options,
-      headers,
-      credentials: "same-origin"
-    }
-  );
-
-  let data = {};
+  let data = null;
 
   try {
-    data = await response.json();
-  } catch (e) {
-    data = {};
+    data =
+      await response.json();
+  } catch {
+    data = null;
   }
 
   if (!response.ok) {
     throw new Error(
-      data.error || "Something went wrong."
+      data?.error ||
+      "Something went wrong."
     );
   }
 
   return data;
 }
 
+function showMessage(
+  message,
+  type = "error"
+) {
+  const box =
+    document.getElementById(
+      "authMessage"
+    );
 
-/* =====================================================
-   UTILITIES
-===================================================== */
+  if (!box) return;
 
-function escapeHtml(val) {
+  box.className =
+    "notice " + type;
 
-  return String(val ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
+  box.textContent =
+    message;
 }
 
+function showAuthArea() {
+  document
+    .getElementById("authArea")
+    .classList.remove("hidden");
 
-function formatDate(val) {
+  document
+    .getElementById("homeArea")
+    .classList.add("hidden");
 
-  if (!val) return "-";
-
-  try {
-    return new Date(val).toLocaleString();
-  } catch (e) {
-    return String(val);
-  }
+  document
+    .getElementById("appArea")
+    .classList.add("hidden");
 }
 
+function showAppArea() {
+  document
+    .getElementById("authArea")
+    .classList.add("hidden");
 
-function userInitials(user) {
+  document
+    .getElementById("homeArea")
+    .classList.remove("hidden");
 
-  const name =
-    user?.name ||
-    "User";
-
-  const parts =
-    name
-      .trim()
-      .split(/\s+/)
-      .filter(Boolean);
-
-  if (!parts.length) return "U";
-
-  if (parts.length === 1) {
-    return parts[0]
-      .substring(0,2)
-      .toUpperCase();
-  }
-
-  return (
-    parts[0][0] +
-    parts[parts.length - 1][0]
-  ).toUpperCase();
+  document
+    .getElementById("appArea")
+    .classList.remove("hidden");
 }
 
-
-/* =====================================================
-   UI STATE
-===================================================== */
-
-function setLoggedInUI(user) {
-
-  currentUser = user || null;
-
-  const profile =
-    document.getElementById(
-      "headerProfile"
-    );
-
-  const nav =
-    document.getElementById(
-      "mobileBottomNav"
-    );
-
-  const heroButtons =
-    document.getElementById(
-      "publicHeroButtons"
-    );
-
-  if (currentUser) {
-
-    if (profile) {
-      profile.style.display = "block";
-    }
-
-    if (nav) {
-      nav.classList.add("logged-in");
-    }
-
-    if (heroButtons) {
-      heroButtons.style.display = "none";
-    }
-
-    updateProfileUI();
-
-  } else {
-
-    if (profile) {
-      profile.style.display = "none";
-    }
-
-    if (nav) {
-      nav.classList.remove("logged-in");
-    }
-
-    if (heroButtons) {
-      heroButtons.style.display = "flex";
-    }
-
-    closeProfilePanel();
-  }
-}
-
-
-function updateProfileUI() {
-
-  if (!currentUser) return;
-
-  const initials =
-    userInitials(currentUser);
-
-  const headerButton =
-    document.getElementById(
-      "headerAvatarButton"
-    );
-
-  const panelAvatar =
-    document.getElementById(
-      "panelAvatar"
-    );
-
-  const name =
-    document.getElementById(
-      "panelUserName"
-    );
-
-  const email =
-    document.getElementById(
-      "panelUserEmail"
-    );
-
-  if (currentUser.profileImage) {
-
-    if (headerButton) {
-      headerButton.innerHTML =
-        `<img src="${escapeHtml(
-          currentUser.profileImage
-        )}" alt="Profile">`;
-    }
-
-    if (panelAvatar) {
-      panelAvatar.innerHTML =
-        `<img src="${escapeHtml(
-          currentUser.profileImage
-        )}" alt="Profile">`;
-    }
-
-  } else {
-
-    if (headerButton) {
-      headerButton.innerHTML =
-        `<span>${escapeHtml(initials)}</span>`;
-    }
-
-    if (panelAvatar) {
-      panelAvatar.innerHTML =
-        `<span>${escapeHtml(initials)}</span>`;
-    }
-
-  }
-
-  if (name) {
-    name.innerText =
-      currentUser.name || "Member";
-  }
-
-  if (email) {
-    email.innerText =
-      currentUser.email || "-";
-  }
-}
-
-
-/* =====================================================
-   PUBLIC HOME
-===================================================== */
-
-function goPublicHome() {
-
-  currentUser = null;
-
-  setLoggedInUI(null);
-
-  document.getElementById(
-    "homeArea"
-  ).style.display = "block";
-
-  document.getElementById(
-    "accountArea"
-  ).innerHTML = "";
-
-  const welcome =
-    document.getElementById(
-      "loggedInWelcome"
-    );
-
-  if (welcome) {
-    welcome.style.display = "none";
-    welcome.innerHTML = "";
-  }
-
-  setActiveBottom("home");
+function openAuth(
+  mode = "login"
+) {
+  showAuthArea();
+  showAuthMode(mode);
 
   window.scrollTo({
     top: 0,
@@ -1611,674 +1204,466 @@ function goPublicHome() {
   });
 }
 
+function showAuthMode(mode) {
+  currentAuthMode = mode;
 
-function homeForLoggedInUser() {
+  const login =
+    document.getElementById(
+      "loginForm"
+    );
 
-  if (currentUser) {
-    tasksHome();
+  const register =
+    document.getElementById(
+      "registerForm"
+    );
+
+  const loginTab =
+    document.getElementById(
+      "loginTab"
+    );
+
+  const registerTab =
+    document.getElementById(
+      "registerTab"
+    );
+
+  login.classList.toggle(
+    "hidden",
+    mode !== "login"
+  );
+
+  register.classList.toggle(
+    "hidden",
+    mode !== "register"
+  );
+
+  loginTab.classList.toggle(
+    "active",
+    mode === "login"
+  );
+
+  registerTab.classList.toggle(
+    "active",
+    mode === "register"
+  );
+
+  showMessage("", "success");
+  document
+    .getElementById(
+      "authMessage"
+    )
+    .classList.add("hidden");
+
+  renderGoogleButtons();
+}
+
+/* =====================================================
+   GOOGLE BUTTONS
+===================================================== */
+
+function googleCredentialResponse(
+  response
+) {
+  if (
+    !response ||
+    !response.credential
+  ) {
+    showMessage(
+      "Google authentication failed."
+    );
+
     return;
   }
 
-  showLogin();
+  googleLogin(
+    response.credential
+  );
 }
 
-
-function handleLogoClick() {
-
-  if (currentUser) {
-    tasksHome();
-  } else {
-    goPublicHome();
-  }
-}
-
-
-/* =====================================================
-   PROFILE PANEL
-===================================================== */
-
-function toggleProfilePanel(e) {
-
-  if (e) {
-    e.stopPropagation();
-  }
-
-  const panel =
-    document.getElementById(
-      "profilePanel"
-    );
-
-  if (!panel) return;
-
-  panel.classList.toggle("show");
-}
-
-
-function closeProfilePanel() {
-
-  const panel =
-    document.getElementById(
-      "profilePanel"
-    );
-
-  if (panel) {
-    panel.classList.remove("show");
-  }
-}
-
-
-function profilePanelAccount() {
-
-  closeProfilePanel();
-
-  if (currentUser) {
-    accountPage();
-  } else {
-    showLogin();
-  }
-}
-
-
-function profilePanelAbout() {
-
-  closeProfilePanel();
-  showAboutPage();
-}
-
-
-function profilePanelTerms() {
-
-  closeProfilePanel();
-  showTermsPage();
-}
-
-
-function profilePanelPrivacy() {
-
-  closeProfilePanel();
-  showPrivacyPage();
-}
-
-
-function profilePanelContact() {
-
-  closeProfilePanel();
-  showContactPage();
-}
-
-
-function profilePanelLogout() {
-
-  closeProfilePanel();
-  logout();
-}
-
-
-/* =====================================================
-   LOGIN
-===================================================== */
-
-function showLogin() {
-
-  closeProfilePanel();
-
-  if (currentUser) {
-    accountPage();
-    return;
-  }
-
-  document.getElementById(
-    "homeArea"
-  ).style.display = "none";
-
-  document.getElementById(
-    "accountArea"
-  ).innerHTML = `
-
-    <div class="auth-wrap">
-
-      <div class="auth-card">
-
-        <div class="auth-logo">
-          T
-        </div>
-
-        <h2>
-          Welcome back 👋
-        </h2>
-
-        <p class="muted">
-          Login to continue to TaskEarn.
-        </p>
-
-        <div class="form">
-
-          <input
-            id="loginEmail"
-            class="input"
-            type="email"
-            placeholder="Email address"
-            autocomplete="username"
-          >
-
-          <input
-            id="loginPassword"
-            class="input"
-            type="password"
-            placeholder="Password"
-            autocomplete="current-password"
-          >
-
-          <label class="remember-row">
-
-            <input
-              id="rememberLogin"
-              type="checkbox"
-            >
-
-            <span>
-              Remember me
-            </span>
-
-          </label>
-
-          <button
-            class="btn primary large-btn"
-            onclick="login()"
-          >
-            Login
-          </button>
-
-          <button
-            class="btn secondary"
-            onclick="showRegister()"
-          >
-            Create a new account
-          </button>
-
-          <button
-            class="btn secondary"
-            onclick="goPublicHome()"
-          >
-            ← Back to Home
-          </button>
-
-        </div>
-
-      </div>
-
-    </div>
-  `;
-
-  loadRememberedEmail();
-
-  showBottomNav(false);
-
-  scrollToView();
-}
-
-
-function loadRememberedEmail() {
-
+async function googleLogin(
+  credential
+) {
   try {
 
-    const savedEmail =
-      localStorage.getItem(
-        "taskearn_remembered_email"
+    showMessage(
+      "Signing in with Google...",
+      "success"
+    );
+
+    const data =
+      await api(
+        "/api/auth/google",
+        {
+          method: "POST",
+
+          body:
+            JSON.stringify({
+              credential
+            })
+        }
       );
 
-    if (savedEmail) {
+    if (data.user) {
+      currentUser =
+        data.user;
 
-      const email =
-        document.getElementById(
-          "loginEmail"
-        );
+      setLoggedInUI(
+        currentUser
+      );
 
-      const checkbox =
-        document.getElementById(
-          "rememberLogin"
-        );
-
-      if (email) {
-        email.value = savedEmail;
-      }
-
-      if (checkbox) {
-        checkbox.checked = true;
-      }
+      tasksHome();
     }
 
-  } catch (e) {}
+  } catch (error) {
+
+    showMessage(
+      error.message
+    );
+  }
 }
 
+function renderGoogleButtons() {
+
+  if (
+    !window.google ||
+    !window.google.accounts ||
+    !window.google.accounts.id
+  ) {
+    return;
+  }
+
+  const clientId =
+    "YOUR_GOOGLE_CLIENT_ID";
+
+  /*
+    The actual Client ID is injected
+    into the page through the server
+    endpoint below.
+  */
+
+  loadGoogleClientId()
+    .then(
+      (realClientId) => {
+
+        if (!realClientId) {
+          return;
+        }
+
+        const options = {
+          client_id:
+            realClientId,
+
+          callback:
+            googleCredentialResponse,
+
+          auto_select:
+            false,
+
+          cancel_on_tap_outside:
+            true
+        };
+
+        const loginBox =
+          document.getElementById(
+            "googleLoginButton"
+          );
+
+        const registerBox =
+          document.getElementById(
+            "googleRegisterButton"
+          );
+
+        if (loginBox) {
+          loginBox.innerHTML = "";
+
+          window.google.accounts.id.renderButton(
+            loginBox,
+            {
+              theme: "outline",
+              size: "large",
+              width: 360,
+              text: "continue_with"
+            }
+          );
+        }
+
+        if (registerBox) {
+          registerBox.innerHTML = "";
+
+          window.google.accounts.id.renderButton(
+            registerBox,
+            {
+              theme: "outline",
+              size: "large",
+              width: 360,
+              text: "signup_with"
+            }
+          );
+        }
+
+        /*
+          initialize is called after the
+          client ID is loaded.
+        */
+
+        window.google.accounts.id.initialize(
+          options
+        );
+      }
+    )
+    .catch(() => {});
+}
+
+async function loadGoogleClientId() {
+  try {
+
+    const response =
+      await fetch(
+        "/api/google-config",
+        {
+          credentials:
+            "same-origin"
+        }
+      );
+
+    if (!response.ok) {
+      return "";
+    }
+
+    const data =
+      await response.json();
+
+    return data.clientId || "";
+
+  } catch {
+    return "";
+  }
+}
 
 /* =====================================================
    REGISTER
 ===================================================== */
 
-function showRegister() {
-
-  closeProfilePanel();
-
-  if (currentUser) {
-    accountPage();
-    return;
-  }
-
-  document.getElementById(
-    "homeArea"
-  ).style.display = "none";
-
-  document.getElementById(
-    "accountArea"
-  ).innerHTML = `
-
-    <div class="auth-wrap">
-
-      <div class="auth-card">
-
-        <div class="auth-logo">
-          T
-        </div>
-
-        <h2>
-          Create your account ✨
-        </h2>
-
-        <p class="muted">
-          Your email and mobile number must be verified.
-        </p>
-
-        <div class="form">
-
-          <input
-            id="registerName"
-            class="input"
-            placeholder="Full name"
-            autocomplete="name"
-          >
-
-          <input
-            id="registerEmail"
-            class="input"
-            type="email"
-            placeholder="Gmail / Email address"
-            autocomplete="username"
-          >
-
-          <input
-            id="registerMobile"
-            class="input"
-            type="tel"
-            placeholder="Mobile number"
-            autocomplete="tel"
-          >
-
-          <input
-            id="registerCity"
-            class="input"
-            placeholder="City"
-            autocomplete="address-level2"
-          >
-
-          <input
-            id="registerPassword"
-            class="input"
-            type="password"
-            placeholder="Password (minimum 6 characters)"
-            autocomplete="new-password"
-          >
-
-          <label class="remember-row">
-
-            <input
-              id="rememberRegister"
-              type="checkbox"
-              checked
-            >
-
-            <span>
-              Remember me
-            </span>
-
-          </label>
-
-          <button
-            class="btn primary large-btn"
-            onclick="register()"
-          >
-            Create Account
-          </button>
-
-          <button
-            class="btn secondary"
-            onclick="showLogin()"
-          >
-            Already have an account? Login
-          </button>
-
-          <button
-            class="btn secondary"
-            onclick="goPublicHome()"
-          >
-            ← Back to Home
-          </button>
-
-        </div>
-
-      </div>
-
-    </div>
-  `;
-
-  showBottomNav(false);
-  scrollToView();
-}
-
-
-/* =====================================================
-   REGISTER ACTION
-===================================================== */
-
-async function register() {
-
-  const name =
-    document.getElementById(
-      "registerName"
-    ).value.trim();
-
-  const email =
-    document.getElementById(
-      "registerEmail"
-    ).value.trim();
-
-  const mobile =
-    document.getElementById(
-      "registerMobile"
-    ).value.trim();
-
-  const city =
-    document.getElementById(
-      "registerCity"
-    ).value.trim();
-
-  const password =
-    document.getElementById(
-      "registerPassword"
-    ).value;
-
-  const remember =
-    document.getElementById(
-      "rememberRegister"
-    )?.checked || false;
-
-  if (
-    !name ||
-    !email ||
-    !mobile ||
-    !city ||
-    !password
-  ) {
-    alert(
-      "Please complete all fields."
-    );
-    return;
-  }
+async function registerUser(
+  event
+) {
+  event.preventDefault();
 
   try {
 
-    const result =
+    const payload = {
+      name:
+        document.getElementById(
+          "registerName"
+        ).value,
+
+      email:
+        document.getElementById(
+          "registerEmail"
+        ).value,
+
+      mobile:
+        document.getElementById(
+          "registerMobile"
+        ).value,
+
+      city:
+        document.getElementById(
+          "registerCity"
+        ).value,
+
+      password:
+        document.getElementById(
+          "registerPassword"
+        ).value,
+
+      remember:
+        document.getElementById(
+          "registerRemember"
+        ).checked
+    };
+
+    const data =
       await api(
         "/api/register",
         {
-          method: "POST",
-          body: JSON.stringify({
-            name,
-            email,
-            mobile,
-            city,
-            password,
-            remember
-          })
+          method:
+            "POST",
+
+          body:
+            JSON.stringify(
+              payload
+            )
         }
       );
 
-    if (remember) {
-      localStorage.setItem(
-        "taskearn_remembered_email",
-        email
+    if (
+      data.verificationRequired
+    ) {
+
+      openOtpModal(
+        data.step,
+        data.email,
+        data.mobile
       );
     }
 
-    currentVerification = {
-      mode: "register",
-      step: result.step || "email",
-      email: result.email || email,
-      mobile: result.mobile || mobile,
-      remember
-    };
+  } catch (error) {
 
-    showVerificationPage();
-
-  } catch (err) {
-
-    alert(err.message);
-
+    showMessage(
+      error.message
+    );
   }
 }
 
-
 /* =====================================================
-   LOGIN ACTION
+   LOGIN
 ===================================================== */
 
-async function login() {
-
-  const email =
-    document.getElementById(
-      "loginEmail"
-    ).value.trim();
-
-  const password =
-    document.getElementById(
-      "loginPassword"
-    ).value;
-
-  const remember =
-    document.getElementById(
-      "rememberLogin"
-    )?.checked || false;
-
-  if (!email || !password) {
-
-    alert(
-      "Please enter email and password."
-    );
-
-    return;
-  }
+async function loginUser(
+  event
+) {
+  event.preventDefault();
 
   try {
 
-    const result =
+    const payload = {
+      email:
+        document.getElementById(
+          "loginEmail"
+        ).value,
+
+      password:
+        document.getElementById(
+          "loginPassword"
+        ).value,
+
+      remember:
+        document.getElementById(
+          "loginRemember"
+        ).checked
+    };
+
+    const data =
       await api(
         "/api/login",
         {
-          method: "POST",
-          body: JSON.stringify({
-            email,
-            password,
-            remember
-          })
+          method:
+            "POST",
+
+          body:
+            JSON.stringify(
+              payload
+            )
         }
       );
 
-    if (remember) {
+    if (data.user) {
 
-      localStorage.setItem(
-        "taskearn_remembered_email",
-        email
+      currentUser =
+        data.user;
+
+      setLoggedInUI(
+        currentUser
       );
 
-    } else {
+      tasksHome();
 
-      localStorage.removeItem(
-        "taskearn_remembered_email"
-      );
-
+      return;
     }
 
-    currentVerification = {
-      mode: "login",
-      step: result.step || "email",
-      email: result.email || email,
-      mobile: result.mobile || "",
-      remember
-    };
+    if (
+      data.verificationRequired
+    ) {
 
-    showVerificationPage();
+      openOtpModal(
+        data.step,
+        data.email,
+        data.mobile
+      );
+    }
 
-  } catch (err) {
+  } catch (error) {
 
-    alert(err.message);
-
+    showMessage(
+      error.message
+    );
   }
 }
-
 
 /* =====================================================
-   VERIFICATION PAGE
+   OTP
 ===================================================== */
 
-function showVerificationPage() {
+function openOtpModal(
+  step,
+  email,
+  mobile
+) {
 
-  closeProfilePanel();
+  const title =
+    document.getElementById(
+      "otpTitle"
+    );
 
-  document.getElementById(
-    "homeArea"
-  ).style.display = "none";
+  const message =
+    document.getElementById(
+      "otpMessage"
+    );
 
-  const step =
-    currentVerification?.step ||
-    "email";
+  if (step === "email") {
 
-  const isEmail =
-    step === "email";
+    title.textContent =
+      "Verify Gmail / Email";
 
-  const target =
-    isEmail
-      ? currentVerification?.email
-      : maskMobile(
-          currentVerification?.mobile
-        );
+    message.textContent =
+      `Enter the 6-digit OTP sent to ${email}.`;
 
-  document.getElementById(
-    "accountArea"
-  ).innerHTML = `
+  } else {
 
-    <div class="auth-wrap">
+    title.textContent =
+      "Verify Mobile";
 
-      <div class="auth-card">
-
-        <div class="auth-logo">
-          ${isEmail ? "✉️" : "📱"}
-        </div>
-
-        <h2>
-          ${isEmail
-            ? "Verify your email"
-            : "Verify your mobile"}
-        </h2>
-
-        <p class="muted">
-          ${isEmail
-            ? "We sent a verification OTP to:"
-            : "We sent a verification OTP to:"}
-        </p>
-
-        <div class="otp-info">
-          <strong>
-            ${escapeHtml(target || "")}
-          </strong>
-          <br>
-          OTP expires in 10 minutes.
-        </div>
-
-        <div class="form">
-
-          <input
-            id="verificationOtp"
-            class="input otp-input"
-            type="text"
-            inputmode="numeric"
-            maxlength="6"
-            placeholder="000000"
-            autocomplete="one-time-code"
-          >
-
-          <button
-            class="btn primary large-btn"
-            onclick="verifyOtp()"
-          >
-            Verify OTP
-          </button>
-
-          <button
-            class="btn secondary"
-            onclick="resendOtp()"
-          >
-            Resend OTP
-          </button>
-
-          <button
-            class="btn secondary"
-            onclick="showLogin()"
-          >
-            ← Back to Login
-          </button>
-
-        </div>
-
-      </div>
-
-    </div>
-  `;
-
-  showBottomNav(false);
-  scrollToView();
-}
-
-
-function maskMobile(mobile) {
-
-  const value =
-    String(mobile || "");
-
-  if (value.length < 4) {
-    return value;
+    message.textContent =
+      `Enter the 6-digit OTP sent to ${mobile}.`;
   }
 
-  return (
-    "*".repeat(
-      Math.max(
-        0,
-        value.length - 4
-      )
-    ) +
-    value.slice(-4)
+  document
+    .getElementById(
+      "otpInput"
+    ).value = "";
+
+  document
+    .getElementById(
+      "otpModal"
+    )
+    .classList.add("open");
+
+  setTimeout(
+    () => {
+      document
+        .getElementById(
+          "otpInput"
+        )
+        .focus();
+    },
+    100
   );
 }
 
-
-/* =====================================================
-   VERIFY OTP
-===================================================== */
+function closeOtpModal() {
+  document
+    .getElementById(
+      "otpModal"
+    )
+    .classList.remove("open");
+}
 
 async function verifyOtp() {
 
   const otp =
     document.getElementById(
-      "verificationOtp"
+      "otpInput"
     ).value.trim();
 
   if (!/^\d{6}$/.test(otp)) {
@@ -2292,180 +1677,229 @@ async function verifyOtp() {
 
   try {
 
-    const result =
+    const data =
       await api(
         "/api/verify-otp",
         {
-          method: "POST",
-          body: JSON.stringify({
-            otp
-          })
+          method:
+            "POST",
+
+          body:
+            JSON.stringify({
+              otp
+            })
         }
       );
 
     if (
-      result.step &&
-      result.step !== "complete"
+      data.step === "mobile"
     ) {
 
-      currentVerification.step =
-        result.step;
-
-      currentVerification.email =
-        result.email ||
-        currentVerification.email;
-
-      currentVerification.mobile =
-        result.mobile ||
-        currentVerification.mobile;
-
-      showVerificationPage();
+      openOtpModal(
+        "mobile",
+        data.email,
+        data.mobile
+      );
 
       return;
     }
 
-    currentVerification = null;
+    if (
+      data.step === "complete" &&
+      data.user
+    ) {
 
-    currentUser =
-      result.user;
+      currentUser =
+        data.user;
 
-    setLoggedInUI(
-      currentUser
+      closeOtpModal();
+
+      setLoggedInUI(
+        currentUser
+      );
+
+      tasksHome();
+    }
+
+  } catch (error) {
+
+    alert(
+      error.message
     );
-
-    tasksHome();
-
-  } catch (err) {
-
-    alert(err.message);
-
   }
 }
-
-
-/* =====================================================
-   RESEND OTP
-===================================================== */
 
 async function resendOtp() {
 
   try {
 
-    const result =
+    const data =
       await api(
         "/api/resend-otp",
         {
-          method: "POST"
+          method:
+            "POST"
         }
       );
 
     alert(
-      result.message ||
-      "A new OTP has been sent."
+      data.message
     );
 
-  } catch (err) {
+  } catch (error) {
 
-    alert(err.message);
-
+    alert(
+      error.message
+    );
   }
 }
 
-
 /* =====================================================
-   LOGOUT
+   LOGGED IN UI
 ===================================================== */
 
-async function logout() {
+function initials(
+  name
+) {
+  const parts =
+    String(name || "User")
+      .trim()
+      .split(/\s+/)
+      .slice(0,2);
 
-  try {
+  return parts
+    .map(
+      p =>
+        p.charAt(0)
+          .toUpperCase()
+    )
+    .join("");
+}
 
-    await api(
-      "/api/logout",
-      {
-        method: "POST"
-      }
+function setLoggedInUI(
+  user
+) {
+
+  const headerProfile =
+    document.getElementById(
+      "headerProfile"
     );
 
-  } catch (e) {}
+  const initialsBox =
+    document.getElementById(
+      "headerAvatarInitials"
+    );
+
+  const panelName =
+    document.getElementById(
+      "profilePanelName"
+    );
+
+  const panelEmail =
+    document.getElementById(
+      "profilePanelEmail"
+    );
+
+  const bottom =
+    document.getElementById(
+      "mobileBottomNav"
+    );
+
+  if (user) {
+
+    headerProfile.style.display =
+      "block";
+
+    initialsBox.textContent =
+      initials(user.name);
+
+    panelName.textContent =
+      user.name || "User";
+
+    panelEmail.textContent =
+      user.email || "";
+
+    bottom.classList.add(
+      "logged-in"
+    );
+
+    const welcome =
+      document.getElementById(
+        "loggedInWelcome"
+      );
+
+    if (welcome) {
+
+      welcome.style.display =
+        "block";
+
+      welcome.innerHTML = `
+        <div class="card">
+          <p class="muted" style="margin:0;">
+            Welcome back
+          </p>
+
+          <h2 style="margin:4px 0;">
+            Hi,
+            ${escapeHtml(
+              user.name ||
+              "User"
+            )}
+            👋
+          </h2>
+
+          <p class="muted" style="margin:0;">
+            Complete available tasks
+            and earn approved rewards.
+          </p>
+        </div>
+      `;
+    }
+
+  } else {
+
+    headerProfile.style.display =
+      "none";
+
+    bottom.classList.remove(
+      "logged-in"
+    );
+  }
+}
+
+/* =====================================================
+   PUBLIC HOME
+===================================================== */
+
+function goPublicHome() {
 
   currentUser = null;
-  currentVerification = null;
 
   setLoggedInUI(null);
 
-  document.getElementById(
-    "accountArea"
-  ).innerHTML = "";
-
-  goPublicHome();
-}
-
-
-/* =====================================================
-   TASK HOME
-===================================================== */
-
-async function tasksHome() {
-
-  if (!currentUser) {
-
-    showLogin();
-    return;
-
-  }
-
-  closeProfilePanel();
-
-  document.getElementById(
-    "homeArea"
-  ).style.display = "block";
-
-  document.getElementById(
-    "accountArea"
-  ).innerHTML = "";
-
-  const welcome =
-    document.getElementById(
-      "loggedInWelcome"
+  document
+    .getElementById(
+      "authArea"
+    )
+    .classList.add(
+      "hidden"
     );
 
-  if (welcome) {
+  document
+    .getElementById(
+      "appArea"
+    )
+    .classList.add(
+      "hidden"
+    );
 
-    welcome.style.display =
-      "block";
-
-    welcome.innerHTML = `
-
-      <div class="card">
-
-        <p
-          class="muted"
-          style="margin:0;"
-        >
-          Welcome back
-        </p>
-
-        <h2
-          style="margin:4px 0;"
-        >
-          Hi,
-          ${escapeHtml(
-            currentUser.name ||
-            "User"
-          )}
-          👋
-        </h2>
-
-        <p class="muted"
-           style="margin:0;">
-          Complete available tasks and earn approved rewards.
-        </p>
-
-      </div>
-
-    `;
-  }
+  document
+    .getElementById(
+      "homeArea"
+    )
+    .classList.remove(
+      "hidden"
+    );
 
   const hero =
     document.getElementById(
@@ -2473,7 +1907,8 @@ async function tasksHome() {
     );
 
   if (hero) {
-    hero.style.display = "none";
+    hero.style.display =
+      "block";
   }
 
   const features =
@@ -2482,204 +1917,195 @@ async function tasksHome() {
     );
 
   if (features) {
-    features.style.display = "none";
+    features.style.display =
+      "block";
   }
+}
 
-  const how =
-    document.querySelectorAll(
-      "#homeArea > .card"
+/* =====================================================
+   PROFILE PANEL
+===================================================== */
+
+function toggleProfilePanel(
+  event
+) {
+
+  event.stopPropagation();
+
+  document
+    .getElementById(
+      "profilePanel"
+    )
+    .classList.toggle(
+      "open"
+    );
+}
+
+function closeProfilePanel() {
+
+  const panel =
+    document.getElementById(
+      "profilePanel"
     );
 
-  how.forEach(
-    el => {
-      el.style.display = "none";
+  if (panel) {
+    panel.classList.remove(
+      "open"
+    );
+  }
+}
+
+window.addEventListener(
+  "click",
+  function(event) {
+
+    if (
+      !event.target.closest(
+        ".header-profile"
+      )
+    ) {
+      closeProfilePanel();
     }
-  );
 
-  const taskArea =
-    document.createElement("div");
+  }
+);
 
-  taskArea.id =
-    "loggedInTaskArea";
+/* =====================================================
+   TASKS HOME
+===================================================== */
 
-  taskArea.innerHTML = `
+async function tasksHome() {
 
-    <div class="page-header">
+  if (!currentUser) {
+    openAuth("login");
+    return;
+  }
 
-      <div>
+  closeProfilePanel();
 
-        <h2>
-          Available Tasks 📋
-        </h2>
+  const app =
+    document.getElementById(
+      "appContent"
+    );
 
-        <div class="muted">
-          Complete tasks and earn approved rewards.
-        </div>
+  showAppArea();
 
-      </div>
-
+  app.innerHTML = `
+    <div class="card">
+      <h2>Available Tasks 📋</h2>
+      <p class="muted">
+        Complete tasks and submit them for review.
+      </p>
     </div>
 
-    <div id="taskScreen">
-
+    <div id="tasksList">
       <div class="card">
-
-        <div class="empty">
-
-          <div style="font-size:40px;">
-            ⏳
-          </div>
-
-          <p>
-            Loading tasks...
-          </p>
-
-        </div>
-
+        Loading tasks...
       </div>
-
     </div>
   `;
 
-  const home =
-    document.getElementById(
-      "homeArea"
-    );
-
-  const old =
-    document.getElementById(
-      "loggedInTaskArea"
-    );
-
-  if (old) {
-    old.remove();
-  }
-
-  home.appendChild(taskArea);
-
-  showBottomNav(true);
-  setActiveBottom("home");
-
-  scrollToView();
-
-  let tasks = [];
-
   try {
 
-    tasks =
+    const tasks =
       await api(
         "/api/tasks"
       );
 
-  } catch (e) {
+    const list =
+      document.getElementById(
+        "tasksList"
+      );
 
-    console.warn(
-      "Tasks API error:",
-      e.message
-    );
+    if (!tasks.length) {
 
-  }
-
-  const screen =
-    document.getElementById(
-      "taskScreen"
-    );
-
-  if (!screen) return;
-
-  if (!tasks.length) {
-
-    screen.innerHTML = `
-
-      <div class="card">
-
-        <div class="empty">
-
-          <div style="font-size:40px;">
-            📋
-          </div>
-
-          <h3>
-            No tasks available
-          </h3>
-
+      list.innerHTML = `
+        <div class="card">
+          <h3>No tasks available</h3>
           <p class="muted">
-            New tasks will appear here when available.
+            Please check again later.
           </p>
-
         </div>
+      `;
 
+      return;
+    }
+
+    list.innerHTML =
+      tasks.map(
+        task => `
+          <div class="card task-card">
+
+            <div
+              style="
+                display:flex;
+                justify-content:space-between;
+                gap:15px;
+              "
+            >
+
+              <div>
+
+                <span class="muted">
+                  ${escapeHtml(
+                    task.type
+                  )}
+                </span>
+
+                <h3>
+                  ${escapeHtml(
+                    task.title
+                  )}
+                </h3>
+
+              </div>
+
+              <div class="reward">
+                ₹${Number(
+                  task.reward
+                ).toFixed(2)}
+              </div>
+
+            </div>
+
+            <p class="muted">
+              ${escapeHtml(
+                task.description
+              )}
+            </p>
+
+            <button
+              class="primary"
+              onclick="submitTask(${task.id})"
+            >
+              Submit Task
+            </button>
+
+          </div>
+        `
+      ).join("");
+
+  } catch (error) {
+
+    app.innerHTML = `
+      <div class="card">
+        <div class="notice error">
+          ${escapeHtml(
+            error.message
+          )}
+        </div>
       </div>
     `;
-
-    return;
   }
-
-  screen.innerHTML = `
-
-    <div class="notice">
-      💡 Complete tasks honestly.
-      Rewards are credited after review.
-    </div>
-
-    <div class="grid">
-
-      ${tasks.map(t => `
-
-        <div class="task-card">
-
-          <div class="task-top">
-
-            <span class="tag">
-              ${escapeHtml(t.type)}
-            </span>
-
-            <span class="earn">
-              +₹${Number(
-                t.reward
-              ).toFixed(2)}
-            </span>
-
-          </div>
-
-          <h3>
-            ${escapeHtml(t.title)}
-          </h3>
-
-          <p class="muted">
-            ${escapeHtml(t.description)}
-          </p>
-
-          <button
-            class="btn primary"
-            onclick="submitTask(${Number(t.id)})"
-          >
-            Submit Task
-          </button>
-
-        </div>
-
-      `).join("")}
-
-    </div>
-  `;
 }
 
-
-/* =====================================================
-   SUBMIT TASK
-===================================================== */
-
-async function submitTask(id) {
-
-  if (!currentUser) {
-    showLogin();
-    return;
-  }
+async function submitTask(
+  id
+) {
 
   if (
     !confirm(
-      "Have you completed this task according to requirements?"
+      "Submit this task for review?"
     )
   ) {
     return;
@@ -2687,1634 +2113,863 @@ async function submitTask(id) {
 
   try {
 
-    const result =
+    const data =
       await api(
-        "/api/tasks/" +
-        id +
-        "/submit",
+        `/api/tasks/${id}/submit`,
         {
-          method: "POST",
-          body: JSON.stringify({})
+          method:
+            "POST",
+
+          body:
+            JSON.stringify({})
         }
       );
 
     alert(
-      result.message ||
-      "Task submitted for review!"
+      data.message
     );
 
-    submissionsPage();
+    tasksHome();
 
-  } catch (err) {
+  } catch (error) {
 
-    alert(err.message);
-
+    alert(
+      error.message
+    );
   }
 }
 
-
 /* =====================================================
-   ACCOUNT PAGE
+   WALLET
 ===================================================== */
 
-async function accountPage() {
+async function walletHome() {
 
   if (!currentUser) {
-    showLogin();
+    openAuth("login");
     return;
   }
 
   closeProfilePanel();
 
-  document.getElementById(
-    "homeArea"
-  ).style.display = "none";
+  showAppArea();
 
-  let wallet = {
-    balance: 0,
-    completed: 0
-  };
+  const app =
+    document.getElementById(
+      "appContent"
+    );
+
+  app.innerHTML = `
+    <div class="card">
+      <h2>Wallet 💰</h2>
+      <p class="muted">
+        Your TaskEarn earnings and withdrawal history.
+      </p>
+    </div>
+
+    <div id="walletContent">
+      Loading wallet...
+    </div>
+  `;
 
   try {
 
-    wallet =
+    const data =
       await api(
         "/api/wallet"
       );
 
-  } catch (e) {}
+    const withdrawals =
+      data.withdrawals || [];
 
-  const balanceValue =
-    Number(
-      wallet.balance || 0
-    ).toFixed(2);
+    document.getElementById(
+      "walletContent"
+    ).innerHTML = `
 
-  document.getElementById(
-    "accountArea"
-  ).innerHTML = `
+      <div class="grid">
 
-    <div class="card">
+        <div class="card stat">
+          <span class="muted">
+            Available Balance
+          </span>
 
-      <div class="row">
+          <b>
+            ₹${Number(
+              data.balance || 0
+            ).toFixed(2)}
+          </b>
+        </div>
 
-        <div>
+        <div class="card stat">
+          <span class="muted">
+            Completed Tasks
+          </span>
 
-          <p
-            class="muted"
-            style="margin:0;"
-          >
-            Account
-          </p>
-
-          <h2 style="margin:4px 0 0;">
-            ${escapeHtml(
-              currentUser.name ||
-              "Member"
+          <b>
+            ${Number(
+              data.completed || 0
             )}
-          </h2>
-
-        </div>
-
-        <span class="verify-badge">
-          ✓ Verified
-        </span>
-
-      </div>
-
-    </div>
-
-
-    <div class="stats">
-
-      <div class="stat">
-
-        <small>
-          Balance
-        </small>
-
-        <b>
-          ₹${balanceValue}
-        </b>
-
-      </div>
-
-      <div class="stat">
-
-        <small>
-          Completed
-        </small>
-
-        <b>
-          ${wallet.completed || 0}
-        </b>
-
-      </div>
-
-      <div class="stat">
-
-        <small>
-          Account
-        </small>
-
-        <b>
-          ${escapeHtml(
-            currentUser.role ||
-            "Member"
-          )}
-        </b>
-
-      </div>
-
-    </div>
-
-
-    <div class="account-menu">
-
-      <button
-        class="account-option"
-        onclick="accountDetailsPage()"
-      >
-
-        <div class="icon">
-          👤
-        </div>
-
-        <div>
-
-          <b>
-            Account Details
           </b>
+        </div>
 
-          <span>
-            Profile, mobile & city
+        <div class="card stat">
+          <span class="muted">
+            Minimum Withdrawal
           </span>
 
-        </div>
-
-      </button>
-
-
-      <button
-        class="account-option"
-        onclick="walletPage()"
-      >
-
-        <div class="icon">
-          💰
-        </div>
-
-        <div>
-
           <b>
-            Wallet
+            ₹100
           </b>
-
-          <span>
-            Balance & withdrawals
-          </span>
-
         </div>
 
-      </button>
+      </div>
 
+      <div class="card">
 
-      <button
-        class="account-option"
-        onclick="submissionsPage()"
-      >
+        <h3>
+          Request Withdrawal
+        </h3>
 
-        <div class="icon">
-          📄
-        </div>
+        <label>
+          Amount
+        </label>
 
-        <div>
+        <input
+          id="withdrawAmount"
+          type="number"
+          min="100"
+          step="0.01"
+          placeholder="100"
+        >
 
-          <b>
-            My Submissions
-          </b>
+        <br><br>
 
-          <span>
-            View submitted tasks
-          </span>
+        <label>
+          Payment Method
+        </label>
 
-        </div>
+        <select
+          id="withdrawMethod"
+          onchange="changePaymentMethod()"
+        >
+          <option value="UPI">
+            UPI
+          </option>
 
-      </button>
+          <option value="Bank Account">
+            Bank Account
+          </option>
+        </select>
 
-    </div>
-  `;
+        <br><br>
 
-  showBottomNav(true);
-  setActiveBottom("account");
-  scrollToView();
+        <div id="paymentFields"></div>
+
+        <br>
+
+        <button
+          class="primary"
+          onclick="withdrawMoney()"
+        >
+          Submit Withdrawal
+        </button>
+
+      </div>
+
+      <div class="card">
+
+        <h3>
+          Withdrawal History
+        </h3>
+
+        ${
+          withdrawals.length
+            ? withdrawals.map(
+                item => `
+                  <div
+                    style="
+                      padding:14px 0;
+                      border-bottom:
+                        1px solid #eee;
+                    "
+                  >
+
+                    <b>
+                      ₹${Number(
+                        item.amount
+                      ).toFixed(2)}
+                    </b>
+
+                    <span class="muted">
+                      · ${escapeHtml(
+                        item.method
+                      )}
+                    </span>
+
+                    <div
+                      class="muted"
+                      style="font-size:13px;"
+                    >
+                      ${escapeHtml(
+                        item.status
+                      )}
+                      ·
+                      ${new Date(
+                        item.createdAt
+                      ).toLocaleString()}
+                    </div>
+
+                  </div>
+                `
+              ).join("")
+            : `
+              <p class="muted">
+                No withdrawals yet.
+              </p>
+            `
+        }
+
+      </div>
+    `;
+
+    changePaymentMethod();
+
+  } catch (error) {
+
+    document.getElementById(
+      "walletContent"
+    ).innerHTML = `
+      <div class="notice error">
+        ${escapeHtml(
+          error.message
+        )}
+      </div>
+    `;
+  }
 }
 
+function changePaymentMethod() {
+
+  const method =
+    document.getElementById(
+      "withdrawMethod"
+    );
+
+  const fields =
+    document.getElementById(
+      "paymentFields"
+    );
+
+  if (!method || !fields) {
+    return;
+  }
+
+  if (
+    method.value ===
+    "UPI"
+  ) {
+
+    fields.innerHTML = `
+      <label>
+        UPI ID
+      </label>
+
+      <input
+        id="upiId"
+        type="text"
+        placeholder="yourname@upi"
+      >
+    `;
+
+  } else {
+
+    fields.innerHTML = `
+      <label>
+        Account Holder Name
+      </label>
+
+      <input
+        id="accountHolderName"
+        type="text"
+      >
+
+      <br><br>
+
+      <label>
+        Account Number
+      </label>
+
+      <input
+        id="accountNumber"
+        type="text"
+      >
+
+      <br><br>
+
+      <label>
+        IFSC Code
+      </label>
+
+      <input
+        id="ifscCode"
+        type="text"
+        maxlength="11"
+      >
+
+      <br><br>
+
+      <label>
+        Bank Name
+      </label>
+
+      <input
+        id="bankName"
+        type="text"
+      >
+    `;
+  }
+}
+
+async function withdrawMoney() {
+
+  const amount =
+    Number(
+      document.getElementById(
+        "withdrawAmount"
+      ).value
+    );
+
+  const method =
+    document.getElementById(
+      "withdrawMethod"
+    ).value;
+
+  let paymentDetails = {};
+
+  if (
+    method === "UPI"
+  ) {
+
+    paymentDetails = {
+      upiId:
+        document.getElementById(
+          "upiId"
+        ).value
+    };
+
+  } else {
+
+    paymentDetails = {
+
+      accountHolderName:
+        document.getElementById(
+          "accountHolderName"
+        ).value,
+
+      accountNumber:
+        document.getElementById(
+          "accountNumber"
+        ).value,
+
+      ifscCode:
+        document.getElementById(
+          "ifscCode"
+        ).value,
+
+      bankName:
+        document.getElementById(
+          "bankName"
+        ).value
+    };
+  }
+
+  try {
+
+    const data =
+      await api(
+        "/api/withdraw",
+        {
+          method:
+            "POST",
+
+          body:
+            JSON.stringify({
+              amount,
+              method,
+              paymentDetails
+            })
+        }
+      );
+
+    alert(
+      data.message
+    );
+
+    walletHome();
+
+  } catch (error) {
+
+    alert(
+      error.message
+    );
+  }
+}
 
 /* =====================================================
-   ACCOUNT DETAILS
+   PROFILE
 ===================================================== */
 
-function accountDetailsPage() {
+async function profileHome() {
 
   if (!currentUser) {
-    showLogin();
+    openAuth("login");
     return;
   }
 
   closeProfilePanel();
 
-  document.getElementById(
-    "homeArea"
-  ).style.display = "none";
+  showAppArea();
 
-  const initials =
-    userInitials(currentUser);
+  const app =
+    document.getElementById(
+      "appContent"
+    );
 
-  const avatar =
-    currentUser.profileImage
-      ? `
-        <img
-          src="${escapeHtml(
-            currentUser.profileImage
-          )}"
-          alt="Profile"
-        >
-      `
-      : escapeHtml(initials);
-
-  document.getElementById(
-    "accountArea"
-  ).innerHTML = `
-
-    <div class="page-header">
-
-      <button
-        class="back-btn"
-        onclick="accountPage()"
-      >
-        ←
-      </button>
-
-      <div>
-
-        <h2>
-          Account Details 👤
-        </h2>
-
-        <div class="muted">
-          Update your profile information
-        </div>
-
-      </div>
-
-    </div>
-
-
+  app.innerHTML = `
     <div class="card">
 
-      <div class="profile-photo-box">
+      <h2>
+        My Profile 👤
+      </h2>
 
-        <div
-          id="profileLargeAvatar"
-          class="profile-large-avatar"
-        >
-          ${avatar}
-        </div>
+      <p class="muted">
+        Update your TaskEarn profile.
+      </p>
 
-        <div style="flex:1;">
+      <div id="profileMessage"></div>
 
-          <b>
-            Profile Photo
-          </b>
-
-          <p class="muted"
-             style="margin:2px 0 8px;">
-            Choose an image for your account avatar.
-          </p>
-
-          <input
-            id="profileImageFile"
-            class="file-input"
-            type="file"
-            accept="image/png,image/jpeg,image/webp"
-            onchange="handleProfileImage(event)"
-          >
-
-        </div>
-
-      </div>
-
-
-      <div class="form">
+      <form
+        onsubmit="saveProfile(event)"
+      >
 
         <label>
-          <b>Full Name</b>
+          Name
         </label>
 
         <input
           id="profileName"
-          class="input"
           value="${escapeHtml(
-            currentUser.name || ""
+            currentUser.name
           )}"
-          maxlength="80"
+          required
         >
 
+        <br><br>
 
         <label>
-          <b>Email Address</b>
+          Email
         </label>
 
         <input
-          class="input"
           value="${escapeHtml(
-            currentUser.email || ""
+            currentUser.email
           )}"
-          readonly
+          disabled
         >
 
-        <div>
-          <span class="verify-badge">
-            ✓ Email verified
-          </span>
-        </div>
-
+        <br><br>
 
         <label>
-          <b>Mobile Number</b>
+          Mobile
         </label>
 
         <input
           id="profileMobile"
-          class="input"
-          type="tel"
           value="${escapeHtml(
-            currentUser.mobile || ""
+            currentUser.mobile
           )}"
-          maxlength="20"
+          placeholder="+919876543210"
         >
 
-        <div>
-          <span class="verify-badge">
-            ✓ Mobile verified
-          </span>
-        </div>
-
+        <br><br>
 
         <label>
-          <b>City</b>
+          City
         </label>
 
         <input
           id="profileCity"
-          class="input"
           value="${escapeHtml(
-            currentUser.city || ""
+            currentUser.city
           )}"
-          maxlength="80"
+          required
         >
 
+        <br><br>
+
+        <label>
+          Profile Image URL
+        </label>
+
+        <input
+          id="profileImage"
+          value="${escapeHtml(
+            currentUser.profileImage
+          )}"
+          placeholder="https://..."
+        >
+
+        <br><br>
 
         <button
-          class="btn primary large-btn"
-          onclick="saveProfile()"
+          class="primary"
+          type="submit"
         >
-          💾 Save Profile
+          Save Profile
         </button>
 
-      </div>
+      </form>
 
     </div>
 
+    <div class="card">
 
-    <button
-      class="btn secondary"
-      style="width:100%;"
-      onclick="accountPage()"
-    >
-      ← Back to Account
-    </button>
+      <h3>
+        Account Verification
+      </h3>
+
+      <p>
+        Email:
+        ${
+          currentUser.emailVerified
+            ? "✅ Verified"
+            : "❌ Not verified"
+        }
+      </p>
+
+      <p>
+        Mobile:
+        ${
+          currentUser.mobileVerified
+            ? "✅ Verified"
+            : "❌ Not verified"
+        }
+      </p>
+
+      <p>
+        Login method:
+        <b>
+          ${escapeHtml(
+            currentUser.authProvider ||
+            "local"
+          )}
+        </b>
+      </p>
+
+    </div>
+
+    <div class="card">
+
+      <h3>
+        My Submissions
+      </h3>
+
+      <div id="submissionList">
+        Loading...
+      </div>
+
+    </div>
   `;
 
-  showBottomNav(true);
-  setActiveBottom("account");
-  scrollToView();
+  loadSubmissions();
 }
 
+async function saveProfile(
+  event
+) {
 
-/* =====================================================
-   PROFILE IMAGE
-===================================================== */
-
-function handleProfileImage(event) {
-
-  const file =
-    event.target.files?.[0];
-
-  if (!file) return;
-
-  if (file.size > 1000 * 1000) {
-
-    alert(
-      "Please select an image smaller than 1 MB."
-    );
-
-    event.target.value = "";
-    return;
-  }
-
-  const allowed =
-    [
-      "image/jpeg",
-      "image/png",
-      "image/webp"
-    ];
-
-  if (!allowed.includes(file.type)) {
-
-    alert(
-      "Please choose JPG, PNG or WEBP."
-    );
-
-    event.target.value = "";
-    return;
-  }
-
-  const reader =
-    new FileReader();
-
-  reader.onload = function() {
-
-    const avatar =
-      document.getElementById(
-        "profileLargeAvatar"
-      );
-
-    if (avatar) {
-
-      avatar.innerHTML =
-        `<img src="${escapeHtml(
-          reader.result
-        )}" alt="Profile">`;
-
-    }
-
-    currentUser.profileImage =
-      reader.result;
-
-  };
-
-  reader.readAsDataURL(file);
-}
-
-
-/* =====================================================
-   SAVE PROFILE
-===================================================== */
-
-async function saveProfile() {
-
-  const name =
-    document.getElementById(
-      "profileName"
-    ).value.trim();
-
-  const mobile =
-    document.getElementById(
-      "profileMobile"
-    ).value.trim();
-
-  const city =
-    document.getElementById(
-      "profileCity"
-    ).value.trim();
-
-  if (!name) {
-
-    alert(
-      "Name cannot be empty."
-    );
-
-    return;
-  }
-
-  if (!mobile) {
-
-    alert(
-      "Mobile number cannot be empty."
-    );
-
-    return;
-  }
-
-  if (!/^[0-9+\-\s()]{7,20}$/.test(mobile)) {
-
-    alert(
-      "Please enter a valid mobile number."
-    );
-
-    return;
-  }
-
-  if (!city) {
-
-    alert(
-      "Please enter your city."
-    );
-
-    return;
-  }
+  event.preventDefault();
 
   try {
 
-    const result =
+    const data =
       await api(
         "/api/profile",
         {
-          method: "PUT",
-          body: JSON.stringify({
-            name,
-            mobile,
-            city,
-            profileImage:
-              currentUser.profileImage || ""
-          })
+          method:
+            "PUT",
+
+          body:
+            JSON.stringify({
+
+              name:
+                document.getElementById(
+                  "profileName"
+                ).value,
+
+              mobile:
+                document.getElementById(
+                  "profileMobile"
+                ).value,
+
+              city:
+                document.getElementById(
+                  "profileCity"
+                ).value,
+
+              profileImage:
+                document.getElementById(
+                  "profileImage"
+                ).value
+            })
         }
       );
 
+    if (
+      data.verificationRequired
+    ) {
+
+      document
+        .getElementById(
+          "profileOtpModal"
+        )
+        .classList.add(
+          "open"
+        );
+
+      return;
+    }
+
     currentUser =
-      result.user;
+      data.user;
 
     setLoggedInUI(
       currentUser
     );
 
     alert(
-      result.message ||
-      "Profile saved successfully."
+      data.message
     );
 
-    accountPage();
+    profileHome();
 
-  } catch (err) {
+  } catch (error) {
 
-    alert(err.message);
+    const box =
+      document.getElementById(
+        "profileMessage"
+      );
 
+    if (box) {
+
+      box.innerHTML = `
+        <div class="notice error">
+          ${escapeHtml(
+            error.message
+          )}
+        </div>
+      `;
+    }
   }
 }
 
+/* =====================================================
+   PROFILE OTP
+===================================================== */
+
+function closeProfileOtp() {
+
+  document
+    .getElementById(
+      "profileOtpModal"
+    )
+    .classList.remove(
+      "open"
+    );
+}
+
+async function verifyProfileOtp() {
+
+  const otp =
+    document.getElementById(
+      "profileOtpInput"
+    ).value.trim();
+
+  try {
+
+    const data =
+      await api(
+        "/api/profile/verify-otp",
+        {
+          method:
+            "POST",
+
+          body:
+            JSON.stringify({
+              otp
+            })
+        }
+      );
+
+    currentUser =
+      data.user;
+
+    closeProfileOtp();
+
+    setLoggedInUI(
+      currentUser
+    );
+
+    alert(
+      data.message
+    );
+
+    profileHome();
+
+  } catch (error) {
+
+    alert(
+      error.message
+    );
+  }
+}
+
+async function resendProfileOtp() {
+
+  try {
+
+    const data =
+      await api(
+        "/api/profile/resend-otp",
+        {
+          method:
+            "POST"
+        }
+      );
+
+    alert(
+      data.message
+    );
+
+  } catch (error) {
+
+    alert(
+      error.message
+    );
+  }
+}
 
 /* =====================================================
    SUBMISSIONS
 ===================================================== */
 
-async function submissionsPage() {
-
-  if (!currentUser) {
-    showLogin();
-    return;
-  }
-
-  document.getElementById(
-    "homeArea"
-  ).style.display = "none";
-
-  document.getElementById(
-    "accountArea"
-  ).innerHTML = `
-
-    <div class="page-header">
-
-      <button
-        class="back-btn"
-        onclick="accountPage()"
-      >
-        ←
-      </button>
-
-      <div>
-
-        <h2>
-          My Submissions 📄
-        </h2>
-
-        <div class="muted">
-          Your submitted tasks and review status
-        </div>
-
-      </div>
-
-    </div>
-
-    <div id="submissionScreen">
-
-      <div class="card">
-
-        <div class="empty">
-          <div style="font-size:40px;">
-            ⏳
-          </div>
-
-          <p>
-            Loading submissions...
-          </p>
-        </div>
-
-      </div>
-
-    </div>
-  `;
-
-  showBottomNav(true);
-  setActiveBottom("account");
-  scrollToView();
-
-  let submissions = [];
+async function loadSubmissions() {
 
   try {
 
-    submissions =
+    const submissions =
       await api(
         "/api/my-submissions"
       );
 
-  } catch (e) {}
+    const box =
+      document.getElementById(
+        "submissionList"
+      );
 
-  const screen =
-    document.getElementById(
-      "submissionScreen"
-    );
+    if (!box) {
+      return;
+    }
 
-  if (!screen) return;
+    if (!submissions.length) {
 
-  if (!submissions.length) {
+      box.innerHTML = `
+        <p class="muted">
+          You have not submitted any tasks yet.
+        </p>
+      `;
 
-    screen.innerHTML = `
+      return;
+    }
 
-      <div class="card">
-
-        <div class="empty">
-
-          <div style="font-size:40px;">
-            📄
-          </div>
-
-          <h3>
-            No submissions yet
-          </h3>
-
-          <p class="muted">
-            You haven't submitted any tasks yet.
-          </p>
-
-          <button
-            class="btn primary"
-            onclick="tasksHome()"
+    box.innerHTML =
+      submissions.map(
+        item => `
+          <div
+            style="
+              padding:13px 0;
+              border-bottom:
+                1px solid #eee;
+            "
           >
-            Browse Tasks
-          </button>
 
-        </div>
+            <b>
+              ${escapeHtml(
+                item.taskTitle
+              )}
+            </b>
 
-      </div>
-    `;
-
-    return;
-  }
-
-  screen.innerHTML = `
-
-    <div class="card">
-
-      <h2>
-        My Submissions
-      </h2>
-
-      ${submissions.map(item => `
-
-        <div class="admin-box">
-
-          <div class="row">
-
-            <div>
-
-              <b>
-                ${escapeHtml(
-                  item.taskTitle
-                )}
-              </b>
-
-              <p class="muted">
-                Reward:
-                ₹${Number(
-                  item.reward
-                ).toFixed(2)}
-              </p>
-
+            <div class="muted">
+              Reward:
+              ₹${Number(
+                item.reward
+              ).toFixed(2)}
             </div>
 
-            <span
-              class="status ${escapeHtml(
-                item.status
-              )}"
-            >
+            <div class="muted">
+              Status:
               ${escapeHtml(
                 item.status
               )}
-            </span>
-
-          </div>
-
-          <p class="muted">
-            Submitted:
-            ${formatDate(
-              item.submittedAt
-            )}
-          </p>
-
-        </div>
-
-      `).join("")}
-
-    </div>
-
-
-    <button
-      class="btn secondary"
-      style="width:100%;"
-      onclick="accountPage()"
-    >
-      ← Back to Account
-    </button>
-  `;
-}
-
-
-/* =====================================================
-   WALLET
-===================================================== */
-
-async function walletPage() {
-
-  if (!currentUser) {
-    showLogin();
-    return;
-  }
-
-  document.getElementById(
-    "homeArea"
-  ).style.display = "none";
-
-  document.getElementById(
-    "accountArea"
-  ).innerHTML = `
-
-    <div class="page-header">
-
-      <button
-        class="back-btn"
-        onclick="accountPage()"
-      >
-        ←
-      </button>
-
-      <div>
-
-        <h2>
-          Wallet 💰
-        </h2>
-
-        <div class="muted">
-          Manage your approved rewards and withdrawals
-        </div>
-
-      </div>
-
-    </div>
-
-    <div id="walletScreen">
-
-      <div class="card">
-
-        <div class="empty">
-
-          <div style="font-size:40px;">
-            ⏳
-          </div>
-
-          <p>
-            Loading wallet...
-          </p>
-
-        </div>
-
-      </div>
-
-    </div>
-  `;
-
-  showBottomNav(true);
-  setActiveBottom("account");
-  scrollToView();
-
-  let wallet = {
-    balance: 0,
-    withdrawals: []
-  };
-
-  try {
-
-    wallet =
-      await api(
-        "/api/wallet"
-      );
-
-  } catch (e) {}
-
-  const screen =
-    document.getElementById(
-      "walletScreen"
-    );
-
-  if (!screen) return;
-
-  const balanceValue =
-    Number(
-      wallet.balance || 0
-    ).toFixed(2);
-
-  screen.innerHTML = `
-
-    <div class="card">
-
-      <p class="muted">
-        Available Balance
-      </p>
-
-      <h1
-        style="font-size:40px;margin:5px 0 8px;"
-      >
-        ₹${balanceValue}
-      </h1>
-
-      <p class="muted">
-        This is your currently approved wallet balance.
-      </p>
-
-    </div>
-
-
-    <div class="card">
-
-      <h2>
-        Request Withdrawal
-      </h2>
-
-      <p class="muted">
-        Minimum withdrawal amount is ₹100.
-      </p>
-
-      <div class="form">
-
-        <input
-          id="amount"
-          class="input"
-          type="number"
-          min="100"
-          placeholder="Amount"
-        >
-
-
-        <div>
-
-          <b>
-            Payment Method
-          </b>
-
-          <div
-            class="payment-methods"
-            style="margin-top:8px;"
-          >
-
-            <button
-              id="upiOption"
-              type="button"
-              class="payment-option selected"
-              onclick="selectPaymentMethod('UPI')"
-            >
-              <span class="payment-icon">
-                🔵
-              </span>
-              UPI
-            </button>
-
-            <button
-              id="bankOption"
-              type="button"
-              class="payment-option"
-              onclick="selectPaymentMethod('Bank Account')"
-            >
-              <span class="payment-icon">
-                🏦
-              </span>
-              Bank Account
-            </button>
-
-          </div>
-
-        </div>
-
-
-        <input
-          id="paymentMethod"
-          type="hidden"
-          value="UPI"
-        >
-
-
-        <div id="upiFields">
-
-          <input
-            id="upiId"
-            class="input"
-            placeholder="UPI ID"
-            autocomplete="off"
-          >
-
-        </div>
-
-
-        <div
-          id="bankFields"
-          style="display:none;"
-        >
-
-          <input
-            id="accountHolderName"
-            class="input"
-            placeholder="Account Holder Name"
-          >
-
-          <input
-            id="accountNumber"
-            class="input"
-            type="text"
-            inputmode="numeric"
-            placeholder="Account Number"
-          >
-
-          <input
-            id="ifscCode"
-            class="input"
-            placeholder="IFSC Code"
-            autocomplete="off"
-          >
-
-          <input
-            id="bankName"
-            class="input"
-            placeholder="Bank Name"
-          >
-
-        </div>
-
-
-        <button
-          class="btn primary large-btn"
-          onclick="withdraw()"
-        >
-          Request Withdrawal
-        </button>
-
-      </div>
-
-    </div>
-
-
-    <div class="card">
-
-      <h3>
-        Withdrawal History
-      </h3>
-
-      ${
-        wallet.withdrawals &&
-        wallet.withdrawals.length
-
-        ?
-
-        wallet.withdrawals.map(w => `
-
-          <div class="admin-box">
-
-            <div class="row">
-
-              <div>
-
-                <b>
-                  ₹${Number(
-                    w.amount
-                  ).toFixed(2)}
-                </b>
-
-                <p class="muted"
-                   style="margin:3px 0 0;">
-                  ${escapeHtml(
-                    w.method
-                  )}
-                </p>
-
-              </div>
-
-              <span
-                class="status ${escapeHtml(
-                  w.status
-                )}"
-              >
-                ${escapeHtml(
-                  w.status
-                )}
-              </span>
-
             </div>
 
-            <p class="muted">
-              ${formatDate(
-                w.createdAt
-              )}
-            </p>
-
           </div>
+        `
+      ).join("");
 
-        `).join("")
+  } catch (error) {
 
-        :
+    const box =
+      document.getElementById(
+        "submissionList"
+      );
 
-        `<p class="muted">
-          No withdrawals yet.
-        </p>`
-      }
-
-    </div>
-
-
-    <button
-      class="btn secondary"
-      style="width:100%;"
-      onclick="accountPage()"
-    >
-      ← Back to Account
-    </button>
-  `;
-}
-
-
-/* =====================================================
-   PAYMENT METHOD
-===================================================== */
-
-function selectPaymentMethod(method) {
-
-  const methodInput =
-    document.getElementById(
-      "paymentMethod"
-    );
-
-  const upiOption =
-    document.getElementById(
-      "upiOption"
-    );
-
-  const bankOption =
-    document.getElementById(
-      "bankOption"
-    );
-
-  const upiFields =
-    document.getElementById(
-      "upiFields"
-    );
-
-  const bankFields =
-    document.getElementById(
-      "bankFields"
-    );
-
-  if (!methodInput) return;
-
-  methodInput.value =
-    method;
-
-  if (method === "UPI") {
-
-    upiOption?.classList.add(
-      "selected"
-    );
-
-    bankOption?.classList.remove(
-      "selected"
-    );
-
-    if (upiFields) {
-      upiFields.style.display =
-        "block";
-    }
-
-    if (bankFields) {
-      bankFields.style.display =
-        "none";
-    }
-
-  } else {
-
-    upiOption?.classList.remove(
-      "selected"
-    );
-
-    bankOption?.classList.add(
-      "selected"
-    );
-
-    if (upiFields) {
-      upiFields.style.display =
-        "none";
-    }
-
-    if (bankFields) {
-      bankFields.style.display =
-        "grid";
-      bankFields.style.gap =
-        "11px";
+    if (box) {
+      box.textContent =
+        error.message;
     }
   }
 }
 
-
 /* =====================================================
-   WITHDRAW
+   LOGOUT
 ===================================================== */
 
-async function withdraw() {
-
-  if (!currentUser) {
-    showLogin();
-    return;
-  }
-
-  const amount =
-    Number(
-      document.getElementById(
-        "amount"
-      ).value
-    );
-
-  const method =
-    document.getElementById(
-      "paymentMethod"
-    ).value;
-
-  if (!Number.isFinite(amount)) {
-
-    alert(
-      "Please enter a valid amount."
-    );
-
-    return;
-  }
-
-  if (amount < 100) {
-
-    alert(
-      "Minimum withdrawal amount is ₹100."
-    );
-
-    return;
-  }
-
-  let paymentDetails = {};
-
-  if (method === "UPI") {
-
-    const upiId =
-      document.getElementById(
-        "upiId"
-      ).value.trim();
-
-    if (!upiId) {
-
-      alert(
-        "Please enter your UPI ID."
-      );
-
-      return;
-    }
-
-    if (
-      !/^[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+$/.test(
-        upiId
-      )
-    ) {
-
-      alert(
-        "Please enter a valid UPI ID."
-      );
-
-      return;
-    }
-
-    paymentDetails = {
-      upiId
-    };
-
-  } else {
-
-    const accountHolderName =
-      document.getElementById(
-        "accountHolderName"
-      ).value.trim();
-
-    const accountNumber =
-      document.getElementById(
-        "accountNumber"
-      ).value.trim();
-
-    const ifscCode =
-      document.getElementById(
-        "ifscCode"
-      ).value.trim();
-
-    const bankName =
-      document.getElementById(
-        "bankName"
-      ).value.trim();
-
-    if (
-      !accountHolderName ||
-      !accountNumber ||
-      !ifscCode ||
-      !bankName
-    ) {
-
-      alert(
-        "Please complete all bank account details."
-      );
-
-      return;
-    }
-
-    paymentDetails = {
-      accountHolderName,
-      accountNumber,
-      ifscCode,
-      bankName
-    };
-  }
+async function logoutUser() {
 
   try {
 
-    const result =
-      await api(
-        "/api/withdraw",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            amount,
-            method,
-            paymentDetails
-          })
-        }
-      );
+    await api(
+      "/api/logout",
+      {
+        method:
+          "POST"
+      }
+    );
+
+    currentUser = null;
+
+    closeProfilePanel();
+
+    goPublicHome();
+
+  } catch (error) {
 
     alert(
-      result.message ||
-      "Withdrawal request submitted."
+      error.message
     );
-
-    walletPage();
-
-  } catch (err) {
-
-    alert(err.message);
-
   }
 }
-
-
-/* =====================================================
-   INFO PAGES
-===================================================== */
-
-function showInfoPage(title, content) {
-
-  closeProfilePanel();
-
-  document.getElementById(
-    "homeArea"
-  ).style.display = "none";
-
-  document.getElementById(
-    "accountArea"
-  ).innerHTML = `
-
-    <div class="card">
-
-      <h2>
-        ${escapeHtml(title)}
-      </h2>
-
-      <div class="muted">
-        ${content}
-      </div>
-
-      <br>
-
-      <button
-        class="btn secondary"
-        onclick="goBackFromInfo()"
-      >
-        ← Back
-      </button>
-
-    </div>
-  `;
-
-  showBottomNav(false);
-  scrollToView();
-}
-
-
-function showAboutPage() {
-
-  showInfoPage(
-    "About Us ℹ️",
-    `
-      <p>
-        TaskEarn is an online task and reward platform
-        designed to provide users with a simple way to
-        discover eligible tasks, complete required work,
-        submit tasks for review and track approved rewards.
-      </p>
-
-      <p>
-        Task availability and rewards may change from time
-        to time. Completing a task does not automatically
-        guarantee payment.
-      </p>
-
-      <p>
-        TaskEarn does not guarantee a fixed income or
-        minimum earnings for any user.
-      </p>
-    `
-  );
-}
-
-
-function showTermsPage() {
-
-  showInfoPage(
-    "Terms & Conditions 📜",
-    `
-      <h3>1. Acceptance</h3>
-
-      <p>
-        By creating or using a TaskEarn account, you agree
-        to follow these Terms & Conditions and use the
-        platform lawfully and honestly.
-      </p>
-
-      <h3>2. User Accounts</h3>
-
-      <p>
-        Users are responsible for keeping their login
-        credentials secure.
-      </p>
-
-      <h3>3. Task Completion</h3>
-
-      <p>
-        Tasks must be completed according to the specific
-        instructions provided.
-      </p>
-
-      <h3>4. Review and Rewards</h3>
-
-      <p>
-        Task submissions may be reviewed before rewards are
-        approved. Submission does not guarantee a reward.
-      </p>
-
-      <h3>5. Prohibited Activity</h3>
-
-      <p>
-        Fraud, abuse, unauthorized multiple accounts,
-        misleading submissions or attempts to exploit
-        the platform may result in suspension.
-      </p>
-
-      <h3>6. Withdrawals</h3>
-
-      <p>
-        Withdrawal requests are subject to the available
-        balance and applicable account requirements.
-      </p>
-    `
-  );
-}
-
-
-function showPrivacyPage() {
-
-  showInfoPage(
-    "Privacy Policy 🔒",
-    `
-      <h3>1. Information We Collect</h3>
-
-      <p>
-        TaskEarn may collect information required to create
-        and operate an account, including name, email,
-        mobile number, city, task activity and
-        transaction-related information.
-      </p>
-
-      <h3>2. How Information Is Used</h3>
-
-      <p>
-        Information may be used to provide platform
-        features, manage accounts, process task submissions,
-        maintain reward records and improve the platform.
-      </p>
-
-      <h3>3. Security</h3>
-
-      <p>
-        Reasonable security measures are used to protect
-        account information.
-      </p>
-
-      <h3>4. Cookies</h3>
-
-      <p>
-        TaskEarn may use cookies and sessions for
-        authentication and security.
-      </p>
-
-      <h3>5. Third-Party Services</h3>
-
-      <p>
-        Email, SMS, payment, analytics or advertising
-        providers may process information according to
-        their own policies.
-      </p>
-    `
-  );
-}
-
-
-function showContactPage() {
-
-  showInfoPage(
-    "Contact Us 📞",
-    `
-      <h3>TaskEarn Support</h3>
-
-      <p>
-        If you have questions about your account, tasks,
-        submissions or rewards, please contact the
-        TaskEarn support team.
-      </p>
-
-      <p>
-        <strong>Email:</strong>
-        support@taskearn.in
-      </p>
-
-      <p>
-        Do not send your password or confidential account
-        credentials by email.
-      </p>
-    `
-  );
-}
-
-
-function goBackFromInfo() {
-
-  if (currentUser) {
-    accountPage();
-  } else {
-    goPublicHome();
-  }
-}
-
-
-/* =====================================================
-   MOBILE NAV
-===================================================== */
-
-function showBottomNav(show) {
-
-  const nav =
-    document.getElementById(
-      "mobileBottomNav"
-    );
-
-  if (!nav) return;
-
-  if (
-    show &&
-    currentUser &&
-    window.innerWidth <= 700
-  ) {
-
-    nav.classList.add(
-      "logged-in"
-    );
-
-  } else {
-
-    nav.classList.remove(
-      "logged-in"
-    );
-
-  }
-}
-
-
-function setActiveBottom(name) {
-
-  document
-    .querySelectorAll(
-      ".bottom-item"
-    )
-    .forEach(
-      b =>
-        b.classList.remove(
-          "active"
-        )
-    );
-
-  const items =
-    document.querySelectorAll(
-      ".bottom-item"
-    );
-
-  if (name === "home") {
-
-    items[0]?.classList.add(
-      "active"
-    );
-
-  }
-
-  if (name === "account") {
-
-    items[1]?.classList.add(
-      "active"
-    );
-
-  }
-}
-
-
-/* =====================================================
-   PROFILE / ACCOUNT
-===================================================== */
-
-async function handleProfileClick() {
-
-  if (currentUser) {
-
-    accountPage();
-    return;
-
-  }
-
-  showLogin();
-}
-
-
-/* =====================================================
-   SCROLL
-===================================================== */
-
-function scrollToView() {
-
-  const area =
-    document.getElementById(
-      "accountArea"
-    );
-
-  if (area) {
-
-    area.scrollIntoView({
-      behavior: "smooth",
-      block: "start"
-    });
-
-  }
-}
-
 
 /* =====================================================
    SESSION
@@ -4342,47 +2997,28 @@ async function checkSession() {
 
     } else {
 
-      currentUser = null;
+      currentUser =
+        null;
 
-      setLoggedInUI(null);
+      setLoggedInUI(
+        null
+      );
 
       goPublicHome();
-
     }
 
-  } catch (e) {
+  } catch (error) {
 
-    currentUser = null;
+    currentUser =
+      null;
 
-    setLoggedInUI(null);
+    setLoggedInUI(
+      null
+    );
 
     goPublicHome();
-
   }
 }
-
-
-/* =====================================================
-   OUTSIDE CLICK
-===================================================== */
-
-window.addEventListener(
-  "click",
-  function(e) {
-
-    if (
-      !e.target.closest(
-        ".header-profile"
-      )
-    ) {
-
-      closeProfilePanel();
-
-    }
-
-  }
-);
-
 
 /* =====================================================
    RESIZE
@@ -4392,15 +3028,45 @@ window.addEventListener(
   "resize",
   function() {
 
+    const bottom =
+      document.getElementById(
+        "mobileBottomNav"
+      );
+
+    if (!bottom) {
+      return;
+    }
+
     if (currentUser) {
-      showBottomNav(true);
+      bottom.classList.add(
+        "logged-in"
+      );
     } else {
-      showBottomNav(false);
+      bottom.classList.remove(
+        "logged-in"
+      );
     }
 
   }
 );
 
+/* =====================================================
+   GOOGLE CONFIG
+===================================================== */
+
+appGoogleConfigFix();
+
+/*
+  This function is intentionally kept
+  on the frontend only.
+*/
+
+function appGoogleConfigFix() {
+  setTimeout(
+    renderGoogleButtons,
+    800
+  );
+}
 
 /* =====================================================
    START
@@ -4412,10 +3078,15 @@ document.addEventListener(
 
     checkSession();
 
+    setTimeout(
+      renderGoogleButtons,
+      1200
+    );
+
   }
 );
 
 </script>
 
 </body>
-      </html>
+</html>
