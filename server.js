@@ -1290,8 +1290,7 @@ app.post(
    FRONTEND FALLBACK
 ===================================================== */
 
-app.get("*", (req, res) => {
-
+app.use((req, res) => {
   res.sendFile(
     path.join(
       __dirname,
@@ -1299,7 +1298,6 @@ app.get("*", (req, res) => {
       "index.html"
     )
   );
-
 });
 
 /* =====================================================
