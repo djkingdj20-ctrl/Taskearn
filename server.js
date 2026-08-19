@@ -8,7 +8,12 @@ const bcrypt = require("bcryptjs");
 const app = express();
 
 app.set("trust proxy", 1);
-
+app.get("/api/google-config", (req, res) => {
+  res.json({
+    clientId:
+      process.env.GOOGLE_CLIENT_ID || ""
+  });
+});
 app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: true, limit: "100kb" }));
 
