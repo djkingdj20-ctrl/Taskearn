@@ -4,19 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta
-    name="google-adsense-account"
-    content="ca-pub-5877718538170577"
-  >
+  <meta name="google-adsense-account" content="ca-pub-5877718538170577">
+  <meta name="description" content="TaskEarn - Discover eligible online tasks, track submissions and manage task-related rewards.">
 
-  <meta
-    name="description"
-    content="TaskEarn - Discover eligible online tasks, track submissions and manage task-related rewards."
-  >
-
-  <script async
-    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5877718538170577"
-    crossorigin="anonymous"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5877718538170577" crossorigin="anonymous"></script>
 
   <title>TaskEarn - Tasks & Rewards</title>
 
@@ -31,25 +22,24 @@
 
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f4f6fb;
-      color: #172033;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #faf8f2; /* Photo matching cream background */
+      color: #1a1e28;
     }
 
-    button,
-    input,
-    textarea,
-    select {
+    button, input, textarea, select {
       font: inherit;
     }
 
+    /* --- HEADER (Matching Design) --- */
     .header {
-      background: linear-gradient(135deg, #5b45f5, #795cff);
-      color: white;
-      padding: 16px;
+      background: #faf8f2;
+      color: #172033;
+      padding: 14px 20px;
       position: sticky;
       top: 0;
-      z-index: 10;
+      z-index: 100;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     }
 
     .header-inner {
@@ -61,16 +51,57 @@
       gap: 12px;
     }
 
-    .logo {
-      font-size: 25px;
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: #ff6b35;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-weight: bold;
+      font-size: 18px;
+    }
+
+    .logo {
+      font-size: 22px;
+      font-weight: 800;
+      color: #222;
+      letter-spacing: -0.5px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
     .balance {
-      background: rgba(255,255,255,.18);
-      padding: 9px 13px;
-      border-radius: 14px;
+      background: #ffffff;
+      padding: 7px 14px;
+      border-radius: 20px;
       font-weight: bold;
+      font-size: 14px;
+      border: 1px solid #e2ded4;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+    }
+
+    .menu-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #222;
+      padding: 0;
+      display: flex;
+      align-items: center;
     }
 
     .container {
@@ -81,24 +112,82 @@
 
     .card {
       background: white;
-      padding: 18px;
-      border-radius: 18px;
-      margin-bottom: 15px;
-      box-shadow: 0 5px 22px rgba(0,0,0,.06);
+      padding: 22px;
+      border-radius: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+      border: 1px solid rgba(0, 0, 0, 0.03);
     }
 
-    .hero {
-      padding: 30px 20px;
+    /* --- HERO SECTION (Exact Photo Styling) --- */
+    .hero-yandex-style {
+      position: relative;
+      background: linear-gradient(135deg, #fffbf0 0%, #ffe9d6 50%, #e3f2fd 100%);
+      padding: 60px 24px 50px 24px;
+      border-radius: 32px;
+      text-align: left;
+      margin-bottom: 25px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
     }
 
-    h1,
-    h2,
-    h3 {
-      margin-top: 0;
+    .hero-yandex-style h1 {
+      font-size: 38px;
+      font-weight: 800;
+      line-height: 1.15;
+      color: #20242f;
+      margin: 0 0 16px 0;
+      letter-spacing: -0.8px;
+      max-width: 550px;
     }
 
-    .hero h1 {
-      font-size: 32px;
+    .hero-yandex-style p.subtitle {
+      font-size: 17px;
+      color: #4a5568;
+      line-height: 1.5;
+      margin: 0 0 32px 0;
+      max-width: 480px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .btn-start-orange {
+      background: #ff6b35; /* Photo matching vibrant orange */
+      color: white;
+      padding: 16px 42px;
+      border-radius: 30px;
+      font-size: 18px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 6px 20px rgba(255, 107, 53, 0.3);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+    }
+
+    .btn-start-orange:hover {
+      background: #f25822;
+      transform: translateY(-2px);
+    }
+
+    .btn-outline-custom {
+      background: rgba(255, 255, 255, 0.8);
+      color: #20242f;
+      padding: 16px 28px;
+      border-radius: 30px;
+      font-size: 16px;
+      font-weight: 600;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      backdrop-filter: blur(5px);
     }
 
     .muted {
@@ -164,7 +253,7 @@
     }
 
     .primary {
-      background: #5b45f5;
+      background: #ff6b35;
       color: white;
     }
 
@@ -186,9 +275,7 @@
       border: 1px solid #bdebd0;
     }
 
-    .input,
-    textarea,
-    select {
+    .input, textarea, select {
       width: 100%;
       padding: 12px;
       border: 1px solid #ddd;
@@ -233,20 +320,9 @@
       text-transform: capitalize;
     }
 
-    .pending {
-      background: #fff3cd;
-      color: #856404;
-    }
-
-    .approved {
-      background: #dff6e8;
-      color: #087a42;
-    }
-
-    .rejected {
-      background: #ffe1e1;
-      color: #b42318;
-    }
+    .pending { background: #fff3cd; color: #856404; }
+    .approved { background: #dff6e8; color: #087a42; }
+    .rejected { background: #ffe1e1; color: #b42318; }
 
     .task-actions {
       display: flex;
@@ -281,25 +357,13 @@
     }
 
     @media (max-width: 650px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
-
-      .stats {
-        grid-template-columns: 1fr 1fr 1fr;
-      }
-
-      .container {
-        padding: 12px;
-      }
-
-      .hero h1 {
-        font-size: 27px;
-      }
-
-      .row {
-        align-items: flex-start;
-      }
+      .grid { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: 1fr 1fr 1fr; }
+      .container { padding: 12px; }
+      .hero-yandex-style h1 { font-size: 30px; }
+      .hero-yandex-style { padding: 40px 18px 35px 18px; }
+      .btn-start-orange { width: 100%; text-align: center; }
+      .row { align-items: flex-start; }
     }
   </style>
 </head>
@@ -308,42 +372,40 @@
 
   <header class="header">
     <div class="header-inner">
-      <div class="logo">TaskEarn</div>
-      <div id="balance" class="balance">₹0.00</div>
+      <div class="logo-container">
+        <div class="logo-icon">T</div>
+        <div class="logo">TaskEarn</div>
+      </div>
+      <div class="header-right">
+        <div id="balance" class="balance">₹0.00</div>
+        <button class="menu-btn" aria-label="Menu">☰</button>
+      </div>
     </div>
   </header>
 
   <main class="container">
 
-    <!-- PUBLIC HOME -->
-
+    <!-- PUBLIC HOME (YANDEX TASKS DESIGN MATCH) -->
     <section id="homeArea">
 
-      <div class="card hero">
-
-        <h1>Welcome to TaskEarn 🚀</h1>
-
-        <p class="muted">
-          Discover eligible online tasks, submit completed work,
-          track your status and manage eligible task-related rewards.
+      <div class="hero-yandex-style">
+        <h1>Earn money by doing simple tasks online</h1>
+        <p class="subtitle">
+          Help develop artificial intelligence, submit completed work and get paid with TaskEarn.
         </p>
 
-        <div class="nav">
-          <button class="btn primary" onclick="showLogin()">
-            Login
+        <div class="hero-actions">
+          <button class="btn-start-orange" onclick="showLogin()">
+            Start
           </button>
-
-          <button class="btn secondary" onclick="showRegister()">
+          <button class="btn-outline-custom" onclick="showRegister()">
             Create Account
           </button>
         </div>
-
       </div>
 
       <section class="card">
-
         <h2>How TaskEarn Works</h2>
-
         <ol>
           <li>Create your TaskEarn account.</li>
           <li>Browse available eligible tasks.</li>
@@ -352,63 +414,45 @@
           <li>Submit the task for review.</li>
           <li>Approved rewards are added to your wallet.</li>
         </ol>
-
       </section>
 
       <section class="card">
-
         <h2>About TaskEarn</h2>
-
         <p class="muted">
-          TaskEarn provides a simple interface for discovering
-          eligible online tasks and managing task submissions
-          and eligible rewards.
+          TaskEarn provides a simple interface for discovering eligible online tasks and managing task submissions and eligible rewards.
         </p>
-
         <p class="muted">
-          Task availability and rewards may change depending on
-          the tasks available on the platform.
+          Task availability and rewards may change depending on the tasks available on the platform.
         </p>
-
       </section>
 
       <section class="card">
-
         <h2>Frequently Asked Questions</h2>
 
         <h3>How do I earn?</h3>
-
         <p class="muted">
-          Browse available eligible tasks and complete them
-          according to the stated requirements.
+          Browse available eligible tasks and complete them according to the stated requirements.
         </p>
 
         <h3>Is income guaranteed?</h3>
-
         <p class="muted">
-          No. Earnings depend on task availability, eligibility
-          and applicable task conditions.
+          No. Earnings depend on task availability, eligibility and applicable task conditions.
         </p>
 
         <h3>How do I withdraw?</h3>
-
         <p class="muted">
-          Eligible users can request a withdrawal after reaching
-          the applicable minimum amount.
+          Eligible users can request a withdrawal after reaching the applicable minimum amount.
         </p>
 
         <h3>What is the minimum withdrawal?</h3>
-
         <p class="muted">
           The current demo configuration uses ₹100.
         </p>
-
       </section>
 
     </section>
 
     <!-- ACCOUNT AREA -->
-
     <section id="accountArea"></section>
 
     <footer class="footer">
@@ -424,7 +468,6 @@
     ========================= */
 
     async function api(url, options = {}) {
-
       const response = await fetch(url, {
         headers: {
           "Content-Type": "application/json"
@@ -433,7 +476,6 @@
       });
 
       let data = {};
-
       try {
         data = await response.json();
       } catch (e) {
@@ -441,9 +483,7 @@
       }
 
       if (!response.ok) {
-        throw new Error(
-          data.error || "Something went wrong"
-        );
+        throw new Error(data.error || "Something went wrong");
       }
 
       return data;
@@ -455,19 +495,13 @@
     ========================= */
 
     async function startApp() {
-
       try {
-
         const user = await api("/api/me");
-
         if (user) {
           dashboard(user);
         }
-
       } catch (error) {
-
         console.log("Public homepage available.");
-
       }
     }
 
@@ -477,50 +511,18 @@
     ========================= */
 
     function showLogin() {
-
       document.getElementById("accountArea").innerHTML = `
-
         <div class="card">
-
           <h2>Login to TaskEarn</h2>
-
           <div class="form">
-
-            <input
-              id="loginEmail"
-              class="input"
-              type="email"
-              placeholder="Email"
-              autocomplete="email">
-
-            <input
-              id="loginPassword"
-              class="input"
-              type="password"
-              placeholder="Password"
-              autocomplete="current-password">
-
-            <button
-              class="btn primary"
-              onclick="login()">
-              Login
-            </button>
-
-            <p class="muted">
-              Demo User:
-              user@taskearn.demo / 123456
-            </p>
-
-            <p class="muted">
-              Admin:
-              admin@taskearn.demo / admin123
-            </p>
-
+            <input id="loginEmail" class="input" type="email" placeholder="Email" autocomplete="email">
+            <input id="loginPassword" class="input" type="password" placeholder="Password" autocomplete="current-password">
+            <button class="btn primary" onclick="login()">Login</button>
+            <p class="muted">Demo User: user@taskearn.demo / 123456</p>
+            <p class="muted">Admin: admin@taskearn.demo / admin123</p>
           </div>
-
         </div>
       `;
-
       scrollAccount();
     }
 
@@ -530,46 +532,17 @@
     ========================= */
 
     function showRegister() {
-
       document.getElementById("accountArea").innerHTML = `
-
         <div class="card">
-
           <h2>Create TaskEarn Account</h2>
-
           <div class="form">
-
-            <input
-              id="registerName"
-              class="input"
-              placeholder="Your name"
-              autocomplete="name">
-
-            <input
-              id="registerEmail"
-              class="input"
-              type="email"
-              placeholder="Email"
-              autocomplete="email">
-
-            <input
-              id="registerPassword"
-              class="input"
-              type="password"
-              placeholder="Password - minimum 6 characters"
-              autocomplete="new-password">
-
-            <button
-              class="btn primary"
-              onclick="register()">
-              Create Account
-            </button>
-
+            <input id="registerName" class="input" placeholder="Your name" autocomplete="name">
+            <input id="registerEmail" class="input" type="email" placeholder="Email" autocomplete="email">
+            <input id="registerPassword" class="input" type="password" placeholder="Password - minimum 6 characters" autocomplete="new-password">
+            <button class="btn primary" onclick="register()">Create Account</button>
           </div>
-
         </div>
       `;
-
       scrollAccount();
     }
 
@@ -579,33 +552,17 @@
     ========================= */
 
     async function login() {
-
       try {
-
         await api("/api/login", {
           method: "POST",
-
           body: JSON.stringify({
-
-            email:
-              document.getElementById(
-                "loginEmail"
-              ).value,
-
-            password:
-              document.getElementById(
-                "loginPassword"
-              ).value
-
+            email: document.getElementById("loginEmail").value,
+            password: document.getElementById("loginPassword").value
           })
         });
-
         await startApp();
-
       } catch (error) {
-
         alert(error.message);
-
       }
     }
 
@@ -615,38 +572,18 @@
     ========================= */
 
     async function register() {
-
       try {
-
         await api("/api/register", {
           method: "POST",
-
           body: JSON.stringify({
-
-            name:
-              document.getElementById(
-                "registerName"
-              ).value,
-
-            email:
-              document.getElementById(
-                "registerEmail"
-              ).value,
-
-            password:
-              document.getElementById(
-                "registerPassword"
-              ).value
-
+            name: document.getElementById("registerName").value,
+            email: document.getElementById("registerEmail").value,
+            password: document.getElementById("registerPassword").value
           })
         });
-
         await startApp();
-
       } catch (error) {
-
         alert(error.message);
-
       }
     }
 
@@ -656,102 +593,42 @@
     ========================= */
 
     async function dashboard(user) {
-
       document.getElementById("homeArea").style.display = "none";
-
       const wallet = await api("/api/wallet");
 
-      document.getElementById("balance").innerText =
-        "₹" + Number(wallet.balance).toFixed(2);
+      document.getElementById("balance").innerText = "₹" + Number(wallet.balance).toFixed(2);
 
       document.getElementById("accountArea").innerHTML = `
-
         <div class="card">
-
           <div class="row">
-
             <div>
-
-              <h2>
-                Hi, ${escapeHtml(user.name)} 👋
-              </h2>
-
-              <p class="muted">
-                Welcome to your TaskEarn dashboard.
-              </p>
-
+              <h2>Hi, ${escapeHtml(user.name)} 👋</h2>
+              <p class="muted">Welcome to your TaskEarn dashboard.</p>
             </div>
-
-            <button
-              class="btn secondary"
-              onclick="logout()">
-              Logout
-            </button>
-
+            <button class="btn secondary" onclick="logout()">Logout</button>
           </div>
-
         </div>
 
         <div class="stats">
-
           <div class="stat">
-            <small>Balance</small>
-            <br>
-            <b>
-              ₹${Number(wallet.balance).toFixed(2)}
-            </b>
+            <small>Balance</small><br>
+            <b>₹${Number(wallet.balance).toFixed(2)}</b>
           </div>
-
           <div class="stat">
-            <small>Completed</small>
-            <br>
-            <b>
-              ${wallet.completed}
-            </b>
+            <small>Completed</small><br>
+            <b>${wallet.completed}</b>
           </div>
-
           <div class="stat">
-            <small>Account</small>
-            <br>
-            <b>
-              ${escapeHtml(user.role)}
-            </b>
+            <small>Account</small><br>
+            <b>${escapeHtml(user.role)}</b>
           </div>
-
         </div>
 
         <div class="nav">
-
-          <button
-            class="btn primary"
-            onclick="tasksPage()">
-            Tasks
-          </button>
-
-          <button
-            class="btn secondary"
-            onclick="walletPage()">
-            Wallet
-          </button>
-
-          <button
-            class="btn secondary"
-            onclick="submissionsPage()">
-            My Submissions
-          </button>
-
-          ${
-            user.role === "admin"
-              ? `
-                <button
-                  class="btn secondary"
-                  onclick="adminPage()">
-                  Admin
-                </button>
-              `
-              : ""
-          }
-
+          <button class="btn primary" onclick="tasksPage()">Tasks</button>
+          <button class="btn secondary" onclick="walletPage()">Wallet</button>
+          <button class="btn secondary" onclick="submissionsPage()">My Submissions</button>
+          ${user.role === "admin" ? `<button class="btn secondary" onclick="adminPage()">Admin</button>` : ""}
         </div>
 
         <div id="screen"></div>
@@ -766,81 +643,37 @@
     ========================= */
 
     async function tasksPage() {
-
       try {
-
         const tasks = await api("/api/tasks");
-
-        const screen =
-          document.getElementById("screen");
+        const screen = document.getElementById("screen");
 
         if (!tasks.length) {
-
-          screen.innerHTML = `
-            <div class="card empty">
-              No tasks are currently available.
-            </div>
-          `;
-
+          screen.innerHTML = `<div class="card empty">No tasks are currently available.</div>`;
           return;
         }
 
         screen.innerHTML = `
-
           <div class="notice">
-            Complete legitimate eligible tasks and submit them
-            for review. Rewards are credited only after approval.
+            Complete legitimate eligible tasks and submit them for review. Rewards are credited only after approval.
           </div>
-
           <div class="grid">
-
-            ${
-              tasks.map(task => `
-
-                <div class="card">
-
-                  <span class="tag">
-                    ${escapeHtml(task.type)}
-                  </span>
-
-                  <h3>
-                    ${escapeHtml(task.title)}
-                  </h3>
-
-                  <p class="muted">
-                    ${escapeHtml(task.description)}
-                  </p>
-
-                  <div class="row">
-
-                    <span class="earn">
-                      +₹${Number(task.reward).toFixed(2)}
-                    </span>
-
-                  </div>
-
-                  <div class="task-actions">
-
-                    <button
-                      class="btn primary"
-                      onclick="submitTask(${task.id})">
-                      Submit Task
-                    </button>
-
-                  </div>
-
+            ${tasks.map(task => `
+              <div class="card">
+                <span class="tag">${escapeHtml(task.type)}</span>
+                <h3>${escapeHtml(task.title)}</h3>
+                <p class="muted">${escapeHtml(task.description)}</p>
+                <div class="row">
+                  <span class="earn">+₹${Number(task.reward).toFixed(2)}</span>
                 </div>
-
-              `).join("")
-            }
-
+                <div class="task-actions">
+                  <button class="btn primary" onclick="submitTask(${task.id})">Submit Task</button>
+                </div>
+              </div>
+            `).join("")}
           </div>
         `;
-
       } catch (error) {
-
         alert(error.message);
-
       }
     }
 
@@ -850,36 +683,13 @@
     ========================= */
 
     async function submitTask(id) {
-
-      if (
-        !confirm(
-          "Have you completed this task according to its requirements?"
-        )
-      ) {
-        return;
-      }
-
+      if (!confirm("Have you completed this task according to its requirements?")) return;
       try {
-
-        const result =
-          await api(
-            "/api/tasks/" + id + "/submit",
-            {
-              method: "POST"
-            }
-          );
-
-        alert(
-          result.message ||
-          "Task submitted for review."
-        );
-
+        const result = await api("/api/tasks/" + id + "/submit", { method: "POST" });
+        alert(result.message || "Task submitted for review.");
         await submissionsPage();
-
       } catch (error) {
-
         alert(error.message);
-
       }
     }
 
@@ -889,66 +699,29 @@
     ========================= */
 
     async function submissionsPage() {
-
-      const submissions =
-        await api("/api/my-submissions");
-
-      const screen =
-        document.getElementById("screen");
+      const submissions = await api("/api/my-submissions");
+      const screen = document.getElementById("screen");
 
       if (!submissions.length) {
-
-        screen.innerHTML = `
-          <div class="card empty">
-            You have no task submissions yet.
-          </div>
-        `;
-
+        screen.innerHTML = `<div class="card empty">You have no task submissions yet.</div>`;
         return;
       }
 
       screen.innerHTML = `
-
         <div class="card">
-
           <h2>My Submissions 📋</h2>
-
-          ${
-            submissions.map(item => `
-
-              <div class="admin-box">
-
-                <div class="row">
-
-                  <div>
-
-                    <b>
-                      ${escapeHtml(item.taskTitle)}
-                    </b>
-
-                    <p class="muted">
-                      Reward:
-                      ₹${Number(item.reward).toFixed(2)}
-                    </p>
-
-                  </div>
-
-                  <span class="status ${item.status}">
-                    ${escapeHtml(item.status)}
-                  </span>
-
+          ${submissions.map(item => `
+            <div class="admin-box">
+              <div class="row">
+                <div>
+                  <b>${escapeHtml(item.taskTitle)}</b>
+                  <p class="muted">Reward: ₹${Number(item.reward).toFixed(2)}</p>
                 </div>
-
-                <p class="small">
-                  Submitted:
-                  ${formatDate(item.submittedAt)}
-                </p>
-
+                <span class="status ${item.status}">${escapeHtml(item.status)}</span>
               </div>
-
-            `).join("")
-          }
-
+              <p class="small">Submitted: ${formatDate(item.submittedAt)}</p>
+            </div>
+          `).join("")}
         </div>
       `;
     }
@@ -959,89 +732,31 @@
     ========================= */
 
     async function walletPage() {
-
-      const wallet =
-        await api("/api/wallet");
+      const wallet = await api("/api/wallet");
 
       document.getElementById("screen").innerHTML = `
-
         <div class="card">
-
           <h2>My Wallet 💰</h2>
-
-          <h1>
-            ₹${Number(wallet.balance).toFixed(2)}
-          </h1>
-
-          <p class="muted">
-            Minimum withdrawal: ₹100
-          </p>
-
+          <h1>₹${Number(wallet.balance).toFixed(2)}</h1>
+          <p class="muted">Minimum withdrawal: ₹100</p>
           <div class="form">
-
-            <input
-              id="amount"
-              class="input"
-              type="number"
-              min="100"
-              placeholder="Withdrawal amount">
-
-            <input
-              id="method"
-              class="input"
-              value="UPI"
-              placeholder="Payment method">
-
-            <button
-              class="btn primary"
-              onclick="withdraw()">
-              Request Withdrawal
-            </button>
-
+            <input id="amount" class="input" type="number" min="100" placeholder="Withdrawal amount">
+            <input id="method" class="input" value="UPI" placeholder="Payment method">
+            <button class="btn primary" onclick="withdraw()">Request Withdrawal</button>
           </div>
-
         </div>
 
         <div class="card">
-
           <h3>Withdrawal History</h3>
-
-          ${
-            wallet.withdrawals.length
-
-              ? wallet.withdrawals.map(item => `
-
-                  <div class="admin-box">
-
-                    <div class="row">
-
-                      <span>
-                        ₹${Number(item.amount).toFixed(2)}
-                        •
-                        ${escapeHtml(item.method)}
-                      </span>
-
-                      <span class="status ${item.status}">
-                        ${escapeHtml(item.status)}
-                      </span>
-
-                    </div>
-
-                    <p class="small">
-                      ${formatDate(item.createdAt)}
-                    </p>
-
-                  </div>
-
-                `).join("")
-
-              : `
-                <p class="muted">
-                  No withdrawals yet.
-                </p>
-              `
-          }
-
+          ${wallet.withdrawals.length ? wallet.withdrawals.map(item => `
+            <div class="admin-box">
+              <div class="row">
+                <span>₹${Number(item.amount).toFixed(2)} • ${escapeHtml(item.method)}</span>
+                <span class="status ${item.status}">${escapeHtml(item.status)}</span>
+              </div>
+              <p class="small">${formatDate(item.createdAt)}</p>
+            </div>
+          `).join("") : `<p class="muted">No withdrawals yet.</p>`}
         </div>
       `;
     }
@@ -1052,39 +767,19 @@
     ========================= */
 
     async function withdraw() {
-
-      const amount =
-        Number(
-          document.getElementById("amount").value
-        );
-
-      const method =
-        document.getElementById("method").value;
+      const amount = Number(document.getElementById("amount").value);
+      const method = document.getElementById("method").value;
 
       try {
-
         await api("/api/withdraw", {
           method: "POST",
-
-          body: JSON.stringify({
-            amount,
-            method
-          })
+          body: JSON.stringify({ amount, method })
         });
-
-        alert(
-          "Withdrawal request submitted!"
-        );
-
-        const user =
-          await api("/api/me");
-
+        alert("Withdrawal request submitted!");
+        const user = await api("/api/me");
         await dashboard(user);
-
       } catch (error) {
-
         alert(error.message);
-
       }
     }
 
@@ -1094,85 +789,34 @@
     ========================= */
 
     async function adminPage() {
-
       try {
-
-        const stats =
-          await api("/api/admin/stats");
+        const stats = await api("/api/admin/stats");
 
         document.getElementById("screen").innerHTML = `
-
           <div class="card">
-
-            <h2>
-              Admin Dashboard 🛠️
-            </h2>
-
+            <h2>Admin Dashboard 🛠️</h2>
             <div class="stats">
-
-              <div class="stat">
-                <b>${stats.users}</b>
-                <br>
-                Users
-              </div>
-
-              <div class="stat">
-                <b>${stats.tasks}</b>
-                <br>
-                Tasks
-              </div>
-
-              <div class="stat">
-                <b>${stats.submissions}</b>
-                <br>
-                Pending Reviews
-              </div>
-
+              <div class="stat"><b>${stats.users}</b><br>Users</div>
+              <div class="stat"><b>${stats.tasks}</b><br>Tasks</div>
+              <div class="stat"><b>${stats.submissions}</b><br>Pending Reviews</div>
             </div>
-
             <div class="stats">
-
-              <div class="stat">
-                <b>${stats.pending}</b>
-                <br>
-                Pending Withdrawals
-              </div>
-
+              <div class="stat"><b>${stats.pending}</b><br>Pending Withdrawals</div>
             </div>
-
           </div>
 
           <div class="nav">
-
-            <button
-              class="btn primary"
-              onclick="adminTasks()">
-              Manage Tasks
-            </button>
-
-            <button
-              class="btn secondary"
-              onclick="adminSubmissions()">
-              Task Reviews
-            </button>
-
-            <button
-              class="btn secondary"
-              onclick="adminWithdrawals()">
-              Withdrawals
-            </button>
-
+            <button class="btn primary" onclick="adminTasks()">Manage Tasks</button>
+            <button class="btn secondary" onclick="adminSubmissions()">Task Reviews</button>
+            <button class="btn secondary" onclick="adminWithdrawals()">Withdrawals</button>
           </div>
 
           <div id="adminScreen"></div>
         `;
 
         await adminTasks();
-
       } catch (error) {
-
         alert(error.message);
-
       }
     }
 
@@ -1182,125 +826,36 @@
     ========================= */
 
     async function adminTasks() {
-
-      const tasks =
-        await api("/api/admin/tasks");
-
-      const adminScreen =
-        document.getElementById("adminScreen");
+      const tasks = await api("/api/admin/tasks");
+      const adminScreen = document.getElementById("adminScreen");
 
       adminScreen.innerHTML = `
-
         <div class="card">
-
           <h2>➕ Add New Task</h2>
-
           <div class="form">
-
-            <input
-              id="newTitle"
-              class="input"
-              placeholder="Task title">
-
-            <textarea
-              id="newDescription"
-              placeholder="Task description"></textarea>
-
-            <input
-              id="newType"
-              class="input"
-              placeholder="Category / Type">
-
-            <input
-              id="newReward"
-              class="input"
-              type="number"
-              min="0"
-              step="0.01"
-              placeholder="Reward ₹">
-
-            <button
-              class="btn primary"
-              onclick="addTask()">
-              Add Task
-            </button>
-
+            <input id="newTitle" class="input" placeholder="Task title">
+            <textarea id="newDescription" placeholder="Task description"></textarea>
+            <input id="newType" class="input" placeholder="Category / Type">
+            <input id="newReward" class="input" type="number" min="0" step="0.01" placeholder="Reward ₹">
+            <button class="btn primary" onclick="addTask()">Add Task</button>
           </div>
-
         </div>
 
         <div class="card">
-
           <h2>📋 Manage Existing Tasks</h2>
-
-          ${
-            tasks.length
-
-              ? tasks.map(task => `
-
-                  <div class="admin-box">
-
-                    <span class="tag">
-                      ${escapeHtml(task.type)}
-                    </span>
-
-                    <h3>
-                      ${escapeHtml(task.title)}
-                    </h3>
-
-                    <p class="muted">
-                      ${escapeHtml(task.description)}
-                    </p>
-
-                    <p>
-                      Reward:
-                      <strong>
-                        ₹${Number(task.reward).toFixed(2)}
-                      </strong>
-                    </p>
-
-                    <p>
-                      Status:
-                      ${
-                        task.active
-                          ? `<span class="status approved">Active</span>`
-                          : `<span class="status rejected">Disabled</span>`
-                      }
-                    </p>
-
-                    <div class="task-actions">
-
-                      <button
-                        class="btn secondary"
-                        onclick="editTask(${task.id})">
-                        Edit
-                      </button>
-
-                      ${
-                        task.active
-                          ? `
-                            <button
-                              class="btn danger"
-                              onclick="disableTask(${task.id})">
-                              Disable
-                            </button>
-                          `
-                          : ""
-                      }
-
-                    </div>
-
-                  </div>
-
-                `).join("")
-
-              : `
-                <p class="empty">
-                  No tasks found.
-                </p>
-              `
-          }
-
+          ${tasks.length ? tasks.map(task => `
+            <div class="admin-box">
+              <span class="tag">${escapeHtml(task.type)}</span>
+              <h3>${escapeHtml(task.title)}</h3>
+              <p class="muted">${escapeHtml(task.description)}</p>
+              <p>Reward: <strong>₹${Number(task.reward).toFixed(2)}</strong></p>
+              <p>Status: ${task.active ? `<span class="status approved">Active</span>` : `<span class="status rejected">Disabled</span>`}</p>
+              <div class="task-actions">
+                <button class="btn secondary" onclick="editTask(${task.id})">Edit</button>
+                ${task.active ? `<button class="btn danger" onclick="disableTask(${task.id})">Disable</button>` : ""}
+              </div>
+            </div>
+          `).join("") : `<p class="empty">No tasks found.</p>`}
         </div>
       `;
     }
@@ -1311,42 +866,20 @@
     ========================= */
 
     async function addTask() {
-
-      const title =
-        document.getElementById("newTitle").value.trim();
-
-      const description =
-        document.getElementById("newDescription").value.trim();
-
-      const type =
-        document.getElementById("newType").value.trim();
-
-      const reward =
-        Number(
-          document.getElementById("newReward").value
-        );
+      const title = document.getElementById("newTitle").value.trim();
+      const description = document.getElementById("newDescription").value.trim();
+      const type = document.getElementById("newType").value.trim();
+      const reward = Number(document.getElementById("newReward").value);
 
       try {
-
         await api("/api/admin/tasks", {
           method: "POST",
-
-          body: JSON.stringify({
-            title,
-            description,
-            type,
-            reward
-          })
+          body: JSON.stringify({ title, description, type, reward })
         });
-
         alert("Task added successfully!");
-
         await adminTasks();
-
       } catch (error) {
-
         alert(error.message);
-
       }
     }
 
@@ -1356,75 +889,32 @@
     ========================= */
 
     async function editTask(id) {
-
       try {
-
-        const task =
-          await api("/api/tasks/" + id);
-
-        const title =
-          prompt(
-            "Task title:",
-            task.title
-          );
-
+        const task = await api("/api/tasks/" + id);
+        const title = prompt("Task title:", task.title);
         if (title === null) return;
 
-        const description =
-          prompt(
-            "Task description:",
-            task.description
-          );
-
+        const description = prompt("Task description:", task.description);
         if (description === null) return;
 
-        const type =
-          prompt(
-            "Task type/category:",
-            task.type
-          );
-
+        const type = prompt("Task type/category:", task.type);
         if (type === null) return;
 
-        const reward =
-          Number(
-            prompt(
-              "Reward ₹:",
-              task.reward
-            )
-          );
-
-        if (
-          !Number.isFinite(reward) ||
-          reward <= 0
-        ) {
+        const reward = Number(prompt("Reward ₹:", task.reward));
+        if (!Number.isFinite(reward) || reward <= 0) {
           alert("Invalid reward.");
           return;
         }
 
-        await api(
-          "/api/admin/tasks/" + id,
-          {
-            method: "PUT",
-
-            body: JSON.stringify({
-              title,
-              description,
-              type,
-              reward,
-              active: true
-            })
-          }
-        );
+        await api("/api/admin/tasks/" + id, {
+          method: "PUT",
+          body: JSON.stringify({ title, description, type, reward, active: true })
+        });
 
         alert("Task updated!");
-
         await adminTasks();
-
       } catch (error) {
-
         alert(error.message);
-
       }
     }
 
@@ -1434,32 +924,13 @@
     ========================= */
 
     async function disableTask(id) {
-
-      if (
-        !confirm(
-          "Disable this task?"
-        )
-      ) {
-        return;
-      }
-
+      if (!confirm("Disable this task?")) return;
       try {
-
-        await api(
-          "/api/admin/tasks/" + id,
-          {
-            method: "DELETE"
-          }
-        );
-
+        await api("/api/admin/tasks/" + id, { method: "DELETE" });
         alert("Task disabled.");
-
         await adminTasks();
-
       } catch (error) {
-
         alert(error.message);
-
       }
     }
 
@@ -1469,89 +940,29 @@
     ========================= */
 
     async function adminSubmissions() {
-
-      const submissions =
-        await api("/api/admin/submissions");
+      const submissions = await api("/api/admin/submissions");
 
       document.getElementById("adminScreen").innerHTML = `
-
         <div class="card">
-
-          <h2>
-            Task Submissions 📋
-          </h2>
-
-          ${
-            submissions.length
-
-              ? submissions.map(item => `
-
-                  <div class="admin-box">
-
-                    <div class="row">
-
-                      <div>
-
-                        <b>
-                          ${escapeHtml(item.userName)}
-                        </b>
-
-                        <p class="muted">
-                          ${escapeHtml(item.taskTitle)}
-                        </p>
-
-                        <p>
-                          Reward:
-                          ₹${Number(item.reward).toFixed(2)}
-                        </p>
-
-                      </div>
-
-                      <span class="status ${item.status}">
-                        ${escapeHtml(item.status)}
-                      </span>
-
-                    </div>
-
-                    ${
-                      item.status === "pending"
-                        ? `
-                          <div class="task-actions">
-
-                            <button
-                              class="btn success"
-                              onclick="reviewSubmission(
-                                ${item.id},
-                                'approved'
-                              )">
-                              Approve
-                            </button>
-
-                            <button
-                              class="btn danger"
-                              onclick="reviewSubmission(
-                                ${item.id},
-                                'rejected'
-                              )">
-                              Reject
-                            </button>
-
-                          </div>
-                        `
-                        : ""
-                    }
-
-                  </div>
-
-                `).join("")
-
-              : `
-                <p class="empty">
-                  No submissions found.
-                </p>
-              `
-          }
-
+          <h2>Task Submissions 📋</h2>
+          ${submissions.length ? submissions.map(item => `
+            <div class="admin-box">
+              <div class="row">
+                <div>
+                  <b>${escapeHtml(item.userName)}</b>
+                  <p class="muted">${escapeHtml(item.taskTitle)}</p>
+                  <p>Reward: ₹${Number(item.reward).toFixed(2)}</p>
+                </div>
+                <span class="status ${item.status}">${escapeHtml(item.status)}</span>
+              </div>
+              ${item.status === "pending" ? `
+                <div class="task-actions">
+                  <button class="btn success" onclick="reviewSubmission(${item.id}, 'approved')">Approve</button>
+                  <button class="btn danger" onclick="reviewSubmission(${item.id}, 'rejected')">Reject</button>
+                </div>
+              ` : ""}
+            </div>
+          `).join("") : `<p class="empty">No submissions found.</p>`}
         </div>
       `;
     }
@@ -1561,45 +972,19 @@
        REVIEW SUBMISSION
     ========================= */
 
-    async function reviewSubmission(
-      id,
-      status
-    ) {
-
-      const question =
-        status === "approved"
-          ? "Approve this submission?"
-          : "Reject this submission?";
-
-      if (!confirm(question)) {
-        return;
-      }
+    async function reviewSubmission(id, status) {
+      const question = status === "approved" ? "Approve this submission?" : "Reject this submission?";
+      if (!confirm(question)) return;
 
       try {
-
-        await api(
-          "/api/admin/submissions/" + id,
-          {
-            method: "POST",
-
-            body: JSON.stringify({
-              status
-            })
-          }
-        );
-
-        alert(
-          status === "approved"
-            ? "Submission approved!"
-            : "Submission rejected."
-        );
-
+        await api("/api/admin/submissions/" + id, {
+          method: "POST",
+          body: JSON.stringify({ status })
+        });
+        alert(status === "approved" ? "Submission approved!" : "Submission rejected.");
         await adminSubmissions();
-
       } catch (error) {
-
         alert(error.message);
-
       }
     }
 
@@ -1609,86 +994,28 @@
     ========================= */
 
     async function adminWithdrawals() {
-
-      const withdrawals =
-        await api("/api/admin/withdrawals");
+      const withdrawals = await api("/api/admin/withdrawals");
 
       document.getElementById("adminScreen").innerHTML = `
-
         <div class="card">
-
-          <h2>
-            Withdrawal Requests 💳
-          </h2>
-
-          ${
-            withdrawals.length
-
-              ? withdrawals.map(item => `
-
-                  <div class="admin-box">
-
-                    <div class="row">
-
-                      <div>
-
-                        <b>
-                          ${escapeHtml(item.name)}
-                        </b>
-
-                        <p class="muted">
-                          ₹${Number(item.amount).toFixed(2)}
-                          •
-                          ${escapeHtml(item.method)}
-                        </p>
-
-                      </div>
-
-                      <span class="status ${item.status}">
-                        ${escapeHtml(item.status)}
-                      </span>
-
-                    </div>
-
-                    ${
-                      item.status === "pending"
-                        ? `
-                          <div class="task-actions">
-
-                            <button
-                              class="btn success"
-                              onclick="reviewWithdrawal(
-                                ${item.id},
-                                'approved'
-                              )">
-                              Approve
-                            </button>
-
-                            <button
-                              class="btn danger"
-                              onclick="reviewWithdrawal(
-                                ${item.id},
-                                'rejected'
-                              )">
-                              Reject
-                            </button>
-
-                          </div>
-                        `
-                        : ""
-                    }
-
-                  </div>
-
-                `).join("")
-
-              : `
-                <p class="empty">
-                  No withdrawal requests.
-                </p>
-              `
-          }
-
+          <h2>Withdrawal Requests 💳</h2>
+          ${withdrawals.length ? withdrawals.map(item => `
+            <div class="admin-box">
+              <div class="row">
+                <div>
+                  <b>${escapeHtml(item.name)}</b>
+                  <p class="muted">₹${Number(item.amount).toFixed(2)} • ${escapeHtml(item.method)}</p>
+                </div>
+                <span class="status ${item.status}">${escapeHtml(item.status)}</span>
+              </div>
+              ${item.status === "pending" ? `
+                <div class="task-actions">
+                  <button class="btn success" onclick="reviewWithdrawal(${item.id}, 'approved')">Approve</button>
+                  <button class="btn danger" onclick="reviewWithdrawal(${item.id}, 'rejected')">Reject</button>
+                </div>
+              ` : ""}
+            </div>
+          `).join("") : `<p class="empty">No withdrawal requests.</p>`}
         </div>
       `;
     }
@@ -1698,46 +1025,18 @@
        REVIEW WITHDRAWAL
     ========================= */
 
-    async function reviewWithdrawal(
-      id,
-      status
-    ) {
-
-      if (
-        !confirm(
-          status === "approved"
-            ? "Approve this withdrawal?"
-            : "Reject this withdrawal and return the balance?"
-        )
-      ) {
-        return;
-      }
+    async function reviewWithdrawal(id, status) {
+      if (!confirm(status === "approved" ? "Approve this withdrawal?" : "Reject this withdrawal and return the balance?")) return;
 
       try {
-
-        await api(
-          "/api/admin/withdrawals/" + id,
-          {
-            method: "POST",
-
-            body: JSON.stringify({
-              status
-            })
-          }
-        );
-
-        alert(
-          status === "approved"
-            ? "Withdrawal approved!"
-            : "Withdrawal rejected and balance returned."
-        );
-
+        await api("/api/admin/withdrawals/" + id, {
+          method: "POST",
+          body: JSON.stringify({ status })
+        });
+        alert(status === "approved" ? "Withdrawal approved!" : "Withdrawal rejected and balance returned.");
         await adminWithdrawals();
-
       } catch (error) {
-
         alert(error.message);
-
       }
     }
 
@@ -1747,20 +1046,10 @@
     ========================= */
 
     async function logout() {
-
       try {
-
-        await api(
-          "/api/logout",
-          {
-            method: "POST"
-          }
-        );
-
+        await api("/api/logout", { method: "POST" });
       } finally {
-
         location.reload();
-
       }
     }
 
@@ -1770,36 +1059,19 @@
     ========================= */
 
     function scrollAccount() {
-
-      document
-        .getElementById("accountArea")
-        .scrollIntoView({
-          behavior: "smooth"
-        });
+      document.getElementById("accountArea").scrollIntoView({ behavior: "smooth" });
     }
-
 
     function formatDate(value) {
-
-      if (!value) {
-        return "-";
-      }
-
+      if (!value) return "-";
       try {
-
-        return new Date(value)
-          .toLocaleString();
-
+        return new Date(value).toLocaleString();
       } catch (e) {
-
         return value;
-
       }
     }
 
-
     function escapeHtml(value) {
-
       return String(value)
         .replaceAll("&", "&amp;")
         .replaceAll("<", "&lt;")
