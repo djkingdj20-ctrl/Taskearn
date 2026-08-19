@@ -29,15 +29,11 @@ if (IS_PRODUCTION && !SESSION_SECRET) {
 const FINAL_SESSION_SECRET = SESSION_SECRET || crypto.randomBytes(48).toString("hex");
 
 /* =====================================================
-   BODY LIMITS
+   BODY LIMITS & SECURITY HEADERS
 ===================================================== */
 
 app.use(express.json({ limit: "50kb" }));
 app.use(express.urlencoded({ extended: false, limit: "50kb" }));
-
-/* =====================================================
-   SECURITY HEADERS
-===================================================== */
 
 app.disable("x-powered-by");
 
@@ -49,7 +45,6 @@ app.use((req, res, next) => {
   res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
   res.setHeader("Cross-Origin-Resource-Policy", "same-origin");
   
-  // Content Security Policy
   res.setHeader(
     "Content-Security-Policy",
     "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;"
@@ -78,12 +73,7 @@ if (!fs.existsSync(DATA_DIR)) {
 ===================================================== */
 
 const PASSWORD_KEY_LENGTH = 64;
-const SCRYPT_OPTIONS = {
-  N: 16384,
-  r: 8,
-  p: 1,
-  maxmem: 32 * 1024 * 1024
-};
+const SCRYPT_OPTIONS = { N: 16384, r: 8, p: 1, maxmem: 32 * 1024 * 1024 };
 
 async function hashPassword(password) {
   const salt = crypto.randomBytes(16).toString("hex");
@@ -98,24 +88,18 @@ function isHashedPassword(password) {
 async function verifyPassword(password, storedPassword) {
   try {
     if (!isHashedPassword(storedPassword)) return false;
-
     const parts = storedPassword.split(":");
     if (parts.length !== 3) return false;
 
     const salt = parts[1];
     const storedHash = parts[2];
 
-    if (!/^[a-f0-9]{32}$/i.test(salt) || !/^[a-f0-9]{128}$/i.test(storedHash)) {
-      return false;
-    }
+    if (!/^[a-f0-9]{32}$/i.test(salt) || !/^[a-f0-9]{128}$/i.test(storedHash)) return false;
 
     const calculatedHash = await scryptAsync(password, salt, PASSWORD_KEY_LENGTH, SCRYPT_OPTIONS);
     const storedBuffer = Buffer.from(storedHash, "hex");
 
-    if (calculatedHash.length !== storedBuffer.length) {
-      return false;
-    }
-
+    if (calculatedHash.length !== storedBuffer.length) return false;
     return crypto.timingSafeEqual(calculatedHash, storedBuffer);
   } catch (error) {
     console.error("Password verification error:", error.message);
@@ -124,7 +108,7 @@ async function verifyPassword(password, storedPassword) {
 }
 
 /* =====================================================
-   DEFAULT DATABASE & LOAD
+   DEFAULT DATABASE & LOAD / SAVE QUEUE
 ===================================================== */
 
 const defaultDatabase = {
@@ -135,7 +119,7 @@ const defaultDatabase = {
       title: "Welcome Task",
       description: "Complete the basic TaskEarn welcome activity and submit it for review.",
       type: "Welcome",
-      reward: 5,
+      reward: 25,
       active: true,
       createdAt: new Date().toISOString()
     },
@@ -144,7 +128,7 @@ const defaultDatabase = {
       title: "Website Feedback",
       description: "Review the website and provide useful feedback about your experience.",
       type: "Feedback",
-      reward: 10,
+      reward: 50,
       active: true,
       createdAt: new Date().toISOString()
     }
@@ -160,10 +144,8 @@ function loadDatabase() {
       fs.writeFileSync(DATA_FILE, JSON.stringify(initial, null, 2), { encoding: "utf8", flag: "wx" });
       return initial;
     }
-
     const raw = fs.readFileSync(DATA_FILE, "utf8");
     const data = JSON.parse(raw);
-
     return {
       users: Array.isArray(data.users) ? data.users : [],
       tasks: Array.isArray(data.tasks) ? data.tasks : [],
@@ -177,11 +159,6 @@ function loadDatabase() {
 }
 
 let db = loadDatabase();
-
-/* =====================================================
-   DATABASE SAVE (SAFE QUEUE)
-===================================================== */
-
 let databaseWriteQueue = Promise.resolve();
 
 function saveDatabase() {
@@ -190,7 +167,6 @@ function saveDatabase() {
     await fs.promises.writeFile(tempFile, JSON.stringify(db, null, 2), "utf8");
     await fs.promises.rename(tempFile, DATA_FILE);
   });
-
   return databaseWriteQueue;
 }
 
@@ -200,50 +176,7 @@ function nextId(array) {
 }
 
 /* =====================================================
-   ADMIN INITIALIZATION
-===================================================== */
-
-async function ensureAdminAccount() {
-  const adminEmail = process.env.ADMIN_EMAIL;
-  const adminPassword = process.env.ADMIN_PASSWORD;
-
-  if (!adminEmail || !adminPassword) {
-    if (IS_PRODUCTION) {
-      console.warn("WARNING: ADMIN_EMAIL and ADMIN_PASSWORD are not configured.");
-    }
-    return;
-  }
-
-  const normalizedEmail = String(adminEmail).trim().toLowerCase();
-  let admin = db.users.find(user => user.role === "admin");
-
-  if (!admin) {
-    admin = {
-      id: nextId(db.users),
-      name: "TaskEarn Admin",
-      email: normalizedEmail,
-      password: await hashPassword(String(adminPassword)),
-      role: "admin",
-      balance: 0,
-      createdAt: new Date().toISOString()
-    };
-
-    db.users.push(admin);
-    await saveDatabase();
-    console.log("Admin account created.");
-    return;
-  }
-
-  if (admin.email !== normalizedEmail) {
-    admin.email = normalizedEmail;
-    await saveDatabase();
-  }
-}
-
-ensureAdminAccount().catch(err => console.error("Admin init error:", err));
-
-/* =====================================================
-   SESSION MANAGEMENT
+   SESSION & MIDDLEWARES
 ===================================================== */
 
 app.use(
@@ -262,21 +195,7 @@ app.use(
   })
 );
 
-/* =====================================================
-   STATIC FILES
-===================================================== */
-
-app.use(
-  express.static(path.join(__dirname, "public"), {
-    index: "index.html",
-    dotfiles: "deny",
-    maxAge: IS_PRODUCTION ? "1d" : 0
-  })
-);
-
-/* =====================================================
-   HELPERS & VALIDATORS
-===================================================== */
+app.use(express.static(path.join(__dirname, "public")));
 
 function getCurrentUser(req) {
   if (!req.session || !req.session.userId) return null;
@@ -301,158 +220,21 @@ function cleanText(value, maxLength = 500) {
 }
 
 function validEmail(email) {
-  if (typeof email !== "string" || email.length < 5 || email.length > 150) return false;
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-function validPassword(password) {
-  return typeof password === "string" && password.length >= 8 && password.length <= 200;
-}
-
-/* =====================================================
-   ORIGIN CHECK (CSRF MITIGATION)
-===================================================== */
-
-function checkOrigin(req, res, next) {
-  const method = req.method.toUpperCase();
-  const isProtected = ["POST", "PUT", "PATCH", "DELETE"].includes(method);
-
-  if (!isProtected || !req.path.startsWith("/api/")) {
-    return next();
-  }
-
-  const origin = req.get("origin");
-  const host = req.get("host");
-
-  if (!origin) return next();
-
-  try {
-    const originUrl = new URL(origin);
-    if (originUrl.host !== host) {
-      return res.status(403).json({ error: "Request origin is not allowed." });
-    }
-  } catch {
-    return res.status(403).json({ error: "Invalid request origin." });
-  }
-
-  next();
-}
-
-app.use(checkOrigin);
-
-/* =====================================================
-   AUTH MIDDLEWARE
-===================================================== */
-
-function requireLogin(req, res, next) {
-  const user = getCurrentUser(req);
-  if (!user) return res.status(401).json({ error: "Please login first." });
-  req.user = user;
-  next();
+  return typeof email === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 function requireUser(req, res, next) {
   const user = getCurrentUser(req);
   if (!user) return res.status(401).json({ error: "Please login first." });
-  if (user.role !== "user") return res.status(403).json({ error: "User account required." });
-  req.user = user;
-  next();
-}
-
-function requireAdmin(req, res, next) {
-  const user = getCurrentUser(req);
-  if (!user) return res.status(401).json({ error: "Please login first." });
-  if (user.role !== "admin") return res.status(403).json({ error: "Admin access required." });
   req.user = user;
   next();
 }
 
 /* =====================================================
-   RATE LIMITERS WITH AUTO-CLEANUP
+   API ROUTES
 ===================================================== */
 
-const loginAttempts = new Map();
-const apiRateMap = new Map();
-
-const MAX_LOGIN_ATTEMPTS = 8;
-const LOGIN_WINDOW = 15 * 60 * 1000;
-
-// Memory leak prevention
-setInterval(() => {
-  const now = Date.now();
-  for (const [ip, record] of loginAttempts.entries()) {
-    if (now - record.firstAttempt > LOGIN_WINDOW) loginAttempts.delete(ip);
-  }
-  for (const [ip, record] of apiRateMap.entries()) {
-    if (now - record.start > 60 * 1000) apiRateMap.delete(ip);
-  }
-}, 5 * 60 * 1000);
-
-function getClientIp(req) {
-  return req.ip || "unknown";
-}
-
-function checkLoginRateLimit(req) {
-  const ip = getClientIp(req);
-  const now = Date.now();
-  const record = loginAttempts.get(ip);
-
-  if (!record) return true;
-  if (now - record.firstAttempt > LOGIN_WINDOW) {
-    loginAttempts.delete(ip);
-    return true;
-  }
-
-  return record.count < MAX_LOGIN_ATTEMPTS;
-}
-
-function recordFailedLogin(req) {
-  const ip = getClientIp(req);
-  const now = Date.now();
-  let record = loginAttempts.get(ip);
-
-  if (!record || now - record.firstAttempt > LOGIN_WINDOW) {
-    record = { count: 0, firstAttempt: now };
-  }
-
-  record.count++;
-  loginAttempts.set(ip, record);
-}
-
-function clearLoginAttempts(req) {
-  loginAttempts.delete(getClientIp(req));
-}
-
-function generalApiRateLimit(req, res, next) {
-  if (!req.path.startsWith("/api/")) return next();
-
-  const ip = getClientIp(req);
-  const now = Date.now();
-  let record = apiRateMap.get(ip);
-
-  if (!record || now - record.start > 60 * 1000) {
-    record = { start: now, count: 0 };
-  }
-
-  record.count++;
-  apiRateMap.set(ip, record);
-
-  if (record.count > 120) {
-    return res.status(429).json({ error: "Too many requests. Please try again later." });
-  }
-
-  next();
-}
-
-app.use(generalApiRateLimit);
-
-/* =====================================================
-   ROUTES
-===================================================== */
-
-app.get("/health", (req, res) => {
-  res.json({ success: true, message: "TaskEarn server is running.", time: new Date().toISOString() });
-});
+app.get("/health", (req, res) => res.json({ success: true, status: "OK" }));
 
 app.get("/api/me", (req, res) => {
   res.json(safeUser(getCurrentUser(req)));
@@ -465,21 +247,12 @@ app.post("/api/register", async (req, res) => {
     const email = cleanText(req.body.email, 150).toLowerCase();
     const password = String(req.body.password || "");
 
-    if (!name || !email || !password) {
-      return res.status(400).json({ error: "Please complete all fields." });
-    }
-    if (name.length < 2) {
-      return res.status(400).json({ error: "Please enter a valid name." });
-    }
-    if (!validEmail(email)) {
-      return res.status(400).json({ error: "Please enter a valid email address." });
-    }
-    if (!validPassword(password)) {
-      return res.status(400).json({ error: "Password must contain 8 to 200 characters." });
-    }
+    if (!name || !email || !password) return res.status(400).json({ error: "Please complete all fields." });
+    if (!validEmail(email)) return res.status(400).json({ error: "Invalid email address." });
+    if (password.length < 6) return res.status(400).json({ error: "Password too short." });
 
-    if (db.users.some(user => user.email === email)) {
-      return res.status(400).json({ error: "An account with this email already exists." });
+    if (db.users.some(u => u.email === email)) {
+      return res.status(400).json({ error: "Account with this email already exists." });
     }
 
     const hashedPassword = await hashPassword(password);
@@ -499,10 +272,9 @@ app.post("/api/register", async (req, res) => {
     req.session.regenerate(err => {
       if (err) return res.status(500).json({ error: "Session creation failed." });
       req.session.userId = user.id;
-      req.session.save(() => res.json({ success: true, user: safeUser(user) }));
+      req.session.save(() => res.json(safeUser(user)));
     });
   } catch (error) {
-    console.error("Registration error:", error);
     res.status(500).json({ error: "Registration failed." });
   }
 });
@@ -510,79 +282,45 @@ app.post("/api/register", async (req, res) => {
 // LOGIN
 app.post("/api/login", async (req, res) => {
   try {
-    if (!checkLoginRateLimit(req)) {
-      return res.status(429).json({ error: "Too many login attempts. Please try again later." });
-    }
-
     const email = cleanText(req.body.email, 150).toLowerCase();
     const password = String(req.body.password || "");
 
-    if (!email || !password) {
-      recordFailedLogin(req);
-      return res.status(400).json({ error: "Please enter email and password." });
-    }
+    const user = db.users.find(u => u.email === email);
+    if (!user) return res.status(401).json({ error: "Invalid email or password." });
 
-    const user = db.users.find(item => item.email === email);
-    if (!user) {
-      recordFailedLogin(req);
-      return res.status(401).json({ error: "Invalid email or password." });
-    }
-
-    let correct = false;
-
-    if (isHashedPassword(user.password)) {
-      correct = await verifyPassword(password, user.password);
-    } else if (typeof user.password === "string" && user.password === password) {
-      correct = true;
-      user.password = await hashPassword(password);
-      await saveDatabase();
-    }
-
-    if (!correct) {
-      recordFailedLogin(req);
-      return res.status(401).json({ error: "Invalid email or password." });
-    }
-
-    clearLoginAttempts(req);
+    const correct = await verifyPassword(password, user.password);
+    if (!correct) return res.status(401).json({ error: "Invalid email or password." });
 
     req.session.regenerate(err => {
-      if (err) return res.status(500).json({ error: "Login session creation failed." });
+      if (err) return res.status(500).json({ error: "Login failed." });
       req.session.userId = user.id;
-      req.session.save(() => res.json({ success: true, user: safeUser(user) }));
+      req.session.save(() => res.json(safeUser(user)));
     });
   } catch (error) {
-    console.error("Login error:", error);
-    res.status(500).json({ error: "Login failed." });
+    res.status(500).json({ error: "Login error." });
   }
 });
 
 // LOGOUT
 app.post("/api/logout", (req, res) => {
-  req.session.destroy(err => {
-    if (err) return res.status(500).json({ error: "Logout failed." });
+  req.session.destroy(() => {
     res.clearCookie("taskearn.sid");
-    res.json({ success: true, message: "Logged out successfully." });
+    res.json({ success: true });
   });
 });
 
-// TASKS & SUBMISSIONS
+// GET TASKS
 app.get("/api/tasks", requireUser, (req, res) => {
-  const tasks = db.tasks.filter(task => task.active).map(t => ({ ...t, reward: Number(t.reward) }));
+  const tasks = db.tasks.filter(t => t.active).map(t => ({ ...t, reward: Number(t.reward) }));
   res.json(tasks);
 });
 
+// SUBMIT TASK
 app.post("/api/tasks/:id/submit", requireUser, async (req, res) => {
   try {
     const taskId = Number(req.params.id);
-    if (!Number.isSafeInteger(taskId)) return res.status(400).json({ error: "Invalid task ID." });
-
-    const task = db.tasks.find(item => item.id === taskId && item.active);
-    if (!task) return res.status(404).json({ error: "Task is not available." });
-
-    const existing = db.submissions.find(s => s.userId === req.user.id && s.taskId === task.id && ["pending", "approved"].includes(s.status));
-    if (existing) {
-      return res.status(400).json({ error: "Task already submitted or completed." });
-    }
+    const task = db.tasks.find(t => t.id === taskId && t.active);
+    if (!task) return res.status(404).json({ error: "Task not found." });
 
     const submission = {
       id: nextId(db.submissions),
@@ -596,38 +334,49 @@ app.post("/api/tasks/:id/submit", requireUser, async (req, res) => {
 
     db.submissions.push(submission);
     await saveDatabase();
-
-    res.json({ success: true, message: "Task submitted for review." });
+    res.json({ success: true, message: "Task submitted." });
   } catch (error) {
-    res.status(500).json({ error: "Task submission failed." });
+    res.status(500).json({ error: "Submission failed." });
   }
 });
 
-// WALLET & WITHDRAWAL
+// GET MY SUBMISSIONS (కొత్తగా జత చేయబడింది)
+app.get("/api/my-submissions", requireUser, (req, res) => {
+  const userSubmissions = db.submissions.filter(s => s.userId === req.user.id);
+  res.json(userSubmissions);
+});
+
+// GET WALLET (కొత్తగా జత చేయబడింది)
+app.get("/api/wallet", requireUser, (req, res) => {
+  const userSubmissions = db.submissions.filter(s => s.userId === req.user.id && s.status === "approved");
+  const userWithdrawals = db.withdrawals.filter(w => w.userId === req.user.id);
+  
+  res.json({
+    balance: Number(req.user.balance || 0),
+    completed: userSubmissions.length,
+    withdrawals: userWithdrawals
+  });
+});
+
+// WITHDRAW REQUEST
 app.post("/api/withdraw", requireUser, async (req, res) => {
   try {
     const amount = Number(req.body.amount);
     const method = cleanText(req.body.method, 100);
 
-    if (!Number.isSafeInteger(amount) || amount < 100 || amount > 100000 || !method) {
-      return res.status(400).json({ error: "Invalid withdrawal parameters." });
+    if (isNaN(amount) || amount < 100) {
+      return res.status(400).json({ error: "Minimum withdrawal is ₹100." });
     }
 
-    const user = db.users.find(item => item.id === req.user.id);
+    const user = db.users.find(u => u.id === req.user.id);
     if (!user || user.balance < amount) {
       return res.status(400).json({ error: "Insufficient balance." });
     }
 
-    if (db.withdrawals.some(w => w.userId === user.id && w.status === "pending")) {
-      return res.status(400).json({ error: "Pending withdrawal request already exists." });
-    }
-
     user.balance -= amount;
-
     db.withdrawals.push({
       id: nextId(db.withdrawals),
       userId: user.id,
-      name: user.name,
       amount,
       method,
       status: "pending",
@@ -642,24 +391,12 @@ app.post("/api/withdraw", requireUser, async (req, res) => {
 });
 
 /* =====================================================
-   ADMIN HANDLERS & ERROR HANDLING
+   FALLBACK & SERVER START
 ===================================================== */
-
-app.use("/api", (req, res) => res.status(404).json({ error: "API endpoint not found." }));
 
 app.use((req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
-
-app.use((err, req, res, next) => {
-  console.error("Server error:", err);
-  if (res.headersSent) return next(err);
-  res.status(500).json({ error: "Internal server error." });
-});
-
-/* =====================================================
-   SERVER START
-===================================================== */
 
 const PORT = Number(process.env.PORT || 3000);
 app.listen(PORT, "0.0.0.0", () => {
