@@ -4,12 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-  <meta name="google-adsense-account" content="ca-pub-5877718538170577">
-  <meta name="description" content="TaskEarn - Discover eligible online tasks, submit completed work and manage approved rewards.">
+  <meta
+    name="google-adsense-account"
+    content="ca-pub-5877718538170577"
+  >
+
+  <meta
+    name="description"
+    content="TaskEarn - Discover eligible online tasks, submit completed work and manage approved rewards."
+  >
 
   <title>TaskEarn - Tasks & Rewards</title>
 
   <style>
+
     /* =====================================================
        RESET
     ===================================================== */
@@ -25,8 +33,13 @@
 
     body {
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-        Roboto, Arial, sans-serif;
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
       background: #f7f8fc;
       color: #171b2d;
       line-height: 1.5;
@@ -113,7 +126,8 @@
       position: relative;
     }
 
-    /* Balance hidden by default */
+    /* BALANCE HIDDEN BY DEFAULT */
+
     .balance {
       display: none;
       background: #f0fdf7;
@@ -126,14 +140,14 @@
       white-space: nowrap;
     }
 
-    /* Show balance only after login */
-    body.logged-in .balance {
+    .balance.visible {
       display: block;
     }
 
     .menu-btn {
       width: 42px;
       height: 42px;
+      border: 0;
       border-radius: 12px;
       background: #f4f5f9;
       font-size: 21px;
@@ -213,12 +227,13 @@
       overflow: hidden;
       padding: 30px 22px;
       border-radius: 28px;
-      background: linear-gradient(
-        135deg,
-        #fff7ed 0%,
-        #ffe8d8 48%,
-        #e9f4ff 100%
-      );
+      background:
+        linear-gradient(
+          135deg,
+          #fff7ed 0%,
+          #ffe8d8 48%,
+          #e9f4ff 100%
+        );
       box-shadow: 0 12px 35px rgba(30,40,70,.06);
       margin-bottom: 18px;
     }
@@ -269,6 +284,7 @@
     .btn {
       min-height: 46px;
       padding: 11px 17px;
+      border: 0;
       border-radius: 13px;
       font-weight: 800;
       transition:
@@ -461,7 +477,7 @@
     }
 
     /* =====================================================
-       DASHBOARD NAV
+       NAV
     ===================================================== */
 
     .nav {
@@ -482,7 +498,7 @@
     }
 
     /* =====================================================
-       FORMS
+       FORM
     ===================================================== */
 
     .form {
@@ -623,22 +639,13 @@
     }
 
     /* =====================================================
-       MOBILE BOTTOM NAV
-       Hidden by default.
-       Visible ONLY when body.logged-in
+       MOBILE NAV
+       ONLY SHOWN AFTER LOGIN
     ===================================================== */
 
     .mobile-bottom-nav {
       display: none;
     }
-
-    body.logged-in .mobile-bottom-nav {
-      display: none;
-    }
-
-    /* =====================================================
-       DESKTOP
-    ===================================================== */
 
     @media (min-width: 800px) {
 
@@ -655,17 +662,9 @@
       }
     }
 
-    /* =====================================================
-       MOBILE
-    ===================================================== */
-
     @media (max-width: 700px) {
 
       body {
-        padding-bottom: 0;
-      }
-
-      body.logged-in {
         padding-bottom: 72px;
       }
 
@@ -724,10 +723,9 @@
         font-size: 16px;
       }
 
-      /* Bottom nav ONLY when logged in */
-      body.logged-in .mobile-bottom-nav {
+      .mobile-bottom-nav {
         position: fixed;
-        display: flex;
+        display: none;
         left: 10px;
         right: 10px;
         bottom: 10px;
@@ -743,11 +741,15 @@
         padding: 5px;
       }
 
+      .mobile-bottom-nav.logged-in {
+        display: flex;
+      }
+
       .bottom-item {
         border: 0;
         background: transparent;
         height: 50px;
-        min-width: 65px;
+        min-width: 75px;
         border-radius: 15px;
         color: #70798b;
         font-size: 10px;
@@ -768,6 +770,7 @@
         color: #ff5d2e;
       }
     }
+
   </style>
 </head>
 
@@ -781,7 +784,7 @@
 
   <div class="header-inner">
 
-    <div class="logo-container" onclick="goHome()">
+    <div class="logo-container" onclick="handleLogoClick()">
 
       <div class="logo-icon">T</div>
 
@@ -793,7 +796,7 @@
 
     <div class="header-right">
 
-      <!-- Hidden until login -->
+      <!-- ONLY LOGGED-IN USER -->
       <div id="balance" class="balance">
         ₹0.00
       </div>
@@ -801,7 +804,8 @@
       <button
         class="menu-btn"
         onclick="toggleDropdown(event)"
-        aria-label="Menu">
+        aria-label="Menu"
+      >
         ☰
       </button>
 
@@ -809,7 +813,8 @@
 
         <button
           class="dropdown-item"
-          onclick="showLogin()">
+          onclick="handleLoginMenu()"
+        >
           🔑 Login / Register
         </button>
 
@@ -818,7 +823,8 @@
           onclick="showInfoPage(
             'About Us ℹ️',
             'TaskEarn offers simple daily tasks and reward tracking.'
-          )">
+          )"
+        >
           ℹ️ About Us
         </button>
 
@@ -827,7 +833,8 @@
           onclick="showInfoPage(
             'Terms & Conditions 📜',
             'Users must complete tasks honestly and maintain account security.'
-          )">
+          )"
+        >
           📜 Terms & Conditions
         </button>
 
@@ -836,7 +843,8 @@
           onclick="showInfoPage(
             'Contact Us 📞',
             'Support Email: support@taskearn.demo'
-          )">
+          )"
+        >
           📞 Contact Us
         </button>
 
@@ -845,7 +853,8 @@
           onclick="showInfoPage(
             'Privacy Policy 🔒',
             'We respect user data and collect minimal information necessary for service delivery.'
-          )">
+          )"
+        >
           🔒 Privacy Policy
         </button>
 
@@ -864,10 +873,7 @@
 
 <main class="container">
 
-  <!-- ===================================================
-       PUBLIC HOME
-  ==================================================== -->
-
+  <!-- PUBLIC HOME -->
   <section id="homeArea">
 
     <div class="hero">
@@ -885,17 +891,24 @@
         submit work, and receive approved rewards.
       </p>
 
-      <div class="hero-actions">
+      <!-- THESE BUTTONS ARE ONLY FOR LOGGED-OUT USERS -->
+
+      <div
+        id="publicHeroButtons"
+        class="hero-actions"
+      >
 
         <button
           class="btn primary large-btn"
-          onclick="showLogin()">
+          onclick="showLogin()"
+        >
           🔐 Login
         </button>
 
         <button
           class="btn secondary large-btn"
-          onclick="showRegister()">
+          onclick="showRegister()"
+        >
           ✨ Create Account
         </button>
 
@@ -903,8 +916,6 @@
 
     </div>
 
-
-    <!-- FEATURES -->
 
     <div class="features">
 
@@ -916,7 +927,9 @@
 
         <div>
           <b>Simple Tasks</b>
-          <span>Browse available tasks easily.</span>
+          <span>
+            Browse available tasks easily.
+          </span>
         </div>
 
       </div>
@@ -930,7 +943,9 @@
 
         <div>
           <b>Track Rewards</b>
-          <span>Monitor approved rewards.</span>
+          <span>
+            Monitor approved rewards.
+          </span>
         </div>
 
       </div>
@@ -944,15 +959,15 @@
 
         <div>
           <b>Secure Account</b>
-          <span>Manage your account securely.</span>
+          <span>
+            Manage your account securely.
+          </span>
         </div>
 
       </div>
 
     </div>
 
-
-    <!-- HOW IT WORKS -->
 
     <section class="card">
 
@@ -962,13 +977,16 @@
 
       <ol>
 
-        <li>Create your TaskEarn account.</li>
-
-        <li>Browse available tasks.</li>
+        <li>
+          Create your TaskEarn account.
+        </li>
 
         <li>
-          Read requirements carefully
-          and complete the work.
+          Browse available tasks.
+        </li>
+
+        <li>
+          Read requirements carefully and complete the work.
         </li>
 
         <li>
@@ -976,16 +994,13 @@
         </li>
 
         <li>
-          Approved rewards are added
-          to your wallet.
+          Approved rewards are added to your wallet.
         </li>
 
       </ol>
 
     </section>
 
-
-    <!-- ABOUT -->
 
     <section class="card">
 
@@ -994,15 +1009,12 @@
       </h2>
 
       <p class="muted">
-        TaskEarn provides a simple interface
-        for discovering tasks, submitting work,
-        and managing rewards.
+        TaskEarn provides a simple interface for discovering
+        tasks, submitting work, and managing rewards.
       </p>
 
     </section>
 
-
-    <!-- FAQ -->
 
     <section class="card">
 
@@ -1015,8 +1027,7 @@
       </h3>
 
       <p class="muted">
-        Browse available tasks and complete
-        them according to requirements.
+        Browse available tasks and complete them according to requirements.
       </p>
 
       <h3>
@@ -1024,8 +1035,7 @@
       </h3>
 
       <p class="muted">
-        No. Earnings depend on task availability
-        and approval.
+        No. Earnings depend on task availability and approval.
       </p>
 
       <h3>
@@ -1041,54 +1051,50 @@
   </section>
 
 
-  <!-- ===================================================
-       DYNAMIC ACCOUNT AREA
-  ==================================================== -->
+  <!-- DYNAMIC AREA -->
 
   <section id="accountArea"></section>
 
 
-  <!-- ===================================================
-       FOOTER
-  ==================================================== -->
+  <!-- FOOTER -->
 
   <footer class="footer">
 
     <div class="footer-links">
 
-      <a onclick="
-        showInfoPage(
+      <a
+        onclick="showInfoPage(
           'Privacy Policy 🔒',
           'We respect user data.'
-        )
-      ">
+        )"
+      >
         Privacy
       </a>
 
-      <a onclick="
-        showInfoPage(
+      <a
+        onclick="showInfoPage(
           'Terms & Conditions 📜',
           'Users must complete tasks honestly.'
-        )
-      ">
+        )"
+      >
         Terms
       </a>
 
-      <a onclick="
-        showInfoPage(
+      <a
+        onclick="showInfoPage(
           'About Us ℹ️',
           'TaskEarn offers simple tasks.'
-        )
-      ">
+        )"
+      >
         About
       </a>
 
-      <a onclick="
-        showInfoPage(
+      <a
+        onclick="showInfoPage(
           'Contact Us 📞',
           'Email: support@taskearn.demo'
-        )
-      ">
+        )"
+      >
         Contact
       </a>
 
@@ -1103,50 +1109,31 @@
 
 <!-- =====================================================
      MOBILE NAVIGATION
-
-     IMPORTANT:
-     This is hidden unless user is logged in.
+     ONLY LOGGED-IN USERS
 ===================================================== -->
 
-<div id="mobileBottomNav" class="mobile-bottom-nav">
+<div
+  id="mobileBottomNav"
+  class="mobile-bottom-nav"
+>
 
+  <!-- HOME -->
   <button
     class="bottom-item active"
-    onclick="goHome()">
-
+    onclick="homeForLoggedInUser()"
+  >
     <span>🏠</span>
     <span>Home</span>
-
   </button>
 
 
+  <!-- ACCOUNT -->
   <button
     class="bottom-item"
-    onclick="tasksPage()">
-
-    <span>📋</span>
-    <span>Tasks</span>
-
-  </button>
-
-
-  <button
-    class="bottom-item"
-    onclick="walletPage()">
-
-    <span>💰</span>
-    <span>Wallet</span>
-
-  </button>
-
-
-  <button
-    class="bottom-item"
-    onclick="handleProfileClick()">
-
+    onclick="handleProfileClick()"
+  >
     <span>👤</span>
     <span>Account</span>
-
   </button>
 
 </div>
@@ -1155,7 +1142,7 @@
 <script>
 
 /* =====================================================
-   GLOBAL LOGIN STATE
+   GLOBAL USER STATE
 ===================================================== */
 
 let currentUser = null;
@@ -1204,7 +1191,7 @@ async function api(url, options = {}) {
 
 
 /* =====================================================
-   ESCAPE HTML
+   UTILITIES
 ===================================================== */
 
 function escapeHtml(val) {
@@ -1218,10 +1205,6 @@ function escapeHtml(val) {
 
 }
 
-
-/* =====================================================
-   DATE
-===================================================== */
 
 function formatDate(val) {
 
@@ -1241,33 +1224,89 @@ function formatDate(val) {
 
 
 /* =====================================================
-   LOGIN STATE UI
+   UI STATE
 ===================================================== */
 
-function setLoggedIn(user) {
+function setLoggedInUI(user) {
 
-  currentUser = user;
+  currentUser = user || null;
 
-  document.body.classList.add("logged-in");
+  const balance =
+    document.getElementById("balance");
 
-  showBottomNav(true);
+  const nav =
+    document.getElementById("mobileBottomNav");
 
-}
+  const heroButtons =
+    document.getElementById("publicHeroButtons");
 
+  if (currentUser) {
 
-/* =====================================================
-   LOGOUT STATE UI
-===================================================== */
+    /*
+      SHOW BALANCE
+    */
 
-function setLoggedOut() {
+    if (balance) {
 
-  currentUser = null;
+      balance.classList.add("visible");
 
-  document.body.classList.remove("logged-in");
+    }
 
-  document.getElementById("balance").innerText = "₹0.00";
+    /*
+      SHOW MOBILE NAV
+    */
 
-  showBottomNav(false);
+    if (nav) {
+
+      nav.classList.add("logged-in");
+
+    }
+
+    /*
+      HIDE LOGIN / REGISTER BUTTONS
+    */
+
+    if (heroButtons) {
+
+      heroButtons.style.display = "none";
+
+    }
+
+  } else {
+
+    /*
+      HIDE BALANCE
+    */
+
+    if (balance) {
+
+      balance.classList.remove("visible");
+
+      balance.innerText = "₹0.00";
+
+    }
+
+    /*
+      HIDE MOBILE NAV
+    */
+
+    if (nav) {
+
+      nav.classList.remove("logged-in");
+
+    }
+
+    /*
+      SHOW LOGIN / REGISTER
+    */
+
+    if (heroButtons) {
+
+      heroButtons.style.display = "flex";
+
+    }
+
+  }
 
 }
 
@@ -1276,33 +1315,17 @@ function setLoggedOut() {
    HOME
 ===================================================== */
 
-function goHome() {
+function goPublicHome() {
 
-  closeDropdown();
+  currentUser = null;
+
+  setLoggedInUI(null);
 
   document.getElementById("homeArea").style.display = "block";
 
   document.getElementById("accountArea").innerHTML = "";
 
-  /*
-     IMPORTANT:
-     DO NOT LOGOUT HERE.
-
-     Home button only returns to home.
-     Login session stays active.
-  */
-
-  if (currentUser) {
-
-    showBottomNav(true);
-
-  } else {
-
-    showBottomNav(false);
-
-  }
-
-  setActiveBottom("home");
+  closeDropdown();
 
   window.scrollTo({
     top: 0,
@@ -1312,20 +1335,36 @@ function goHome() {
 }
 
 
-/* =====================================================
-   SCROLL
-===================================================== */
+function homeForLoggedInUser() {
 
-function scrollToView() {
+  /*
+    IMPORTANT:
+    LOGGED-IN USER MUST NOT GO
+    TO PUBLIC LOGIN PAGE.
+  */
 
-  const area =
-    document.getElementById("accountArea");
+  if (currentUser) {
 
-  if (area) {
+    dashboard(currentUser);
 
-    area.scrollIntoView({
-      behavior: "smooth"
-    });
+    return;
+
+  }
+
+  showLogin();
+
+}
+
+
+function handleLogoClick() {
+
+  if (currentUser) {
+
+    dashboard(currentUser);
+
+  } else {
+
+    goPublicHome();
 
   }
 
@@ -1339,7 +1378,9 @@ function scrollToView() {
 function toggleDropdown(e) {
 
   if (e) {
+
     e.stopPropagation();
+
   }
 
   const menu =
@@ -1365,12 +1406,46 @@ function closeDropdown() {
 
 
 /* =====================================================
+   LOGIN MENU
+===================================================== */
+
+function handleLoginMenu() {
+
+  closeDropdown();
+
+  if (currentUser) {
+
+    dashboard(currentUser);
+
+  } else {
+
+    showLogin();
+
+  }
+
+}
+
+
+/* =====================================================
    LOGIN PAGE
 ===================================================== */
 
 function showLogin() {
 
   closeDropdown();
+
+  /*
+    If already logged in,
+    don't show login page.
+  */
+
+  if (currentUser) {
+
+    dashboard(currentUser);
+
+    return;
+
+  }
 
   document.getElementById("homeArea").style.display = "none";
 
@@ -1410,18 +1485,23 @@ function showLogin() {
 
           <button
             class="btn primary large-btn"
-            onclick="login()">
-
+            onclick="login()"
+          >
             Login
-
           </button>
 
           <button
             class="btn secondary"
-            onclick="showRegister()">
-
+            onclick="showRegister()"
+          >
             Create a new account
+          </button>
 
+          <button
+            class="btn secondary"
+            onclick="goPublicHome()"
+          >
+            ← Back to Home
           </button>
 
         </div>
@@ -1446,6 +1526,14 @@ function showLogin() {
 function showRegister() {
 
   closeDropdown();
+
+  if (currentUser) {
+
+    dashboard(currentUser);
+
+    return;
+
+  }
 
   document.getElementById("homeArea").style.display = "none";
 
@@ -1491,18 +1579,23 @@ function showRegister() {
 
           <button
             class="btn primary large-btn"
-            onclick="register()">
-
+            onclick="register()"
+          >
             Create Account
-
           </button>
 
           <button
             class="btn secondary"
-            onclick="showLogin()">
-
+            onclick="showLogin()"
+          >
             Already have an account? Login
+          </button>
 
+          <button
+            class="btn secondary"
+            onclick="goPublicHome()"
+          >
+            ← Back to Home
           </button>
 
         </div>
@@ -1555,13 +1648,15 @@ async function login() {
       }
     );
 
-    setLoggedIn(user);
+    currentUser = user;
+
+    setLoggedInUI(user);
 
     dashboard(user);
 
   } catch (err) {
 
-    alert(err.message || "Login failed.");
+    alert(err.message);
 
   }
 
@@ -1607,15 +1702,15 @@ async function register() {
       }
     );
 
-    setLoggedIn(user);
+    currentUser = user;
+
+    setLoggedInUI(user);
 
     dashboard(user);
 
   } catch (err) {
 
-    alert(
-      err.message || "Registration failed."
-    );
+    alert(err.message);
 
   }
 
@@ -1623,7 +1718,7 @@ async function register() {
 
 
 /* =====================================================
-   REAL LOGOUT
+   LOGOUT
 ===================================================== */
 
 async function logout() {
@@ -1646,9 +1741,20 @@ async function logout() {
 
   }
 
-  setLoggedOut();
+  currentUser = null;
 
-  goHome();
+  setLoggedInUI(null);
+
+  document.getElementById("accountArea").innerHTML = "";
+
+  document.getElementById("homeArea").style.display = "block";
+
+  closeDropdown();
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
 
 }
 
@@ -1659,7 +1765,17 @@ async function logout() {
 
 async function dashboard(user) {
 
-  setLoggedIn(user);
+  if (!user) {
+
+    showLogin();
+
+    return;
+
+  }
+
+  currentUser = user;
+
+  setLoggedInUI(user);
 
   closeDropdown();
 
@@ -1667,26 +1783,30 @@ async function dashboard(user) {
 
   let wallet = {
     balance: 0,
-    completed: 0
+    completed: 0,
+    withdrawals: []
   };
 
   try {
 
-    wallet =
-      await api("/api/wallet");
+    wallet = await api(
+      "/api/wallet"
+    );
 
   } catch (e) {
 
     console.warn(
-      "Wallet could not be loaded."
+      "Wallet API error:",
+      e.message
     );
 
   }
 
-  document.getElementById("balance").innerText =
-    "₹" +
+  const balanceValue =
     Number(wallet.balance || 0).toFixed(2);
 
+  document.getElementById("balance").innerText =
+    "₹" + balanceValue;
 
   document.getElementById("accountArea").innerHTML = `
 
@@ -1698,27 +1818,26 @@ async function dashboard(user) {
 
           <p
             class="muted"
-            style="margin:0;">
+            style="margin:0;"
+          >
             Welcome back
           </p>
 
           <h2
-            style="margin:4px 0 0;">
-
+            style="margin:4px 0 0;"
+          >
             Hi,
             ${escapeHtml(user.name)}
             👋
-
           </h2>
 
         </div>
 
         <button
           class="btn secondary"
-          onclick="logout()">
-
+          onclick="logout()"
+        >
           Logout
-
         </button>
 
       </div>
@@ -1735,7 +1854,7 @@ async function dashboard(user) {
         </small>
 
         <b>
-          ₹${Number(wallet.balance || 0).toFixed(2)}
+          ₹${balanceValue}
         </b>
 
       </div>
@@ -1769,30 +1888,32 @@ async function dashboard(user) {
     </div>
 
 
+    <!--
+      TASKS / WALLET / SUBMISSIONS
+      EXIST ONLY INSIDE ACCOUNT
+    -->
+
     <div class="nav">
 
       <button
         class="btn primary"
-        onclick="tasksPage()">
-
+        onclick="tasksPage()"
+      >
         📋 Tasks
-
       </button>
 
       <button
         class="btn secondary"
-        onclick="walletPage()">
-
+        onclick="walletPage()"
+      >
         💰 Wallet
-
       </button>
 
       <button
         class="btn secondary"
-        onclick="submissionsPage()">
-
+        onclick="submissionsPage()"
+      >
         📄 Submissions
-
       </button>
 
     </div>
@@ -1827,48 +1948,63 @@ async function tasksPage() {
 
   try {
 
-    tasks =
-      await api("/api/tasks");
+    tasks = await api(
+      "/api/tasks"
+    );
 
   } catch (e) {
 
     console.warn(
-      "Could not load tasks."
+      "Tasks API error:",
+      e.message
     );
 
   }
 
-  if (!tasks || !tasks.length) {
-
-    tasks = [
-
-      {
-        id: 1,
-        type: "Survey",
-        reward: 25,
-        title: "Quick Tech Feedback",
-        description:
-          "Answer 5 simple questions regarding software usage."
-      },
-
-      {
-        id: 2,
-        type: "App Test",
-        reward: 50,
-        title: "App Navigation Check",
-        description:
-          "Test mobile responsive navigation layout."
-      }
-
-    ];
-
-  }
+  /*
+    IMPORTANT:
+    NO FAKE TASKS NOW.
+    Backend tasks only.
+  */
 
   const screen =
     document.getElementById("screen");
 
   if (!screen) return;
 
+  if (!tasks || !tasks.length) {
+
+    screen.innerHTML = `
+
+      <div class="card">
+
+        <div class="empty">
+
+          <div
+            style="font-size:40px;"
+          >
+            📋
+          </div>
+
+          <h3>
+            No tasks available
+          </h3>
+
+          <p class="muted">
+            New tasks will appear here when available.
+          </p>
+
+        </div>
+
+      </div>
+
+    `;
+
+    setActiveBottom("account");
+
+    return;
+
+  }
 
   screen.innerHTML = `
 
@@ -1879,7 +2015,6 @@ async function tasksPage() {
 
     </div>
 
-
     <div class="grid">
 
       ${tasks.map(t => `
@@ -1889,40 +2024,28 @@ async function tasksPage() {
           <div class="task-top">
 
             <span class="tag">
-
               ${escapeHtml(t.type)}
-
             </span>
 
             <span class="earn">
-
               +₹${Number(t.reward).toFixed(2)}
-
             </span>
 
           </div>
 
-
           <h3>
-
             ${escapeHtml(t.title)}
-
           </h3>
 
-
           <p class="muted">
-
             ${escapeHtml(t.description)}
-
           </p>
-
 
           <button
             class="btn primary"
-            onclick="submitTask(${t.id})">
-
+            onclick="submitTask(${Number(t.id)})"
+          >
             Submit Task
-
           </button>
 
         </div>
@@ -1933,7 +2056,7 @@ async function tasksPage() {
 
   `;
 
-  setActiveBottom("tasks");
+  setActiveBottom("account");
 
 }
 
@@ -1952,9 +2075,11 @@ async function submitTask(id) {
 
   }
 
-  if (!confirm(
-    "Have you completed this task according to requirements?"
-  )) {
+  if (
+    !confirm(
+      "Have you completed this task according to requirements?"
+    )
+  ) {
 
     return;
 
@@ -1962,14 +2087,16 @@ async function submitTask(id) {
 
   try {
 
-    await api(
+    const result = await api(
       "/api/tasks/" + id + "/submit",
       {
-        method: "POST"
+        method: "POST",
+        body: JSON.stringify({})
       }
     );
 
     alert(
+      result.message ||
       "Task submitted for review!"
     );
 
@@ -1977,10 +2104,7 @@ async function submitTask(id) {
 
   } catch (err) {
 
-    alert(
-      err.message ||
-      "Task submission failed."
-    );
+    alert(err.message);
 
   }
 
@@ -2005,13 +2129,15 @@ async function submissionsPage() {
 
   try {
 
-    submissions =
-      await api("/api/my-submissions");
+    submissions = await api(
+      "/api/my-submissions"
+    );
 
   } catch (e) {
 
     console.warn(
-      "Could not load submissions."
+      "Submission API error:",
+      e.message
     );
 
   }
@@ -2020,7 +2146,6 @@ async function submissionsPage() {
     document.getElementById("screen");
 
   if (!screen) return;
-
 
   if (!submissions.length) {
 
@@ -2034,7 +2159,15 @@ async function submissionsPage() {
 
         <div class="empty">
 
-          No task submissions yet.
+          <div
+            style="font-size:40px;"
+          >
+            📄
+          </div>
+
+          <p>
+            You haven't submitted any tasks yet.
+          </p>
 
         </div>
 
@@ -2042,12 +2175,11 @@ async function submissionsPage() {
 
     `;
 
-    setActiveBottom("submissions");
+    setActiveBottom("account");
 
     return;
 
   }
-
 
   screen.innerHTML = `
 
@@ -2070,29 +2202,23 @@ async function submissionsPage() {
               </b>
 
               <p class="muted">
-
                 Reward:
                 ₹${Number(item.reward).toFixed(2)}
-
               </p>
 
             </div>
 
             <span
-              class="status ${escapeHtml(item.status)}">
-
+              class="status ${escapeHtml(item.status)}"
+            >
               ${escapeHtml(item.status)}
-
             </span>
 
           </div>
 
-
           <p class="muted">
-
             Submitted:
             ${formatDate(item.submittedAt)}
-
           </p>
 
         </div>
@@ -2103,7 +2229,7 @@ async function submissionsPage() {
 
   `;
 
-  setActiveBottom("submissions");
+  setActiveBottom("account");
 
 }
 
@@ -2129,13 +2255,15 @@ async function walletPage() {
 
   try {
 
-    wallet =
-      await api("/api/wallet");
+    wallet = await api(
+      "/api/wallet"
+    );
 
   } catch (e) {
 
     console.warn(
-      "Could not load wallet."
+      "Wallet API error:",
+      e.message
     );
 
   }
@@ -2144,7 +2272,6 @@ async function walletPage() {
     document.getElementById("screen");
 
   if (!screen) return;
-
 
   screen.innerHTML = `
 
@@ -2155,16 +2282,14 @@ async function walletPage() {
       </p>
 
       <h1
-        style="font-size:36px;margin:5px 0 8px;">
-
+        style="font-size:36px;margin:5px 0 8px;"
+      >
         ₹${Number(wallet.balance || 0).toFixed(2)}
-
       </h1>
 
       <p class="muted">
         Minimum withdrawal: ₹100
       </p>
-
 
       <div class="form">
 
@@ -2176,7 +2301,6 @@ async function walletPage() {
           placeholder="Amount"
         >
 
-
         <input
           id="method"
           class="input"
@@ -2184,13 +2308,11 @@ async function walletPage() {
           placeholder="Payment Method"
         >
 
-
         <button
           class="btn primary large-btn"
-          onclick="withdraw()">
-
+          onclick="withdraw()"
+        >
           Request Withdrawal
-
         </button>
 
       </div>
@@ -2207,7 +2329,6 @@ async function walletPage() {
       ${
         wallet.withdrawals &&
         wallet.withdrawals.length
-
         ?
 
         wallet.withdrawals.map(w => `
@@ -2217,26 +2338,21 @@ async function walletPage() {
             <div class="row">
 
               <span>
-
                 ₹${Number(w.amount).toFixed(2)}
                 •
                 ${escapeHtml(w.method)}
-
               </span>
 
               <span
-                class="status ${escapeHtml(w.status)}">
-
+                class="status ${escapeHtml(w.status)}"
+              >
                 ${escapeHtml(w.status)}
-
               </span>
 
             </div>
 
             <p class="muted">
-
               ${formatDate(w.createdAt)}
-
             </p>
 
           </div>
@@ -2248,13 +2364,14 @@ async function walletPage() {
         `<p class="muted">
           No withdrawals yet.
         </p>`
+
       }
 
     </div>
 
   `;
 
-  setActiveBottom("wallet");
+  setActiveBottom("account");
 
 }
 
@@ -2281,7 +2398,6 @@ async function withdraw() {
   const method =
     document.getElementById("method").value.trim();
 
-
   if (!amount || amount < 100) {
 
     alert(
@@ -2292,34 +2408,39 @@ async function withdraw() {
 
   }
 
+  if (!method) {
+
+    alert(
+      "Please enter payment method."
+    );
+
+    return;
+
+  }
 
   try {
 
-    const result =
-      await api(
-        "/api/withdraw",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            amount,
-            method
-          })
-        }
-      );
+    const result = await api(
+      "/api/withdraw",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          amount,
+          method
+        })
+      }
+    );
 
     alert(
       result.message ||
-      "Withdrawal request submitted successfully!"
+      "Withdrawal request submitted."
     );
 
-    walletPage();
+    dashboard(currentUser);
 
   } catch (err) {
 
-    alert(
-      err.message ||
-      "Withdrawal failed."
-    );
+    alert(err.message);
 
   }
 
@@ -2334,8 +2455,7 @@ function showInfoPage(title, content) {
 
   closeDropdown();
 
-  document.getElementById("homeArea").style.display =
-    "none";
+  document.getElementById("homeArea").style.display = "none";
 
   document.getElementById("accountArea").innerHTML = `
 
@@ -2351,10 +2471,9 @@ function showInfoPage(title, content) {
 
       <button
         class="btn secondary"
-        onclick="goHome()">
-
-        ← Back to Home
-
+        onclick="goBackFromInfo()"
+      >
+        ← Back
       </button>
 
     </div>
@@ -2368,8 +2487,23 @@ function showInfoPage(title, content) {
 }
 
 
+function goBackFromInfo() {
+
+  if (currentUser) {
+
+    dashboard(currentUser);
+
+  } else {
+
+    goPublicHome();
+
+  }
+
+}
+
+
 /* =====================================================
-   BOTTOM NAV
+   MOBILE NAV
 ===================================================== */
 
 function showBottomNav(show) {
@@ -2381,22 +2515,17 @@ function showBottomNav(show) {
 
   if (!nav) return;
 
-  /*
-     Bottom navigation only exists
-     for logged-in users.
-  */
-
   if (
     show &&
     currentUser &&
     window.innerWidth <= 700
   ) {
 
-    nav.style.display = "flex";
+    nav.classList.add("logged-in");
 
   } else {
 
-    nav.style.display = "none";
+    nav.classList.remove("logged-in");
 
   }
 
@@ -2404,7 +2533,7 @@ function showBottomNav(show) {
 
 
 /* =====================================================
-   ACTIVE BOTTOM BUTTON
+   ACTIVE MOBILE BUTTON
 ===================================================== */
 
 function setActiveBottom(name) {
@@ -2415,12 +2544,10 @@ function setActiveBottom(name) {
       b => b.classList.remove("active")
     );
 
-
   const items =
     document.querySelectorAll(
       ".bottom-item"
     );
-
 
   if (name === "home") {
 
@@ -2428,27 +2555,9 @@ function setActiveBottom(name) {
 
   }
 
-  if (name === "tasks") {
-
-    items[1]?.classList.add("active");
-
-  }
-
-  if (name === "wallet") {
-
-    items[2]?.classList.add("active");
-
-  }
-
-  if (name === "submissions") {
-
-    items[1]?.classList.add("active");
-
-  }
-
   if (name === "account") {
 
-    items[3]?.classList.add("active");
+    items[1]?.classList.add("active");
 
   }
 
@@ -2461,9 +2570,9 @@ function setActiveBottom(name) {
 
 async function handleProfileClick() {
 
-  if (!currentUser) {
+  if (currentUser) {
 
-    showLogin();
+    dashboard(currentUser);
 
     return;
 
@@ -2478,11 +2587,11 @@ async function handleProfileClick() {
 
       currentUser = user;
 
+      setLoggedInUI(user);
+
       dashboard(user);
 
     } else {
-
-      setLoggedOut();
 
       showLogin();
 
@@ -2498,10 +2607,32 @@ async function handleProfileClick() {
 
 
 /* =====================================================
-   CHECK EXISTING LOGIN SESSION
+   SCROLL
 ===================================================== */
 
-async function checkLoginSession() {
+function scrollToView() {
+
+  const area =
+    document.getElementById(
+      "accountArea"
+    );
+
+  if (area) {
+
+    area.scrollIntoView({
+      behavior: "smooth"
+    });
+
+  }
+
+}
+
+
+/* =====================================================
+   INITIAL SESSION CHECK
+===================================================== */
+
+async function checkSession() {
 
   try {
 
@@ -2510,43 +2641,35 @@ async function checkLoginSession() {
 
     if (user) {
 
-      setLoggedIn(user);
+      currentUser = user;
+
+      setLoggedInUI(user);
 
       /*
-         Do NOT automatically open dashboard.
-         User can stay on Home.
+        IMPORTANT:
+        If session is still active,
+        directly show dashboard.
       */
 
-      let wallet = {
-        balance: 0
-      };
-
-      try {
-
-        wallet =
-          await api("/api/wallet");
-
-      } catch (e) {}
-
-      document.getElementById(
-        "balance"
-      ).innerText =
-        "₹" +
-        Number(
-          wallet.balance || 0
-        ).toFixed(2);
-
-      goHome();
+      dashboard(user);
 
     } else {
 
-      setLoggedOut();
+      currentUser = null;
+
+      setLoggedInUI(null);
+
+      goPublicHome();
 
     }
 
   } catch (e) {
 
-    setLoggedOut();
+    currentUser = null;
+
+    setLoggedInUI(null);
+
+    goPublicHome();
 
   }
 
@@ -2554,7 +2677,7 @@ async function checkLoginSession() {
 
 
 /* =====================================================
-   OUTSIDE CLICK
+   GLOBAL OUTSIDE CLICK
 ===================================================== */
 
 window.addEventListener(
@@ -2605,9 +2728,7 @@ document.addEventListener(
   "DOMContentLoaded",
   function() {
 
-    setLoggedOut();
-
-    checkLoginSession();
+    checkSession();
 
   }
 );
@@ -2615,4 +2736,4 @@ document.addEventListener(
 </script>
 
 </body>
-</html>
+  </html>
