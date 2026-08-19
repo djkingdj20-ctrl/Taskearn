@@ -2,3893 +2,591 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-  <meta name="google-adsense-account"
-        content="ca-pub-5877718538170577">
-
-  <meta name="description"
-        content="TaskEarn - Discover eligible online tasks, submit completed work and manage approved rewards.">
-
-  <script async
-    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5877718538170577"
-    crossorigin="anonymous"></script>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="google-adsense-account" content="ca-pub-5877718538170577">
+  <meta name="description" content="TaskEarn - Discover eligible online tasks, submit completed work and manage approved rewards.">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5877718538170577" crossorigin="anonymous"></script>
   <title>TaskEarn - Tasks & Rewards</title>
 
   <style>
-
-    /* =====================================================
-       RESET
-    ===================================================== */
-
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      margin: 0;
-      font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        Arial,
-        sans-serif;
-
-      background: #f7f8fc;
-      color: #171b2d;
-      line-height: 1.5;
-    }
-
-    button,
-    input,
-    textarea,
-    select {
-      font: inherit;
-    }
-
-    button {
-      touch-action: manipulation;
-    }
-
-    a {
-      color: inherit;
-    }
-
-    /* =====================================================
-       HEADER
-    ===================================================== */
-
-    .header {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-
-      background: rgba(255,255,255,.94);
-      backdrop-filter: blur(15px);
-      -webkit-backdrop-filter: blur(15px);
-
-      border-bottom: 1px solid #eceef4;
-    }
-
-    .header-inner {
-      max-width: 1050px;
-      margin: auto;
-
-      min-height: 64px;
-
-      padding: 10px 16px;
-
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    .logo-container {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      min-width: 0;
-    }
-
-    .logo-icon {
-      width: 38px;
-      height: 38px;
-
-      flex-shrink: 0;
-
-      border-radius: 12px;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      color: white;
-
-      font-size: 19px;
-      font-weight: 900;
-
-      background:
-        linear-gradient(135deg,#ff6b35,#ff3d6e);
-
-      box-shadow:
-        0 7px 18px rgba(255,91,73,.25);
-    }
-
-    .logo {
-      font-size: 20px;
-      font-weight: 900;
-      letter-spacing: -.5px;
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      position: relative;
-    }
-
-    .balance {
-      background: #f0fdf7;
-      color: #087a42;
-
-      border: 1px solid #d5f3e2;
-
-      padding: 8px 12px;
-
-      border-radius: 999px;
-
-      font-size: 13px;
-      font-weight: 800;
-
-      white-space: nowrap;
-    }
-
-    .menu-btn {
-      width: 42px;
-      height: 42px;
-
-      border: 0;
-      border-radius: 12px;
-
-      background: #f4f5f9;
-
-      cursor: pointer;
-
-      font-size: 21px;
-      color: #20243a;
-    }
-
-    .menu-btn:active {
-      transform: scale(.95);
-    }
-
-    /* =====================================================
-       DROPDOWN
-    ===================================================== */
-
-    .dropdown-menu {
-      position: absolute;
-
-      top: 50px;
-      right: 0;
-
-      width: 225px;
-
-      background: white;
-
-      border: 1px solid #eceef4;
-      border-radius: 18px;
-
-      box-shadow:
-        0 18px 50px rgba(20,25,50,.16);
-
-      overflow: hidden;
-
-      opacity: 0;
-      visibility: hidden;
-
-      transform:
-        translateY(-10px)
-        scale(.96);
-
-      transition:
-        .2s ease;
-
-      z-index: 2000;
-    }
-
-    .dropdown-menu.show {
-      opacity: 1;
-      visibility: visible;
-
-      transform:
-        translateY(0)
-        scale(1);
-    }
-
-    .dropdown-item {
-      padding: 15px 17px;
-
-      display: flex;
-      align-items: center;
-
-      gap: 10px;
-
-      border-bottom: 1px solid #f1f2f6;
-
-      font-size: 14px;
-      font-weight: 600;
-
-      cursor: pointer;
-    }
-
-    .dropdown-item:last-child {
-      border-bottom: 0;
-    }
-
-    .dropdown-item:active {
-      background: #fff4ef;
-      color: #ff5b32;
-    }
-
-    /* =====================================================
-       MAIN
-    ===================================================== */
-
-    .container {
-      width: 100%;
-      max-width: 1050px;
-
-      margin: auto;
-
-      padding: 16px;
-      padding-bottom: 90px;
-    }
-
-    /* =====================================================
-       HERO
-    ===================================================== */
-
-    .hero {
-      position: relative;
-
-      overflow: hidden;
-
-      padding: 30px 22px;
-
-      border-radius: 28px;
-
-      background:
-        linear-gradient(
-          135deg,
-          #fff7ed 0%,
-          #ffe8d8 48%,
-          #e9f4ff 100%
-        );
-
-      box-shadow:
-        0 12px 35px rgba(30,40,70,.06);
-
-      margin-bottom: 18px;
-    }
-
-    .hero::after {
-      content: "";
-
-      position: absolute;
-
-      width: 160px;
-      height: 160px;
-
-      right: -70px;
-      top: -70px;
-
-      border-radius: 50%;
-
-      background: rgba(255,255,255,.5);
-    }
-
-    .hero-badge {
-      display: inline-flex;
-
-      padding: 7px 11px;
-
-      border-radius: 999px;
-
-      background: rgba(255,255,255,.72);
-
-      color: #b94c24;
-
-      font-size: 12px;
-      font-weight: 800;
-
-      margin-bottom: 13px;
-    }
-
-    .hero h1 {
-      position: relative;
-      z-index: 1;
-
-      max-width: 600px;
-
-      margin: 0 0 12px;
-
-      font-size: clamp(30px,7vw,48px);
-
-      line-height: 1.08;
-
-      letter-spacing: -1.4px;
-
-      font-weight: 900;
-    }
-
-    .hero p {
-      position: relative;
-      z-index: 1;
-
-      max-width: 560px;
-
-      margin: 0 0 22px;
-
-      color: #5f6879;
-
-      font-size: 15px;
-    }
-
-    .hero-actions {
-      position: relative;
-      z-index: 2;
-
-      display: flex;
-      gap: 10px;
-
-      flex-wrap: wrap;
-    }
-
-    /* =====================================================
-       BUTTONS
-    ===================================================== */
-
-    .btn {
-      min-height: 46px;
-
-      padding: 11px 17px;
-
-      border: 0;
-
-      border-radius: 13px;
-
-      font-weight: 800;
-
-      cursor: pointer;
-
-      transition:
-        transform .15s ease,
-        box-shadow .15s ease,
-        background .15s ease;
-    }
-
-    .btn:active {
-      transform: scale(.97);
-    }
-
-    .primary {
-      background: #ff6333;
-      color: white;
-
-      box-shadow:
-        0 8px 18px rgba(255,99,51,.25);
-    }
-
-    .primary:hover {
-      background: #ef5324;
-    }
-
-    .secondary {
-      background: white;
-
-      color: #24283b;
-
-      border: 1px solid #e3e5eb;
-    }
-
-    .success {
-      background: #e5f8ed;
-      color: #087a42;
-
-      border: 1px solid #c7efd9;
-    }
-
-    .danger {
-      background: #ffe7e7;
-      color: #b42318;
-
-      border: 1px solid #ffcaca;
-    }
-
-    .large-btn {
-      min-height: 52px;
-      padding: 13px 25px;
-      border-radius: 16px;
-
-      font-size: 16px;
-    }
-
-    /* =====================================================
-       CARDS
-    ===================================================== */
-
-    .card {
-      background: white;
-
-      border: 1px solid #eceef4;
-
-      border-radius: 22px;
-
-      padding: 20px;
-
-      margin-bottom: 16px;
-
-      box-shadow:
-        0 7px 25px rgba(20,30,60,.045);
-    }
-
-    .card h2 {
-      margin-top: 0;
-
-      font-size: 21px;
-
-      letter-spacing: -.4px;
-    }
-
-    .card h3 {
-      margin-bottom: 7px;
-    }
-
-    .muted {
-      color: #687386;
-
-      font-size: 14px;
-
-      line-height: 1.65;
-    }
-
-    /* =====================================================
-       FEATURE CARDS
-    ===================================================== */
-
-    .features {
-      display: grid;
-
-      grid-template-columns:
-        repeat(3,1fr);
-
-      gap: 12px;
-
-      margin-bottom: 16px;
-    }
-
-    .feature {
-      background: white;
-
-      border: 1px solid #eceef4;
-
-      border-radius: 20px;
-
-      padding: 18px;
-
-      box-shadow:
-        0 6px 20px rgba(20,30,60,.04);
-    }
-
-    .feature-icon {
-      width: 42px;
-      height: 42px;
-
-      border-radius: 13px;
-
-      background: #fff2ec;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      font-size: 20px;
-
-      margin-bottom: 12px;
-    }
-
-    .feature b {
-      display: block;
-
-      margin-bottom: 5px;
-    }
-
-    .feature span {
-      color: #687386;
-
-      font-size: 13px;
-    }
-
-    /* =====================================================
-       GRID
-    ===================================================== */
-
-    .grid {
-      display: grid;
-
-      grid-template-columns:
-        repeat(2,1fr);
-
-      gap: 14px;
-    }
-
-    /* =====================================================
-       TASK CARD
-    ===================================================== */
-
-    .task-card {
-      position: relative;
-
-      background: white;
-
-      border: 1px solid #eceef4;
-
-      border-radius: 21px;
-
-      padding: 18px;
-
-      box-shadow:
-        0 7px 25px rgba(20,30,60,.05);
-    }
-
-    .task-top {
-      display: flex;
-
-      justify-content: space-between;
-
-      align-items: flex-start;
-
-      gap: 10px;
-    }
-
-    .tag {
-      display: inline-flex;
-
-      background: #f0efff;
-
-      color: #5541d9;
-
-      padding: 6px 9px;
-
-      border-radius: 999px;
-
-      font-size: 11px;
-
-      font-weight: 800;
-    }
-
-    .earn {
-      color: #078b4b;
-
-      font-size: 20px;
-
-      font-weight: 900;
-
-      white-space: nowrap;
-    }
-
-    .task-card h3 {
-      font-size: 17px;
-
-      margin-top: 14px;
-    }
-
-    .task-card .btn {
-      width: 100%;
-
-      margin-top: 12px;
-    }
-
-    /* =====================================================
-       STATS
-    ===================================================== */
-
-    .stats {
-      display: grid;
-
-      grid-template-columns:
-        repeat(3,1fr);
-
-      gap: 10px;
-
-      margin-bottom: 16px;
-    }
-
-    .stat {
-      background: white;
-
-      border: 1px solid #eceef4;
-
-      border-radius: 18px;
-
-      padding: 16px;
-
-      box-shadow:
-        0 5px 18px rgba(20,30,60,.04);
-    }
-
-    .stat small {
-      color: #788195;
-
-      font-size: 12px;
-    }
-
-    .stat b {
-      display: block;
-
-      margin-top: 5px;
-
-      font-size: 19px;
-    }
-
-    /* =====================================================
-       NAV
-    ===================================================== */
-
-    .nav {
-      display: flex;
-
-      gap: 8px;
-
-      overflow-x: auto;
-
-      padding: 3px 1px 10px;
-
-      margin-bottom: 4px;
-
-      scrollbar-width: none;
-    }
-
-    .nav::-webkit-scrollbar {
-      display: none;
-    }
-
-    .nav .btn {
-      flex-shrink: 0;
-    }
-
-    /* =====================================================
-       FORM
-    ===================================================== */
-
-    .form {
-      display: grid;
-
-      gap: 11px;
-
-      width: 100%;
-
-      max-width: 520px;
-    }
-
-    .input,
-    textarea,
-    select {
-      width: 100%;
-
-      min-height: 48px;
-
-      padding: 12px 14px;
-
-      background: #fbfcff;
-
-      border: 1px solid #dfe2ea;
-
-      border-radius: 13px;
-
-      outline: none;
-
-      color: #171b2d;
-    }
-
-    .input:focus,
-    textarea:focus,
-    select:focus {
-      border-color: #ff6b35;
-
-      box-shadow:
-        0 0 0 3px rgba(255,107,53,.1);
-    }
-
-    textarea {
-      min-height: 100px;
-
-      resize: vertical;
-    }
-
-    /* =====================================================
-       AUTH SCREEN
-    ===================================================== */
-
-    .auth-wrap {
-      min-height: 58vh;
-
-      display: flex;
-
-      align-items: center;
-
-      justify-content: center;
-    }
-
-    .auth-card {
-      width: 100%;
-
-      max-width: 460px;
-
-      background: white;
-
-      border: 1px solid #eceef4;
-
-      border-radius: 26px;
-
-      padding: 25px;
-
-      box-shadow:
-        0 15px 45px rgba(20,30,60,.08);
-    }
-
-    .auth-logo {
-      width: 55px;
-      height: 55px;
-
-      border-radius: 17px;
-
-      background:
-        linear-gradient(135deg,#ff6b35,#ff3d6e);
-
-      color: white;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      font-size: 25px;
-      font-weight: 900;
-
-      margin-bottom: 15px;
-    }
-
-    .auth-card h2 {
-      font-size: 27px;
-
-      margin: 0 0 7px;
-    }
-
-    .auth-card .primary {
-      width: 100%;
-    }
-
-    /* =====================================================
-       NOTICE
-    ===================================================== */
-
-    .notice {
-      background: #fff8df;
-
-      border: 1px solid #f5e6a8;
-
-      color: #6c5200;
-
-      padding: 13px 15px;
-
-      border-radius: 14px;
-
-      margin-bottom: 15px;
-
-      font-size: 13px;
-    }
-
-    /* =====================================================
-       STATUS
-    ===================================================== */
-
-    .status {
-      display: inline-flex;
-
-      padding: 6px 9px;
-
-      border-radius: 999px;
-
-      font-size: 11px;
-
-      font-weight: 800;
-
-      text-transform: capitalize;
-    }
-
-    .pending {
-      background: #fff3cd;
-      color: #856404;
-    }
-
-    .approved {
-      background: #dff6e8;
-      color: #087a42;
-    }
-
-    .rejected {
-      background: #ffe1e1;
-      color: #b42318;
-    }
-
-    /* =====================================================
-       ADMIN
-    ===================================================== */
-
-    .admin-box {
-      border: 1px solid #e7e9ef;
-
-      border-radius: 16px;
-
-      padding: 15px;
-
-      margin-bottom: 11px;
-
-      background: #fff;
-    }
-
-    .task-actions {
-      display: flex;
-
-      flex-wrap: wrap;
-
-      gap: 8px;
-
-      margin-top: 12px;
-    }
-
-    /* =====================================================
-       ROW
-    ===================================================== */
-
-    .row {
-      display: flex;
-
-      justify-content: space-between;
-
-      align-items: center;
-
-      gap: 10px;
-    }
-
-    /* =====================================================
-       EMPTY
-    ===================================================== */
-
-    .empty {
-      text-align: center;
-
-      padding: 35px 20px;
-
-      color: #687386;
-    }
-
-    /* =====================================================
-       FOOTER
-    ===================================================== */
-
-    .footer {
-      text-align: center;
-
-      padding: 28px 10px;
-
-      color: #7b8495;
-
-      font-size: 12px;
-    }
-
-    .footer-links {
-      display: flex;
-
-      justify-content: center;
-
-      flex-wrap: wrap;
-
-      gap: 15px;
-
-      margin-bottom: 12px;
-    }
-
-    .footer-links a {
-      color: #596277;
-
-      text-decoration: none;
-    }
-
-    /* =====================================================
-       MOBILE BOTTOM NAV
-    ===================================================== */
-
-    .mobile-bottom-nav {
-      display: none;
-    }
-
-    /* =====================================================
-       DESKTOP
-    ===================================================== */
-
-    @media (min-width: 800px) {
-
-      .container {
-        padding-top: 24px;
-      }
-
-      .hero {
-        padding: 55px 45px;
-      }
-
-      .card {
-        padding: 24px;
-      }
-
-    }
-
-    /* =====================================================
-       MOBILE
-    ===================================================== */
-
+    /* RESET */
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: #f7f8fc; color: #171b2d; line-height: 1.5; }
+    button, input, textarea, select { font: inherit; }
+    button { touch-action: manipulation; }
+    a { color: inherit; text-decoration: none; cursor: pointer; }
+
+    /* HEADER */
+    .header { position: sticky; top: 0; z-index: 1000; background: rgba(255,255,255,.94); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-bottom: 1px solid #eceef4; }
+    .header-inner { max-width: 1050px; margin: auto; min-height: 64px; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .logo-container { display: flex; align-items: center; gap: 9px; min-width: 0; cursor: pointer; }
+    .logo-icon { width: 38px; height: 38px; flex-shrink: 0; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 19px; font-weight: 900; background: linear-gradient(135deg,#ff6b35,#ff3d6e); box-shadow: 0 7px 18px rgba(255,91,73,.25); }
+    .logo { font-size: 20px; font-weight: 900; letter-spacing: -.5px; }
+    .header-right { display: flex; align-items: center; gap: 8px; position: relative; }
+    .balance { background: #f0fdf7; color: #087a42; border: 1px solid #d5f3e2; padding: 8px 12px; border-radius: 999px; font-size: 13px; font-weight: 800; white-space: nowrap; }
+    .menu-btn { width: 42px; height: 42px; border: 0; border-radius: 12px; background: #f4f5f9; cursor: pointer; font-size: 21px; color: #20243a; }
+    .menu-btn:active { transform: scale(.95); }
+
+    /* DROPDOWN */
+    .dropdown-menu { position: absolute; top: 50px; right: 0; width: 225px; background: white; border: 1px solid #eceef4; border-radius: 18px; box-shadow: 0 18px 50px rgba(20,25,50,.16); overflow: hidden; opacity: 0; visibility: hidden; transform: translateY(-10px) scale(.96); transition: .2s ease; z-index: 2000; }
+    .dropdown-menu.show { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
+    .dropdown-item { padding: 15px 17px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #f1f2f6; font-size: 14px; font-weight: 600; cursor: pointer; }
+    .dropdown-item:last-child { border-bottom: 0; }
+    .dropdown-item:active { background: #fff4ef; color: #ff5b32; }
+
+    /* MAIN */
+    .container { width: 100%; max-width: 1050px; margin: auto; padding: 16px; padding-bottom: 90px; }
+
+    /* HERO */
+    .hero { position: relative; overflow: hidden; padding: 30px 22px; border-radius: 28px; background: linear-gradient(135deg, #fff7ed 0%, #ffe8d8 48%, #e9f4ff 100%); box-shadow: 0 12px 35px rgba(30,40,70,.06); margin-bottom: 18px; }
+    .hero::after { content: ""; position: absolute; width: 160px; height: 160px; right: -70px; top: -70px; border-radius: 50%; background: rgba(255,255,255,.5); }
+    .hero-badge { display: inline-flex; padding: 7px 11px; border-radius: 999px; background: rgba(255,255,255,.72); color: #b94c24; font-size: 12px; font-weight: 800; margin-bottom: 13px; }
+    .hero h1 { position: relative; z-index: 1; max-width: 600px; margin: 0 0 12px; font-size: clamp(30px,7vw,48px); line-height: 1.08; letter-spacing: -1.4px; font-weight: 900; }
+    .hero p { position: relative; z-index: 1; max-width: 560px; margin: 0 0 22px; color: #5f6879; font-size: 15px; }
+    .hero-actions { position: relative; z-index: 2; display: flex; gap: 10px; flex-wrap: wrap; }
+
+    /* BUTTONS */
+    .btn { min-height: 46px; padding: 11px 17px; border: 0; border-radius: 13px; font-weight: 800; cursor: pointer; transition: transform .15s ease, box-shadow .15s ease, background .15s ease; }
+    .btn:active { transform: scale(.97); }
+    .primary { background: #ff6333; color: white; box-shadow: 0 8px 18px rgba(255,99,51,.25); }
+    .primary:hover { background: #ef5324; }
+    .secondary { background: white; color: #24283b; border: 1px solid #e3e5eb; }
+    .success { background: #e5f8ed; color: #087a42; border: 1px solid #c7efd9; }
+    .danger { background: #ffe7e7; color: #b42318; border: 1px solid #ffcaca; }
+    .large-btn { min-height: 52px; padding: 13px 25px; border-radius: 16px; font-size: 16px; }
+
+    /* CARDS */
+    .card { background: white; border: 1px solid #eceef4; border-radius: 22px; padding: 20px; margin-bottom: 16px; box-shadow: 0 7px 25px rgba(20,30,60,.045); }
+    .card h2 { margin-top: 0; font-size: 21px; letter-spacing: -.4px; }
+    .card h3 { margin-bottom: 7px; }
+    .muted { color: #687386; font-size: 14px; line-height: 1.65; }
+
+    /* FEATURES */
+    .features { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 16px; }
+    .feature { background: white; border: 1px solid #eceef4; border-radius: 20px; padding: 18px; box-shadow: 0 6px 20px rgba(20,30,60,.04); }
+    .feature-icon { width: 42px; height: 42px; border-radius: 13px; background: #fff2ec; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 12px; }
+    .feature b { display: block; margin-bottom: 5px; }
+    .feature span { color: #687386; font-size: 13px; }
+
+    /* GRID & TASK CARDS */
+    .grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; }
+    .task-card { position: relative; background: white; border: 1px solid #eceef4; border-radius: 21px; padding: 18px; box-shadow: 0 7px 25px rgba(20,30,60,.05); }
+    .task-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .tag { display: inline-flex; background: #f0efff; color: #5541d9; padding: 6px 9px; border-radius: 999px; font-size: 11px; font-weight: 800; }
+    .earn { color: #078b4b; font-size: 20px; font-weight: 900; white-space: nowrap; }
+    .task-card h3 { font-size: 17px; margin-top: 14px; }
+    .task-card .btn { width: 100%; margin-top: 12px; }
+
+    /* STATS & NAV */
+    .stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 16px; }
+    .stat { background: white; border: 1px solid #eceef4; border-radius: 18px; padding: 16px; box-shadow: 0 5px 18px rgba(20,30,60,.04); }
+    .stat small { color: #788195; font-size: 12px; }
+    .stat b { display: block; margin-top: 5px; font-size: 19px; }
+    .nav { display: flex; gap: 8px; overflow-x: auto; padding: 3px 1px 10px; margin-bottom: 4px; scrollbar-width: none; }
+    .nav::-webkit-scrollbar { display: none; }
+    .nav .btn { flex-shrink: 0; }
+
+    /* FORM & AUTH */
+    .form { display: grid; gap: 11px; width: 100%; max-width: 520px; }
+    .input, textarea, select { width: 100%; min-height: 48px; padding: 12px 14px; background: #fbfcff; border: 1px solid #dfe2ea; border-radius: 13px; outline: none; color: #171b2d; }
+    .input:focus, textarea:focus, select:focus { border-color: #ff6b35; box-shadow: 0 0 0 3px rgba(255,107,53,.1); }
+    textarea { min-height: 100px; resize: vertical; }
+    .auth-wrap { min-height: 58vh; display: flex; align-items: center; justify-content: center; }
+    .auth-card { width: 100%; max-width: 460px; background: white; border: 1px solid #eceef4; border-radius: 26px; padding: 25px; box-shadow: 0 15px 45px rgba(20,30,60,.08); }
+    .auth-logo { width: 55px; height: 55px; border-radius: 17px; background: linear-gradient(135deg,#ff6b35,#ff3d6e); color: white; display: flex; align-items: center; justify-content: center; font-size: 25px; font-weight: 900; margin-bottom: 15px; }
+    .auth-card h2 { font-size: 27px; margin: 0 0 7px; }
+
+    /* STATUS & ADMIN */
+    .notice { background: #fff8df; border: 1px solid #f5e6a8; color: #6c5200; padding: 13px 15px; border-radius: 14px; margin-bottom: 15px; font-size: 13px; }
+    .status { display: inline-flex; padding: 6px 9px; border-radius: 999px; font-size: 11px; font-weight: 800; text-transform: capitalize; }
+    .pending { background: #fff3cd; color: #856404; }
+    .approved { background: #dff6e8; color: #087a42; }
+    .rejected { background: #ffe1e1; color: #b42318; }
+    .admin-box { border: 1px solid #e7e9ef; border-radius: 16px; padding: 15px; margin-bottom: 11px; background: #fff; }
+    .task-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .empty { text-align: center; padding: 35px 20px; color: #687386; }
+
+    /* FOOTER & MOBILE NAV */
+    .footer { text-align: center; padding: 28px 10px; color: #7b8495; font-size: 12px; }
+    .footer-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; margin-bottom: 12px; }
+    .mobile-bottom-nav { display: none; }
+
+    @media (min-width: 800px) { .container { padding-top: 24px; } .hero { padding: 55px 45px; } .card { padding: 24px; } }
     @media (max-width: 700px) {
-
-      body {
-        padding-bottom: 72px;
-      }
-
-      .header-inner {
-        padding: 9px 12px;
-      }
-
-      .logo {
-        font-size: 19px;
-      }
-
-      .logo-icon {
-        width: 35px;
-        height: 35px;
-        border-radius: 11px;
-      }
-
-      .balance {
-        font-size: 12px;
-        padding: 7px 10px;
-      }
-
-      .container {
-        padding: 11px;
-
-        padding-bottom: 25px;
-      }
-
-      .hero {
-        padding: 27px 19px;
-
-        border-radius: 24px;
-      }
-
-      .hero h1 {
-        font-size: 31px;
-
-        letter-spacing: -1px;
-      }
-
-      .hero p {
-        font-size: 14px;
-      }
-
-      .hero-actions {
-        display: grid;
-
-        grid-template-columns: 1fr;
-
-        width: 100%;
-      }
-
-      .hero-actions .btn {
-        width: 100%;
-      }
-
-      .features {
-        grid-template-columns: 1fr;
-
-        gap: 9px;
-      }
-
-      .feature {
-        display: flex;
-
-        align-items: center;
-
-        gap: 12px;
-
-        padding: 14px;
-      }
-
-      .feature-icon {
-        flex-shrink: 0;
-
-        margin: 0;
-      }
-
-      .grid {
-        grid-template-columns: 1fr;
-      }
-
-      .stats {
-        gap: 7px;
-      }
-
-      .stat {
-        padding: 13px 10px;
-
-        text-align: center;
-      }
-
-      .stat b {
-        font-size: 16px;
-      }
-
-      .card {
-        padding: 17px;
-
-        border-radius: 19px;
-      }
-
-      .nav {
-        padding-bottom: 8px;
-      }
-
-      .nav .btn {
-        min-height: 42px;
-
-        padding: 9px 13px;
-
-        font-size: 13px;
-      }
-
-      .task-card {
-        padding: 16px;
-      }
-
-      .auth-wrap {
-        min-height: 65vh;
-
-        align-items: flex-start;
-
-        padding-top: 18px;
-      }
-
-      .auth-card {
-        padding: 21px;
-
-        border-radius: 22px;
-      }
-
-      .dropdown-menu {
-        width: min(225px, calc(100vw - 25px));
-      }
-
-      .mobile-bottom-nav {
-        position: fixed;
-
-        display: flex;
-
-        left: 10px;
-        right: 10px;
-        bottom: 10px;
-
-        height: 60px;
-
-        z-index: 1500;
-
-        background: rgba(255,255,255,.96);
-
-        backdrop-filter: blur(18px);
-
-        border: 1px solid #e7e9ef;
-
-        border-radius: 20px;
-
-        box-shadow:
-          0 12px 35px rgba(20,30,60,.16);
-
-        align-items: center;
-
-        justify-content: space-around;
-
-        padding: 5px;
-      }
-
-      .bottom-item {
-        border: 0;
-
-        background: transparent;
-
-        height: 50px;
-
-        min-width: 65px;
-
-        border-radius: 15px;
-
-        color: #70798b;
-
-        font-size: 10px;
-
-        font-weight: 700;
-
-        cursor: pointer;
-
-        display: flex;
-
-        flex-direction: column;
-
-        align-items: center;
-
-        justify-content: center;
-
-        gap: 2px;
-      }
-
-      .bottom-item span:first-child {
-        font-size: 20px;
-      }
-
-      .bottom-item.active {
-        background: #fff1eb;
-
-        color: #ff5d2e;
-      }
-
+      body { padding-bottom: 72px; }
+      .header-inner { padding: 9px 12px; }
+      .container { padding: 11px; padding-bottom: 25px; }
+      .hero { padding: 27px 19px; border-radius: 24px; }
+      .hero h1 { font-size: 31px; letter-spacing: -1px; }
+      .hero-actions { display: grid; grid-template-columns: 1fr; width: 100%; }
+      .features { grid-template-columns: 1fr; gap: 9px; }
+      .feature { display: flex; align-items: center; gap: 12px; padding: 14px; }
+      .feature-icon { flex-shrink: 0; margin: 0; }
+      .grid { grid-template-columns: 1fr; }
+      .stats { gap: 7px; }
+      .stat { padding: 13px 10px; text-align: center; }
+      .stat b { font-size: 16px; }
+      .mobile-bottom-nav { position: fixed; display: flex; left: 10px; right: 10px; bottom: 10px; height: 60px; z-index: 1500; background: rgba(255,255,255,.96); backdrop-filter: blur(18px); border: 1px solid #e7e9ef; border-radius: 20px; box-shadow: 0 12px 35px rgba(20,30,60,.16); align-items: center; justify-content: space-around; padding: 5px; }
+      .bottom-item { border: 0; background: transparent; height: 50px; min-width: 65px; border-radius: 15px; color: #70798b; font-size: 10px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+      .bottom-item span:first-child { font-size: 20px; }
+      .bottom-item.active { background: #fff1eb; color: #ff5d2e; }
     }
-
   </style>
 </head>
 
 <body>
 
-<!-- =====================================================
-     HEADER
-===================================================== -->
-
 <header class="header">
-
   <div class="header-inner">
-
-    <div class="logo-container">
-
+    <div class="logo-container" onclick="goHome()">
       <div class="logo-icon">T</div>
-
-      <div class="logo">
-        TaskEarn
-      </div>
-
+      <div class="logo">TaskEarn</div>
     </div>
 
     <div class="header-right">
+      <div id="balance" class="balance">₹0.00</div>
+      <button class="menu-btn" onclick="toggleMenu()" aria-label="Menu">☰</button>
 
-      <div id="balance"
-           class="balance">
-        ₹0.00
+      <div id="dropdownMenu" class="dropdown-menu">
+        <div class="dropdown-item" onclick="handleMenuClick('login')">🔑 Login / Register</div>
+        <div class="dropdown-item" onclick="handleMenuClick('about')">ℹ️ About Us</div>
+        <div class="dropdown-item" onclick="handleMenuClick('terms')">📜 Terms & Conditions</div>
+        <div class="dropdown-item" onclick="handleMenuClick('contact')">📞 Contact Us</div>
+        <div class="dropdown-item" onclick="handleMenuClick('privacy')">🔒 Privacy Policy</div>
       </div>
-
-      <button
-        class="menu-btn"
-        onclick="toggleMenu()"
-        aria-label="Menu">
-        ☰
-      </button>
-
-      <div
-        id="dropdownMenu"
-        class="dropdown-menu">
-
-        <div
-          class="dropdown-item"
-          onclick="handleMenuClick('login')">
-          🔑 Login / Register
-        </div>
-
-        <div
-          class="dropdown-item"
-          onclick="handleMenuClick('about')">
-          ℹ️ About Us
-        </div>
-
-        <div
-          class="dropdown-item"
-          onclick="handleMenuClick('terms')">
-          📜 Terms & Conditions
-        </div>
-
-        <div
-          class="dropdown-item"
-          onclick="handleMenuClick('contact')">
-          📞 Contact Us
-        </div>
-
-        <div
-          class="dropdown-item"
-          onclick="handleMenuClick('privacy')">
-          🔒 Privacy Policy
-        </div>
-
-      </div>
-
     </div>
-
   </div>
-
 </header>
-
-
-<!-- =====================================================
-     MAIN
-===================================================== -->
 
 <main class="container">
 
   <!-- PUBLIC HOME -->
-
   <section id="homeArea">
-
     <div class="hero">
-
-      <div class="hero-badge">
-        ⚡ Simple tasks • Easy tracking
-      </div>
-
-      <h1>
-        Earn money by completing simple online tasks
-      </h1>
-
-      <p>
-        Discover eligible tasks, complete the requirements,
-        submit your work and receive approved rewards.
-      </p>
-
+      <div class="hero-badge">⚡ Simple tasks • Easy tracking</div>
+      <h1>Earn money by completing simple online tasks</h1>
+      <p>Discover eligible tasks, complete requirements, submit work, and receive approved rewards.</p>
       <div class="hero-actions">
-
-        <button
-          class="btn primary large-btn"
-          onclick="showLogin()">
-          🔐 Login
-        </button>
-
-        <button
-          class="btn secondary large-btn"
-          onclick="showRegister()">
-          ✨ Create Account
-        </button>
-
+        <button class="btn primary large-btn" onclick="showLogin()">🔐 Login</button>
+        <button class="btn secondary large-btn" onclick="showRegister()">✨ Create Account</button>
       </div>
-
     </div>
-
-
-    <!-- FEATURES -->
 
     <div class="features">
-
       <div class="feature">
-
-        <div class="feature-icon">
-          📋
-        </div>
-
-        <div>
-          <b>Simple Tasks</b>
-          <span>
-            Browse available tasks easily.
-          </span>
-        </div>
-
+        <div class="feature-icon">📋</div>
+        <div><b>Simple Tasks</b><span>Browse available tasks easily.</span></div>
       </div>
-
       <div class="feature">
-
-        <div class="feature-icon">
-          💰
-        </div>
-
-        <div>
-          <b>Track Rewards</b>
-          <span>
-            Monitor approved task rewards.
-          </span>
-        </div>
-
+        <div class="feature-icon">💰</div>
+        <div><b>Track Rewards</b><span>Monitor approved rewards.</span></div>
       </div>
-
       <div class="feature">
-
-        <div class="feature-icon">
-          🔒
-        </div>
-
-        <div>
-          <b>Secure Account</b>
-          <span>
-            Manage your account through login.
-          </span>
-        </div>
-
+        <div class="feature-icon">🔒</div>
+        <div><b>Secure Account</b><span>Manage your account securely.</span></div>
       </div>
-
     </div>
 
-
-    <!-- HOW IT WORKS -->
-
     <section class="card">
-
-      <h2>
-        How TaskEarn Works
-      </h2>
-
+      <h2>How TaskEarn Works</h2>
       <ol>
-
-        <li>
-          Create your TaskEarn account.
-        </li>
-
-        <li>
-          Browse available eligible tasks.
-        </li>
-
-        <li>
-          Read the task requirements carefully.
-        </li>
-
-        <li>
-          Complete the task honestly.
-        </li>
-
-        <li>
-          Submit the completed task for review.
-        </li>
-
-        <li>
-          Approved rewards are added to your wallet.
-        </li>
-
+        <li>Create your TaskEarn account.</li>
+        <li>Browse available tasks.</li>
+        <li>Read requirements carefully and complete the work.</li>
+        <li>Submit completed task for review.</li>
+        <li>Approved rewards are added to your wallet.</li>
       </ol>
-
     </section>
 
-
-    <!-- ABOUT -->
-
-    <section
-      id="aboutSection"
-      class="card">
-
-      <h2>
-        About TaskEarn
-      </h2>
-
-      <p class="muted">
-        TaskEarn provides a simple interface for
-        discovering eligible online tasks,
-        submitting completed work and managing
-        approved task-related rewards.
-      </p>
-
-      <p class="muted">
-        Task availability and rewards may change
-        depending on available tasks and applicable
-        conditions.
-      </p>
-
+    <section id="aboutSection" class="card">
+      <h2>About TaskEarn</h2>
+      <p class="muted">TaskEarn provides a simple interface for discovering tasks, submitting work, and managing rewards.</p>
     </section>
-
-
-    <!-- FAQ -->
 
     <section class="card">
-
-      <h2>
-        Frequently Asked Questions
-      </h2>
-
-      <h3>
-        How do I earn?
-      </h3>
-
-      <p class="muted">
-        Browse available eligible tasks and complete
-        them according to the stated requirements.
-      </p>
-
-      <h3>
-        Is income guaranteed?
-      </h3>
-
-      <p class="muted">
-        No. Earnings depend on task availability,
-        eligibility, approval and applicable conditions.
-      </p>
-
-      <h3>
-        How do I withdraw?
-      </h3>
-
-      <p class="muted">
-        Eligible users can request a withdrawal after
-        reaching the applicable minimum amount.
-      </p>
-
-      <h3>
-        What is the minimum withdrawal?
-      </h3>
-
-      <p class="muted">
-        The current platform configuration uses
-        ₹100 as the minimum withdrawal amount.
-      </p>
-
+      <h2>Frequently Asked Questions</h2>
+      <h3>How do I earn?</h3>
+      <p class="muted">Browse available tasks and complete them according to requirements.</p>
+      <h3>Is income guaranteed?</h3>
+      <p class="muted">No. Earnings depend on task availability and approval.</p>
+      <h3>Minimum withdrawal?</h3>
+      <p class="muted">The minimum withdrawal amount is ₹100.</p>
     </section>
-
   </section>
 
-
-  <!-- ACCOUNT -->
-
+  <!-- ACCOUNT CONTAINER -->
   <section id="accountArea"></section>
 
-
-  <!-- FOOTER -->
-
   <footer class="footer">
-
     <div class="footer-links">
-
-      <a href="/privacy">
-        Privacy
-      </a>
-
-      <a href="/terms">
-        Terms
-      </a>
-
-      <a href="/about">
-        About
-      </a>
-
-      <a href="/contact">
-        Contact
-      </a>
-
+      <a onclick="showPrivacy()">Privacy</a>
+      <a onclick="showTerms()">Terms</a>
+      <a onclick="showAbout()">About</a>
+      <a onclick="showContact()">Contact</a>
     </div>
-
-    © 2026 TaskEarn.
-    All rights reserved.
-
+    © 2026 TaskEarn. All rights reserved.
   </footer>
 
 </main>
 
-
-<!-- =====================================================
-     MOBILE BOTTOM NAV
-===================================================== -->
-
-<div
-  id="mobileBottomNav"
-  class="mobile-bottom-nav"
-  style="display:none;">
-
-  <button
-    class="bottom-item active"
-    onclick="mobileHome()">
-
-    <span>🏠</span>
-    <span>Home</span>
-
-  </button>
-
-  <button
-    class="bottom-item"
-    onclick="mobileTasks()">
-
-    <span>📋</span>
-    <span>Tasks</span>
-
-  </button>
-
-  <button
-    class="bottom-item"
-    onclick="mobileWallet()">
-
-    <span>💰</span>
-    <span>Wallet</span>
-
-  </button>
-
-  <button
-    class="bottom-item"
-    onclick="mobileProfile()">
-
-    <span>👤</span>
-    <span>Account</span>
-
-  </button>
-
+<!-- MOBILE NAVIGATION -->
+<div id="mobileBottomNav" class="mobile-bottom-nav">
+  <button class="bottom-item active" onclick="mobileHome()"><span>🏠</span><span>Home</span></button>
+  <button class="bottom-item" onclick="mobileTasks()"><span>📋</span><span>Tasks</span></button>
+  <button class="bottom-item" onclick="mobileWallet()"><span>💰</span><span>Wallet</span></button>
+  <button class="bottom-item" onclick="mobileProfile()"><span>👤</span><span>Account</span></button>
 </div>
 
-
 <script>
-
-/* =====================================================
-   MENU
-===================================================== */
-
-function toggleMenu() {
-
-  const menu =
-    document.getElementById("dropdownMenu");
-
-  menu.classList.toggle("show");
-
+/* UTILS & API */
+async function api(url, options = {}) {
+  const headers = Object.assign({ "Content-Type": "application/json" }, options.headers || {});
+  const response = await fetch(url, { ...options, headers });
+  let data = {};
+  try { data = await response.json(); } catch (e) { data = {}; }
+  if (!response.ok) throw new Error(data.error || "Something went wrong");
+  return data;
 }
 
+function escapeHtml(val) {
+  return String(val).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+}
 
-window.addEventListener("click", function(event) {
+function formatDate(val) {
+  if (!val) return "-";
+  try { return new Date(val).toLocaleString(); } catch (e) { return val; }
+}
 
-  if (!event.target.closest(".header-right")) {
+/* NAVIGATION & MENU */
+function toggleMenu() {
+  document.getElementById("dropdownMenu").classList.toggle("show");
+}
 
-    const menu =
-      document.getElementById("dropdownMenu");
-
-    if (menu) {
-      menu.classList.remove("show");
-    }
-
+window.addEventListener("click", function(e) {
+  if (!e.target.closest(".header-right")) {
+    const menu = document.getElementById("dropdownMenu");
+    if (menu) menu.classList.remove("show");
   }
-
 });
 
-
 function handleMenuClick(action) {
-
-  const menu =
-    document.getElementById("dropdownMenu");
-
-  if (menu) {
-    menu.classList.remove("show");
-  }
-
-  if (action === "login") {
-    showLogin();
-  }
-
-  if (action === "about") {
-
-    const about =
-      document.getElementById("aboutSection");
-
-    if (about) {
-
-      about.scrollIntoView({
-        behavior: "smooth"
-      });
-
-    }
-
-  }
-
-  if (action === "terms") {
-    showTerms();
-  }
-
-  if (action === "contact") {
-    showContact();
-  }
-
-  if (action === "privacy") {
-    showPrivacy();
-  }
-
+  document.getElementById("dropdownMenu")?.classList.remove("show");
+  if (action === "login") showLogin();
+  if (action === "about") showAbout();
+  if (action === "terms") showTerms();
+  if (action === "contact") showContact();
+  if (action === "privacy") showPrivacy();
 }
 
-
-/* =====================================================
-   API
-===================================================== */
-
-async function api(url, options = {}) {
-
-  const response =
-    await fetch(url, {
-
-      headers: {
-        "Content-Type":
-          "application/json"
-      },
-
-      ...options
-
-    });
-
-  let data = {};
-
-  try {
-
-    data =
-      await response.json();
-
-  } catch (e) {
-
-    data = {};
-
-  }
-
-  if (!response.ok) {
-
-    throw new Error(
-      data.error ||
-      "Something went wrong"
-    );
-
-  }
-
-  return data;
-
-}
-
-
-/* =====================================================
-   START
-===================================================== */
-
-async function startApp() {
-
-  try {
-
-    const user =
-      await api("/api/me");
-
-    if (user) {
-
-      await dashboard(user);
-
-    }
-
-  } catch (error) {
-
-    console.log(
-      "Public homepage ready."
-    );
-
-  }
-
-}
-
-
-/* =====================================================
-   LOGIN SCREEN
-===================================================== */
-
-function showLogin() {
-
-  document.getElementById(
-    "homeArea"
-  ).style.display = "none";
-
-  document.getElementById(
-    "accountArea"
-  ).innerHTML = `
-
-    <div class="auth-wrap">
-
-      <div class="auth-card">
-
-        <div class="auth-logo">
-          T
-        </div>
-
-        <h2>
-          Welcome back 👋
-        </h2>
-
-        <p class="muted">
-          Login to continue to your
-          TaskEarn account.
-        </p>
-
-        <div class="form">
-
-          <input
-            id="loginEmail"
-            class="input"
-            type="email"
-            placeholder="Email address"
-            autocomplete="email">
-
-          <input
-            id="loginPassword"
-            class="input"
-            type="password"
-            placeholder="Password"
-            autocomplete="current-password">
-
-          <button
-            class="btn primary large-btn"
-            onclick="login()">
-            Login
-          </button>
-
-          <button
-            class="btn secondary"
-            onclick="showRegister()">
-            Create a new account
-          </button>
-
-        </div>
-
-        <p class="muted"
-           style="margin-top:18px;">
-
-          Demo:
-          user@taskearn.demo /
-          123456
-
-        </p>
-
-        <p class="muted">
-
-          Admin:
-          admin@taskearn.demo /
-          admin123
-
-        </p>
-
-      </div>
-
-    </div>
-
-  `;
-
+function goHome() {
+  document.getElementById("homeArea").style.display = "block";
+  document.getElementById("accountArea").innerHTML = "";
   showBottomNav(false);
-
-  scrollAccount();
-
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+function scrollAccount() {
+  document.getElementById("accountArea").scrollIntoView({ behavior: "smooth" });
+}
 
-/* =====================================================
-   REGISTER SCREEN
-===================================================== */
+/* STARTUP */
+async function startApp() {
+  try {
+    const user = await api("/api/me");
+    if (user) await dashboard(user);
+  } catch (error) {
+    console.log("Public homepage ready.");
+  }
+}
+
+/* AUTH VIEWS */
+function showLogin() {
+  document.getElementById("homeArea").style.display = "none";
+  document.getElementById("accountArea").innerHTML = `
+    <div class="auth-wrap">
+      <div class="auth-card">
+        <div class="auth-logo">T</div>
+        <h2>Welcome back 👋</h2>
+        <p class="muted">Login to continue to your account.</p>
+        <div class="form">
+          <input id="loginEmail" class="input" type="email" placeholder="Email address" autocomplete="email">
+          <input id="loginPassword" class="input" type="password" placeholder="Password" autocomplete="current-password">
+          <button class="btn primary large-btn" onclick="login()">Login</button>
+          <button class="btn secondary" onclick="showRegister()">Create a new account</button>
+        </div>
+      </div>
+    </div>`;
+  showBottomNav(false);
+  scrollAccount();
+}
 
 function showRegister() {
-
-  document.getElementById(
-    "homeArea"
-  ).style.display = "none";
-
-  document.getElementById(
-    "accountArea"
-  ).innerHTML = `
-
+  document.getElementById("homeArea").style.display = "none";
+  document.getElementById("accountArea").innerHTML = `
     <div class="auth-wrap">
-
       <div class="auth-card">
-
-        <div class="auth-logo">
-          T
-        </div>
-
-        <h2>
-          Create your account ✨
-        </h2>
-
-        <p class="muted">
-          Join TaskEarn and discover
-          eligible online tasks.
-        </p>
-
+        <div class="auth-logo">T</div>
+        <h2>Create your account ✨</h2>
+        <p class="muted">Join TaskEarn and discover online tasks.</p>
         <div class="form">
-
-          <input
-            id="registerName"
-            class="input"
-            placeholder="Full name"
-            autocomplete="name">
-
-          <input
-            id="registerEmail"
-            class="input"
-            type="email"
-            placeholder="Email address"
-            autocomplete="email">
-
-          <input
-            id="registerPassword"
-            class="input"
-            type="password"
-            placeholder="Password - minimum 6 characters"
-            autocomplete="new-password">
-
-          <button
-            class="btn primary large-btn"
-            onclick="register()">
-            Create Account
-          </button>
-
-          <button
-            class="btn secondary"
-            onclick="showLogin()">
-            Already have an account?
-            Login
-          </button>
-
+          <input id="registerName" class="input" placeholder="Full name" autocomplete="name">
+          <input id="registerEmail" class="input" type="email" placeholder="Email address" autocomplete="email">
+          <input id="registerPassword" class="input" type="password" placeholder="Password" autocomplete="new-password">
+          <button class="btn primary large-btn" onclick="register()">Create Account</button>
+          <button class="btn secondary" onclick="showLogin()">Already have an account? Login</button>
         </div>
-
       </div>
-
-    </div>
-
-  `;
-
+    </div>`;
   showBottomNav(false);
-
   scrollAccount();
-
 }
-
-
-/* =====================================================
-   LOGIN
-===================================================== */
 
 async function login() {
-
-  const email =
-    document.getElementById(
-      "loginEmail"
-    ).value.trim();
-
-  const password =
-    document.getElementById(
-      "loginPassword"
-    ).value;
-
-  if (!email || !password) {
-
-    alert(
-      "Please enter email and password."
-    );
-
-    return;
-
-  }
-
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value;
+  if (!email || !password) return alert("Please enter email and password.");
   try {
-
-    await api(
-      "/api/login",
-      {
-        method: "POST",
-
-        body: JSON.stringify({
-          email,
-          password
-        })
-
-      }
-    );
-
+    await api("/api/login", { method: "POST", body: JSON.stringify({ email, password }) });
     await startApp();
-
-  } catch (error) {
-
-    alert(error.message);
-
-  }
-
+  } catch (err) { alert(err.message); }
 }
-
-
-/* =====================================================
-   REGISTER
-===================================================== */
 
 async function register() {
-
-  const name =
-    document.getElementById(
-      "registerName"
-    ).value.trim();
-
-  const email =
-    document.getElementById(
-      "registerEmail"
-    ).value.trim();
-
-  const password =
-    document.getElementById(
-      "registerPassword"
-    ).value;
-
-  if (!name || !email || !password) {
-
-    alert(
-      "Please complete all fields."
-    );
-
-    return;
-
-  }
-
+  const name = document.getElementById("registerName").value.trim();
+  const email = document.getElementById("registerEmail").value.trim();
+  const password = document.getElementById("registerPassword").value;
+  if (!name || !email || !password) return alert("Please complete all fields.");
   try {
-
-    await api(
-      "/api/register",
-      {
-        method: "POST",
-
-        body: JSON.stringify({
-          name,
-          email,
-          password
-        })
-
-      }
-    );
-
+    await api("/api/register", { method: "POST", body: JSON.stringify({ name, email, password }) });
     await startApp();
-
-  } catch (error) {
-
-    alert(error.message);
-
-  }
-
+  } catch (err) { alert(err.message); }
 }
 
+async function logout() {
+  try { await api("/api/logout", { method: "POST" }); } 
+  finally { location.reload(); }
+}
 
-/* =====================================================
-   DASHBOARD
-===================================================== */
-
+/* DASHBOARD */
 async function dashboard(user) {
+  document.getElementById("homeArea").style.display = "none";
+  const wallet = await api("/api/wallet");
+  document.getElementById("balance").innerText = "₹" + Number(wallet.balance).toFixed(2);
 
-  document.getElementById(
-    "homeArea"
-  ).style.display = "none";
-
-  const wallet =
-    await api("/api/wallet");
-
-  document.getElementById(
-    "balance"
-  ).innerText =
-    "₹" +
-    Number(wallet.balance)
-      .toFixed(2);
-
-  document.getElementById(
-    "accountArea"
-  ).innerHTML = `
-
+  document.getElementById("accountArea").innerHTML = `
     <div class="card">
-
       <div class="row">
-
         <div>
-
-          <p class="muted"
-             style="margin:0;">
-            Welcome back
-          </p>
-
-          <h2 style="margin:4px 0 0;">
-            Hi, ${escapeHtml(user.name)} 👋
-          </h2>
-
+          <p class="muted" style="margin:0;">Welcome back</p>
+          <h2 style="margin:4px 0 0;">Hi, ${escapeHtml(user.name)} 👋</h2>
         </div>
-
-        <button
-          class="btn secondary"
-          onclick="logout()">
-          Logout
-        </button>
-
+        <button class="btn secondary" onclick="logout()">Logout</button>
       </div>
-
     </div>
-
 
     <div class="stats">
-
-      <div class="stat">
-
-        <small>
-          Balance
-        </small>
-
-        <b>
-          ₹${Number(wallet.balance).toFixed(2)}
-        </b>
-
-      </div>
-
-      <div class="stat">
-
-        <small>
-          Completed
-        </small>
-
-        <b>
-          ${wallet.completed}
-        </b>
-
-      </div>
-
-      <div class="stat">
-
-        <small>
-          Account
-        </small>
-
-        <b>
-          ${escapeHtml(user.role)}
-        </b>
-
-      </div>
-
+      <div class="stat"><small>Balance</small><b>₹${Number(wallet.balance).toFixed(2)}</b></div>
+      <div class="stat"><small>Completed</small><b>${wallet.completed}</b></div>
+      <div class="stat"><small>Account</small><b>${escapeHtml(user.role)}</b></div>
     </div>
-
 
     <div class="nav">
-
-      <button
-        class="btn primary"
-        onclick="tasksPage()">
-        📋 Tasks
-      </button>
-
-      <button
-        class="btn secondary"
-        onclick="walletPage()">
-        💰 Wallet
-      </button>
-
-      <button
-        class="btn secondary"
-        onclick="submissionsPage()">
-        📄 Submissions
-      </button>
-
-      ${
-        user.role === "admin"
-        ?
-        `
-        <button
-          class="btn secondary"
-          onclick="adminPage()">
-          🛠️ Admin
-        </button>
-        `
-        :
-        ""
-      }
-
+      <button class="btn primary" onclick="tasksPage()">📋 Tasks</button>
+      <button class="btn secondary" onclick="walletPage()">💰 Wallet</button>
+      <button class="btn secondary" onclick="submissionsPage()">📄 Submissions</button>
+      ${user.role === "admin" ? `<button class="btn secondary" onclick="adminPage()">🛠️ Admin</button>` : ""}
     </div>
 
-
-    <div id="screen"></div>
-
-  `;
+    <div id="screen"></div>`;
 
   showBottomNav(true);
-
   await tasksPage();
-
 }
 
-
-/* =====================================================
-   TASKS
-===================================================== */
-
+/* TASK & SUBMISSION PAGES */
 async function tasksPage() {
-
   try {
-
-    const tasks =
-      await api("/api/tasks");
-
-    const screen =
-      document.getElementById(
-        "screen"
-      );
-
+    const tasks = await api("/api/tasks");
+    const screen = document.getElementById("screen");
     if (!screen) return;
 
     if (!tasks.length) {
-
-      screen.innerHTML = `
-        <div class="card empty">
-          <div style="font-size:40px;">
-            📋
-          </div>
-
-          <h3>
-            No tasks available
-          </h3>
-
-          <p>
-            Please check again later.
-          </p>
-        </div>
-      `;
-
+      screen.innerHTML = `<div class="card empty"><h3>No tasks available</h3><p>Please check back later.</p></div>`;
       setActiveBottom("tasks");
-
       return;
-
     }
 
     screen.innerHTML = `
-
-      <div class="notice">
-        💡 Complete eligible tasks honestly.
-        Rewards are credited only after approval.
-      </div>
-
+      <div class="notice">💡 Complete tasks honestly. Rewards are credited after review.</div>
       <div class="grid">
-
-        ${tasks.map(task => `
-
+        ${tasks.map(t => `
           <div class="task-card">
-
             <div class="task-top">
-
-              <span class="tag">
-                ${escapeHtml(task.type)}
-              </span>
-
-              <span class="earn">
-                +₹${Number(task.reward).toFixed(2)}
-              </span>
-
+              <span class="tag">${escapeHtml(t.type)}</span>
+              <span class="earn">+₹${Number(t.reward).toFixed(2)}</span>
             </div>
-
-            <h3>
-              ${escapeHtml(task.title)}
-            </h3>
-
-            <p class="muted">
-              ${escapeHtml(task.description)}
-            </p>
-
-            <button
-              class="btn primary"
-              onclick="submitTask(${task.id})">
-              Submit Task
-            </button>
-
+            <h3>${escapeHtml(t.title)}</h3>
+            <p class="muted">${escapeHtml(t.description)}</p>
+            <button class="btn primary" onclick="submitTask(${t.id})">Submit Task</button>
           </div>
-
-        `).join("")}
-
-      </div>
-
-    `;
-
+        `).join('')}
+      </div>`;
     setActiveBottom("tasks");
-
-  } catch (error) {
-
-    alert(error.message);
-
-  }
-
+  } catch (err) { alert(err.message); }
 }
-
-
-/* =====================================================
-   SUBMIT TASK
-===================================================== */
 
 async function submitTask(id) {
-
-  if (
-    !confirm(
-      "Have you completed this task according to its requirements?"
-    )
-  ) {
-    return;
-  }
-
+  if (!confirm("Have you completed this task according to requirements?")) return;
   try {
-
-    const result =
-      await api(
-        "/api/tasks/" +
-        id +
-        "/submit",
-        {
-          method: "POST"
-        }
-      );
-
-    alert(
-      result.message ||
-      "Task submitted for review."
-    );
-
+    const res = await api("/api/tasks/" + id + "/submit", { method: "POST" });
+    alert(res.message || "Task submitted!");
     await submissionsPage();
-
-  } catch (error) {
-
-    alert(error.message);
-
-  }
-
+  } catch (err) { alert(err.message); }
 }
-
-
-/* =====================================================
-   SUBMISSIONS
-===================================================== */
 
 async function submissionsPage() {
-
-  const submissions =
-    await api(
-      "/api/my-submissions"
-    );
-
-  const screen =
-    document.getElementById(
-      "screen"
-    );
-
+  const submissions = await api("/api/my-submissions");
+  const screen = document.getElementById("screen");
   if (!submissions.length) {
-
-    screen.innerHTML = `
-      <div class="card empty">
-
-        <div style="font-size:40px;">
-          📄
-        </div>
-
-        <h3>
-          No submissions yet
-        </h3>
-
-        <p>
-          Your submitted tasks will
-          appear here.
-        </p>
-
-      </div>
-    `;
-
+    screen.innerHTML = `<div class="card empty"><h3>No submissions yet</h3></div>`;
     setActiveBottom("submissions");
-
     return;
-
   }
-
   screen.innerHTML = `
-
     <div class="card">
-
-      <h2>
-        My Submissions 📋
-      </h2>
-
+      <h2>My Submissions 📋</h2>
       ${submissions.map(item => `
-
         <div class="admin-box">
-
           <div class="row">
-
-            <div>
-
-              <b>
-                ${escapeHtml(item.taskTitle)}
-              </b>
-
-              <p class="muted">
-                Reward:
-                ₹${Number(item.reward).toFixed(2)}
-              </p>
-
-            </div>
-
-            <span
-              class="status ${item.status}">
-              ${escapeHtml(item.status)}
-            </span>
-
+            <div><b>${escapeHtml(item.taskTitle)}</b><p class="muted">Reward: ₹${Number(item.reward).toFixed(2)}</p></div>
+            <span class="status ${item.status}">${escapeHtml(item.status)}</span>
           </div>
-
-          <p class="muted">
-            Submitted:
-            ${formatDate(item.submittedAt)}
-          </p>
-
+          <p class="muted">Submitted: ${formatDate(item.submittedAt)}</p>
         </div>
-
-      `).join("")}
-
-    </div>
-
-  `;
-
+      `).join('')}
+    </div>`;
   setActiveBottom("submissions");
-
 }
 
-
-/* =====================================================
-   WALLET
-===================================================== */
-
+/* WALLET & WITHDRAWAL */
 async function walletPage() {
-
-  const wallet =
-    await api("/api/wallet");
-
-  document.getElementById(
-    "screen"
-  ).innerHTML = `
-
+  const wallet = await api("/api/wallet");
+  document.getElementById("screen").innerHTML = `
     <div class="card">
-
-      <p class="muted">
-        Available Balance
-      </p>
-
-      <h1
-        style="
-          font-size:36px;
-          margin:5px 0 8px;
-        ">
-
-        ₹${Number(wallet.balance).toFixed(2)}
-
-      </h1>
-
-      <p class="muted">
-        Minimum withdrawal: ₹100
-      </p>
-
+      <p class="muted">Available Balance</p>
+      <h1 style="font-size:36px;margin:5px 0 8px;">₹${Number(wallet.balance).toFixed(2)}</h1>
+      <p class="muted">Minimum withdrawal: ₹100</p>
       <div class="form">
-
-        <input
-          id="amount"
-          class="input"
-          type="number"
-          min="100"
-          placeholder="Withdrawal amount">
-
-        <input
-          id="method"
-          class="input"
-          value="UPI"
-          placeholder="Payment method">
-
-        <button
-          class="btn primary large-btn"
-          onclick="withdraw()">
-
-          Request Withdrawal
-
-        </button>
-
+        <input id="amount" class="input" type="number" min="100" placeholder="Amount">
+        <input id="method" class="input" value="UPI" placeholder="Payment Method">
+        <button class="btn primary large-btn" onclick="withdraw()">Request Withdrawal</button>
       </div>
-
     </div>
-
-
     <div class="card">
-
-      <h3>
-        Withdrawal History
-      </h3>
-
-      ${
-        wallet.withdrawals.length
-
-        ?
-
-        wallet.withdrawals.map(item => `
-
-          <div class="admin-box">
-
-            <div class="row">
-
-              <span>
-                ₹${Number(item.amount).toFixed(2)}
-                •
-                ${escapeHtml(item.method)}
-              </span>
-
-              <span
-                class="status ${item.status}">
-                ${escapeHtml(item.status)}
-              </span>
-
-            </div>
-
-            <p class="muted">
-              ${formatDate(item.createdAt)}
-            </p>
-
+      <h3>Withdrawal History</h3>
+      ${wallet.withdrawals.length ? wallet.withdrawals.map(w => `
+        <div class="admin-box">
+          <div class="row">
+            <span>₹${Number(w.amount).toFixed(2)} • ${escapeHtml(w.method)}</span>
+            <span class="status ${w.status}">${escapeHtml(w.status)}</span>
           </div>
-
-        `).join("")
-
-        :
-
-        `<p class="muted">
-          No withdrawals yet.
-        </p>`
-
-      }
-
-    </div>
-
-  `;
-
+          <p class="muted">${formatDate(w.createdAt)}</p>
+        </div>
+      `).join('') : `<p class="muted">No withdrawals yet.</p>`}
+    </div>`;
   setActiveBottom("wallet");
-
 }
-
-
-/* =====================================================
-   WITHDRAW
-===================================================== */
 
 async function withdraw() {
-
-  const amount =
-    Number(
-      document.getElementById(
-        "amount"
-      ).value
-    );
-
-  const method =
-    document.getElementById(
-      "method"
-    ).value.trim();
-
+  const amount = Number(document.getElementById("amount").value);
+  const method = document.getElementById("method").value.trim();
   try {
-
-    await api(
-      "/api/withdraw",
-      {
-        method: "POST",
-
-        body: JSON.stringify({
-          amount,
-          method
-        })
-
-      }
-    );
-
-    alert(
-      "Withdrawal request submitted!"
-    );
-
-    const user =
-      await api("/api/me");
-
+    await api("/api/withdraw", { method: "POST", body: JSON.stringify({ amount, method }) });
+    alert("Withdrawal request submitted!");
+    const user = await api("/api/me");
     await dashboard(user);
-
-    await walletPage();
-
-  } catch (error) {
-
-    alert(error.message);
-
-  }
-
+  } catch (err) { alert(err.message); }
 }
 
-
-/* =====================================================
-   ADMIN
-===================================================== */
-
-async function adminPage() {
-
-  try {
-
-    const stats =
-      await api(
-        "/api/admin/stats"
-      );
-
-    document.getElementById(
-      "screen"
-    ).innerHTML = `
-
-      <div class="card">
-
-        <h2>
-          Admin Dashboard 🛠️
-        </h2>
-
-        <div class="stats">
-
-          <div class="stat">
-            <b>${stats.users}</b>
-            <small>Users</small>
-          </div>
-
-          <div class="stat">
-            <b>${stats.tasks}</b>
-            <small>Tasks</small>
-          </div>
-
-          <div class="stat">
-            <b>${stats.submissions}</b>
-            <small>Pending Reviews</small>
-          </div>
-
-        </div>
-
-        <div class="stats">
-
-          <div class="stat">
-            <b>${stats.pending}</b>
-            <small>Pending Withdrawals</small>
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <div class="nav">
-
-        <button
-          class="btn primary"
-          onclick="adminTasks()">
-          Tasks
-        </button>
-
-        <button
-          class="btn secondary"
-          onclick="adminSubmissions()">
-          Reviews
-        </button>
-
-        <button
-          class="btn secondary"
-          onclick="adminWithdrawals()">
-          Withdrawals
-        </button>
-
-      </div>
-
-
-      <div id="adminScreen"></div>
-
-    `;
-
-    await adminTasks();
-
-  } catch (error) {
-
-    alert(error.message);
-
-  }
-
-}
-
-
-/* =====================================================
-   ADMIN TASKS
-===================================================== */
-
-async function adminTasks() {
-
-  const tasks =
-    await api(
-      "/api/admin/tasks"
-    );
-
-  const adminScreen =
-    document.getElementById(
-      "adminScreen"
-    );
-
-  if (!adminScreen) return;
-
-  adminScreen.innerHTML = `
-
-    <div class="card">
-
-      <h2>
-        ➕ Add New Task
-      </h2>
-
-      <div class="form">
-
-        <input
-          id="newTitle"
-          class="input"
-          placeholder="Task title">
-
-        <textarea
-          id="newDescription"
-          placeholder="Task description">
-        </textarea>
-
-        <input
-          id="newType"
-          class="input"
-          placeholder="Category / Type">
-
-        <input
-          id="newReward"
-          class="input"
-          type="number"
-          min="0"
-          step="0.01"
-          placeholder="Reward ₹">
-
-        <button
-          class="btn primary"
-          onclick="addTask()">
-          Add Task
-        </button>
-
-      </div>
-
-    </div>
-
-
-    <div class="card">
-
-      <h2>
-        📋 Manage Tasks
-      </h2>
-
-      ${
-        tasks.length
-
-        ?
-
-        tasks.map(task => `
-
-          <div class="admin-box">
-
-            <span class="tag">
-              ${escapeHtml(task.type)}
-            </span>
-
-            <h3>
-              ${escapeHtml(task.title)}
-            </h3>
-
-            <p class="muted">
-              ${escapeHtml(task.description)}
-            </p>
-
-            <p>
-              Reward:
-              <strong>
-                ₹${Number(task.reward).toFixed(2)}
-              </strong>
-            </p>
-
-            <p>
-              ${
-                task.active
-
-                ?
-
-                `<span class="status approved">
-                  Active
-                </span>`
-
-                :
-
-                `<span class="status rejected">
-                  Disabled
-                </span>`
-              }
-            </p>
-
-            <div class="task-actions">
-
-              <button
-                class="btn secondary"
-                onclick="editTask(${task.id})">
-                Edit
-              </button>
-
-              ${
-                task.active
-
-                ?
-
-                `<button
-                  class="btn danger"
-                  onclick="disableTask(${task.id})">
-                  Disable
-                </button>`
-
-                :
-
-                ""
-              }
-
-            </div>
-
-          </div>
-
-        `).join("")
-
-        :
-
-        `<p class="empty">
-          No tasks found.
-        </p>`
-
-      }
-
-    </div>
-
-  `;
-
-}
-
-
-/* =====================================================
-   ADD TASK
-===================================================== */
-
-async function addTask() {
-
-  const title =
-    document.getElementById(
-      "newTitle"
-    ).value.trim();
-
-  const description =
-    document.getElementById(
-      "newDescription"
-    ).value.trim();
-
-  const type =
-    document.getElementById(
-      "newType"
-    ).value.trim();
-
-  const reward =
-    Number(
-      document.getElementById(
-        "newReward"
-      ).value
-    );
-
-  try {
-
-    await api(
-      "/api/admin/tasks",
-      {
-        method: "POST",
-
-        body: JSON.stringify({
-          title,
-          description,
-          type,
-          reward
-        })
-
-      }
-    );
-
-    alert(
-      "Task added successfully!"
-    );
-
-    await adminTasks();
-
-  } catch (error) {
-
-    alert(error.message);
-
-  }
-
-}
-
-
-/* =====================================================
-   EDIT TASK
-===================================================== */
-
-async function editTask(id) {
-
-  try {
-
-    const task =
-      await api(
-        "/api/tasks/" + id
-      );
-
-    const title =
-      prompt(
-        "Task title:",
-        task.title
-      );
-
-    if (title === null) return;
-
-    const description =
-      prompt(
-        "Task description:",
-        task.description
-      );
-
-    if (description === null) return;
-
-    const type =
-      prompt(
-        "Task type/category:",
-        task.type
-      );
-
-    if (type === null) return;
-
-    const reward =
-      Number(
-        prompt(
-          "Reward ₹:",
-          task.reward
-        )
-      );
-
-    if (
-      !Number.isFinite(reward) ||
-      reward <= 0
-    ) {
-
-      alert(
-        "Invalid reward."
-      );
-
-      return;
-
-    }
-
-    await api(
-      "/api/admin/tasks/" + id,
-      {
-        method: "PUT",
-
-        body: JSON.stringify({
-          title,
-          description,
-          type,
-          reward,
-          active: true
-        })
-
-      }
-    );
-
-    alert(
-      "Task updated!"
-    );
-
-    await adminTasks();
-
-  } catch (error) {
-
-    alert(error.message);
-
-  }
-
-}
-
-
-/* =====================================================
-   DISABLE TASK
-===================================================== */
-
-async function disableTask(id) {
-
-  if (
-    !confirm(
-      "Disable this task?"
-    )
-  ) {
-    return;
-  }
-
-  try {
-
-    await api(
-      "/api/admin/tasks/" + id,
-      {
-        method: "DELETE"
-      }
-    );
-
-    alert(
-      "Task disabled."
-    );
-
-    await adminTasks();
-
-  } catch (error) {
-
-    alert(error.message);
-
-  }
-
-}
-
-
-/* =====================================================
-   ADMIN SUBMISSIONS
-===================================================== */
-
-async function adminSubmissions() {
-
-  const submissions =
-    await api(
-      "/api/admin/submissions"
-    );
-
-  document.getElementById(
-    "adminScreen"
-  ).innerHTML = `
-
-    <div class="card">
-
-      <h2>
-        Task Submissions 📋
-      </h2>
-
-      ${
-        submissions.length
-
-        ?
-
-        submissions.map(item => `
-
-          <div class="admin-box">
-
-            <div class="row">
-
-              <div>
-
-                <b>
-                  ${escapeHtml(item.userName)}
-                </b>
-
-                <p class="muted">
-                  ${escapeHtml(item.taskTitle)}
-                </p>
-
-                <p>
-                  Reward:
-                  ₹${Number(item.reward).toFixed(2)}
-                </p>
-
-              </div>
-
-              <span
-                class="status ${item.status}">
-                ${escapeHtml(item.status)}
-              </span>
-
-            </div>
-
-            ${
-              item.status === "pending"
-
-              ?
-
-              `<div class="task-actions">
-
-                <button
-                  class="btn success"
-                  onclick="reviewSubmission(${item.id},'approved')">
-                  Approve
-                </button>
-
-                <button
-                  class="btn danger"
-                  onclick="reviewSubmission(${item.id},'rejected')">
-                  Reject
-                </button>
-
-              </div>`
-
-              :
-
-              ""
-            }
-
-          </div>
-
-        `).join("")
-
-        :
-
-        `<p class="empty">
-          No submissions found.
-        </p>`
-
-      }
-
-    </div>
-
-  `;
-
-}
-
-
-/* =====================================================
-   REVIEW SUBMISSION
-===================================================== */
-
-async function reviewSubmission(
-  id,
-  status
-) {
-
-  const question =
-    status === "approved"
-    ?
-    "Approve this submission?"
-    :
-    "Reject this submission?";
-
-  if (!confirm(question)) {
-    return;
-  }
-
-  try {
-
-    await api(
-      "/api/admin/submissions/" + id,
-      {
-        method: "POST",
-
-        body: JSON.stringify({
-          status
-        })
-
-      }
-    );
-
-    alert(
-      status === "approved"
-      ?
-      "Submission approved!"
-      :
-      "Submission rejected."
-    );
-
-    await adminSubmissions();
-
-  } catch (error) {
-
-    alert(error.message);
-
-  }
-
-}
-
-
-/* =====================================================
-   ADMIN WITHDRAWALS
-===================================================== */
-
-async function adminWithdrawals() {
-
-  const withdrawals =
-    await api(
-      "/api/admin/withdrawals"
-    );
-
-  document.getElementById(
-    "adminScreen"
-  ).innerHTML = `
-
-    <div class="card">
-
-      <h2>
-        Withdrawal Requests 💳
-      </h2>
-
-      ${
-        withdrawals.length
-
-        ?
-
-        withdrawals.map(item => `
-
-          <div class="admin-box">
-
-            <div class="row">
-
-              <div>
-
-                <b>
-                  ${escapeHtml(item.name)}
-                </b>
-
-                <p class="muted">
-
-                  ₹${Number(item.amount).toFixed(2)}
-                  •
-                  ${escapeHtml(item.method)}
-
-                </p>
-
-              </div>
-
-              <span
-                class="status ${item.status}">
-                ${escapeHtml(item.status)}
-              </span>
-
-            </div>
-
-            ${
-              item.status === "pending"
-
-              ?
-
-              `<div class="task-actions">
-
-                <button
-                  class="btn success"
-                  onclick="reviewWithdrawal(${item.id},'approved')">
-                  Approve
-                </button>
-
-                <button
-                  class="btn danger"
-                  onclick="reviewWithdrawal(${item.id},'rejected')">
-                  Reject
-                </button>
-
-              </div>`
-
-              :
-
-              ""
-            }
-
-          </div>
-
-        `).join("")
-
-        :
-
-        `<p class="empty">
-          No withdrawal requests.
-        </p>`
-
-      }
-
-    </div>
-
-  `;
-
-}
-
-
-/* =====================================================
-   REVIEW WITHDRAWAL
-===================================================== */
-
-async function reviewWithdrawal(
-  id,
-  status
-) {
-
-  const message =
-    status === "approved"
-    ?
-    "Approve this withdrawal?"
-    :
-    "Reject this withdrawal and return the balance?";
-
-  if (!confirm(message)) {
-    return;
-  }
-
-  try {
-
-    await api(
-      "/api/admin/withdrawals/" + id,
-      {
-        method: "POST",
-
-        body: JSON.stringify({
-          status
-        })
-
-      }
-    );
-
-    alert(
-      status === "approved"
-      ?
-      "Withdrawal approved!"
-      :
-      "Withdrawal rejected and balance returned."
-    );
-
-    await adminWithdrawals();
-
-  } catch (error) {
-
-    alert(error.message);
-
-  }
-
-}
-
-
-/* =====================================================
-   TERMS
-===================================================== */
-
+/* INFORMATIONAL PAGES */
 function showTerms() {
-
-  document.getElementById(
-    "homeArea"
-  ).style.display = "none";
-
-  document.getElementById(
-    "accountArea"
-  ).innerHTML = `
-
+  document.getElementById("homeArea").style.display = "none";
+  document.getElementById("accountArea").innerHTML = `
     <div class="card">
-
-      <h2>
-        Terms & Conditions 📜
-      </h2>
-
-      <h3>
-        1. Account Registration
-      </h3>
-
-      <p class="muted">
-        Users must provide accurate information
-        when creating an account and are responsible
-        for keeping their login credentials secure.
-      </p>
-
-      <h3>
-        2. Task Eligibility
-      </h3>
-
-      <p class="muted">
-        Available tasks may differ between users.
-        Eligibility depends on the task requirements
-        and applicable platform conditions.
-      </p>
-
-      <h3>
-        3. Task Completion
-      </h3>
-
-      <p class="muted">
-        Users must complete tasks honestly and
-        according to the instructions displayed
-        on the platform.
-      </p>
-
-      <h3>
-        4. Task Submission
-      </h3>
-
-      <p class="muted">
-        Submitting a task does not guarantee payment.
-        Submissions may be reviewed before a reward
-        is credited.
-      </p>
-
-      <h3>
-        5. Rewards
-      </h3>
-
-      <p class="muted">
-        Rewards are subject to eligibility,
-        successful completion and approval.
-      </p>
-
-      <h3>
-        6. Withdrawals
-      </h3>
-
-      <p class="muted">
-        Withdrawal requests are subject to the
-        minimum withdrawal amount, account eligibility
-        and platform review.
-      </p>
-
-      <h3>
-        7. Prohibited Activities
-      </h3>
-
-      <p class="muted">
-        Fraud, fake submissions, automated abuse,
-        manipulation, multiple-account abuse and
-        attempts to exploit the platform are prohibited.
-      </p>
-
-      <h3>
-        8. Account Suspension
-      </h3>
-
-      <p class="muted">
-        Accounts involved in prohibited activity
-        may be restricted, suspended or terminated
-        where appropriate.
-      </p>
-
-      <h3>
-        9. Changes
-      </h3>
-
-      <p class="muted">
-        TaskEarn may update platform features,
-        tasks, rewards and these terms from time
-        to time.
-      </p>
-
-      <button
-        class="btn secondary"
-        onclick="goHome()">
-        ← Back
-      </button>
-
-    </div>
-
-  `;
-
+      <h2>Terms & Conditions 📜</h2>
+      <p class="muted">Users must complete tasks honestly and maintain account security.</p>
+      <button class="btn secondary" onclick="goHome()">← Back</button>
+    </div>`;
   showBottomNav(false);
-
   scrollAccount();
-
 }
-
-
-/* =====================================================
-   PRIVACY
-===================================================== */
 
 function showPrivacy() {
-
-  document.getElementById(
-    "homeArea"
-  ).style.display = "none";
-
-  document.getElementById(
-    "accountArea"
-  ).innerHTML = `
-
+  document.getElementById("homeArea").style.display = "none";
+  document.getElementById("accountArea").innerHTML = `
     <div class="card">
-
-      <h2>
-        Privacy Policy 🔒
-      </h2>
-
-      <h3>
-        Information We Collect
-      </h3>
-
-      <p class="muted">
-        TaskEarn may collect information such as
-        name, email address, account information,
-        task submissions and withdrawal requests.
-      </p>
-
-      <h3>
-        How Information Is Used
-      </h3>
-
-      <p class="muted">
-        Information may be used to provide account
-        services, manage tasks, process submissions,
-        maintain security and improve the website.
-      </p>
-
-      <h3>
-        Advertising
-      </h3>
-
-      <p class="muted">
-        TaskEarn may display advertisements from
-        third-party advertising providers such as
-        Google AdSense.
-      </p>
-
-      <h3>
-        Cookies
-      </h3>
-
-      <p class="muted">
-        Cookies may be used to maintain login
-        sessions and support website functionality.
-      </p>
-
-      <h3>
-        Data Security
-      </h3>
-
-      <p class="muted">
-        Reasonable steps are taken to protect
-        information associated with user accounts.
-      </p>
-
-      <h3>
-        Policy Updates
-      </h3>
-
-      <p class="muted">
-        This Privacy Policy may be updated from
-        time to time.
-      </p>
-
-      <button
-        class="btn secondary"
-        onclick="goHome()">
-        ← Back
-      </button>
-
-    </div>
-
-  `;
-
+      <h2>Privacy Policy 🔒</h2>
+      <p class="muted">We respect user data and collect minimal information necessary for service delivery.</p>
+      <button class="btn secondary" onclick="goHome()">← Back</button>
+    </div>`;
   showBottomNav(false);
-
   scrollAccount();
-
 }
-
-
-/* =====================================================
-   CONTACT
-===================================================== */
 
 function showContact() {
-
-  document.getElementById(
-    "homeArea"
-  ).style.display = "none";
-
-  document.getElementById(
-    "accountArea"
-  ).innerHTML = `
-
+  document.getElementById("homeArea").style.display = "none";
+  document.getElementById("accountArea").innerHTML = `
     <div class="card">
-
-      <h2>
-        Contact TaskEarn 📞
-      </h2>
-
-      <p class="muted">
-        If you have questions, feedback or
-        need support regarding TaskEarn,
-        please contact the support team.
-      </p>
-
-      <div class="notice">
-
-        📧 Support:
-        support@taskearn.demo
-
-      </div>
-
-      <h3>
-        Support Information
-      </h3>
-
-      <p class="muted">
-        For account, task or withdrawal questions,
-        provide enough information for the support
-        team to understand your request.
-      </p>
-
-      <h3>
-        Security
-      </h3>
-
-      <p class="muted">
-        Never share your password, payment PIN,
-        OTP or other confidential security
-        information with anyone.
-      </p>
-
-      <button
-        class="btn secondary"
-        onclick="goHome()">
-        ← Back
-      </button>
-
-    </div>
-
-  `;
-
+      <h2>Contact Us 📞</h2>
+      <p class="muted">Support Email: support@taskearn.demo</p>
+      <button class="btn secondary" onclick="goHome()">← Back</button>
+    </div>`;
   showBottomNav(false);
-
   scrollAccount();
-
 }
-
-
-/* =====================================================
-   ABOUT
-===================================================== */
 
 function showAbout() {
-
-  document.getElementById(
-    "homeArea"
-  ).style.display = "none";
-
-  document.getElementById(
-    "accountArea"
-  ).innerHTML = `
-
+  document.getElementById("homeArea").style.display = "none";
+  document.getElementById("accountArea").innerHTML = `
     <div class="card">
-
-      <h2>
-        About TaskEarn
-      </h2>
-
-      <h3>
-        What is TaskEarn?
-      </h3>
-
-      <p class="muted">
-        TaskEarn is an online platform designed
-        to provide a simple interface for discovering
-        eligible tasks, submitting completed work
-        and managing approved task-related rewards.
-      </p>
-
-      <h3>
-        Our Goal
-      </h3>
-
-      <p class="muted">
-        Our goal is to provide users with a simple
-        and transparent task discovery and submission
-        experience.
-      </p>
-
-      <h3>
-        Important Information
-      </h3>
-
-      <p class="muted">
-        Task availability and rewards can change.
-        Earnings are not guaranteed and depend on
-        available tasks, eligibility and applicable
-        conditions.
-      </p>
-
-      <button
-        class="btn secondary"
-        onclick="goHome()">
-        ← Back
-      </button>
-
-    </div>
-
-  `;
-
+      <h2>About TaskEarn</h2>
+      <p class="muted">TaskEarn offers simple daily tasks and reward tracking.</p>
+      <button class="btn secondary" onclick="goHome()">← Back</button>
+    </div>`;
   showBottomNav(false);
-
   scrollAccount();
-
 }
 
-
-/* =====================================================
-   HOME
-===================================================== */
-
-function goHome() {
-
-  document.getElementById(
-    "homeArea"
-  ).style.display = "block";
-
-  document.getElementById(
-    "accountArea"
-  ).innerHTML = "";
-
-  showBottomNav(false);
-
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth"
-  });
-
-}
-
-
-/* =====================================================
-   MOBILE NAV
-===================================================== */
-
+/* MOBILE NAV CONTROLS */
 function showBottomNav(show) {
-
-  const nav =
-    document.getElementById(
-      "mobileBottomNav"
-    );
-
+  const nav = document.getElementById("mobileBottomNav");
   if (!nav) return;
+  nav.style.display = (show && window.innerWidth <= 700) ? "flex" : "none";
+}
 
-  if (
-    show &&
-    window.innerWidth <= 700
-  ) {
-
-    nav.style.display = "flex";
-
-  } else {
-
-    nav.style.display = "none";
-
+function mobileHome() { goHome(); }
+function mobileTasks() { tasksPage(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+function mobileWallet() { walletPage(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+async function mobileProfile() {
+  try {
+    const user = await api("/api/me");
+    if (user) await dashboard(user);
+  } catch (e) {
+    showLogin();
   }
-
 }
-
-
-function mobileHome() {
-
-  goHome();
-
-}
-
-
-function mobileTasks() {
-
-  tasksPage();
-
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth"
-  });
-
-}
-
-
-function mobileWallet() {
-
-  walletPage();
-
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth"
-  });
-
-}
-
-
-function mobileProfile() {
-
-  const user =
-    api("/api/me")
-      .then(user => {
-
-        if (user) {
-
-          dashboard(user);
-
-          window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-          });
-
-        }
-
-      });
-
-}
-
 
 function setActiveBottom(name) {
-
-  document
-    .querySelectorAll(".bottom-item")
-    .forEach(button => {
-
-      button.classList.remove(
-        "active"
-      );
-
-    });
-
-  const items =
-    document.querySelectorAll(
-      ".bottom-item"
-    );
-
-  if (name === "tasks") {
-    items[1]?.classList.add("active");
-  }
-
-  if (name === "wallet") {
-    items[2]?.classList.add("active");
-  }
-
-  if (name === "submissions") {
-    items[1]?.classList.add("active");
-  }
-
+  document.querySelectorAll(".bottom-item").forEach(b => b.classList.remove("active"));
+  const items = document.querySelectorAll(".bottom-item");
+  if (name === "tasks") items[1]?.classList.add("active");
+  if (name === "wallet") items[2]?.classList.add("active");
+  if (name === "submissions") items[1]?.classList.add("active");
 }
-
-
-/* =====================================================
-   LOGOUT
-===================================================== */
-
-async function logout() {
-
-  try {
-
-    await api(
-      "/api/logout",
-      {
-        method: "POST"
-      }
-    );
-
-  } finally {
-
-    location.reload();
-
-  }
-
-}
-
-
-/* =====================================================
-   UTILITIES
-===================================================== */
-
-function scrollAccount() {
-
-  document.getElementById(
-    "accountArea"
-  ).scrollIntoView({
-    behavior: "smooth"
-  });
-
-}
-
-
-function formatDate(value) {
-
-  if (!value) {
-    return "-";
-  }
-
-  try {
-
-    return new Date(
-      value
-    ).toLocaleString();
-
-  } catch (e) {
-
-    return value;
-
-  }
-
-}
-
-
-function escapeHtml(value) {
-
-  return String(value)
-
-    .replaceAll(
-      "&",
-      "&amp;"
-    )
-
-    .replaceAll(
-      "<",
-      "&lt;"
-    )
-
-    .replaceAll(
-      ">",
-      "&gt;"
-    )
-
-    .replaceAll(
-      '"',
-      "&quot;"
-    )
-
-    .replaceAll(
-      "'",
-      "&#039;"
-    );
-
-}
-
-
-/* =====================================================
-   RESPONSIVE NAV
-===================================================== */
-
-window.addEventListener(
-  "resize",
-  function() {
-
-    const nav =
-      document.getElementById(
-        "mobileBottomNav"
-      );
-
-    if (!nav) return;
-
-    if (
-      window.innerWidth <= 700 &&
-      document.getElementById(
-        "accountArea"
-      ).innerHTML.trim() !== ""
-    ) {
-
-      nav.style.display =
-        "flex";
-
-    } else {
-
-      nav.style.display =
-        "none";
-
-    }
-
-  }
-);
-
-
-/* =====================================================
-   START APP
-===================================================== */
 
 startApp();
-
 </script>
-
 </body>
 </html>
