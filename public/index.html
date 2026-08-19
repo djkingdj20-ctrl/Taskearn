@@ -14,9 +14,13 @@
   <title>TaskEarn - Tasks & Rewards</title>
 
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
-    html { scroll-behavior: smooth; }
+    html {
+      scroll-behavior: smooth;
+    }
 
     body {
       margin: 0;
@@ -32,7 +36,6 @@
 
     .header {
       background: #faf8f2;
-      color: #172033;
       padding: 14px 20px;
       position: sticky;
       top: 0;
@@ -46,8 +49,6 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 12px;
-      position: relative;
     }
 
     .logo-container {
@@ -57,8 +58,8 @@
     }
 
     .logo-icon {
-      width: 32px;
-      height: 32px;
+      width: 34px;
+      height: 34px;
       background: #ff6b35;
       color: white;
       border-radius: 50%;
@@ -66,65 +67,49 @@
       align-items: center;
       justify-content: center;
       font-weight: bold;
-      font-size: 18px;
     }
 
     .logo {
       font-size: 22px;
       font-weight: 800;
-      color: #222;
-      letter-spacing: -.5px;
     }
 
     .header-right {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       position: relative;
     }
 
     .balance {
-      background: #fff;
+      background: white;
       padding: 7px 14px;
       border-radius: 20px;
       font-weight: bold;
-      font-size: 14px;
       border: 1px solid #e2ded4;
-      box-shadow: 0 2px 5px rgba(0,0,0,.03);
     }
 
     .menu-btn {
       background: none;
-      border: none;
-      font-size: 24px;
+      border: 0;
+      font-size: 25px;
       cursor: pointer;
-      color: #222;
-      padding: 4px 8px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-    }
-
-    .menu-btn:hover {
-      background: rgba(0,0,0,.05);
     }
 
     .dropdown-menu {
       position: absolute;
       top: 45px;
       right: 0;
-      background: #fff;
-      min-width: 225px;
-      box-shadow: 0 12px 30px rgba(0,0,0,.15);
+      width: 220px;
+      background: white;
       border-radius: 18px;
-      border: 1px solid rgba(0,0,0,.06);
+      box-shadow: 0 12px 30px rgba(0,0,0,.15);
       overflow: hidden;
-      z-index: 200;
       opacity: 0;
       visibility: hidden;
-      transform: translateY(-12px) scale(.92);
-      transform-origin: top right;
-      transition: .25s ease;
+      transform: translateY(-10px) scale(.95);
+      transition: .2s;
+      z-index: 200;
     }
 
     .dropdown-menu.show {
@@ -134,25 +119,14 @@
     }
 
     .dropdown-item {
-      padding: 13px 18px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: #333;
-      text-decoration: none;
-      font-size: 15px;
-      font-weight: 500;
+      padding: 14px 18px;
+      border-bottom: 1px solid #f1f1f1;
       cursor: pointer;
-      border-bottom: 1px solid #f5f5f5;
-      transition: .2s ease;
-    }
-
-    .dropdown-item:last-child {
-      border-bottom: none;
+      font-weight: 600;
     }
 
     .dropdown-item:hover {
-      background: #fdf5f0;
+      background: #fff5ef;
       color: #ff6b35;
     }
 
@@ -162,98 +136,86 @@
       padding: 16px;
     }
 
+    .hero {
+      background: linear-gradient(
+        135deg,
+        #fffbf0,
+        #ffe9d6,
+        #e3f2fd
+      );
+      padding: 60px 25px;
+      border-radius: 32px;
+      margin-bottom: 25px;
+    }
+
+    .hero h1 {
+      font-size: 40px;
+      max-width: 600px;
+      line-height: 1.15;
+      margin: 0 0 15px;
+    }
+
+    .hero p {
+      max-width: 520px;
+      color: #4a5568;
+      font-size: 17px;
+      line-height: 1.6;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 25px;
+    }
+
+    .btn {
+      padding: 12px 18px;
+      border: 0;
+      border-radius: 12px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn-large {
+      padding: 16px 35px;
+      border-radius: 30px;
+      font-size: 17px;
+    }
+
+    .primary {
+      background: #ff6b35;
+      color: white;
+    }
+
+    .secondary {
+      background: white;
+      color: #172033;
+      border: 1px solid #ddd;
+    }
+
+    .danger {
+      background: #ffe7e7;
+      color: #b42318;
+    }
+
+    .success {
+      background: #e5f8ed;
+      color: #087a42;
+    }
+
     .card {
       background: white;
       padding: 22px;
       border-radius: 24px;
       margin-bottom: 20px;
       box-shadow: 0 4px 20px rgba(0,0,0,.04);
-      border: 1px solid rgba(0,0,0,.03);
-    }
-
-    .hero-yandex-style {
-      position: relative;
-      background: linear-gradient(
-        135deg,
-        #fffbf0 0%,
-        #ffe9d6 50%,
-        #e3f2fd 100%
-      );
-      padding: 60px 24px 50px;
-      border-radius: 32px;
-      text-align: left;
-      margin-bottom: 25px;
-      overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0,0,0,.03);
-    }
-
-    .hero-yandex-style h1 {
-      font-size: 38px;
-      font-weight: 800;
-      line-height: 1.15;
-      color: #20242f;
-      margin: 0 0 16px;
-      letter-spacing: -.8px;
-      max-width: 550px;
-    }
-
-    .hero-yandex-style p.subtitle {
-      font-size: 17px;
-      color: #4a5568;
-      line-height: 1.5;
-      margin: 0 0 32px;
-      max-width: 480px;
-    }
-
-    .hero-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-items: center;
-    }
-
-    .btn-start-orange {
-      background: #ff6b35;
-      color: white;
-      padding: 16px 42px;
-      border-radius: 30px;
-      font-size: 18px;
-      font-weight: 700;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 6px 20px rgba(255,107,53,.3);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
-    }
-
-    .btn-start-orange:hover {
-      background: #f25822;
-      transform: translateY(-2px);
-    }
-
-    .btn-outline-custom {
-      background: rgba(255,255,255,.8);
-      color: #20242f;
-      padding: 16px 28px;
-      border-radius: 30px;
-      font-size: 16px;
-      font-weight: 600;
-      border: 1px solid rgba(0,0,0,.1);
-      cursor: pointer;
-    }
-
-    .muted {
-      color: #687386;
-      font-size: 14px;
-      line-height: 1.6;
     }
 
     .grid {
       display: grid;
       grid-template-columns: repeat(2,1fr);
-      gap: 14px;
+      gap: 15px;
     }
 
     .stats {
@@ -293,60 +255,41 @@
       gap: 10px;
     }
 
-    .btn {
-      padding: 11px 15px;
-      border: 0;
-      border-radius: 11px;
-      font-weight: bold;
-      cursor: pointer;
+    .muted {
+      color: #687386;
+      line-height: 1.6;
     }
 
-    .btn:disabled {
-      opacity: .55;
-      cursor: not-allowed;
-    }
-
-    .primary {
-      background: #ff6b35;
-      color: white;
-    }
-
-    .secondary {
-      background: white;
-      border: 1px solid #ddd;
-      color: #172033;
-    }
-
-    .danger {
-      background: #ffe7e7;
-      color: #b42318;
-      border: 1px solid #ffcaca;
-    }
-
-    .success {
-      background: #e5f8ed;
-      color: #087a42;
-      border: 1px solid #bdebd0;
-    }
-
-    .input, textarea, select {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 11px;
-      font-size: 15px;
-      background: white;
-    }
-
-    textarea {
-      min-height: 90px;
-      resize: vertical;
+    .small {
+      font-size: 12px;
+      color: #687386;
     }
 
     .form {
       display: grid;
-      gap: 10px;
+      gap: 12px;
       max-width: 500px;
+    }
+
+    .input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #ddd;
+      border-radius: 11px;
+      background: white;
+      outline: none;
+    }
+
+    .input:focus,
+    textarea:focus {
+      border-color: #ff6b35;
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
     }
 
     .nav {
@@ -354,12 +297,12 @@
       gap: 8px;
       overflow-x: auto;
       margin: 15px 0;
-      padding-bottom: 3px;
+      padding-bottom: 5px;
     }
 
     .notice {
       background: #fff6d9;
-      padding: 12px;
+      padding: 13px;
       border-radius: 11px;
       margin-bottom: 15px;
       color: #6c5200;
@@ -371,7 +314,6 @@
       border-radius: 20px;
       font-size: 12px;
       font-weight: bold;
-      text-transform: capitalize;
     }
 
     .pending {
@@ -389,13 +331,6 @@
       color: #b42318;
     }
 
-    .task-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 12px;
-    }
-
     .admin-box {
       border: 1px solid #e7e9ef;
       border-radius: 14px;
@@ -403,9 +338,11 @@
       margin-bottom: 12px;
     }
 
-    .small {
-      font-size: 12px;
-      color: #687386;
+    .task-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
     }
 
     .empty {
@@ -421,24 +358,13 @@
       font-size: 13px;
     }
 
-    .footer-links {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-
-    .footer-links a {
-      color: #555;
-      text-decoration: none;
-    }
-
-    .footer-links a:hover {
+    a {
       color: #ff6b35;
+      text-decoration: none;
+      font-weight: 600;
     }
 
-    @media (max-width:650px) {
+    @media(max-width:650px) {
       .grid {
         grid-template-columns: 1fr;
       }
@@ -447,24 +373,16 @@
         grid-template-columns: repeat(3,1fr);
       }
 
-      .container {
-        padding: 12px;
+      .hero {
+        padding: 40px 18px;
       }
 
-      .hero-yandex-style h1 {
+      .hero h1 {
         font-size: 30px;
       }
 
-      .hero-yandex-style {
-        padding: 40px 18px 35px;
-      }
-
-      .btn-start-orange {
+      .btn-large {
         width: 100%;
-      }
-
-      .row {
-        align-items: flex-start;
       }
     }
   </style>
@@ -484,48 +402,40 @@
 
       <div id="balance" class="balance">₹0.00</div>
 
-      <button
-        class="menu-btn"
-        onclick="toggleMenu()"
-        aria-label="Menu">
+      <button class="menu-btn"
+        onclick="toggleMenu()">
         ☰
       </button>
 
       <div id="dropdownMenu" class="dropdown-menu">
 
-        <div
-          class="dropdown-item"
-          onclick="handleMenuClick('login')">
-          🔑 Login / Register
+        <div class="dropdown-item"
+          onclick="goTo('/login')">
+          🔑 Login
         </div>
 
-        <div
-          class="dropdown-item"
-          onclick="handleMenuClick('about')">
+        <div class="dropdown-item"
+          onclick="goTo('/register')">
+          📝 Create Account
+        </div>
+
+        <div class="dropdown-item"
+          onclick="goTo('/about')">
           ℹ️ About Us
         </div>
 
-        <div
-          class="dropdown-item"
-          onclick="handleMenuClick('terms')">
+        <div class="dropdown-item"
+          onclick="goTo('/terms')">
           📜 Terms & Conditions
         </div>
 
-        <div
-          class="dropdown-item"
-          onclick="handleMenuClick('privacy')">
+        <div class="dropdown-item"
+          onclick="goTo('/privacy')">
           🔒 Privacy Policy
         </div>
 
-        <div
-          class="dropdown-item"
-          onclick="handleMenuClick('disclaimer')">
-          ⚠️ Disclaimer
-        </div>
-
-        <div
-          class="dropdown-item"
-          onclick="handleMenuClick('contact')">
+        <div class="dropdown-item"
+          onclick="goTo('/contact')">
           📞 Contact Us
         </div>
 
@@ -534,35 +444,41 @@
   </div>
 </header>
 
+
 <main class="container">
 
   <section id="homeArea">
 
-    <div class="hero-yandex-style">
+    <div class="hero">
 
-      <h1>Earn money by doing simple tasks online</h1>
+      <h1>
+        Earn money by doing simple tasks online
+      </h1>
 
-      <p class="subtitle">
-        Discover eligible online tasks, submit completed work
-        and manage approved task-related rewards with TaskEarn.
+      <p>
+        Discover eligible online tasks,
+        submit completed work and manage
+        approved task-related rewards with
+        TaskEarn.
       </p>
 
-      <div class="hero-actions">
+      <div class="hero-buttons">
 
         <button
-          class="btn-start-orange"
-          onclick="showLogin()">
+          class="btn primary btn-large"
+          onclick="location.href='/login'">
           Start
         </button>
 
         <button
-          class="btn-outline-custom"
-          onclick="showRegister()">
+          class="btn secondary btn-large"
+          onclick="location.href='/register'">
           Create Account
         </button>
 
       </div>
     </div>
+
 
     <section class="card">
 
@@ -579,87 +495,89 @@
 
     </section>
 
-    <section id="aboutSection" class="card">
+
+    <section class="card">
 
       <h2>About TaskEarn</h2>
 
       <p class="muted">
-        TaskEarn provides a simple interface for discovering
-        eligible online tasks and managing task submissions
-        and eligible rewards.
+        TaskEarn provides a simple interface
+        for discovering eligible online tasks,
+        submitting completed work and managing
+        approved task-related rewards.
       </p>
 
-      <p class="muted">
-        Task availability and rewards may change depending
-        on the tasks available on the platform.
-      </p>
+      <a href="/about">
+        Read More About TaskEarn →
+      </a>
 
     </section>
+
 
     <section class="card">
 
       <h2>Frequently Asked Questions</h2>
 
       <h3>How do I earn?</h3>
-
       <p class="muted">
-        Browse available eligible tasks and complete them
-        according to the stated requirements.
+        Browse available eligible tasks and
+        complete them according to the stated
+        requirements.
       </p>
 
       <h3>Is income guaranteed?</h3>
-
       <p class="muted">
-        No. Earnings are not guaranteed. They depend on
-        task availability, eligibility, approval and
-        applicable task conditions.
+        No. Earnings depend on task availability,
+        eligibility and applicable task conditions.
       </p>
 
       <h3>How do I withdraw?</h3>
-
       <p class="muted">
-        Eligible users can request a withdrawal after
-        reaching the applicable minimum amount.
+        Eligible users can request a withdrawal
+        after reaching the applicable minimum
+        amount.
       </p>
 
       <h3>What is the minimum withdrawal?</h3>
-
       <p class="muted">
-        The current demo configuration uses ₹100.
+        The current configuration uses ₹100.
       </p>
 
     </section>
 
   </section>
 
+
   <section id="accountArea"></section>
 
+
   <footer class="footer">
-
-    <div class="footer-links">
-
-      <a href="/about">About Us</a>
-      <a href="/terms">Terms & Conditions</a>
-      <a href="/privacy">Privacy Policy</a>
-      <a href="/disclaimer">Disclaimer</a>
-      <a href="/contact">Contact Us</a>
-
-    </div>
-
     © 2026 TaskEarn. All rights reserved.
-
+    <br><br>
+    <a href="/privacy">Privacy Policy</a> ·
+    <a href="/terms">Terms</a> ·
+    <a href="/about">About</a> ·
+    <a href="/contact">Contact</a>
   </footer>
 
 </main>
 
+
 <script>
 
 function toggleMenu() {
-  const menu = document.getElementById("dropdownMenu");
 
-  if (menu) {
-    menu.classList.toggle("show");
-  }
+  const menu =
+    document.getElementById("dropdownMenu");
+
+  menu.classList.toggle("show");
+}
+
+
+function goTo(url) {
+
+  window.location.href = url;
+
 }
 
 
@@ -673,72 +591,36 @@ window.addEventListener("click", function(event) {
     if (menu) {
       menu.classList.remove("show");
     }
+
   }
 
 });
 
 
-function handleMenuClick(action) {
-
-  const menu =
-    document.getElementById("dropdownMenu");
-
-  if (menu) {
-    menu.classList.remove("show");
-  }
-
-  if (action === "login") {
-    showLogin();
-  }
-
-  else if (action === "about") {
-    window.location.href = "/about";
-  }
-
-  else if (action === "terms") {
-    window.location.href = "/terms";
-  }
-
-  else if (action === "privacy") {
-    window.location.href = "/privacy";
-  }
-
-  else if (action === "disclaimer") {
-    window.location.href = "/disclaimer";
-  }
-
-  else if (action === "contact") {
-    window.location.href = "/contact";
-  }
-
-}
-
-
 async function api(url, options = {}) {
 
   const response = await fetch(url, {
-    credentials: "same-origin",
+
     headers: {
-      "Content-Type": "application/json",
-      ...(options.headers || {})
+      "Content-Type": "application/json"
     },
+
     ...options
+
   });
 
   let data = {};
 
   try {
     data = await response.json();
-  }
-
-  catch (e) {
-    data = {};
-  }
+  } catch (e) {}
 
   if (!response.ok) {
+
     throw new Error(
       data.error || "Something went wrong"
     );
+
   }
 
   return data;
@@ -753,203 +635,14 @@ async function startApp() {
       await api("/api/me");
 
     if (user) {
-      await dashboard(user);
+
+      dashboard(user);
+
     }
 
-  }
+  } catch (error) {
 
-  catch (error) {
-
-    console.log(
-      "Public homepage available."
-    );
-
-  }
-
-}
-
-
-function showLogin() {
-
-  document.getElementById(
-    "accountArea"
-  ).innerHTML = `
-
-    <div class="card">
-
-      <h2>Login to TaskEarn</h2>
-
-      <div class="form">
-
-        <input
-          id="loginEmail"
-          class="input"
-          type="email"
-          placeholder="Email"
-          autocomplete="email">
-
-        <input
-          id="loginPassword"
-          class="input"
-          type="password"
-          placeholder="Password"
-          autocomplete="current-password">
-
-        <button
-          class="btn primary"
-          onclick="login()">
-          Login
-        </button>
-
-        <p class="muted">
-          Demo User:
-          user@taskearn.demo / 123456
-        </p>
-
-        <p class="muted">
-          Admin:
-          admin@taskearn.demo / admin123
-        </p>
-
-      </div>
-
-    </div>
-
-  `;
-
-  scrollAccount();
-
-}
-
-
-function showRegister() {
-
-  document.getElementById(
-    "accountArea"
-  ).innerHTML = `
-
-    <div class="card">
-
-      <h2>Create TaskEarn Account</h2>
-
-      <div class="form">
-
-        <input
-          id="registerName"
-          class="input"
-          placeholder="Your name"
-          autocomplete="name">
-
-        <input
-          id="registerEmail"
-          class="input"
-          type="email"
-          placeholder="Email"
-          autocomplete="email">
-
-        <input
-          id="registerPassword"
-          class="input"
-          type="password"
-          placeholder="Password - minimum 6 characters"
-          autocomplete="new-password">
-
-        <button
-          class="btn primary"
-          onclick="register()">
-          Create Account
-        </button>
-
-        <p class="small">
-          By creating an account, you agree
-          to the TaskEarn Terms & Conditions
-          and Privacy Policy.
-        </p>
-
-      </div>
-
-    </div>
-
-  `;
-
-  scrollAccount();
-
-}
-
-
-async function login() {
-
-  try {
-
-    await api("/api/login", {
-
-      method: "POST",
-
-      body: JSON.stringify({
-
-        email:
-          document.getElementById(
-            "loginEmail"
-          ).value,
-
-        password:
-          document.getElementById(
-            "loginPassword"
-          ).value
-
-      })
-
-    });
-
-    await startApp();
-
-  }
-
-  catch (error) {
-
-    alert(error.message);
-
-  }
-
-}
-
-
-async function register() {
-
-  try {
-
-    await api("/api/register", {
-
-      method: "POST",
-
-      body: JSON.stringify({
-
-        name:
-          document.getElementById(
-            "registerName"
-          ).value,
-
-        email:
-          document.getElementById(
-            "registerEmail"
-          ).value,
-
-        password:
-          document.getElementById(
-            "registerPassword"
-          ).value
-
-      })
-
-    });
-
-    await startApp();
-
-  }
-
-  catch (error) {
-
-    alert(error.message);
+    console.log("Homepage ready.");
 
   }
 
@@ -958,109 +651,113 @@ async function register() {
 
 async function dashboard(user) {
 
-  document.getElementById(
-    "homeArea"
-  ).style.display = "none";
+  document.getElementById("homeArea")
+    .style.display = "none";
 
   const wallet =
     await api("/api/wallet");
 
-  document.getElementById(
-    "balance"
-  ).innerText =
-    "₹" +
-    Number(wallet.balance).toFixed(2);
+  document.getElementById("balance")
+    .innerText =
+      "₹" +
+      Number(wallet.balance).toFixed(2);
 
-  document.getElementById(
-    "accountArea"
-  ).innerHTML = `
 
-    <div class="card">
+  document.getElementById("accountArea")
+    .innerHTML = `
 
-      <div class="row">
+      <div class="card">
 
-        <div>
+        <div class="row">
 
-          <h2>
-            Hi,
-            ${escapeHtml(user.name)}
-            👋
-          </h2>
+          <div>
 
-          <p class="muted">
-            Welcome to your TaskEarn dashboard.
-          </p>
+            <h2>
+              Hi, ${escapeHtml(user.name)} 👋
+            </h2>
+
+            <p class="muted">
+              Welcome to your TaskEarn dashboard.
+            </p>
+
+          </div>
+
+          <button
+            class="btn secondary"
+            onclick="logout()">
+            Logout
+          </button>
 
         </div>
 
+      </div>
+
+
+      <div class="stats">
+
+        <div class="stat">
+          <small>Balance</small>
+          <br>
+          <b>
+            ₹${Number(wallet.balance).toFixed(2)}
+          </b>
+        </div>
+
+        <div class="stat">
+          <small>Completed</small>
+          <br>
+          <b>${wallet.completed}</b>
+        </div>
+
+        <div class="stat">
+          <small>Account</small>
+          <br>
+          <b>${escapeHtml(user.role)}</b>
+        </div>
+
+      </div>
+
+
+      <div class="nav">
+
         <button
-          class="btn secondary"
-          onclick="logout()">
-          Logout
+          class="btn primary"
+          onclick="tasksPage()">
+          Tasks
         </button>
 
-      </div>
+        <button
+          class="btn secondary"
+          onclick="walletPage()">
+          Wallet
+        </button>
 
-    </div>
+        <button
+          class="btn secondary"
+          onclick="submissionsPage()">
+          My Submissions
+        </button>
 
-    <div class="stats">
-
-      <div class="stat">
-        <small>Balance</small><br>
-        <b>
-          ₹${Number(wallet.balance).toFixed(2)}
-        </b>
-      </div>
-
-      <div class="stat">
-        <small>Completed</small><br>
-        <b>${wallet.completed}</b>
-      </div>
-
-      <div class="stat">
-        <small>Account</small><br>
-        <b>${escapeHtml(user.role)}</b>
-      </div>
-
-    </div>
-
-    <div class="nav">
-
-      <button
-        class="btn primary"
-        onclick="tasksPage()">
-        Tasks
-      </button>
-
-      <button
-        class="btn secondary"
-        onclick="walletPage()">
-        Wallet
-      </button>
-
-      <button
-        class="btn secondary"
-        onclick="submissionsPage()">
-        My Submissions
-      </button>
-
-      ${
-        user.role === "admin"
-          ? `
-            <button
-              class="btn secondary"
-              onclick="adminPage()">
-              Admin
-            </button>
+        ${
+          user.role === "admin"
+          ?
           `
-          : ""
-      }
+          <button
+            class="btn secondary"
+            onclick="adminPage()">
+            Admin
+          </button>
+          `
+          :
+          ""
+        }
 
-    </div>
+      </div>
 
-    <div id="screen"></div>
 
-  `;
+      <div id="screen"></div>
+
+    `;
 
   await tasksPage();
 
@@ -1087,13 +784,17 @@ async function tasksPage() {
       return;
     }
 
+
     screen.innerHTML = `
 
       <div class="notice">
+
         Complete legitimate eligible tasks
         and submit them for review.
         Rewards are credited only after approval.
+
       </div>
+
 
       <div class="grid">
 
@@ -1139,9 +840,7 @@ async function tasksPage() {
 
     `;
 
-  }
-
-  catch (error) {
+  } catch(error) {
 
     alert(error.message);
 
@@ -1156,20 +855,14 @@ async function submitTask(id) {
     !confirm(
       "Have you completed this task according to its requirements?"
     )
-  ) {
-    return;
-  }
+  ) return;
 
   try {
 
     const result =
       await api(
-        "/api/tasks/" +
-        id +
-        "/submit",
-        {
-          method: "POST"
-        }
+        "/api/tasks/" + id + "/submit",
+        { method: "POST" }
       );
 
     alert(
@@ -1179,9 +872,7 @@ async function submitTask(id) {
 
     await submissionsPage();
 
-  }
-
-  catch (error) {
+  } catch(error) {
 
     alert(error.message);
 
@@ -1192,93 +883,86 @@ async function submitTask(id) {
 
 async function submissionsPage() {
 
-  try {
+  const submissions =
+    await api("/api/my-submissions");
 
-    const submissions =
-      await api("/api/my-submissions");
+  const screen =
+    document.getElementById("screen");
 
-    const screen =
-      document.getElementById("screen");
+  if (!submissions.length) {
 
-    if (!submissions.length) {
+    screen.innerHTML =
+      `<div class="card empty">
+        You have no task submissions yet.
+      </div>`;
 
-      screen.innerHTML =
-        `<div class="card empty">
-          You have no task submissions yet.
-        </div>`;
+    return;
 
-      return;
-    }
+  }
 
-    screen.innerHTML = `
 
-      <div class="card">
+  screen.innerHTML = `
 
-        <h2>My Submissions 📋</h2>
+    <div class="card">
 
-        ${submissions.map(item => `
+      <h2>
+        My Submissions 📋
+      </h2>
 
-          <div class="admin-box">
+      ${submissions.map(item => `
 
-            <div class="row">
+        <div class="admin-box">
 
-              <div>
+          <div class="row">
 
-                <b>
-                  ${escapeHtml(item.taskTitle)}
-                </b>
+            <div>
 
-                <p class="muted">
-                  Reward:
-                  ₹${Number(item.reward).toFixed(2)}
-                </p>
+              <b>
+                ${escapeHtml(item.taskTitle)}
+              </b>
 
-              </div>
-
-              <span class="status ${escapeHtml(item.status)}">
-                ${escapeHtml(item.status)}
-              </span>
+              <p class="muted">
+                Reward:
+                ₹${Number(item.reward).toFixed(2)}
+              </p>
 
             </div>
 
-            <p class="small">
-              Submitted:
-              ${formatDate(item.submittedAt)}
-            </p>
+            <span class="status ${item.status}">
+              ${escapeHtml(item.status)}
+            </span>
 
           </div>
 
-        `).join("")}
+          <p class="small">
+            Submitted:
+            ${formatDate(item.submittedAt)}
+          </p>
 
-      </div>
+        </div>
 
-    `;
+      `).join("")}
 
-  }
+    </div>
 
-  catch (error) {
-
-    alert(error.message);
-
-  }
+  `;
 
 }
 
 
 async function walletPage() {
 
-  try {
+  const wallet =
+    await api("/api/wallet");
 
-    const wallet =
-      await api("/api/wallet");
-
-    document.getElementById(
-      "screen"
-    ).innerHTML = `
+  document.getElementById("screen")
+    .innerHTML = `
 
       <div class="card">
 
-        <h2>My Wallet 💰</h2>
+        <h2>
+          My Wallet 💰
+        </h2>
 
         <h1>
           ₹${Number(wallet.balance).toFixed(2)}
@@ -1313,53 +997,55 @@ async function walletPage() {
 
       </div>
 
+
       <div class="card">
 
-        <h3>Withdrawal History</h3>
+        <h3>
+          Withdrawal History
+        </h3>
 
         ${
           wallet.withdrawals.length
-            ? wallet.withdrawals.map(item => `
 
-              <div class="admin-box">
+          ?
 
-                <div class="row">
+          wallet.withdrawals.map(item => `
 
-                  <span>
-                    ₹${Number(item.amount).toFixed(2)}
-                    •
-                    ${escapeHtml(item.method)}
-                  </span>
+            <div class="admin-box">
 
-                  <span class="status ${escapeHtml(item.status)}">
-                    ${escapeHtml(item.status)}
-                  </span>
+              <div class="row">
 
-                </div>
+                <span>
+                  ₹${Number(item.amount).toFixed(2)}
+                  •
+                  ${escapeHtml(item.method)}
+                </span>
 
-                <p class="small">
-                  ${formatDate(item.createdAt)}
-                </p>
+                <span
+                  class="status ${item.status}">
+                  ${escapeHtml(item.status)}
+                </span>
 
               </div>
 
-            `).join("")
-            : `<p class="muted">
-                No withdrawals yet.
-              </p>`
+              <p class="small">
+                ${formatDate(item.createdAt)}
+              </p>
+
+            </div>
+
+          `).join("")
+
+          :
+
+          `<p class="muted">
+            No withdrawals yet.
+          </p>`
         }
 
       </div>
 
     `;
-
-  }
-
-  catch (error) {
-
-    alert(error.message);
-
-  }
 
 }
 
@@ -1368,15 +1054,12 @@ async function withdraw() {
 
   const amount =
     Number(
-      document.getElementById(
-        "amount"
-      ).value
+      document.getElementById("amount").value
     );
 
   const method =
-    document.getElementById(
-      "method"
-    ).value;
+    document.getElementById("method").value;
+
 
   try {
 
@@ -1400,9 +1083,7 @@ async function withdraw() {
 
     await dashboard(user);
 
-  }
-
-  catch (error) {
+  } catch(error) {
 
     alert(error.message);
 
@@ -1418,75 +1099,80 @@ async function adminPage() {
     const stats =
       await api("/api/admin/stats");
 
-    document.getElementById(
-      "screen"
-    ).innerHTML = `
+    document.getElementById("screen")
+      .innerHTML = `
 
-      <div class="card">
+        <div class="card">
 
-        <h2>Admin Dashboard 🛠️</h2>
+          <h2>
+            Admin Dashboard 🛠️
+          </h2>
 
-        <div class="stats">
+          <div class="stats">
 
-          <div class="stat">
-            <b>${stats.users}</b><br>
-            Users
+            <div class="stat">
+              <b>${stats.users}</b>
+              <br>
+              Users
+            </div>
+
+            <div class="stat">
+              <b>${stats.tasks}</b>
+              <br>
+              Tasks
+            </div>
+
+            <div class="stat">
+              <b>${stats.submissions}</b>
+              <br>
+              Pending Reviews
+            </div>
+
           </div>
 
-          <div class="stat">
-            <b>${stats.tasks}</b><br>
-            Tasks
-          </div>
+          <div class="stats">
 
-          <div class="stat">
-            <b>${stats.submissions}</b><br>
-            Pending Reviews
+            <div class="stat">
+              <b>${stats.pending}</b>
+              <br>
+              Pending Withdrawals
+            </div>
+
           </div>
 
         </div>
 
-        <div class="stats">
 
-          <div class="stat">
-            <b>${stats.pending}</b><br>
-            Pending Withdrawals
-          </div>
+        <div class="nav">
+
+          <button
+            class="btn primary"
+            onclick="adminTasks()">
+            Manage Tasks
+          </button>
+
+          <button
+            class="btn secondary"
+            onclick="adminSubmissions()">
+            Task Reviews
+          </button>
+
+          <button
+            class="btn secondary"
+            onclick="adminWithdrawals()">
+            Withdrawals
+          </button>
 
         </div>
 
-      </div>
 
-      <div class="nav">
+        <div id="adminScreen"></div>
 
-        <button
-          class="btn primary"
-          onclick="adminTasks()">
-          Manage Tasks
-        </button>
-
-        <button
-          class="btn secondary"
-          onclick="adminSubmissions()">
-          Task Reviews
-        </button>
-
-        <button
-          class="btn secondary"
-          onclick="adminWithdrawals()">
-          Withdrawals
-        </button>
-
-      </div>
-
-      <div id="adminScreen"></div>
-
-    `;
+      `;
 
     await adminTasks();
 
-  }
-
-  catch (error) {
+  } catch(error) {
 
     alert(error.message);
 
@@ -1497,139 +1183,144 @@ async function adminPage() {
 
 async function adminTasks() {
 
-  try {
+  const tasks =
+    await api("/api/admin/tasks");
 
-    const tasks =
-      await api("/api/admin/tasks");
+  const adminScreen =
+    document.getElementById("adminScreen");
 
-    const adminScreen =
-      document.getElementById(
-        "adminScreen"
-      );
 
-    adminScreen.innerHTML = `
+  adminScreen.innerHTML = `
 
-      <div class="card">
+    <div class="card">
 
-        <h2>➕ Add New Task</h2>
+      <h2>
+        ➕ Add New Task
+      </h2>
 
-        <div class="form">
+      <div class="form">
 
-          <input
-            id="newTitle"
-            class="input"
-            placeholder="Task title">
+        <input
+          id="newTitle"
+          class="input"
+          placeholder="Task title">
 
-          <textarea
-            id="newDescription"
-            placeholder="Task description"></textarea>
+        <textarea
+          id="newDescription"
+          placeholder="Task description">
+        </textarea>
 
-          <input
-            id="newType"
-            class="input"
-            placeholder="Category / Type">
+        <input
+          id="newType"
+          class="input"
+          placeholder="Category / Type">
 
-          <input
-            id="newReward"
-            class="input"
-            type="number"
-            min="0"
-            step="0.01"
-            placeholder="Reward ₹">
+        <input
+          id="newReward"
+          class="input"
+          type="number"
+          min="0"
+          step="0.01"
+          placeholder="Reward ₹">
 
-          <button
-            class="btn primary"
-            onclick="addTask()">
-            Add Task
-          </button>
-
-        </div>
+        <button
+          class="btn primary"
+          onclick="addTask()">
+          Add Task
+        </button>
 
       </div>
 
-      <div class="card">
+    </div>
 
-        <h2>📋 Manage Existing Tasks</h2>
 
-        ${
-          tasks.length
-            ? tasks.map(task => `
+    <div class="card">
 
-              <div class="admin-box">
+      <h2>
+        📋 Manage Existing Tasks
+      </h2>
 
-                <span class="tag">
-                  ${escapeHtml(task.type)}
-                </span>
+      ${
+        tasks.length
 
-                <h3>
-                  ${escapeHtml(task.title)}
-                </h3>
+        ?
 
-                <p class="muted">
-                  ${escapeHtml(task.description)}
-                </p>
+        tasks.map(task => `
 
-                <p>
-                  Reward:
-                  <strong>
-                    ₹${Number(task.reward).toFixed(2)}
-                  </strong>
-                </p>
+          <div class="admin-box">
 
-                <p>
-                  Status:
-                  ${
-                    task.active
-                      ? `<span class="status approved">
-                          Active
-                        </span>`
-                      : `<span class="status rejected">
-                          Disabled
-                        </span>`
-                  }
-                </p>
+            <span class="tag">
+              ${escapeHtml(task.type)}
+            </span>
 
-                <div class="task-actions">
+            <h3>
+              ${escapeHtml(task.title)}
+            </h3>
 
-                  <button
-                    class="btn secondary"
-                    onclick="editTask(${task.id})">
-                    Edit
-                  </button>
+            <p class="muted">
+              ${escapeHtml(task.description)}
+            </p>
 
-                  ${
-                    task.active
-                      ? `
-                        <button
-                          class="btn danger"
-                          onclick="disableTask(${task.id})">
-                          Disable
-                        </button>
-                      `
-                      : ""
-                  }
+            <p>
+              Reward:
+              <strong>
+                ₹${Number(task.reward).toFixed(2)}
+              </strong>
+            </p>
 
-                </div>
+            <p>
+              Status:
+              ${
+                task.active
+                ?
+                `<span class="status approved">
+                  Active
+                </span>`
+                :
+                `<span class="status rejected">
+                  Disabled
+                </span>`
+              }
+            </p>
 
-              </div>
+            <div class="task-actions">
 
-            `).join("")
-            : `<p class="empty">
-                No tasks found.
-              </p>`
-        }
+              <button
+                class="btn secondary"
+                onclick="editTask(${task.id})">
+                Edit
+              </button>
 
-      </div>
+              ${
+                task.active
+                ?
+                `
+                <button
+                  class="btn danger"
+                  onclick="disableTask(${task.id})">
+                  Disable
+                </button>
+                `
+                :
+                ""
+              }
 
-    `;
+            </div>
 
-  }
+          </div>
 
-  catch (error) {
+        `).join("")
 
-    alert(error.message);
+        :
 
-  }
+        `<p class="empty">
+          No tasks found.
+        </p>`
+      }
+
+    </div>
+
+  `;
 
 }
 
@@ -1637,42 +1328,38 @@ async function adminTasks() {
 async function addTask() {
 
   const title =
-    document.getElementById(
-      "newTitle"
-    ).value.trim();
+    document.getElementById("newTitle")
+      .value.trim();
 
   const description =
-    document.getElementById(
-      "newDescription"
-    ).value.trim();
+    document.getElementById("newDescription")
+      .value.trim();
 
   const type =
-    document.getElementById(
-      "newType"
-    ).value.trim();
+    document.getElementById("newType")
+      .value.trim();
 
   const reward =
     Number(
-      document.getElementById(
-        "newReward"
-      ).value
+      document.getElementById("newReward")
+        .value
     );
+
 
   try {
 
-    await api(
-      "/api/admin/tasks",
-      {
-        method: "POST",
+    await api("/api/admin/tasks", {
 
-        body: JSON.stringify({
-          title,
-          description,
-          type,
-          reward
-        })
-      }
-    );
+      method: "POST",
+
+      body: JSON.stringify({
+        title,
+        description,
+        type,
+        reward
+      })
+
+    });
 
     alert(
       "Task added successfully!"
@@ -1680,9 +1367,7 @@ async function addTask() {
 
     await adminTasks();
 
-  }
-
-  catch (error) {
+  } catch(error) {
 
     alert(error.message);
 
@@ -1696,9 +1381,7 @@ async function editTask(id) {
   try {
 
     const task =
-      await api(
-        "/api/tasks/" + id
-      );
+      await api("/api/tasks/" + id);
 
     const title =
       prompt(
@@ -1708,6 +1391,7 @@ async function editTask(id) {
 
     if (title === null) return;
 
+
     const description =
       prompt(
         "Task description:",
@@ -1715,6 +1399,7 @@ async function editTask(id) {
       );
 
     if (description === null) return;
+
 
     const type =
       prompt(
@@ -1724,6 +1409,7 @@ async function editTask(id) {
 
     if (type === null) return;
 
+
     const reward =
       Number(
         prompt(
@@ -1732,20 +1418,22 @@ async function editTask(id) {
         )
       );
 
+
     if (
       !Number.isFinite(reward) ||
       reward <= 0
     ) {
 
       alert("Invalid reward.");
-
       return;
 
     }
 
+
     await api(
       "/api/admin/tasks/" + id,
       {
+
         method: "PUT",
 
         body: JSON.stringify({
@@ -1755,16 +1443,16 @@ async function editTask(id) {
           reward,
           active: true
         })
+
       }
     );
+
 
     alert("Task updated!");
 
     await adminTasks();
 
-  }
-
-  catch (error) {
+  } catch(error) {
 
     alert(error.message);
 
@@ -1776,12 +1464,8 @@ async function editTask(id) {
 async function disableTask(id) {
 
   if (
-    !confirm(
-      "Disable this task?"
-    )
-  ) {
-    return;
-  }
+    !confirm("Disable this task?")
+  ) return;
 
   try {
 
@@ -1796,9 +1480,7 @@ async function disableTask(id) {
 
     await adminTasks();
 
-  }
-
-  catch (error) {
+  } catch(error) {
 
     alert(error.message);
 
@@ -1809,141 +1491,150 @@ async function disableTask(id) {
 
 async function adminSubmissions() {
 
-  try {
+  const submissions =
+    await api(
+      "/api/admin/submissions"
+    );
 
-    const submissions =
-      await api(
-        "/api/admin/submissions"
-      );
 
-    document.getElementById(
-      "adminScreen"
-    ).innerHTML = `
+  document.getElementById("adminScreen")
+    .innerHTML = `
 
       <div class="card">
 
-        <h2>Task Submissions 📋</h2>
+        <h2>
+          Task Submissions 📋
+        </h2>
 
         ${
           submissions.length
-            ? submissions.map(item => `
 
-              <div class="admin-box">
+          ?
 
-                <div class="row">
+          submissions.map(item => `
 
-                  <div>
+            <div class="admin-box">
 
-                    <b>
-                      ${escapeHtml(item.userName)}
-                    </b>
+              <div class="row">
 
-                    <p class="muted">
-                      ${escapeHtml(item.taskTitle)}
-                    </p>
+                <div>
 
-                    <p>
-                      Reward:
-                      ₹${Number(item.reward).toFixed(2)}
-                    </p>
+                  <b>
+                    ${escapeHtml(item.userName)}
+                  </b>
 
-                  </div>
+                  <p class="muted">
+                    ${escapeHtml(item.taskTitle)}
+                  </p>
 
-                  <span class="status ${escapeHtml(item.status)}">
-                    ${escapeHtml(item.status)}
-                  </span>
+                  <p>
+                    Reward:
+                    ₹${Number(item.reward).toFixed(2)}
+                  </p>
 
                 </div>
 
-                ${
-                  item.status === "pending"
-                    ? `
-                      <div class="task-actions">
-
-                        <button
-                          class="btn success"
-                          onclick="reviewSubmission(
-                            ${item.id},
-                            'approved'
-                          )">
-                          Approve
-                        </button>
-
-                        <button
-                          class="btn danger"
-                          onclick="reviewSubmission(
-                            ${item.id},
-                            'rejected'
-                          )">
-                          Reject
-                        </button>
-
-                      </div>
-                    `
-                    : ""
-                }
+                <span
+                  class="status ${item.status}">
+                  ${escapeHtml(item.status)}
+                </span>
 
               </div>
 
-            `).join("")
-            : `<p class="empty">
-                No submissions found.
-              </p>`
+
+              ${
+                item.status === "pending"
+
+                ?
+
+                `
+                <div class="task-actions">
+
+                  <button
+                    class="btn success"
+                    onclick="reviewSubmission(
+                      ${item.id},
+                      'approved'
+                    )">
+                    Approve
+                  </button>
+
+                  <button
+                    class="btn danger"
+                    onclick="reviewSubmission(
+                      ${item.id},
+                      'rejected'
+                    )">
+                    Reject
+                  </button>
+
+                </div>
+                `
+
+                :
+
+                ""
+              }
+
+            </div>
+
+          `).join("")
+
+          :
+
+          `<p class="empty">
+            No submissions found.
+          </p>`
         }
 
       </div>
 
     `;
 
-  }
-
-  catch (error) {
-
-    alert(error.message);
-
-  }
-
 }
 
 
-async function reviewSubmission(
-  id,
-  status
-) {
+async function reviewSubmission(id,status) {
 
   const question =
     status === "approved"
-      ? "Approve this submission?"
-      : "Reject this submission?";
+    ?
+    "Approve this submission?"
+    :
+    "Reject this submission?";
 
-  if (!confirm(question)) {
-    return;
-  }
+
+  if (!confirm(question)) return;
+
 
   try {
 
     await api(
       "/api/admin/submissions/" + id,
       {
+
         method: "POST",
 
         body: JSON.stringify({
           status
         })
+
       }
     );
 
+
     alert(
       status === "approved"
-        ? "Submission approved!"
-        : "Submission rejected."
+      ?
+      "Submission approved!"
+      :
+      "Submission rejected."
     );
+
 
     await adminSubmissions();
 
-  }
-
-  catch (error) {
+  } catch(error) {
 
     alert(error.message);
 
@@ -1954,139 +1645,146 @@ async function reviewSubmission(
 
 async function adminWithdrawals() {
 
-  try {
+  const withdrawals =
+    await api(
+      "/api/admin/withdrawals"
+    );
 
-    const withdrawals =
-      await api(
-        "/api/admin/withdrawals"
-      );
 
-    document.getElementById(
-      "adminScreen"
-    ).innerHTML = `
+  document.getElementById("adminScreen")
+    .innerHTML = `
 
       <div class="card">
 
-        <h2>Withdrawal Requests 💳</h2>
+        <h2>
+          Withdrawal Requests 💳
+        </h2>
 
         ${
           withdrawals.length
-            ? withdrawals.map(item => `
 
-              <div class="admin-box">
+          ?
 
-                <div class="row">
+          withdrawals.map(item => `
 
-                  <div>
+            <div class="admin-box">
 
-                    <b>
-                      ${escapeHtml(item.name)}
-                    </b>
+              <div class="row">
 
-                    <p class="muted">
-                      ₹${Number(item.amount).toFixed(2)}
-                      •
-                      ${escapeHtml(item.method)}
-                    </p>
+                <div>
 
-                  </div>
+                  <b>
+                    ${escapeHtml(item.name)}
+                  </b>
 
-                  <span class="status ${escapeHtml(item.status)}">
-                    ${escapeHtml(item.status)}
-                  </span>
+                  <p class="muted">
+                    ₹${Number(item.amount).toFixed(2)}
+                    •
+                    ${escapeHtml(item.method)}
+                  </p>
 
                 </div>
 
-                ${
-                  item.status === "pending"
-                    ? `
-                      <div class="task-actions">
-
-                        <button
-                          class="btn success"
-                          onclick="reviewWithdrawal(
-                            ${item.id},
-                            'approved'
-                          )">
-                          Approve
-                        </button>
-
-                        <button
-                          class="btn danger"
-                          onclick="reviewWithdrawal(
-                            ${item.id},
-                            'rejected'
-                          )">
-                          Reject
-                        </button>
-
-                      </div>
-                    `
-                    : ""
-                }
+                <span
+                  class="status ${item.status}">
+                  ${escapeHtml(item.status)}
+                </span>
 
               </div>
 
-            `).join("")
-            : `<p class="empty">
-                No withdrawal requests.
-              </p>`
+
+              ${
+                item.status === "pending"
+
+                ?
+
+                `
+                <div class="task-actions">
+
+                  <button
+                    class="btn success"
+                    onclick="reviewWithdrawal(
+                      ${item.id},
+                      'approved'
+                    )">
+                    Approve
+                  </button>
+
+                  <button
+                    class="btn danger"
+                    onclick="reviewWithdrawal(
+                      ${item.id},
+                      'rejected'
+                    )">
+                    Reject
+                  </button>
+
+                </div>
+                `
+
+                :
+                ""
+              }
+
+            </div>
+
+          `).join("")
+
+          :
+
+          `<p class="empty">
+            No withdrawal requests.
+          </p>`
         }
 
       </div>
 
     `;
 
-  }
-
-  catch (error) {
-
-    alert(error.message);
-
-  }
-
 }
 
 
-async function reviewWithdrawal(
-  id,
-  status
-) {
+async function reviewWithdrawal(id,status) {
 
   if (
     !confirm(
       status === "approved"
-        ? "Approve this withdrawal?"
-        : "Reject this withdrawal and return the balance?"
+      ?
+      "Approve this withdrawal?"
+      :
+      "Reject this withdrawal and return the balance?"
     )
-  ) {
-    return;
-  }
+  ) return;
+
 
   try {
 
     await api(
       "/api/admin/withdrawals/" + id,
       {
+
         method: "POST",
 
         body: JSON.stringify({
           status
         })
+
       }
     );
 
+
     alert(
       status === "approved"
-        ? "Withdrawal approved!"
-        : "Withdrawal rejected and balance returned."
+      ?
+      "Withdrawal approved!"
+      :
+      "Withdrawal rejected and balance returned."
     );
+
 
     await adminWithdrawals();
 
-  }
-
-  catch (error) {
+  } catch(error) {
 
     alert(error.message);
 
@@ -2106,24 +1804,11 @@ async function logout() {
       }
     );
 
-  }
+  } finally {
 
-  finally {
-
-    location.reload();
+    location.href = "/";
 
   }
-
-}
-
-
-function scrollAccount() {
-
-  document.getElementById(
-    "accountArea"
-  ).scrollIntoView({
-    behavior: "smooth"
-  });
 
 }
 
@@ -2134,13 +1819,10 @@ function formatDate(value) {
 
   try {
 
-    return new Date(
-      value
-    ).toLocaleString();
+    return new Date(value)
+      .toLocaleString();
 
-  }
-
-  catch (e) {
+  } catch(e) {
 
     return value;
 
@@ -2152,11 +1834,12 @@ function formatDate(value) {
 function escapeHtml(value) {
 
   return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 
 }
 
@@ -2166,4 +1849,4 @@ startApp();
 </script>
 
 </body>
-  </html>
+</html>
