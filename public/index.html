@@ -2,125 +2,760 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="google-adsense-account" content="ca-pub-5877718538170577">
-  <meta name="description" content="TaskEarn - Discover eligible online tasks, submit completed work and manage approved rewards.">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  >
+
+  <meta
+    name="google-adsense-account"
+    content="ca-pub-5877718538170577"
+  >
+
+  <meta
+    name="description"
+    content="TaskEarn - Discover eligible online tasks, submit completed work and manage approved rewards."
+  >
+
   <title>TaskEarn - Tasks & Rewards</title>
 
   <style>
-    /* RESET */
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    html { scroll-behavior: smooth; }
-    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: #f7f8fc; color: #171b2d; line-height: 1.5; }
-    button, input, textarea, select { font: inherit; }
-    button { touch-action: manipulation; cursor: pointer; border: none; background: none; }
-    a { color: inherit; text-decoration: none; cursor: pointer; }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
+      background: #f7f8fc;
+      color: #171b2d;
+      line-height: 1.5;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button {
+      touch-action: manipulation;
+      cursor: pointer;
+      border: none;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+      cursor: pointer;
+    }
 
     /* HEADER */
-    .header { position: sticky; top: 0; z-index: 1000; background: rgba(255,255,255,.94); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-bottom: 1px solid #eceef4; }
-    .header-inner { max-width: 1050px; margin: auto; min-height: 64px; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-    .logo-container { display: flex; align-items: center; gap: 9px; min-width: 0; cursor: pointer; }
-    .logo-icon { width: 38px; height: 38px; flex-shrink: 0; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 19px; font-weight: 900; background: linear-gradient(135deg,#ff6b35,#ff3d6e); box-shadow: 0 7px 18px rgba(255,91,73,.25); }
-    .logo { font-size: 20px; font-weight: 900; letter-spacing: -.5px; }
-    .header-right { display: flex; align-items: center; gap: 8px; position: relative; }
-    .balance { background: #f0fdf7; color: #087a42; border: 1px solid #d5f3e2; padding: 8px 12px; border-radius: 999px; font-size: 13px; font-weight: 800; white-space: nowrap; }
-    .menu-btn { width: 42px; height: 42px; border: 0; border-radius: 12px; background: #f4f5f9; font-size: 21px; color: #20243a; display: flex; align-items: center; justify-content: center; }
-    .menu-btn:active { transform: scale(.95); }
+
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(255,255,255,.95);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border-bottom: 1px solid #eceef4;
+    }
+
+    .header-inner {
+      max-width: 1050px;
+      margin: auto;
+      min-height: 64px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-width: 0;
+      cursor: pointer;
+    }
+
+    .logo-icon,
+    .auth-logo {
+      background: linear-gradient(135deg,#ff6b35,#ff3d6e);
+      color: white;
+      font-weight: 900;
+    }
+
+    .logo-icon {
+      width: 38px;
+      height: 38px;
+      flex-shrink: 0;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 19px;
+      box-shadow: 0 7px 18px rgba(255,91,73,.25);
+    }
+
+    .logo {
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: -.5px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+    }
+
+    .balance {
+      background: #f0fdf7;
+      color: #087a42;
+      border: 1px solid #d5f3e2;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .menu-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: #f4f5f9;
+      font-size: 21px;
+      color: #20243a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .menu-btn:active {
+      transform: scale(.95);
+    }
 
     /* DROPDOWN */
-    .dropdown-menu { position: absolute; top: 50px; right: 0; width: 225px; background: white; border: 1px solid #eceef4; border-radius: 18px; box-shadow: 0 18px 50px rgba(20,25,50,.16); overflow: hidden; display: none; z-index: 2000; }
-    .dropdown-menu.show { display: block; }
-    .dropdown-item { width: 100%; text-align: left; padding: 15px 17px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #f1f2f6; font-size: 14px; font-weight: 600; cursor: pointer; color: #171b2d; }
-    .dropdown-item:last-child { border-bottom: 0; }
-    .dropdown-item:active { background: #fff4ef; color: #ff5b32; }
+
+    .dropdown-menu {
+      position: absolute;
+      top: 50px;
+      right: 0;
+      width: 225px;
+      background: white;
+      border: 1px solid #eceef4;
+      border-radius: 18px;
+      box-shadow: 0 18px 50px rgba(20,25,50,.16);
+      overflow: hidden;
+      display: none;
+      z-index: 2000;
+    }
+
+    .dropdown-menu.show {
+      display: block;
+    }
+
+    .dropdown-item {
+      width: 100%;
+      text-align: left;
+      padding: 15px 17px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid #f1f2f6;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      color: #171b2d;
+      background: white;
+    }
+
+    .dropdown-item:last-child {
+      border-bottom: 0;
+    }
+
+    .dropdown-item:hover {
+      background: #fff5f0;
+    }
 
     /* MAIN */
-    .container { width: 100%; max-width: 1050px; margin: auto; padding: 16px; padding-bottom: 90px; }
+
+    .container {
+      width: 100%;
+      max-width: 1050px;
+      margin: auto;
+      padding: 16px;
+      padding-bottom: 90px;
+    }
 
     /* HERO */
-    .hero { position: relative; overflow: hidden; padding: 30px 22px; border-radius: 28px; background: linear-gradient(135deg, #fff7ed 0%, #ffe8d8 48%, #e9f4ff 100%); box-shadow: 0 12px 35px rgba(30,40,70,.06); margin-bottom: 18px; }
-    .hero-badge { display: inline-flex; padding: 7px 11px; border-radius: 999px; background: rgba(255,255,255,.72); color: #b94c24; font-size: 12px; font-weight: 800; margin-bottom: 13px; }
-    .hero h1 { position: relative; z-index: 1; max-width: 600px; margin: 0 0 12px; font-size: clamp(30px,7vw,48px); line-height: 1.08; letter-spacing: -1.4px; font-weight: 900; }
-    .hero p { position: relative; z-index: 1; max-width: 560px; margin: 0 0 22px; color: #5f6879; font-size: 15px; }
-    .hero-actions { position: relative; z-index: 2; display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 30px 22px;
+      border-radius: 28px;
+      background:
+        linear-gradient(
+          135deg,
+          #fff7ed 0%,
+          #ffe8d8 48%,
+          #e9f4ff 100%
+        );
+      box-shadow: 0 12px 35px rgba(30,40,70,.06);
+      margin-bottom: 18px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.72);
+      color: #b94c24;
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 13px;
+    }
+
+    .hero h1 {
+      position: relative;
+      z-index: 1;
+      max-width: 600px;
+      margin: 0 0 12px;
+      font-size: clamp(30px,7vw,48px);
+      line-height: 1.08;
+      letter-spacing: -1.4px;
+      font-weight: 900;
+    }
+
+    .hero p {
+      position: relative;
+      z-index: 1;
+      max-width: 560px;
+      margin: 0 0 22px;
+      color: #5f6879;
+      font-size: 15px;
+    }
+
+    .hero-actions {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
 
     /* BUTTONS */
-    .btn { min-height: 46px; padding: 11px 17px; border: 0; border-radius: 13px; font-weight: 800; transition: transform .15s ease, box-shadow .15s ease, background .15s ease; display: inline-flex; align-items: center; justify-content: center; }
-    .btn:active { transform: scale(.97); }
-    .primary { background: #ff6333; color: white; box-shadow: 0 8px 18px rgba(255,99,51,.25); }
-    .primary:hover { background: #ef5324; }
-    .secondary { background: white; color: #24283b; border: 1px solid #e3e5eb; }
-    .large-btn { min-height: 52px; padding: 13px 25px; border-radius: 16px; font-size: 16px; }
 
-    /* CARDS & FEATURES */
-    .card { background: white; border: 1px solid #eceef4; border-radius: 22px; padding: 20px; margin-bottom: 16px; box-shadow: 0 7px 25px rgba(20,30,60,.045); }
-    .card h2 { margin-top: 0; font-size: 21px; letter-spacing: -.4px; }
-    .card h3 { margin-bottom: 7px; }
-    .muted { color: #687386; font-size: 14px; line-height: 1.65; }
+    .btn {
+      min-height: 46px;
+      padding: 11px 17px;
+      border-radius: 13px;
+      font-weight: 800;
+      transition:
+        transform .15s ease,
+        box-shadow .15s ease,
+        background .15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-    .features { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 16px; }
-    .feature { background: white; border: 1px solid #eceef4; border-radius: 20px; padding: 18px; box-shadow: 0 6px 20px rgba(20,30,60,.04); }
-    .feature-icon { width: 42px; height: 42px; border-radius: 13px; background: #fff2ec; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 12px; }
-    .feature b { display: block; margin-bottom: 5px; }
-    .feature span { color: #687386; font-size: 13px; }
+    .btn:active {
+      transform: scale(.97);
+    }
 
-    .grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; }
-    .task-card { position: relative; background: white; border: 1px solid #eceef4; border-radius: 21px; padding: 18px; box-shadow: 0 7px 25px rgba(20,30,60,.05); }
-    .task-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
-    .tag { display: inline-flex; background: #f0efff; color: #5541d9; padding: 6px 9px; border-radius: 999px; font-size: 11px; font-weight: 800; }
-    .earn { color: #078b4b; font-size: 20px; font-weight: 900; white-space: nowrap; }
-    .task-card h3 { font-size: 17px; margin-top: 14px; }
-    .task-card .btn { width: 100%; margin-top: 12px; }
+    .primary {
+      background: #ff6333;
+      color: white;
+      box-shadow: 0 8px 18px rgba(255,99,51,.25);
+    }
 
-    .stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 16px; }
-    .stat { background: white; border: 1px solid #eceef4; border-radius: 18px; padding: 16px; box-shadow: 0 5px 18px rgba(20,30,60,.04); }
-    .stat small { color: #788195; font-size: 12px; }
-    .stat b { display: block; margin-top: 5px; font-size: 19px; }
+    .primary:hover {
+      background: #ef5324;
+    }
 
-    .nav { display: flex; gap: 8px; overflow-x: auto; padding: 3px 1px 10px; margin-bottom: 4px; scrollbar-width: none; }
-    .nav::-webkit-scrollbar { display: none; }
-    .nav .btn { flex-shrink: 0; }
+    .secondary {
+      background: white;
+      color: #24283b;
+      border: 1px solid #e3e5eb;
+    }
 
-    /* FORM & AUTH */
-    .form { display: grid; gap: 11px; width: 100%; max-width: 520px; }
-    .input { width: 100%; min-height: 48px; padding: 12px 14px; background: #fbfcff; border: 1px solid #dfe2ea; border-radius: 13px; outline: none; color: #171b2d; }
-    .input:focus { border-color: #ff6b35; box-shadow: 0 0 0 3px rgba(255,107,53,.1); }
-    .auth-wrap { min-height: 50vh; display: flex; align-items: center; justify-content: center; padding: 20px 0; }
-    .auth-card { width: 100%; max-width: 460px; background: white; border: 1px solid #eceef4; border-radius: 26px; padding: 25px; box-shadow: 0 15px 45px rgba(20,30,60,.08); }
-    .auth-logo { width: 55px; height: 55px; border-radius: 17px; background: linear-gradient(135deg,#ff6b35,#ff3d6e); color: white; display: flex; align-items: center; justify-content: center; font-size: 25px; font-weight: 900; margin-bottom: 15px; }
+    .secondary:hover {
+      background: #f8f9fc;
+    }
 
-    .notice { background: #fff8df; border: 1px solid #f5e6a8; color: #6c5200; padding: 13px 15px; border-radius: 14px; margin-bottom: 15px; font-size: 13px; }
-    .status { display: inline-flex; padding: 6px 9px; border-radius: 999px; font-size: 11px; font-weight: 800; text-transform: capitalize; }
-    .pending { background: #fff3cd; color: #856404; }
-    .approved { background: #dff6e8; color: #087a42; }
-    .rejected { background: #ffe1e1; color: #b42318; }
-    .admin-box { border: 1px solid #e7e9ef; border-radius: 16px; padding: 15px; margin-bottom: 11px; background: #fff; }
-    .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-    .empty { text-align: center; padding: 35px 20px; color: #687386; }
+    .large-btn {
+      min-height: 52px;
+      padding: 13px 25px;
+      border-radius: 16px;
+      font-size: 16px;
+    }
 
-    /* FOOTER & MOBILE NAV */
-    .footer { text-align: center; padding: 28px 10px; color: #7b8495; font-size: 12px; }
-    .footer-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; margin-bottom: 12px; }
-    .mobile-bottom-nav { display: none; }
+    /* CARDS */
 
-    @media (min-width: 800px) { .container { padding-top: 24px; } .hero { padding: 55px 45px; } .card { padding: 24px; } }
+    .card {
+      background: white;
+      border: 1px solid #eceef4;
+      border-radius: 22px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 7px 25px rgba(20,30,60,.045);
+    }
+
+    .card h2 {
+      margin-top: 0;
+      font-size: 21px;
+      letter-spacing: -.4px;
+    }
+
+    .card h3 {
+      margin-bottom: 7px;
+    }
+
+    .muted {
+      color: #687386;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    /* FEATURES */
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .feature {
+      background: white;
+      border: 1px solid #eceef4;
+      border-radius: 20px;
+      padding: 18px;
+      box-shadow: 0 6px 20px rgba(20,30,60,.04);
+    }
+
+    .feature-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 13px;
+      background: #fff2ec;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-bottom: 12px;
+    }
+
+    .feature b {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .feature span {
+      color: #687386;
+      font-size: 13px;
+    }
+
+    /* TASKS */
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2,1fr);
+      gap: 14px;
+    }
+
+    .task-card {
+      position: relative;
+      background: white;
+      border: 1px solid #eceef4;
+      border-radius: 21px;
+      padding: 18px;
+      box-shadow: 0 7px 25px rgba(20,30,60,.05);
+    }
+
+    .task-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .tag {
+      display: inline-flex;
+      background: #f0efff;
+      color: #5541d9;
+      padding: 6px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .earn {
+      color: #078b4b;
+      font-size: 20px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .task-card h3 {
+      font-size: 17px;
+      margin-top: 14px;
+    }
+
+    .task-card .btn {
+      width: 100%;
+      margin-top: 12px;
+    }
+
+    /* STATS */
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .stat {
+      background: white;
+      border: 1px solid #eceef4;
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 5px 18px rgba(20,30,60,.04);
+    }
+
+    .stat small {
+      color: #788195;
+      font-size: 12px;
+    }
+
+    .stat b {
+      display: block;
+      margin-top: 5px;
+      font-size: 19px;
+    }
+
+    /* NAV */
+
+    .nav {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 3px 1px 10px;
+      margin-bottom: 4px;
+      scrollbar-width: none;
+    }
+
+    .nav::-webkit-scrollbar {
+      display: none;
+    }
+
+    .nav .btn {
+      flex-shrink: 0;
+    }
+
+    /* FORMS */
+
+    .form {
+      display: grid;
+      gap: 11px;
+      width: 100%;
+      max-width: 520px;
+    }
+
+    .input {
+      width: 100%;
+      min-height: 48px;
+      padding: 12px 14px;
+      background: #fbfcff;
+      border: 1px solid #dfe2ea;
+      border-radius: 13px;
+      outline: none;
+      color: #171b2d;
+    }
+
+    .input:focus {
+      border-color: #ff6b35;
+      box-shadow:
+        0 0 0 3px rgba(255,107,53,.1);
+    }
+
+    .auth-wrap {
+      min-height: 50vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 0;
+    }
+
+    .auth-card {
+      width: 100%;
+      max-width: 460px;
+      background: white;
+      border: 1px solid #eceef4;
+      border-radius: 26px;
+      padding: 25px;
+      box-shadow:
+        0 15px 45px rgba(20,30,60,.08);
+    }
+
+    .auth-logo {
+      width: 55px;
+      height: 55px;
+      border-radius: 17px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 25px;
+      margin-bottom: 15px;
+    }
+
+    /* OTHER */
+
+    .notice {
+      background: #fff8df;
+      border: 1px solid #f5e6a8;
+      color: #6c5200;
+      padding: 13px 15px;
+      border-radius: 14px;
+      margin-bottom: 15px;
+      font-size: 13px;
+    }
+
+    .status {
+      display: inline-flex;
+      padding: 6px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: capitalize;
+    }
+
+    .pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .approved {
+      background: #dff6e8;
+      color: #087a42;
+    }
+
+    .rejected {
+      background: #ffe1e1;
+      color: #b42318;
+    }
+
+    .admin-box {
+      border: 1px solid #e7e9ef;
+      border-radius: 16px;
+      padding: 15px;
+      margin-bottom: 11px;
+      background: #fff;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 35px 20px;
+      color: #687386;
+    }
+
+    .message {
+      padding: 13px 15px;
+      border-radius: 13px;
+      margin-bottom: 14px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .message.error {
+      display: block;
+      background: #ffe8e8;
+      color: #a51d1d;
+      border: 1px solid #f4bcbc;
+    }
+
+    .message.success {
+      display: block;
+      background: #e7f8ee;
+      color: #087a42;
+      border: 1px solid #bfe8d0;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 35px 20px;
+      color: #687386;
+    }
+
+    /* FOOTER */
+
+    .footer {
+      text-align: center;
+      padding: 28px 10px;
+      color: #7b8495;
+      font-size: 12px;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 12px;
+    }
+
+    /* MOBILE */
+
+    .mobile-bottom-nav {
+      display: none;
+    }
+
+    @media (min-width: 800px) {
+      .container {
+        padding-top: 24px;
+      }
+
+      .hero {
+        padding: 55px 45px;
+      }
+
+      .card {
+        padding: 24px;
+      }
+    }
+
     @media (max-width: 700px) {
-      body { padding-bottom: 72px; }
-      .container { padding: 11px; padding-bottom: 25px; }
-      .hero { padding: 27px 19px; border-radius: 24px; }
-      .hero h1 { font-size: 31px; letter-spacing: -1px; }
-      .hero-actions { display: grid; grid-template-columns: 1fr; width: 100%; }
-      .features { grid-template-columns: 1fr; gap: 9px; }
-      .feature { display: flex; align-items: center; gap: 12px; padding: 14px; }
-      .feature-icon { flex-shrink: 0; margin: 0; }
-      .grid { grid-template-columns: 1fr; }
-      .stats { gap: 7px; }
-      .stat { padding: 13px 10px; text-align: center; }
-      .stat b { font-size: 16px; }
-      .mobile-bottom-nav { position: fixed; display: flex; left: 10px; right: 10px; bottom: 10px; height: 60px; z-index: 1500; background: rgba(255,255,255,.96); backdrop-filter: blur(18px); border: 1px solid #e7e9ef; border-radius: 20px; box-shadow: 0 12px 35px rgba(20,30,60,.16); align-items: center; justify-content: space-around; padding: 5px; }
-      .bottom-item { border: 0; background: transparent; height: 50px; min-width: 65px; border-radius: 15px; color: #70798b; font-size: 10px; font-weight: 700; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
-      .bottom-item span:first-child { font-size: 20px; }
-      .bottom-item.active { background: #fff1eb; color: #ff5d2e; }
+
+      body {
+        padding-bottom: 72px;
+      }
+
+      .container {
+        padding: 11px;
+        padding-bottom: 25px;
+      }
+
+      .hero {
+        padding: 27px 19px;
+        border-radius: 24px;
+      }
+
+      .hero h1 {
+        font-size: 31px;
+        letter-spacing: -1px;
+      }
+
+      .hero-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+        width: 100%;
+      }
+
+      .features {
+        grid-template-columns: 1fr;
+        gap: 9px;
+      }
+
+      .feature {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px;
+      }
+
+      .feature-icon {
+        flex-shrink: 0;
+        margin: 0;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stats {
+        gap: 7px;
+      }
+
+      .stat {
+        padding: 13px 10px;
+        text-align: center;
+      }
+
+      .stat b {
+        font-size: 16px;
+      }
+
+      .mobile-bottom-nav {
+        position: fixed;
+        display: none;
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        height: 60px;
+        z-index: 1500;
+        background: rgba(255,255,255,.96);
+        backdrop-filter: blur(18px);
+        border: 1px solid #e7e9ef;
+        border-radius: 20px;
+        box-shadow:
+          0 12px 35px rgba(20,30,60,.16);
+        align-items: center;
+        justify-content: space-around;
+        padding: 5px;
+      }
+
+      .bottom-item {
+        border: 0;
+        background: transparent;
+        height: 50px;
+        min-width: 65px;
+        border-radius: 15px;
+        color: #70798b;
+        font-size: 10px;
+        font-weight: 700;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+      }
+
+      .bottom-item span:first-child {
+        font-size: 20px;
+      }
+
+      .bottom-item.active {
+        background: #fff1eb;
+        color: #ff5d2e;
+      }
     }
   </style>
 </head>
@@ -128,426 +763,2010 @@
 <body>
 
 <header class="header">
+
   <div class="header-inner">
-    <div class="logo-container" onclick="goHome()">
+
+    <div
+      class="logo-container"
+      onclick="goHome()"
+    >
       <div class="logo-icon">T</div>
       <div class="logo">TaskEarn</div>
     </div>
 
     <div class="header-right">
-      <div id="balance" class="balance">₹0.00</div>
-      <button class="menu-btn" onclick="toggleDropdown(event)" aria-label="Menu">☰</button>
 
-      <div id="dropdownMenu" class="dropdown-menu">
-        <button class="dropdown-item" onclick="showLogin()">🔑 Login / Register</button>
-        <button class="dropdown-item" onclick="showInfoPage('About Us ℹ️', 'TaskEarn offers simple daily tasks and reward tracking.')">ℹ️ About Us</button>
-        <button class="dropdown-item" onclick="showInfoPage('Terms & Conditions 📜', 'Users must complete tasks honestly and maintain account security.')">📜 Terms & Conditions</button>
-        <button class="dropdown-item" onclick="showInfoPage('Contact Us 📞', 'Support Email: support@taskearn.demo')">📞 Contact Us</button>
-        <button class="dropdown-item" onclick="showInfoPage('Privacy Policy 🔒', 'We respect user data and collect minimal information necessary for service delivery.')">🔒 Privacy Policy</button>
+      <div
+        id="balance"
+        class="balance"
+      >
+        ₹0.00
+      </div>
+
+      <button
+        class="menu-btn"
+        onclick="toggleDropdown(event)"
+        aria-label="Menu"
+      >
+        ☰
+      </button>
+
+      <div
+        id="dropdownMenu"
+        class="dropdown-menu"
+      >
+
+        <button
+          class="dropdown-item"
+          onclick="handleAuthMenu()"
+        >
+          🔑 Login / Register
+        </button>
+
+        <button
+          class="dropdown-item"
+          onclick="showInfoPage(
+            'About Us ℹ️',
+            'TaskEarn provides a simple interface for discovering tasks, submitting work and managing approved rewards.'
+          )"
+        >
+          ℹ️ About Us
+        </button>
+
+        <button
+          class="dropdown-item"
+          onclick="showInfoPage(
+            'Terms & Conditions 📜',
+            'Users must complete tasks honestly and maintain account security. Task availability and approval are not guaranteed.'
+          )"
+        >
+          📜 Terms & Conditions
+        </button>
+
+        <button
+          class="dropdown-item"
+          onclick="showInfoPage(
+            'Contact Us 📞',
+            'Support Email: support@taskearn.demo'
+          )"
+        >
+          📞 Contact Us
+        </button>
+
+        <button
+          class="dropdown-item"
+          onclick="showInfoPage(
+            'Privacy Policy 🔒',
+            'TaskEarn respects user privacy and stores only information necessary to operate the account and reward system.'
+          )"
+        >
+          🔒 Privacy Policy
+        </button>
+
       </div>
     </div>
+
   </div>
+
 </header>
 
 <main class="container">
 
-  <!-- PUBLIC HOME -->
+  <!-- HOME -->
+
   <section id="homeArea">
+
     <div class="hero">
-      <div class="hero-badge">⚡ Simple tasks • Easy tracking</div>
-      <h1>Earn money by completing simple online tasks</h1>
-      <p>Discover eligible tasks, complete requirements, submit work, and receive approved rewards.</p>
-      <div class="hero-actions">
-        <button class="btn primary large-btn" onclick="showLogin()">🔐 Login</button>
-        <button class="btn secondary large-btn" onclick="showRegister()">✨ Create Account</button>
+
+      <div class="hero-badge">
+        ⚡ Simple tasks • Easy tracking
       </div>
+
+      <h1>
+        Earn money by completing simple online tasks
+      </h1>
+
+      <p>
+        Discover eligible tasks, complete requirements,
+        submit work and receive approved rewards.
+      </p>
+
+      <div class="hero-actions">
+
+        <button
+          class="btn primary large-btn"
+          onclick="showLogin()"
+        >
+          🔐 Login
+        </button>
+
+        <button
+          class="btn secondary large-btn"
+          onclick="showRegister()"
+        >
+          ✨ Create Account
+        </button>
+
+      </div>
+
     </div>
 
     <div class="features">
+
       <div class="feature">
-        <div class="feature-icon">📋</div>
-        <div><b>Simple Tasks</b><span>Browse available tasks easily.</span></div>
+
+        <div class="feature-icon">
+          📋
+        </div>
+
+        <div>
+          <b>Simple Tasks</b>
+          <span>
+            Browse available tasks easily.
+          </span>
+        </div>
+
       </div>
+
       <div class="feature">
-        <div class="feature-icon">💰</div>
-        <div><b>Track Rewards</b><span>Monitor approved rewards.</span></div>
+
+        <div class="feature-icon">
+          💰
+        </div>
+
+        <div>
+          <b>Track Rewards</b>
+          <span>
+            Monitor approved rewards.
+          </span>
+        </div>
+
       </div>
+
       <div class="feature">
-        <div class="feature-icon">🔒</div>
-        <div><b>Secure Account</b><span>Manage your account securely.</span></div>
+
+        <div class="feature-icon">
+          🔒
+        </div>
+
+        <div>
+          <b>Secure Account</b>
+          <span>
+            Manage your account securely.
+          </span>
+        </div>
+
       </div>
+
     </div>
 
     <section class="card">
-      <h2>How TaskEarn Works</h2>
+
+      <h2>
+        How TaskEarn Works
+      </h2>
+
       <ol>
-        <li>Create your TaskEarn account.</li>
-        <li>Browse available tasks.</li>
-        <li>Read requirements carefully and complete the work.</li>
-        <li>Submit completed task for review.</li>
-        <li>Approved rewards are added to your wallet.</li>
+
+        <li>
+          Create your TaskEarn account.
+        </li>
+
+        <li>
+          Browse available tasks.
+        </li>
+
+        <li>
+          Read requirements carefully and complete the work.
+        </li>
+
+        <li>
+          Submit completed task for review.
+        </li>
+
+        <li>
+          Approved rewards are added to your wallet.
+        </li>
+
       </ol>
+
     </section>
 
     <section class="card">
-      <h2>About TaskEarn</h2>
-      <p class="muted">TaskEarn provides a simple interface for discovering tasks, submitting work, and managing rewards.</p>
+
+      <h2>
+        About TaskEarn
+      </h2>
+
+      <p class="muted">
+        TaskEarn provides a simple interface for
+        discovering tasks, submitting work and managing rewards.
+      </p>
+
     </section>
 
     <section class="card">
-      <h2>Frequently Asked Questions</h2>
-      <h3>How do I earn?</h3>
-      <p class="muted">Browse available tasks and complete them according to requirements.</p>
-      <h3>Is income guaranteed?</h3>
-      <p class="muted">No. Earnings depend on task availability and approval.</p>
-      <h3>Minimum withdrawal?</h3>
-      <p class="muted">The minimum withdrawal amount is ₹100.</p>
+
+      <h2>
+        Frequently Asked Questions
+      </h2>
+
+      <h3>
+        How do I earn?
+      </h3>
+
+      <p class="muted">
+        Browse available tasks and complete them according to requirements.
+      </p>
+
+      <h3>
+        Is income guaranteed?
+      </h3>
+
+      <p class="muted">
+        No. Earnings depend on task availability and approval.
+      </p>
+
+      <h3>
+        Minimum withdrawal?
+      </h3>
+
+      <p class="muted">
+        The minimum withdrawal amount is ₹100.
+      </p>
+
     </section>
+
   </section>
 
-  <!-- DYNAMIC VIEW AREA -->
+  <!-- DYNAMIC AREA -->
+
   <section id="accountArea"></section>
 
   <footer class="footer">
+
     <div class="footer-links">
-      <a onclick="showInfoPage('Privacy Policy 🔒', 'We respect user data.')">Privacy</a>
-      <a onclick="showInfoPage('Terms & Conditions 📜', 'Users must complete tasks honestly.')">Terms</a>
-      <a onclick="showInfoPage('About Us ℹ️', 'TaskEarn offers simple tasks.')">About</a>
-      <a onclick="showInfoPage('Contact Us 📞', 'Email: support@taskearn.demo')">Contact</a>
+
+      <a
+        onclick="showInfoPage(
+          'Privacy Policy 🔒',
+          'TaskEarn respects user privacy.'
+        )"
+      >
+        Privacy
+      </a>
+
+      <a
+        onclick="showInfoPage(
+          'Terms & Conditions 📜',
+          'Users must complete tasks honestly.'
+        )"
+      >
+        Terms
+      </a>
+
+      <a
+        onclick="showInfoPage(
+          'About Us ℹ️',
+          'TaskEarn provides simple online tasks.'
+        )"
+      >
+        About
+      </a>
+
+      <a
+        onclick="showInfoPage(
+          'Contact Us 📞',
+          'Email: support@taskearn.demo'
+        )"
+      >
+        Contact
+      </a>
+
     </div>
+
     © 2026 TaskEarn. All rights reserved.
+
   </footer>
 
 </main>
 
-<!-- MOBILE NAVIGATION -->
-<div id="mobileBottomNav" class="mobile-bottom-nav">
-  <button class="bottom-item active" onclick="goHome()"><span>🏠</span><span>Home</span></button>
-  <button class="bottom-item" onclick="tasksPage()"><span>📋</span><span>Tasks</span></button>
-  <button class="bottom-item" onclick="walletPage()"><span>💰</span><span>Wallet</span></button>
-  <button class="bottom-item" onclick="handleProfileClick()"><span>👤</span><span>Account</span></button>
+<!-- MOBILE NAV -->
+
+<div
+  id="mobileBottomNav"
+  class="mobile-bottom-nav"
+>
+
+  <button
+    class="bottom-item active"
+    onclick="goHome()"
+  >
+    <span>🏠</span>
+    <span>Home</span>
+  </button>
+
+  <button
+    class="bottom-item"
+    onclick="tasksPage()"
+  >
+    <span>📋</span>
+    <span>Tasks</span>
+  </button>
+
+  <button
+    class="bottom-item"
+    onclick="walletPage()"
+  >
+    <span>💰</span>
+    <span>Wallet</span>
+  </button>
+
+  <button
+    class="bottom-item"
+    onclick="handleProfileClick()"
+  >
+    <span>👤</span>
+    <span>Account</span>
+  </button>
+
 </div>
 
 <script>
-/* UTILS & API */
+
+/* =====================================================
+   API
+===================================================== */
+
 async function api(url, options = {}) {
+
+  const config = {
+    credentials: "same-origin",
+    ...options
+  };
+
+  config.headers = {
+    "Content-Type": "application/json",
+    ...(options.headers || {})
+  };
+
+  const response = await fetch(
+    url,
+    config
+  );
+
+  let data = {};
+
   try {
-    const headers = Object.assign({ "Content-Type": "application/json" }, options.headers || {});
-    const response = await fetch(url, { ...options, headers });
-    let data = {};
-    try { data = await response.json(); } catch (e) { data = {}; }
-    if (!response.ok) throw new Error(data.error || "Something went wrong");
-    return data;
-  } catch (err) {
-    console.warn("API Error (Demo Mode active):", err.message);
-    throw err;
+    data = await response.json();
+  } catch (error) {
+    data = {};
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      data.error ||
+      "Something went wrong."
+    );
+  }
+
+  return data;
+}
+
+/* =====================================================
+   UTILS
+===================================================== */
+
+function escapeHtml(value) {
+
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function formatDate(value) {
+
+  if (!value) {
+    return "-";
+  }
+
+  try {
+    return new Date(value).toLocaleString();
+  } catch (error) {
+    return String(value);
   }
 }
 
-function escapeHtml(val) {
-  return String(val || "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+function showMessage(
+  id,
+  message,
+  type = "error"
+) {
+
+  const element =
+    document.getElementById(id);
+
+  if (!element) {
+    return;
+  }
+
+  element.className =
+    "message " + type;
+
+  element.innerText =
+    message;
 }
 
-function formatDate(val) {
-  if (!val) return "-";
-  try { return new Date(val).toLocaleString(); } catch (e) { return val; }
+function clearMessage(id) {
+
+  const element =
+    document.getElementById(id);
+
+  if (!element) {
+    return;
+  }
+
+  element.className =
+    "message";
+
+  element.innerText = "";
 }
 
-/* NAVIGATION ENGINE */
+/* =====================================================
+   NAVIGATION
+===================================================== */
+
 function goHome() {
-  document.getElementById("homeArea").style.display = "block";
-  document.getElementById("accountArea").innerHTML = "";
+
+  document.getElementById(
+    "homeArea"
+  ).style.display = "block";
+
+  document.getElementById(
+    "accountArea"
+  ).innerHTML = "";
+
   closeDropdown();
+
   showBottomNav(false);
-  window.scrollTo({ top: 0, behavior: "smooth" });
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
 }
 
 function scrollToView() {
-  const area = document.getElementById("accountArea");
-  if (area) area.scrollIntoView({ behavior: "smooth" });
+
+  const area =
+    document.getElementById(
+      "accountArea"
+    );
+
+  if (area) {
+
+    area.scrollIntoView({
+      behavior: "smooth"
+    });
+
+  }
 }
 
-function toggleDropdown(e) {
-  if (e) e.stopPropagation();
-  const menu = document.getElementById("dropdownMenu");
+function toggleDropdown(event) {
+
+  if (event) {
+    event.stopPropagation();
+  }
+
+  const menu =
+    document.getElementById(
+      "dropdownMenu"
+    );
+
+  if (!menu) {
+    return;
+  }
+
   menu.classList.toggle("show");
 }
 
 function closeDropdown() {
-  const menu = document.getElementById("dropdownMenu");
-  if (menu) menu.classList.remove("show");
+
+  const menu =
+    document.getElementById(
+      "dropdownMenu"
+    );
+
+  if (menu) {
+    menu.classList.remove("show");
+  }
 }
 
-/* AUTH VIEWS */
-function showLogin() {
+/* =====================================================
+   AUTH MENU
+===================================================== */
+
+async function handleAuthMenu() {
+
   closeDropdown();
-  document.getElementById("homeArea").style.display = "none";
-  document.getElementById("accountArea").innerHTML = `
+
+  try {
+
+    const user =
+      await api("/api/me");
+
+    if (user) {
+      dashboard(user);
+    } else {
+      showLogin();
+    }
+
+  } catch (error) {
+
+    showLogin();
+
+  }
+}
+
+/* =====================================================
+   LOGIN
+===================================================== */
+
+function showLogin() {
+
+  closeDropdown();
+
+  document.getElementById(
+    "homeArea"
+  ).style.display = "none";
+
+  document.getElementById(
+    "accountArea"
+  ).innerHTML = `
+
     <div class="auth-wrap">
+
       <div class="auth-card">
-        <div class="auth-logo">T</div>
-        <h2>Welcome back 👋</h2>
-        <p class="muted">Login to continue to your account.</p>
-        <div class="form">
-          <input id="loginEmail" class="input" type="email" placeholder="Email address" value="demo@user.com">
-          <input id="loginPassword" class="input" type="password" placeholder="Password" value="123456">
-          <button class="btn primary large-btn" onclick="login()">Login</button>
-          <button class="btn secondary" onclick="showRegister()">Create a new account</button>
+
+        <div class="auth-logo">
+          T
         </div>
+
+        <h2>
+          Welcome back 👋
+        </h2>
+
+        <p class="muted">
+          Login to continue to your TaskEarn account.
+        </p>
+
+        <div
+          id="loginMessage"
+          class="message"
+        ></div>
+
+        <form
+          class="form"
+          onsubmit="event.preventDefault(); login();"
+        >
+
+          <input
+            id="loginEmail"
+            class="input"
+            type="email"
+            placeholder="Email address"
+            autocomplete="email"
+            required
+          >
+
+          <input
+            id="loginPassword"
+            class="input"
+            type="password"
+            placeholder="Password"
+            autocomplete="current-password"
+            required
+          >
+
+          <button
+            id="loginButton"
+            class="btn primary large-btn"
+            type="submit"
+          >
+            🔐 Login
+          </button>
+
+          <button
+            class="btn secondary"
+            type="button"
+            onclick="showRegister()"
+          >
+            Create a new account
+          </button>
+
+        </form>
+
       </div>
-    </div>`;
-  
+
+    </div>
+  `;
+
   showBottomNav(false);
+
   scrollToView();
 }
+
+/* =====================================================
+   REGISTER
+===================================================== */
 
 function showRegister() {
+
   closeDropdown();
-  document.getElementById("homeArea").style.display = "none";
-  document.getElementById("accountArea").innerHTML = `
+
+  document.getElementById(
+    "homeArea"
+  ).style.display = "none";
+
+  document.getElementById(
+    "accountArea"
+  ).innerHTML = `
+
     <div class="auth-wrap">
+
       <div class="auth-card">
-        <div class="auth-logo">T</div>
-        <h2>Create your account ✨</h2>
-        <p class="muted">Join TaskEarn and discover online tasks.</p>
-        <div class="form">
-          <input id="registerName" class="input" placeholder="Full name">
-          <input id="registerEmail" class="input" type="email" placeholder="Email address">
-          <input id="registerPassword" class="input" type="password" placeholder="Password">
-          <button class="btn primary large-btn" onclick="register()">Create Account</button>
-          <button class="btn secondary" onclick="showLogin()">Already have an account? Login</button>
+
+        <div class="auth-logo">
+          T
         </div>
+
+        <h2>
+          Create your account ✨
+        </h2>
+
+        <p class="muted">
+          Join TaskEarn and discover available tasks.
+        </p>
+
+        <div
+          id="registerMessage"
+          class="message"
+        ></div>
+
+        <form
+          class="form"
+          onsubmit="event.preventDefault(); register();"
+        >
+
+          <input
+            id="registerName"
+            class="input"
+            type="text"
+            placeholder="Full name"
+            maxlength="80"
+            autocomplete="name"
+            required
+          >
+
+          <input
+            id="registerEmail"
+            class="input"
+            type="email"
+            placeholder="Email address"
+            maxlength="150"
+            autocomplete="email"
+            required
+          >
+
+          <input
+            id="registerPassword"
+            class="input"
+            type="password"
+            placeholder="Password - minimum 6 characters"
+            minlength="6"
+            autocomplete="new-password"
+            required
+          >
+
+          <button
+            id="registerButton"
+            class="btn primary large-btn"
+            type="submit"
+          >
+            ✨ Create Account
+          </button>
+
+          <button
+            class="btn secondary"
+            type="button"
+            onclick="showLogin()"
+          >
+            Already have an account? Login
+          </button>
+
+        </form>
+
       </div>
-    </div>`;
-  
+
+    </div>
+  `;
+
   showBottomNav(false);
+
   scrollToView();
 }
 
+/* =====================================================
+   LOGIN ACTION
+===================================================== */
+
 async function login() {
-  const email = document.getElementById("loginEmail").value.trim();
-  const password = document.getElementById("loginPassword").value;
-  if (!email || !password) return alert("Please enter email and password.");
-  
+
+  const emailElement =
+    document.getElementById(
+      "loginEmail"
+    );
+
+  const passwordElement =
+    document.getElementById(
+      "loginPassword"
+    );
+
+  const button =
+    document.getElementById(
+      "loginButton"
+    );
+
+  if (!emailElement || !passwordElement) {
+    return;
+  }
+
+  const email =
+    emailElement.value
+      .trim()
+      .toLowerCase();
+
+  const password =
+    passwordElement.value;
+
+  clearMessage(
+    "loginMessage"
+  );
+
+  if (!email || !password) {
+
+    showMessage(
+      "loginMessage",
+      "Please enter email and password."
+    );
+
+    return;
+  }
+
+  if (button) {
+    button.disabled = true;
+    button.innerText = "Logging in...";
+  }
+
   try {
-    const user = await api("/api/login", { method: "POST", body: JSON.stringify({ email, password }) });
+
+    const user =
+      await api(
+        "/api/login",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            email,
+            password
+          })
+        }
+      );
+
     dashboard(user);
-  } catch (err) {
-    // Fallback Demo Login if Backend is not running
-    alert("Backend server not detected! Logging in using Demo Mode.");
-    dashboard({ name: email.split('@')[0] || "User", role: "Member" });
+
+  } catch (error) {
+
+    showMessage(
+      "loginMessage",
+      error.message ||
+        "Login failed."
+    );
+
+  } finally {
+
+    if (button) {
+      button.disabled = false;
+      button.innerText = "🔐 Login";
+    }
+
   }
 }
+
+/* =====================================================
+   REGISTER ACTION
+===================================================== */
 
 async function register() {
-  const name = document.getElementById("registerName").value.trim();
-  const email = document.getElementById("registerEmail").value.trim();
-  const password = document.getElementById("registerPassword").value;
-  if (!name || !email || !password) return alert("Please complete all fields.");
+
+  const nameElement =
+    document.getElementById(
+      "registerName"
+    );
+
+  const emailElement =
+    document.getElementById(
+      "registerEmail"
+    );
+
+  const passwordElement =
+    document.getElementById(
+      "registerPassword"
+    );
+
+  const button =
+    document.getElementById(
+      "registerButton"
+    );
+
+  if (
+    !nameElement ||
+    !emailElement ||
+    !passwordElement
+  ) {
+    return;
+  }
+
+  const name =
+    nameElement.value.trim();
+
+  const email =
+    emailElement.value
+      .trim()
+      .toLowerCase();
+
+  const password =
+    passwordElement.value;
+
+  clearMessage(
+    "registerMessage"
+  );
+
+  if (!name || !email || !password) {
+
+    showMessage(
+      "registerMessage",
+      "Please complete all fields."
+    );
+
+    return;
+  }
+
+  if (password.length < 6) {
+
+    showMessage(
+      "registerMessage",
+      "Password must contain at least 6 characters."
+    );
+
+    return;
+  }
+
+  if (button) {
+    button.disabled = true;
+    button.innerText = "Creating account...";
+  }
 
   try {
-    const user = await api("/api/register", { method: "POST", body: JSON.stringify({ name, email, password }) });
+
+    const user =
+      await api(
+        "/api/register",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            name,
+            email,
+            password
+          })
+        }
+      );
+
     dashboard(user);
-  } catch (err) {
-    alert("Account created in Demo Mode!");
-    dashboard({ name: name, role: "Member" });
+
+  } catch (error) {
+
+    showMessage(
+      "registerMessage",
+      error.message ||
+        "Registration failed."
+    );
+
+  } finally {
+
+    if (button) {
+      button.disabled = false;
+      button.innerText = "✨ Create Account";
+    }
+
   }
 }
 
-function logout() {
-  location.reload();
+/* =====================================================
+   LOGOUT
+===================================================== */
+
+async function logout() {
+
+  try {
+
+    await api(
+      "/api/logout",
+      {
+        method: "POST",
+        body: JSON.stringify({})
+      }
+    );
+
+  } catch (error) {
+
+    console.warn(
+      "Logout error:",
+      error.message
+    );
+
+  }
+
+  goHome();
+
+  document.getElementById(
+    "balance"
+  ).innerText = "₹0.00";
 }
 
-/* DASHBOARD */
+/* =====================================================
+   DASHBOARD
+===================================================== */
+
 async function dashboard(user) {
+
   closeDropdown();
-  document.getElementById("homeArea").style.display = "none";
-  let wallet = { balance: 0, completed: 0 };
-  try { wallet = await api("/api/wallet"); } catch(e){}
 
-  document.getElementById("balance").innerText = "₹" + Number(wallet.balance || 0).toFixed(2);
+  document.getElementById(
+    "homeArea"
+  ).style.display = "none";
 
-  document.getElementById("accountArea").innerHTML = `
+  let wallet = {
+    balance: 0,
+    completed: 0,
+    withdrawals: []
+  };
+
+  try {
+
+    wallet =
+      await api(
+        "/api/wallet"
+      );
+
+  } catch (error) {
+
+    console.warn(
+      "Wallet error:",
+      error.message
+    );
+
+  }
+
+  document.getElementById(
+    "balance"
+  ).innerText =
+    "₹" +
+    Number(
+      wallet.balance || 0
+    ).toFixed(2);
+
+  document.getElementById(
+    "accountArea"
+  ).innerHTML = `
+
     <div class="card">
+
       <div class="row">
+
         <div>
-          <p class="muted" style="margin:0;">Welcome back</p>
-          <h2 style="margin:4px 0 0;">Hi, ${escapeHtml(user.name)} 👋</h2>
+
+          <p
+            class="muted"
+            style="margin:0;"
+          >
+            Welcome back
+          </p>
+
+          <h2
+            style="margin:4px 0 0;"
+          >
+            Hi,
+            ${escapeHtml(user.name)}
+            👋
+          </h2>
+
         </div>
-        <button class="btn secondary" onclick="logout()">Logout</button>
+
+        <button
+          class="btn secondary"
+          onclick="logout()"
+        >
+          Logout
+        </button>
+
       </div>
+
     </div>
 
     <div class="stats">
-      <div class="stat"><small>Balance</small><b>₹${Number(wallet.balance || 0).toFixed(2)}</b></div>
-      <div class="stat"><small>Completed</small><b>${wallet.completed || 0}</b></div>
-      <div class="stat"><small>Account</small><b>${escapeHtml(user.role || 'Member')}</b></div>
+
+      <div class="stat">
+
+        <small>
+          Balance
+        </small>
+
+        <b>
+          ₹${Number(
+            wallet.balance || 0
+          ).toFixed(2)}
+        </b>
+
+      </div>
+
+      <div class="stat">
+
+        <small>
+          Completed
+        </small>
+
+        <b>
+          ${Number(
+            wallet.completed || 0
+          )}
+        </b>
+
+      </div>
+
+      <div class="stat">
+
+        <small>
+          Account
+        </small>
+
+        <b>
+          ${escapeHtml(
+            user.role || "user"
+          )}
+        </b>
+
+      </div>
+
     </div>
 
     <div class="nav">
-      <button class="btn primary" onclick="tasksPage()">📋 Tasks</button>
-      <button class="btn secondary" onclick="walletPage()">💰 Wallet</button>
-      <button class="btn secondary" onclick="submissionsPage()">📄 Submissions</button>
+
+      <button
+        class="btn primary"
+        onclick="tasksPage()"
+      >
+        📋 Tasks
+      </button>
+
+      <button
+        class="btn secondary"
+        onclick="walletPage()"
+      >
+        💰 Wallet
+      </button>
+
+      <button
+        class="btn secondary"
+        onclick="submissionsPage()"
+      >
+        📄 Submissions
+      </button>
+
     </div>
 
-    <div id="screen"></div>`;
-
-  showBottomNav(true);
-  tasksPage();
-}
-
-/* PAGES */
-async function tasksPage() {
-  let tasks = [];
-  try { tasks = await api("/api/tasks"); } catch(e){}
-  
-  // Default Demo Tasks if API not connected
-  if (!tasks || !tasks.length) {
-    tasks = [
-      { id: 1, type: "Survey", reward: 25.00, title: "Quick Tech Feedback", description: "Answer 5 simple questions regarding software usage." },
-      { id: 2, type: "App Test", reward: 50.00, title: "App Navigation Check", description: "Test mobile responsive navigation layout." }
-    ];
-  }
-
-  const screen = document.getElementById("screen");
-  if (!screen) return;
-
-  screen.innerHTML = `
-    <div class="notice">💡 Complete tasks honestly. Rewards are credited after review.</div>
-    <div class="grid">
-      ${tasks.map(t => `
-        <div class="task-card">
-          <div class="task-top">
-            <span class="tag">${escapeHtml(t.type)}</span>
-            <span class="earn">+₹${Number(t.reward).toFixed(2)}</span>
-          </div>
-          <h3>${escapeHtml(t.title)}</h3>
-          <p class="muted">${escapeHtml(t.description)}</p>
-          <button class="btn primary" onclick="submitTask(${t.id})">Submit Task</button>
-        </div>
-      `).join('')}
-    </div>`;
-  setActiveBottom("tasks");
-}
-
-function submitTask(id) {
-  if (confirm("Have you completed this task according to requirements?")) {
-    alert("Task submitted for review!");
-    submissionsPage();
-  }
-}
-
-async function submissionsPage() {
-  let submissions = [];
-  try { submissions = await api("/api/my-submissions"); } catch(e){}
-
-  if (!submissions || !submissions.length) {
-    submissions = [
-      { taskTitle: "Quick Tech Feedback", reward: 25.00, status: "pending", submittedAt: new Date() }
-    ];
-  }
-
-  const screen = document.getElementById("screen");
-  screen.innerHTML = `
-    <div class="card">
-      <h2>My Submissions 📋</h2>
-      ${submissions.map(item => `
-        <div class="admin-box">
-          <div class="row">
-            <div><b>${escapeHtml(item.taskTitle)}</b><p class="muted">Reward: ₹${Number(item.reward).toFixed(2)}</p></div>
-            <span class="status ${item.status}">${escapeHtml(item.status)}</span>
-          </div>
-          <p class="muted">Submitted: ${formatDate(item.submittedAt)}</p>
-        </div>
-      `).join('')}
-    </div>`;
-  setActiveBottom("submissions");
-}
-
-async function walletPage() {
-  let wallet = { balance: 0, withdrawals: [] };
-  try { wallet = await api("/api/wallet"); } catch(e){}
-
-  const screen = document.getElementById("screen");
-  screen.innerHTML = `
-    <div class="card">
-      <p class="muted">Available Balance</p>
-      <h1 style="font-size:36px;margin:5px 0 8px;">₹${Number(wallet.balance || 0).toFixed(2)}</h1>
-      <p class="muted">Minimum withdrawal: ₹100</p>
-      <div class="form">
-        <input id="amount" class="input" type="number" min="100" placeholder="Amount">
-        <input id="method" class="input" value="UPI" placeholder="Payment Method">
-        <button class="btn primary large-btn" onclick="withdraw()">Request Withdrawal</button>
+    <div id="screen">
+      <div class="loading">
+        Loading...
       </div>
     </div>
-    <div class="card">
-      <h3>Withdrawal History</h3>
-      ${wallet.withdrawals && wallet.withdrawals.length ? wallet.withdrawals.map(w => `
-        <div class="admin-box">
-          <div class="row">
-            <span>₹${Number(w.amount).toFixed(2)} • ${escapeHtml(w.method)}</span>
-            <span class="status ${w.status}">${escapeHtml(w.status)}</span>
-          </div>
-          <p class="muted">${formatDate(w.createdAt)}</p>
+  `;
+
+  showBottomNav(true);
+
+  await tasksPage();
+}
+
+/* =====================================================
+   TASKS PAGE
+===================================================== */
+
+async function tasksPage() {
+
+  const screen =
+    document.getElementById(
+      "screen"
+    );
+
+  if (!screen) {
+
+    const user =
+      await getMe();
+
+    if (user) {
+      dashboard(user);
+    } else {
+      showLogin();
+    }
+
+    return;
+  }
+
+  screen.innerHTML = `
+    <div class="loading">
+      Loading tasks...
+    </div>
+  `;
+
+  try {
+
+    const tasks =
+      await api(
+        "/api/tasks"
+      );
+
+    if (!tasks.length) {
+
+      screen.innerHTML = `
+        <div class="card empty">
+          <h3>
+            No tasks available
+          </h3>
+
+          <p class="muted">
+            Please check again later.
+          </p>
         </div>
-      `).join('') : `<p class="muted">No withdrawals yet.</p>`}
-    </div>`;
-  
-  setActiveBottom("wallet");
+      `;
+
+      setActiveBottom("tasks");
+
+      return;
+    }
+
+    screen.innerHTML = `
+
+      <div class="notice">
+        💡 Complete tasks honestly.
+        Rewards are credited after review and approval.
+      </div>
+
+      <div class="grid">
+
+        ${tasks.map(task => `
+
+          <div class="task-card">
+
+            <div class="task-top">
+
+              <span class="tag">
+                ${escapeHtml(
+                  task.type
+                )}
+              </span>
+
+              <span class="earn">
+                +₹${Number(
+                  task.reward || 0
+                ).toFixed(2)}
+              </span>
+
+            </div>
+
+            <h3>
+              ${escapeHtml(
+                task.title
+              )}
+            </h3>
+
+            <p class="muted">
+              ${escapeHtml(
+                task.description
+              )}
+            </p>
+
+            <button
+              class="btn primary"
+              onclick="submitTask(${Number(
+                task.id
+              )})"
+            >
+              Submit Task
+            </button>
+
+          </div>
+
+        `).join("")}
+
+      </div>
+    `;
+
+    setActiveBottom("tasks");
+
+  } catch (error) {
+
+    screen.innerHTML = `
+
+      <div class="card">
+
+        <div class="notice">
+          ${escapeHtml(
+            error.message ||
+            "Unable to load tasks."
+          )}
+        </div>
+
+        <button
+          class="btn primary"
+          onclick="tasksPage()"
+        >
+          Try Again
+        </button>
+
+      </div>
+    `;
+
+  }
 }
 
-function withdraw() {
-  const amount = Number(document.getElementById("amount").value);
-  if (!amount || amount < 100) return alert("Minimum withdrawal amount is ₹100.");
-  alert("Withdrawal request submitted successfully!");
+/* =====================================================
+   SUBMIT TASK
+===================================================== */
+
+async function submitTask(id) {
+
+  const confirmed =
+    confirm(
+      "Have you completed this task according to its requirements?"
+    );
+
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+
+    const result =
+      await api(
+        "/api/tasks/" +
+          encodeURIComponent(id) +
+          "/submit",
+        {
+          method: "POST",
+          body: JSON.stringify({})
+        }
+      );
+
+    alert(
+      result.message ||
+      "Task submitted for review."
+    );
+
+    await submissionsPage();
+
+  } catch (error) {
+
+    alert(
+      error.message ||
+      "Task submission failed."
+    );
+
+  }
 }
 
-/* INFO PAGES */
-function showInfoPage(title, content) {
+/* =====================================================
+   SUBMISSIONS
+===================================================== */
+
+async function submissionsPage() {
+
+  const screen =
+    document.getElementById(
+      "screen"
+    );
+
+  if (!screen) {
+    return;
+  }
+
+  screen.innerHTML = `
+    <div class="loading">
+      Loading submissions...
+    </div>
+  `;
+
+  try {
+
+    const submissions =
+      await api(
+        "/api/my-submissions"
+      );
+
+    if (!submissions.length) {
+
+      screen.innerHTML = `
+
+        <div class="card empty">
+
+          <h3>
+            No submissions yet
+          </h3>
+
+          <p class="muted">
+            Complete a task and submit it for review.
+          </p>
+
+          <button
+            class="btn primary"
+            onclick="tasksPage()"
+          >
+            Browse Tasks
+          </button>
+
+        </div>
+      `;
+
+      setActiveBottom("submissions");
+
+      return;
+    }
+
+    screen.innerHTML = `
+
+      <div class="card">
+
+        <h2>
+          My Submissions 📋
+        </h2>
+
+        ${submissions.map(item => `
+
+          <div class="admin-box">
+
+            <div class="row">
+
+              <div>
+
+                <b>
+                  ${escapeHtml(
+                    item.taskTitle
+                  )}
+                </b>
+
+                <p class="muted">
+                  Reward:
+                  ₹${Number(
+                    item.reward || 0
+                  ).toFixed(2)}
+                </p>
+
+              </div>
+
+              <span
+                class="status ${escapeHtml(
+                  item.status
+                )}"
+              >
+                ${escapeHtml(
+                  item.status
+                )}
+              </span>
+
+            </div>
+
+            <p class="muted">
+              Submitted:
+              ${formatDate(
+                item.submittedAt
+              )}
+            </p>
+
+          </div>
+
+        `).join("")}
+
+      </div>
+    `;
+
+    setActiveBottom(
+      "submissions"
+    );
+
+  } catch (error) {
+
+    screen.innerHTML = `
+
+      <div class="card">
+
+        <div class="notice">
+          ${escapeHtml(
+            error.message ||
+            "Unable to load submissions."
+          )}
+        </div>
+
+        <button
+          class="btn primary"
+          onclick="submissionsPage()"
+        >
+          Try Again
+        </button>
+
+      </div>
+    `;
+
+  }
+}
+
+/* =====================================================
+   WALLET
+===================================================== */
+
+async function walletPage() {
+
+  const screen =
+    document.getElementById(
+      "screen"
+    );
+
+  if (!screen) {
+    return;
+  }
+
+  screen.innerHTML = `
+    <div class="loading">
+      Loading wallet...
+    </div>
+  `;
+
+  try {
+
+    const wallet =
+      await api(
+        "/api/wallet"
+      );
+
+    document.getElementById(
+      "balance"
+    ).innerText =
+      "₹" +
+      Number(
+        wallet.balance || 0
+      ).toFixed(2);
+
+    screen.innerHTML = `
+
+      <div class="card">
+
+        <p class="muted">
+          Available Balance
+        </p>
+
+        <h1
+          style="font-size:36px;margin:5px 0 8px;"
+        >
+          ₹${Number(
+            wallet.balance || 0
+          ).toFixed(2)}
+        </h1>
+
+        <p class="muted">
+          Minimum withdrawal: ₹100
+        </p>
+
+        <div
+          id="withdrawMessage"
+          class="message"
+        ></div>
+
+        <form
+          class="form"
+          onsubmit="event.preventDefault(); withdraw();"
+        >
+
+          <input
+            id="amount"
+            class="input"
+            type="number"
+            min="100"
+            step="1"
+            placeholder="Amount"
+            required
+          >
+
+          <select
+            id="method"
+            class="input"
+            required
+          >
+            <option value="UPI">
+              UPI
+            </option>
+
+            <option value="Bank Transfer">
+              Bank Transfer
+            </option>
+          </select>
+
+          <button
+            id="withdrawButton"
+            class="btn primary large-btn"
+            type="submit"
+          >
+            Request Withdrawal
+          </button>
+
+        </form>
+
+      </div>
+
+      <div class="card">
+
+        <h3>
+          Withdrawal History
+        </h3>
+
+        ${
+          wallet.withdrawals &&
+          wallet.withdrawals.length
+            ? wallet.withdrawals
+                .map(
+                  withdrawal => `
+
+                    <div class="admin-box">
+
+                      <div class="row">
+
+                        <span>
+                          ₹${Number(
+                            withdrawal.amount || 0
+                          ).toFixed(2)}
+                          •
+                          ${escapeHtml(
+                            withdrawal.method
+                          )}
+                        </span>
+
+                        <span
+                          class="status ${escapeHtml(
+                            withdrawal.status
+                          )}"
+                        >
+                          ${escapeHtml(
+                            withdrawal.status
+                          )}
+                        </span>
+
+                      </div>
+
+                      <p class="muted">
+                        ${formatDate(
+                          withdrawal.createdAt
+                        )}
+                      </p>
+
+                    </div>
+                  `
+                )
+                .join("")
+            : `
+                <p class="muted">
+                  No withdrawals yet.
+                </p>
+              `
+        }
+
+      </div>
+    `;
+
+    setActiveBottom("wallet");
+
+  } catch (error) {
+
+    screen.innerHTML = `
+
+      <div class="card">
+
+        <div class="notice">
+          ${escapeHtml(
+            error.message ||
+            "Unable to load wallet."
+          )}
+        </div>
+
+        <button
+          class="btn primary"
+          onclick="walletPage()"
+        >
+          Try Again
+        </button>
+
+      </div>
+    `;
+
+  }
+}
+
+/* =====================================================
+   WITHDRAW
+===================================================== */
+
+async function withdraw() {
+
+  const amountElement =
+    document.getElementById(
+      "amount"
+    );
+
+  const methodElement =
+    document.getElementById(
+      "method"
+    );
+
+  const button =
+    document.getElementById(
+      "withdrawButton"
+    );
+
+  if (
+    !amountElement ||
+    !methodElement
+  ) {
+    return;
+  }
+
+  const amount =
+    Number(
+      amountElement.value
+    );
+
+  const method =
+    methodElement.value;
+
+  clearMessage(
+    "withdrawMessage"
+  );
+
+  if (
+    !Number.isFinite(amount) ||
+    amount < 100
+  ) {
+
+    showMessage(
+      "withdrawMessage",
+      "Minimum withdrawal amount is ₹100."
+    );
+
+    return;
+  }
+
+  if (!method) {
+
+    showMessage(
+      "withdrawMessage",
+      "Please select a payment method."
+    );
+
+    return;
+  }
+
+  if (button) {
+
+    button.disabled = true;
+    button.innerText =
+      "Submitting...";
+  }
+
+  try {
+
+    const result =
+      await api(
+        "/api/withdraw",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            amount,
+            method
+          })
+        }
+      );
+
+    showMessage(
+      "withdrawMessage",
+      result.message ||
+        "Withdrawal request submitted.",
+      "success"
+    );
+
+    amountElement.value = "";
+
+    await walletPage();
+
+  } catch (error) {
+
+    showMessage(
+      "withdrawMessage",
+      error.message ||
+        "Withdrawal failed."
+    );
+
+  } finally {
+
+    if (button) {
+
+      button.disabled = false;
+      button.innerText =
+        "Request Withdrawal";
+
+    }
+
+  }
+}
+
+/* =====================================================
+   INFO PAGES
+===================================================== */
+
+function showInfoPage(
+  title,
+  content
+) {
+
   closeDropdown();
-  document.getElementById("homeArea").style.display = "none";
-  document.getElementById("accountArea").innerHTML = `
+
+  document.getElementById(
+    "homeArea"
+  ).style.display = "none";
+
+  document.getElementById(
+    "accountArea"
+  ).innerHTML = `
+
     <div class="card">
-      <h2>${title}</h2>
-      <p class="muted">${content}</p>
-      <button class="btn secondary" onclick="goHome()">← Back to Home</button>
-    </div>`;
-  
+
+      <h2>
+        ${escapeHtml(title)}
+      </h2>
+
+      <p class="muted">
+        ${escapeHtml(content)}
+      </p>
+
+      <button
+        class="btn secondary"
+        onclick="goHome()"
+      >
+        ← Back to Home
+      </button>
+
+    </div>
+  `;
+
   showBottomNav(false);
+
   scrollToView();
 }
 
-/* MOBILE NAV */
+/* =====================================================
+   MOBILE NAV
+===================================================== */
+
 function showBottomNav(show) {
-  const nav = document.getElementById("mobileBottomNav");
-  if (!nav) return;
-  nav.style.display = (show && window.innerWidth <= 700) ? "flex" : "none";
+
+  const nav =
+    document.getElementById(
+      "mobileBottomNav"
+    );
+
+  if (!nav) {
+    return;
+  }
+
+  nav.style.display =
+    show &&
+    window.innerWidth <= 700
+      ? "flex"
+      : "none";
 }
 
 function setActiveBottom(name) {
-  document.querySelectorAll(".bottom-item").forEach(b => b.classList.remove("active"));
-  const items = document.querySelectorAll(".bottom-item");
-  if (name === "tasks") items[1]?.classList.add("active");
-  if (name === "wallet") items[2]?.classList.add("active");
-  if (name === "submissions") items[1]?.classList.add("active");
+
+  document
+    .querySelectorAll(
+      ".bottom-item"
+    )
+    .forEach(
+      item =>
+        item.classList.remove(
+          "active"
+        )
+    );
+
+  const items =
+    document.querySelectorAll(
+      ".bottom-item"
+    );
+
+  if (
+    name === "tasks"
+  ) {
+    items[1]?.classList.add(
+      "active"
+    );
+  }
+
+  if (
+    name === "wallet"
+  ) {
+    items[2]?.classList.add(
+      "active"
+    );
+  }
+
+  if (
+    name === "submissions"
+  ) {
+    items[1]?.classList.add(
+      "active"
+    );
+  }
 }
+
+/* =====================================================
+   GET CURRENT USER
+===================================================== */
+
+async function getMe() {
+
+  try {
+
+    return await api(
+      "/api/me"
+    );
+
+  } catch (error) {
+
+    return null;
+
+  }
+}
+
+/* =====================================================
+   ACCOUNT BUTTON
+===================================================== */
 
 async function handleProfileClick() {
-  try {
-    const user = await api("/api/me");
-    if (user) dashboard(user);
-    else showLogin();
-  } catch(e) {
+
+  const user =
+    await getMe();
+
+  if (user) {
+
+    dashboard(user);
+
+  } else {
+
     showLogin();
+
   }
 }
 
-// Global click to close menu when clicking outside
-window.addEventListener("click", (e) => {
-  if (!e.target.closest(".header-right")) {
-    closeDropdown();
+/* =====================================================
+   INITIAL LOGIN CHECK
+===================================================== */
+
+async function initializeApp() {
+
+  try {
+
+    const user =
+      await api(
+        "/api/me"
+      );
+
+    if (user) {
+
+      dashboard(user);
+
+    } else {
+
+      goHome();
+
+    }
+
+  } catch (error) {
+
+    goHome();
+
   }
-});
+}
+
+/* =====================================================
+   GLOBAL EVENTS
+===================================================== */
+
+window.addEventListener(
+  "click",
+  function(event) {
+
+    if (
+      !event.target.closest(
+        ".header-right"
+      )
+    ) {
+
+      closeDropdown();
+
+    }
+
+  }
+);
+
+window.addEventListener(
+  "resize",
+  function() {
+
+    const nav =
+      document.getElementById(
+        "mobileBottomNav"
+      );
+
+    if (!nav) {
+      return;
+    }
+
+    const isVisible =
+      nav.style.display === "flex";
+
+    if (
+      isVisible &&
+      window.innerWidth <= 700
+    ) {
+
+      nav.style.display =
+        "flex";
+
+    } else if (
+      window.innerWidth > 700
+    ) {
+
+      nav.style.display =
+        "none";
+
+    }
+
+  }
+);
+
+/* =====================================================
+   START
+===================================================== */
+
+initializeApp();
+
 </script>
+
 </body>
-</html>
+  </html>
