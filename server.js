@@ -6,12 +6,12 @@ const app = express();
 app.set("trust proxy", 1);
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-
-/* =========================
+/* =========================================================
    SESSION
-========================= */
+========================================================= */
 
 app.use(
   session({
@@ -26,21 +26,18 @@ app.use(
     cookie: {
       httpOnly: true,
       sameSite: "lax",
-      secure:
-        process.env.NODE_ENV === "production",
-      maxAge:
-        7 * 24 * 60 * 60 * 1000
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 7 * 24 * 60 * 60 * 1000
     }
   })
 );
 
 
-/* =========================
+/* =========================================================
    USERS
-========================= */
+========================================================= */
 
 const users = [
-
   {
     id: 1,
     name: "Demo User",
@@ -60,18 +57,16 @@ const users = [
     balance: 0,
     completed: 0
   }
-
 ];
 
 let nextUserId = 3;
 
 
-/* =========================
+/* =========================================================
    TASKS
-========================= */
+========================================================= */
 
 let tasks = [
-
   {
     id: 1,
     title: "Read a short description",
@@ -111,82 +106,70 @@ let tasks = [
     reward: 5,
     active: true
   }
-
 ];
 
 let nextTaskId = 5;
 
 
-/* =========================
+/* =========================================================
    SUBMISSIONS
-========================= */
+========================================================= */
 
 let submissions = [];
 
 let nextSubmissionId = 1;
 
 
-/* =========================
+/* =========================================================
    WITHDRAWALS
-========================= */
+========================================================= */
 
 let withdrawals = [];
 
 let nextWithdrawalId = 1;
 
 
-/* =========================
+/* =========================================================
    HELPERS
-========================= */
+========================================================= */
 
 function getUser(id) {
-
   return users.find(
     user => user.id === Number(id)
   );
-
 }
 
 
 function getTask(id) {
-
   return tasks.find(
     task => task.id === Number(id)
   );
-
 }
 
 
 function publicUser(user) {
-
   return {
-
     id: user.id,
     name: user.name,
     email: user.email,
     role: user.role
-
   };
-
 }
 
 
-/* =========================
-   AUTH
-========================= */
+/* =========================================================
+   AUTH MIDDLEWARE
+========================================================= */
 
 function auth(req, res, next) {
 
   if (!req.session.user) {
-
     return res.status(401).json({
       error: "Login required"
     });
-
   }
 
   next();
-
 }
 
 
@@ -196,26 +179,18 @@ function admin(req, res, next) {
     !req.session.user ||
     req.session.user.role !== "admin"
   ) {
-
     return res.status(403).json({
       error: "Admin only"
     });
-
   }
 
   next();
-
 }
 
 
-/* =========================
-   PAGE ROUTES
-========================= */
-
-
-/*
+/* =========================================================
    HOME
-*/
+========================================================= */
 
 app.get("/", (req, res) => {
 
@@ -226,16 +201,14 @@ app.get("/", (req, res) => {
 });
 
 
-/*
+/* =========================================================
    LOGIN PAGE
-*/
+========================================================= */
 
 app.get("/login", (req, res) => {
 
   res.send(`
-
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
@@ -243,7 +216,10 @@ app.get("/login", (req, res) => {
 <meta charset="UTF-8">
 
 <meta name="viewport"
-content="width=device-width,initial-scale=1.0">
+content="width=device-width,initial-scale=1">
+
+<meta name="description"
+content="Login to your TaskEarn account.">
 
 <title>Login - TaskEarn</title>
 
@@ -254,9 +230,7 @@ box-sizing:border-box;
 }
 
 body{
-
 margin:0;
-
 font-family:
 -apple-system,
 BlinkMacSystemFont,
@@ -275,173 +249,126 @@ linear-gradient(
 min-height:100vh;
 
 display:flex;
-
 align-items:center;
-
 justify-content:center;
 
-padding:20px;
+padding:18px;
 
 color:#172033;
-
 }
 
 .card{
-
-background:white;
-
 width:100%;
-
 max-width:430px;
-
-padding:30px;
-
-border-radius:25px;
+background:#fff;
+padding:28px;
+border-radius:24px;
 
 box-shadow:
-0 15px 40px
+0 15px 45px
 rgba(0,0,0,.10);
-
 }
 
 .logo{
-
 text-align:center;
-
-font-size:28px;
-
+font-size:30px;
 font-weight:800;
-
 margin-bottom:8px;
-
 }
 
 .logo span{
-
 color:#ff6b35;
-
 }
 
 .subtitle{
-
 text-align:center;
-
 color:#687386;
-
 margin-bottom:25px;
-
 }
 
 .form{
-
 display:grid;
+gap:14px;
+}
 
-gap:12px;
-
+label{
+font-size:14px;
+font-weight:600;
+margin-bottom:-7px;
 }
 
 input{
-
 width:100%;
-
-padding:14px;
+padding:15px;
 
 border:1px solid #ddd;
-
-border-radius:12px;
+border-radius:13px;
 
 font-size:16px;
-
 outline:none;
-
 }
 
 input:focus{
-
 border-color:#ff6b35;
-
+box-shadow:
+0 0 0 3px
+rgba(255,107,53,.10);
 }
 
 button{
-
 width:100%;
-
-padding:14px;
+padding:15px;
 
 border:0;
-
-border-radius:12px;
+border-radius:13px;
 
 background:#ff6b35;
-
 color:white;
 
 font-size:16px;
-
-font-weight:bold;
+font-weight:700;
 
 cursor:pointer;
-
 }
 
-button:hover{
-
-background:#f25822;
-
+button:active{
+transform:scale(.98);
 }
 
 .demo{
-
 margin-top:20px;
-
-padding:14px;
+padding:15px;
 
 background:#fff7ed;
-
-border-radius:12px;
+border-radius:14px;
 
 font-size:13px;
-
+line-height:1.6;
 color:#687386;
-
 }
 
 .links{
-
 text-align:center;
-
 margin-top:20px;
-
-line-height:2;
-
+line-height:1.8;
 }
 
 a{
-
 color:#ff6b35;
-
-font-weight:bold;
-
+font-weight:700;
 text-decoration:none;
-
 }
 
 .back{
-
 display:block;
-
 text-align:center;
-
 margin-top:20px;
-
 color:#687386;
-
 }
 
 </style>
 
 </head>
-
 
 <body>
 
@@ -455,22 +382,25 @@ Task<span>Earn</span>
 Login to your TaskEarn account
 </div>
 
-
 <form
 class="form"
 onsubmit="login(event)">
 
+<label>Email</label>
+
 <input
 id="email"
 type="email"
-placeholder="Email"
+placeholder="Enter your email"
 autocomplete="email"
 required>
+
+<label>Password</label>
 
 <input
 id="password"
 type="password"
-placeholder="Password"
+placeholder="Enter your password"
 autocomplete="current-password"
 required>
 
@@ -479,7 +409,6 @@ Login
 </button>
 
 </form>
-
 
 <div class="demo">
 
@@ -495,7 +424,6 @@ Password: admin123
 
 </div>
 
-
 <div class="links">
 
 Don't have an account?
@@ -505,7 +433,6 @@ Create Account
 </a>
 
 </div>
-
 
 <a class="back" href="/">
 ← Back to TaskEarn
@@ -521,7 +448,7 @@ async function login(event){
 event.preventDefault();
 
 const email =
-document.getElementById("email").value;
+document.getElementById("email").value.trim();
 
 const password =
 document.getElementById("password").value;
@@ -539,6 +466,8 @@ headers:{
 "application/json"
 },
 
+credentials:"same-origin",
+
 body:JSON.stringify({
 email,
 password
@@ -546,10 +475,8 @@ password
 
 });
 
-
 const data =
 await response.json();
-
 
 if(!response.ok){
 
@@ -559,7 +486,6 @@ data.error ||
 );
 
 }
-
 
 window.location.href="/";
 
@@ -574,24 +500,20 @@ alert(error.message);
 </script>
 
 </body>
-
 </html>
-
   `);
 
 });
 
 
-/*
+/* =========================================================
    REGISTER PAGE
-*/
+========================================================= */
 
 app.get("/register", (req, res) => {
 
   res.send(`
-
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
@@ -599,7 +521,10 @@ app.get("/register", (req, res) => {
 <meta charset="UTF-8">
 
 <meta name="viewport"
-content="width=device-width,initial-scale=1.0">
+content="width=device-width,initial-scale=1">
+
+<meta name="description"
+content="Create a TaskEarn account.">
 
 <title>Create Account - TaskEarn</title>
 
@@ -610,7 +535,6 @@ box-sizing:border-box;
 }
 
 body{
-
 margin:0;
 
 font-family:
@@ -631,102 +555,89 @@ linear-gradient(
 min-height:100vh;
 
 display:flex;
-
 align-items:center;
-
 justify-content:center;
 
-padding:20px;
+padding:18px;
 
 color:#172033;
-
 }
 
 .card{
-
-background:white;
-
 width:100%;
-
 max-width:430px;
 
-padding:30px;
+background:#fff;
 
-border-radius:25px;
+padding:28px;
+
+border-radius:24px;
 
 box-shadow:
-0 15px 40px
+0 15px 45px
 rgba(0,0,0,.10);
-
 }
 
 .logo{
-
 text-align:center;
 
-font-size:28px;
-
+font-size:30px;
 font-weight:800;
 
 margin-bottom:8px;
-
 }
 
 .logo span{
-
 color:#ff6b35;
-
 }
 
 .subtitle{
-
 text-align:center;
-
 color:#687386;
-
 margin-bottom:25px;
-
 }
 
 .form{
-
 display:grid;
+gap:14px;
+}
 
-gap:12px;
-
+label{
+font-size:14px;
+font-weight:600;
+margin-bottom:-7px;
 }
 
 input{
-
 width:100%;
 
-padding:14px;
+padding:15px;
 
 border:1px solid #ddd;
 
-border-radius:12px;
+border-radius:13px;
 
 font-size:16px;
 
 outline:none;
-
 }
 
 input:focus{
-
 border-color:#ff6b35;
 
+box-shadow:
+0 0 0 3px
+rgba(255,107,53,.10);
 }
 
 button{
-
 width:100%;
 
-padding:14px;
+padding:15px;
 
 border:0;
 
-border-radius:12px;
+border-radius:13px;
 
 background:#ff6b35;
 
@@ -734,52 +645,38 @@ color:white;
 
 font-size:16px;
 
-font-weight:bold;
+font-weight:700;
 
 cursor:pointer;
-
-}
-
-button:hover{
-
-background:#f25822;
-
 }
 
 .note{
-
 margin-top:15px;
 
 font-size:12px;
 
 color:#687386;
 
-line-height:1.5;
-
+line-height:1.6;
 }
 
 .links{
-
 text-align:center;
 
 margin-top:20px;
 
-line-height:2;
-
+line-height:1.8;
 }
 
 a{
-
 color:#ff6b35;
 
-font-weight:bold;
+font-weight:700;
 
 text-decoration:none;
-
 }
 
 .back{
-
 display:block;
 
 text-align:center;
@@ -787,13 +684,11 @@ text-align:center;
 margin-top:20px;
 
 color:#687386;
-
 }
 
 </style>
 
 </head>
-
 
 <body>
 
@@ -807,10 +702,11 @@ Task<span>Earn</span>
 Create your TaskEarn account
 </div>
 
-
 <form
 class="form"
 onsubmit="registerUser(event)">
+
+<label>Name</label>
 
 <input
 id="name"
@@ -819,17 +715,21 @@ placeholder="Your name"
 autocomplete="name"
 required>
 
+<label>Email</label>
+
 <input
 id="email"
 type="email"
-placeholder="Email"
+placeholder="Email address"
 autocomplete="email"
 required>
+
+<label>Password</label>
 
 <input
 id="password"
 type="password"
-placeholder="Password - minimum 6 characters"
+placeholder="Minimum 6 characters"
 autocomplete="new-password"
 minlength="6"
 required>
@@ -840,17 +740,19 @@ Create Account
 
 </form>
 
-
 <div class="note">
 
-By creating an account, you agree to
-the TaskEarn
-<a href="/terms">Terms & Conditions</a>
+By creating an account, you agree to the
+TaskEarn
+<a href="/terms">
+Terms & Conditions
+</a>
 and
-<a href="/privacy">Privacy Policy</a>.
+<a href="/privacy">
+Privacy Policy
+</a>.
 
 </div>
-
 
 <div class="links">
 
@@ -861,7 +763,6 @@ Login
 </a>
 
 </div>
-
 
 <a class="back" href="/">
 ← Back to TaskEarn
@@ -876,12 +777,11 @@ async function registerUser(event){
 
 event.preventDefault();
 
-
 const name =
-document.getElementById("name").value;
+document.getElementById("name").value.trim();
 
 const email =
-document.getElementById("email").value;
+document.getElementById("email").value.trim();
 
 const password =
 document.getElementById("password").value;
@@ -899,6 +799,8 @@ headers:{
 "application/json"
 },
 
+credentials:"same-origin",
+
 body:JSON.stringify({
 name,
 email,
@@ -907,10 +809,8 @@ password
 
 });
 
-
 const data =
 await response.json();
-
 
 if(!response.ok){
 
@@ -921,13 +821,11 @@ data.error ||
 
 }
 
-
 alert(
 "Account created successfully!"
 );
 
 window.location.href="/";
-
 
 }catch(error){
 
@@ -940,33 +838,31 @@ alert(error.message);
 </script>
 
 </body>
-
 </html>
-
   `);
 
 });
 
 
-/* =========================
-   HEALTH
-========================= */
+/* =========================================================
+   HEALTH CHECK
+========================================================= */
 
-app.get("/health", (req,res)=>{
+app.get("/health", (req, res) => {
 
   res.json({
-    ok:true,
-    service:"TaskEarn"
+    ok: true,
+    service: "TaskEarn"
   });
 
 });
 
 
-/* =========================
+/* =========================================================
    CURRENT USER
-========================= */
+========================================================= */
 
-app.get("/api/me",(req,res)=>{
+app.get("/api/me", (req, res) => {
 
   res.json(
     req.session.user || null
@@ -975,11 +871,11 @@ app.get("/api/me",(req,res)=>{
 });
 
 
-/* =========================
+/* =========================================================
    LOGIN API
-========================= */
+========================================================= */
 
-app.post("/api/login",(req,res)=>{
+app.post("/api/login", (req, res) => {
 
   const email =
     String(req.body.email || "")
@@ -989,8 +885,7 @@ app.post("/api/login",(req,res)=>{
   const password =
     String(req.body.password || "");
 
-
-  if(!email || !password){
+  if (!email || !password) {
 
     return res.status(400).json({
       error:
@@ -999,7 +894,6 @@ app.post("/api/login",(req,res)=>{
 
   }
 
-
   const user =
     users.find(
       item =>
@@ -1007,8 +901,7 @@ app.post("/api/login",(req,res)=>{
         item.password === password
     );
 
-
-  if(!user){
+  if (!user) {
 
     return res.status(401).json({
       error:
@@ -1017,14 +910,12 @@ app.post("/api/login",(req,res)=>{
 
   }
 
-
   req.session.user =
     publicUser(user);
 
+  req.session.save(err => {
 
-  req.session.save(err=>{
-
-    if(err){
+    if (err) {
 
       console.error(
         "Session save error:",
@@ -1038,14 +929,9 @@ app.post("/api/login",(req,res)=>{
 
     }
 
-
     res.json({
-
-      ok:true,
-
-      user:
-        req.session.user
-
+      ok: true,
+      user: req.session.user
     });
 
   });
@@ -1053,11 +939,11 @@ app.post("/api/login",(req,res)=>{
 });
 
 
-/* =========================
+/* =========================================================
    REGISTER API
-========================= */
+========================================================= */
 
-app.post("/api/register",(req,res)=>{
+app.post("/api/register", (req, res) => {
 
   const name =
     String(req.body.name || "")
@@ -1071,8 +957,7 @@ app.post("/api/register",(req,res)=>{
   const password =
     String(req.body.password || "");
 
-
-  if(!name || !email || !password){
+  if (!name || !email || !password) {
 
     return res.status(400).json({
       error:
@@ -1081,8 +966,16 @@ app.post("/api/register",(req,res)=>{
 
   }
 
+  if (name.length < 2) {
 
-  if(password.length < 6){
+    return res.status(400).json({
+      error:
+        "Name must be at least 2 characters"
+    });
+
+  }
+
+  if (password.length < 6) {
 
     return res.status(400).json({
       error:
@@ -1091,13 +984,12 @@ app.post("/api/register",(req,res)=>{
 
   }
 
-
-  if(
+  if (
     users.some(
       user =>
         user.email.toLowerCase() === email
     )
-  ){
+  ) {
 
     return res.status(400).json({
       error:
@@ -1106,10 +998,9 @@ app.post("/api/register",(req,res)=>{
 
   }
 
+  const user = {
 
-  const user={
-
-    id:nextUserId++,
+    id: nextUserId++,
 
     name,
 
@@ -1117,25 +1008,27 @@ app.post("/api/register",(req,res)=>{
 
     password,
 
-    role:"user",
+    role: "user",
 
-    balance:0,
+    balance: 0,
 
-    completed:0
+    completed: 0
 
   };
 
-
   users.push(user);
-
 
   req.session.user =
     publicUser(user);
 
+  req.session.save(err => {
 
-  req.session.save(err=>{
+    if (err) {
 
-    if(err){
+      console.error(
+        "Registration session error:",
+        err
+      );
 
       return res.status(500).json({
         error:
@@ -1144,12 +1037,12 @@ app.post("/api/register",(req,res)=>{
 
     }
 
-
     res.json({
 
-      ok:true,
+      ok: true,
 
-      user:req.session.user
+      user:
+        req.session.user
 
     });
 
@@ -1158,28 +1051,26 @@ app.post("/api/register",(req,res)=>{
 });
 
 
-/* =========================
+/* =========================================================
    LOGOUT
-========================= */
+========================================================= */
 
-app.post("/api/logout",(req,res)=>{
+app.post("/api/logout", (req, res) => {
 
-  req.session.destroy(err=>{
+  req.session.destroy(err => {
 
-    if(err){
+    if (err) {
 
       return res.status(500).json({
-        error:"Logout failed"
+        error: "Logout failed"
       });
 
     }
 
-
     res.clearCookie("connect.sid");
 
-
     res.json({
-      ok:true
+      ok: true
     });
 
   });
@@ -1187,49 +1078,47 @@ app.post("/api/logout",(req,res)=>{
 });
 
 
-/* =========================
+/* =========================================================
    TASKS
-========================= */
+========================================================= */
 
-app.get("/api/tasks",(req,res)=>{
+app.get("/api/tasks", (req, res) => {
 
   res.json(
     tasks.filter(
-      task=>task.active
+      task => task.active
     )
   );
 
 });
 
 
-app.get("/api/tasks/:id",(req,res)=>{
+app.get("/api/tasks/:id", (req, res) => {
 
   const task =
     getTask(req.params.id);
 
-
-  if(!task){
+  if (!task) {
 
     return res.status(404).json({
-      error:"Task not found"
+      error: "Task not found"
     });
 
   }
-
 
   res.json(task);
 
 });
 
 
-/* =========================
+/* =========================================================
    SUBMIT TASK
-========================= */
+========================================================= */
 
 app.post(
   "/api/tasks/:id/submit",
   auth,
-  (req,res)=>{
+  (req, res) => {
 
     const user =
       getUser(req.session.user.id);
@@ -1237,24 +1126,21 @@ app.post(
     const task =
       getTask(req.params.id);
 
-
-    if(!user){
+    if (!user) {
 
       return res.status(404).json({
-        error:"User not found"
+        error: "User not found"
       });
 
     }
 
-
-    if(!task || !task.active){
+    if (!task || !task.active) {
 
       return res.status(404).json({
-        error:"Task not available"
+        error: "Task not available"
       });
 
     }
-
 
     const existing =
       submissions.find(
@@ -1267,48 +1153,47 @@ app.post(
           )
       );
 
-
-    if(existing){
+    if (existing) {
 
       return res.status(400).json({
 
         error:
           existing.status === "approved"
-          ?
-          "Task already approved"
-          :
-          "Task already submitted"
+            ? "Task already approved"
+            : "Task already submitted"
 
       });
 
     }
 
+    const submission = {
 
-    submissions.push({
+      id: nextSubmissionId++,
 
-      id:nextSubmissionId++,
+      userId: user.id,
 
-      userId:user.id,
+      userName: user.name,
 
-      userName:user.name,
+      taskId: task.id,
 
-      taskId:task.id,
+      taskTitle: task.title,
 
-      taskTitle:task.title,
+      reward: Number(task.reward),
 
-      reward:Number(task.reward),
-
-      status:"pending",
+      status: "pending",
 
       submittedAt:
         new Date().toISOString()
 
-    });
+    };
 
+    submissions.push(
+      submission
+    );
 
     res.json({
 
-      ok:true,
+      ok: true,
 
       message:
         "Task submitted for review."
@@ -1319,14 +1204,14 @@ app.post(
 );
 
 
-/* =========================
+/* =========================================================
    MY SUBMISSIONS
-========================= */
+========================================================= */
 
 app.get(
   "/api/my-submissions",
   auth,
-  (req,res)=>{
+  (req, res) => {
 
     res.json(
       submissions.filter(
@@ -1340,33 +1225,33 @@ app.get(
 );
 
 
-/* =========================
+/* =========================================================
    WALLET
-========================= */
+========================================================= */
 
 app.get(
   "/api/wallet",
   auth,
-  (req,res)=>{
+  (req, res) => {
 
     const user =
       getUser(req.session.user.id);
 
-
-    if(!user){
+    if (!user) {
 
       return res.status(404).json({
-        error:"User not found"
+        error: "User not found"
       });
 
     }
 
-
     res.json({
 
-      balance:Number(user.balance),
+      balance:
+        Number(user.balance),
 
-      completed:Number(user.completed),
+      completed:
+        Number(user.completed),
 
       withdrawals:
         withdrawals.filter(
@@ -1380,48 +1265,43 @@ app.get(
 );
 
 
-/* =========================
+/* =========================================================
    WITHDRAW
-========================= */
+========================================================= */
 
 app.post(
   "/api/withdraw",
   auth,
-  (req,res)=>{
+  (req, res) => {
 
     const user =
       getUser(req.session.user.id);
 
-
-    if(!user){
+    if (!user) {
 
       return res.status(404).json({
-        error:"User not found"
+        error: "User not found"
       });
 
     }
 
-
     const amount =
       Number(req.body.amount);
-
 
     const method =
       String(
         req.body.method || "UPI"
       ).trim();
 
-
-    if(!Number.isFinite(amount)){
+    if (!Number.isFinite(amount)) {
 
       return res.status(400).json({
-        error:"Invalid amount"
+        error: "Invalid amount"
       });
 
     }
 
-
-    if(amount < 100){
+    if (amount < 100) {
 
       return res.status(400).json({
         error:
@@ -1430,8 +1310,7 @@ app.post(
 
     }
 
-
-    if(amount > user.balance){
+    if (amount > user.balance) {
 
       return res.status(400).json({
         error:
@@ -1440,33 +1319,30 @@ app.post(
 
     }
 
-
     user.balance -= amount;
-
 
     withdrawals.push({
 
-      id:nextWithdrawalId++,
+      id: nextWithdrawalId++,
 
-      userId:user.id,
+      userId: user.id,
 
-      name:user.name,
+      name: user.name,
 
       amount,
 
       method,
 
-      status:"pending",
+      status: "pending",
 
       createdAt:
         new Date().toISOString()
 
     });
 
-
     res.json({
 
-      ok:true,
+      ok: true,
 
       message:
         "Withdrawal request submitted"
@@ -1477,20 +1353,22 @@ app.post(
 );
 
 
-/* =========================
+/* =========================================================
    ADMIN STATS
-========================= */
+========================================================= */
 
 app.get(
   "/api/admin/stats",
   admin,
-  (req,res)=>{
+  (req, res) => {
 
     res.json({
 
-      users:users.length,
+      users:
+        users.length,
 
-      tasks:tasks.length,
+      tasks:
+        tasks.length,
 
       submissions:
         submissions.filter(
@@ -1510,14 +1388,14 @@ app.get(
 );
 
 
-/* =========================
+/* =========================================================
    ADMIN TASKS
-========================= */
+========================================================= */
 
 app.get(
   "/api/admin/tasks",
   admin,
-  (req,res)=>{
+  (req, res) => {
 
     res.json(tasks);
 
@@ -1525,42 +1403,38 @@ app.get(
 );
 
 
-/* =========================
+/* =========================================================
    ADD TASK
-========================= */
+========================================================= */
 
 app.post(
   "/api/admin/tasks",
   admin,
-  (req,res)=>{
+  (req, res) => {
 
     const title =
       String(
         req.body.title || ""
       ).trim();
 
-
     const description =
       String(
         req.body.description || ""
       ).trim();
-
 
     const type =
       String(
         req.body.type || ""
       ).trim();
 
-
     const reward =
       Number(req.body.reward);
 
-
-    if(
+    if (
       !title ||
       !description ||
       !type
-    ){
+    ) {
 
       return res.status(400).json({
         error:
@@ -1569,22 +1443,20 @@ app.post(
 
     }
 
-
-    if(
+    if (
       !Number.isFinite(reward) ||
       reward <= 0
-    ){
+    ) {
 
       return res.status(400).json({
-        error:"Invalid reward"
+        error: "Invalid reward"
       });
 
     }
 
+    const task = {
 
-    const task={
-
-      id:nextTaskId++,
+      id: nextTaskId++,
 
       title,
 
@@ -1594,13 +1466,11 @@ app.post(
 
       reward,
 
-      active:true
+      active: true
 
     };
 
-
     tasks.push(task);
-
 
     res.json(task);
 
@@ -1608,27 +1478,25 @@ app.post(
 );
 
 
-/* =========================
+/* =========================================================
    EDIT TASK
-========================= */
+========================================================= */
 
 app.put(
   "/api/admin/tasks/:id",
   admin,
-  (req,res)=>{
+  (req, res) => {
 
     const task =
       getTask(req.params.id);
 
-
-    if(!task){
+    if (!task) {
 
       return res.status(404).json({
-        error:"Task not found"
+        error: "Task not found"
       });
 
     }
-
 
     const title =
       String(
@@ -1636,13 +1504,11 @@ app.put(
         task.title
       ).trim();
 
-
     const description =
       String(
         req.body.description ??
         task.description
       ).trim();
-
 
     const type =
       String(
@@ -1650,19 +1516,17 @@ app.put(
         task.type
       ).trim();
 
-
     const reward =
       Number(
         req.body.reward ??
         task.reward
       );
 
-
-    if(
+    if (
       !title ||
       !description ||
       !type
-    ){
+    ) {
 
       return res.status(400).json({
         error:
@@ -1671,38 +1535,38 @@ app.put(
 
     }
 
-
-    if(
+    if (
       !Number.isFinite(reward) ||
       reward <= 0
-    ){
+    ) {
 
       return res.status(400).json({
-        error:"Invalid reward"
+        error: "Invalid reward"
       });
 
     }
 
+    task.title =
+      title;
 
-    task.title = title;
+    task.description =
+      description;
 
-    task.description = description;
+    task.type =
+      type;
 
-    task.type = type;
+    task.reward =
+      reward;
 
-    task.reward = reward;
-
-
-    if(
+    if (
       typeof req.body.active ===
       "boolean"
-    ){
+    ) {
 
       task.active =
         req.body.active;
 
     }
-
 
     res.json(task);
 
@@ -1710,47 +1574,44 @@ app.put(
 );
 
 
-/* =========================
+/* =========================================================
    DISABLE TASK
-========================= */
+========================================================= */
 
 app.delete(
   "/api/admin/tasks/:id",
   admin,
-  (req,res)=>{
+  (req, res) => {
 
     const task =
       getTask(req.params.id);
 
-
-    if(!task){
+    if (!task) {
 
       return res.status(404).json({
-        error:"Task not found"
+        error: "Task not found"
       });
 
     }
 
-
-    task.active=false;
-
+    task.active = false;
 
     res.json({
-      ok:true
+      ok: true
     });
 
   }
 );
 
 
-/* =========================
+/* =========================================================
    ADMIN SUBMISSIONS
-========================= */
+========================================================= */
 
 app.get(
   "/api/admin/submissions",
   admin,
-  (req,res)=>{
+  (req, res) => {
 
     res.json(submissions);
 
@@ -1758,14 +1619,14 @@ app.get(
 );
 
 
-/* =========================
+/* =========================================================
    REVIEW SUBMISSION
-========================= */
+========================================================= */
 
 app.post(
   "/api/admin/submissions/:id",
   admin,
-  (req,res)=>{
+  (req, res) => {
 
     const submission =
       submissions.find(
@@ -1774,8 +1635,7 @@ app.post(
           Number(req.params.id)
       );
 
-
-    if(!submission){
+    if (!submission) {
 
       return res.status(404).json({
         error:
@@ -1784,11 +1644,10 @@ app.post(
 
     }
 
-
-    if(
+    if (
       submission.status !==
       "pending"
-    ){
+    ) {
 
       return res.status(400).json({
         error:
@@ -1797,45 +1656,43 @@ app.post(
 
     }
 
-
     const status =
       String(
         req.body.status || ""
       ).toLowerCase();
 
-
-    if(
+    if (
       status !== "approved" &&
       status !== "rejected"
-    ){
+    ) {
 
       return res.status(400).json({
-        error:"Invalid status"
+        error:
+          "Invalid status"
       });
 
     }
-
 
     const user =
       getUser(
         submission.userId
       );
 
-
-    if(!user){
+    if (!user) {
 
       return res.status(404).json({
-        error:"User not found"
+        error:
+          "User not found"
       });
 
     }
 
-
     submission.status =
       status;
 
-
-    if(status === "approved"){
+    if (
+      status === "approved"
+    ) {
 
       user.balance +=
         Number(
@@ -1846,10 +1703,9 @@ app.post(
 
     }
 
-
     res.json({
 
-      ok:true,
+      ok: true,
 
       status
 
@@ -1859,14 +1715,14 @@ app.post(
 );
 
 
-/* =========================
+/* =========================================================
    ADMIN WITHDRAWALS
-========================= */
+========================================================= */
 
 app.get(
   "/api/admin/withdrawals",
   admin,
-  (req,res)=>{
+  (req, res) => {
 
     res.json(withdrawals);
 
@@ -1874,14 +1730,14 @@ app.get(
 );
 
 
-/* =========================
+/* =========================================================
    REVIEW WITHDRAWAL
-========================= */
+========================================================= */
 
 app.post(
   "/api/admin/withdrawals/:id",
   admin,
-  (req,res)=>{
+  (req, res) => {
 
     const withdrawal =
       withdrawals.find(
@@ -1890,8 +1746,7 @@ app.post(
           Number(req.params.id)
       );
 
-
-    if(!withdrawal){
+    if (!withdrawal) {
 
       return res.status(404).json({
         error:
@@ -1900,11 +1755,10 @@ app.post(
 
     }
 
-
-    if(
+    if (
       withdrawal.status !==
       "pending"
-    ){
+    ) {
 
       return res.status(400).json({
         error:
@@ -1913,45 +1767,43 @@ app.post(
 
     }
 
-
     const status =
       String(
         req.body.status || ""
       ).toLowerCase();
 
-
-    if(
+    if (
       status !== "approved" &&
       status !== "rejected"
-    ){
+    ) {
 
       return res.status(400).json({
-        error:"Invalid status"
+        error:
+          "Invalid status"
       });
 
     }
-
 
     const user =
       getUser(
         withdrawal.userId
       );
 
-
-    if(!user){
+    if (!user) {
 
       return res.status(404).json({
-        error:"User not found"
+        error:
+          "User not found"
       });
 
     }
 
-
     withdrawal.status =
       status;
 
-
-    if(status === "rejected"){
+    if (
+      status === "rejected"
+    ) {
 
       user.balance +=
         Number(
@@ -1960,10 +1812,9 @@ app.post(
 
     }
 
-
     res.json({
 
-      ok:true,
+      ok: true,
 
       status
 
@@ -1973,17 +1824,15 @@ app.post(
 );
 
 
-/* =========================
-   PRIVACY
-========================= */
+/* =========================================================
+   PRIVACY POLICY
+========================================================= */
 
-app.get("/privacy",(req,res)=>{
+app.get("/privacy", (req, res) => {
 
-res.send(`
-
+  res.send(`
 <!DOCTYPE html>
-
-<html>
+<html lang="en">
 
 <head>
 
@@ -1992,15 +1841,23 @@ res.send(`
 <meta name="viewport"
 content="width=device-width,initial-scale=1">
 
+<meta name="description"
+content="TaskEarn Privacy Policy">
+
 <title>Privacy Policy - TaskEarn</title>
 
 <style>
 
 body{
 margin:0;
-font-family:Arial,sans-serif;
+font-family:
+Arial,
+sans-serif;
+
 background:#f4f6fb;
+
 color:#172033;
+
 line-height:1.7;
 }
 
@@ -2025,7 +1882,10 @@ padding:20px;
 background:white;
 padding:25px;
 border-radius:20px;
-box-shadow:0 5px 22px rgba(0,0,0,.06);
+
+box-shadow:
+0 5px 22px
+rgba(0,0,0,.06);
 }
 
 a{
@@ -2060,7 +1920,6 @@ your name, email address, account information,
 task submissions and withdrawal requests.
 </p>
 
-
 <h2>2. How We Use Information</h2>
 
 <p>
@@ -2070,7 +1929,6 @@ maintain platform security and improve the
 website.
 </p>
 
-
 <h2>3. Advertising</h2>
 
 <p>
@@ -2079,7 +1937,6 @@ third-party advertising providers such as
 Google AdSense.
 </p>
 
-
 <h2>4. Cookies</h2>
 
 <p>
@@ -2087,14 +1944,12 @@ TaskEarn may use cookies to maintain login
 sessions and support website functionality.
 </p>
 
-
 <h2>5. Data Security</h2>
 
 <p>
 We take reasonable steps to protect information
 associated with user accounts.
 </p>
-
 
 <h2>6. Data Retention</h2>
 
@@ -2105,7 +1960,6 @@ security, legal requirements and platform
 administration.
 </p>
 
-
 <h2>7. Third-Party Services</h2>
 
 <p>
@@ -2114,15 +1968,22 @@ advertising, hosting, analytics or other
 website functionality.
 </p>
 
+<h2>8. Children's Privacy</h2>
 
-<h2>8. Changes</h2>
+<p>
+TaskEarn is not intended to encourage children
+to provide personal information. Users should
+follow applicable age requirements and laws
+in their location.
+</p>
+
+<h2>9. Changes</h2>
 
 <p>
 This Privacy Policy may be updated from time
 to time. Users should review this page for
 future changes.
 </p>
-
 
 <p>
 <a href="/">
@@ -2135,25 +1996,21 @@ future changes.
 </main>
 
 </body>
-
 </html>
-
-`);
+  `);
 
 });
 
 
-/* =========================
-   TERMS
-========================= */
+/* =========================================================
+   TERMS & CONDITIONS
+========================================================= */
 
-app.get("/terms",(req,res)=>{
+app.get("/terms", (req, res) => {
 
-res.send(`
-
+  res.send(`
 <!DOCTYPE html>
-
-<html>
+<html lang="en">
 
 <head>
 
@@ -2162,15 +2019,23 @@ res.send(`
 <meta name="viewport"
 content="width=device-width,initial-scale=1">
 
+<meta name="description"
+content="TaskEarn Terms and Conditions">
+
 <title>Terms & Conditions - TaskEarn</title>
 
 <style>
 
 body{
 margin:0;
-font-family:Arial,sans-serif;
+font-family:
+Arial,
+sans-serif;
+
 background:#f4f6fb;
+
 color:#172033;
+
 line-height:1.7;
 }
 
@@ -2195,7 +2060,10 @@ padding:20px;
 background:white;
 padding:25px;
 border-radius:20px;
-box-shadow:0 5px 22px rgba(0,0,0,.06);
+
+box-shadow:
+0 5px 22px
+rgba(0,0,0,.06);
 }
 
 a{
@@ -2222,7 +2090,6 @@ TaskEarn - Terms & Conditions
 
 <div class="card">
 
-
 <h2>1. Acceptance of Terms</h2>
 
 <p>
@@ -2230,7 +2097,6 @@ By accessing or using TaskEarn, you agree
 to follow these Terms & Conditions and all
 applicable laws and regulations.
 </p>
-
 
 <h2>2. Account Registration</h2>
 
@@ -2240,7 +2106,6 @@ creating an account and are responsible for
 protecting their login credentials.
 </p>
 
-
 <h2>3. Account Security</h2>
 
 <p>
@@ -2249,14 +2114,12 @@ payment PIN or other confidential security
 information.
 </p>
 
-
 <h2>4. Tasks</h2>
 
 <p>
 Users must complete tasks according to the
 requirements displayed on the platform.
 </p>
-
 
 <h2>5. Task Submissions</h2>
 
@@ -2266,14 +2129,12 @@ guarantee a reward. Submissions may be
 reviewed before rewards are credited.
 </p>
 
-
 <h2>6. Rewards</h2>
 
 <p>
 Rewards are subject to task eligibility,
 platform rules and approval.
 </p>
-
 
 <h2>7. Withdrawals</h2>
 
@@ -2282,7 +2143,6 @@ Withdrawal requests are subject to the
 applicable minimum withdrawal amount,
 available balance and platform review.
 </p>
-
 
 <h2>8. Prohibited Activities</h2>
 
@@ -2293,7 +2153,6 @@ misleading activity and attempts to exploit
 the platform are prohibited.
 </p>
 
-
 <h2>9. Account Suspension</h2>
 
 <p>
@@ -2303,7 +2162,6 @@ of abuse, fraud, manipulation or violation
 of these terms.
 </p>
 
-
 <h2>10. No Guaranteed Income</h2>
 
 <p>
@@ -2312,23 +2170,31 @@ TaskEarn does not guarantee a specific level
 of income or earnings.
 </p>
 
-
-<h2>11. Changes to the Platform</h2>
+<h2>11. Platform Changes</h2>
 
 <p>
 TaskEarn may modify tasks, features,
-requirements or platform functionality from
-time to time.
+requirements or platform functionality
+from time to time.
 </p>
 
+<h2>12. Advertising</h2>
 
-<h2>12. Changes to Terms</h2>
+<p>
+The platform may display advertisements
+provided by third-party advertising
+services. Advertising availability and
+content may change.
+</p>
+
+<h2>13. Changes to Terms</h2>
 
 <p>
 These Terms & Conditions may be updated from
-time to time.
+time to time. Continued use of the platform
+after changes may constitute acceptance of
+the updated terms.
 </p>
-
 
 <p>
 <a href="/">
@@ -2341,25 +2207,21 @@ time to time.
 </main>
 
 </body>
-
 </html>
-
-`);
+  `);
 
 });
 
 
-/* =========================
+/* =========================================================
    ABOUT
-========================= */
+========================================================= */
 
-app.get("/about",(req,res)=>{
+app.get("/about", (req, res) => {
 
-res.send(`
-
+  res.send(`
 <!DOCTYPE html>
-
-<html>
+<html lang="en">
 
 <head>
 
@@ -2368,15 +2230,23 @@ res.send(`
 <meta name="viewport"
 content="width=device-width,initial-scale=1">
 
+<meta name="description"
+content="About TaskEarn">
+
 <title>About TaskEarn</title>
 
 <style>
 
 body{
 margin:0;
-font-family:Arial,sans-serif;
+font-family:
+Arial,
+sans-serif;
+
 background:#f4f6fb;
+
 color:#172033;
+
 line-height:1.7;
 }
 
@@ -2401,7 +2271,10 @@ padding:20px;
 background:white;
 padding:25px;
 border-radius:20px;
-box-shadow:0 5px 22px rgba(0,0,0,.06);
+
+box-shadow:
+0 5px 22px
+rgba(0,0,0,.06);
 }
 
 a{
@@ -2437,7 +2310,6 @@ eligible tasks, submitting completed work
 and managing approved task-related rewards.
 </p>
 
-
 <h2>Our Goal</h2>
 
 <p>
@@ -2445,7 +2317,6 @@ Our goal is to provide users with a simple
 and transparent task discovery and submission
 experience.
 </p>
-
 
 <h2>How It Works</h2>
 
@@ -2455,7 +2326,6 @@ tasks, complete eligible tasks and submit
 them for review.
 </p>
 
-
 <h2>Task Availability</h2>
 
 <p>
@@ -2464,7 +2334,6 @@ depending on the tasks available on the
 platform.
 </p>
 
-
 <h2>Important Information</h2>
 
 <p>
@@ -2472,7 +2341,6 @@ Earnings are not guaranteed and depend on
 available tasks, eligibility and applicable
 conditions.
 </p>
-
 
 <p>
 <a href="/">
@@ -2485,25 +2353,21 @@ conditions.
 </main>
 
 </body>
-
 </html>
-
-`);
+  `);
 
 });
 
 
-/* =========================
+/* =========================================================
    CONTACT
-========================= */
+========================================================= */
 
-app.get("/contact",(req,res)=>{
+app.get("/contact", (req, res) => {
 
-res.send(`
-
+  res.send(`
 <!DOCTYPE html>
-
-<html>
+<html lang="en">
 
 <head>
 
@@ -2512,15 +2376,23 @@ res.send(`
 <meta name="viewport"
 content="width=device-width,initial-scale=1">
 
+<meta name="description"
+content="Contact TaskEarn support">
+
 <title>Contact TaskEarn</title>
 
 <style>
 
 body{
 margin:0;
-font-family:Arial,sans-serif;
+font-family:
+Arial,
+sans-serif;
+
 background:#f4f6fb;
+
 color:#172033;
+
 line-height:1.7;
 }
 
@@ -2545,13 +2417,23 @@ padding:20px;
 background:white;
 padding:25px;
 border-radius:20px;
-box-shadow:0 5px 22px rgba(0,0,0,.06);
+
+box-shadow:
+0 5px 22px
+rgba(0,0,0,.06);
 }
 
 a{
 color:#ff6b35;
 font-weight:bold;
 text-decoration:none;
+}
+
+.email{
+display:inline-block;
+padding:12px 16px;
+background:#fff7ed;
+border-radius:10px;
 }
 
 </style>
@@ -2577,10 +2459,8 @@ Contact TaskEarn
 <p>
 If you have questions, feedback or need
 support regarding TaskEarn, please contact
-the TaskEarn support team using the official
-contact method provided by the platform.
+the TaskEarn support team.
 </p>
-
 
 <h2>Account Support</h2>
 
@@ -2590,7 +2470,6 @@ please provide enough information for the
 support team to understand your request.
 </p>
 
-
 <h2>Security</h2>
 
 <p>
@@ -2599,13 +2478,11 @@ OTP or other confidential security
 information with anyone.
 </p>
 
-
 <h2>Support Email</h2>
 
-<p>
+<p class="email">
 support@taskearn.demo
 </p>
-
 
 <p>
 <a href="/">
@@ -2618,17 +2495,44 @@ support@taskearn.demo
 </main>
 
 </body>
-
 </html>
-
-`);
+  `);
 
 });
 
 
-/* =========================
+/* =========================================================
+   404 API HANDLER
+========================================================= */
+
+app.use("/api", (req, res) => {
+
+  res.status(404).json({
+    error: "API endpoint not found"
+  });
+
+});
+
+
+/* =========================================================
+   SERVER ERROR HANDLER
+========================================================= */
+
+app.use((err, req, res, next) => {
+
+  console.error("Server error:", err);
+
+  res.status(500).json({
+    error:
+      "Internal server error"
+  });
+
+});
+
+
+/* =========================================================
    START SERVER
-========================= */
+========================================================= */
 
 const PORT =
   process.env.PORT || 3000;
