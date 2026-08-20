@@ -6,6 +6,7 @@ const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
+const { google } = require("googleapis");
 
 const app = express();
 
@@ -24,11 +25,14 @@ const DATA_DIR = path.join(__dirname, "data");
 const DB_FILE = path.join(DATA_DIR, "database.json");
 
 const SESSION_SECRET =
-  process.env.SESSION_SECRET ||
+  String(process.env.SESSION_SECRET || "").trim() ||
   "CHANGE_THIS_TASKEARN_SECRET_2026";
 
 const GMAIL_USER =
   String(process.env.GMAIL_USER || "").trim();
+
+const EMAIL_FROM =
+  String(process.env.EMAIL_FROM || GMAIL_USER).trim();
 
 const GOOGLE_CLIENT_ID =
   String(process.env.GOOGLE_CLIENT_ID || "").trim();
@@ -39,351 +43,74 @@ const GOOGLE_CLIENT_SECRET =
 const GOOGLE_REFRESH_TOKEN =
   String(process.env.GOOGLE_REFRESH_TOKEN || "").trim();
 
+const GOOGLE_CLIENT_ID_FOR_LOGIN =
+  GOOGLE_CLIENT_ID;
+
 if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
 }
 
 /* =====================================================
-   GMAIL API CONFIGURATION
+   GMAIL API
 ===================================================== */
 
-const GMAIL_API_URL =
-  "https://gmail.googleapis.com/gmail/v1/users/me/messages/send";
+let gmailClient = null;
+let gmailApiConfigured = false;
 
-const GOOGLE_TOKEN_URL =
-  "https://oauth2.googleapis.com/token";
-
-function gmailApiConfigured() {
-  return Boolean(
-    GMAIL_USER &&
-    GOOGLE_CLIENT_ID &&
-    GOOGLE_CLIENT_SECRET &&
-    GOOGLE_REFRESH_TOKEN
-  );
-}
-
-/* =====================================================
-   GOOGLE OAUTH ACCESS TOKEN
-===================================================== */
-
-async function getGoogleAccessToken() {
-  if (!GOOGLE_CLIENT_ID) {
-    throw new Error(
-      "GOOGLE_CLIENT_ID is not configured."
+function configureGmailApi() {
+  if (
+    !GMAIL_USER ||
+    !GOOGLE_CLIENT_ID ||
+    !GOOGLE_CLIENT_SECRET ||
+    !GOOGLE_REFRESH_TOKEN
+  ) {
+    console.log(
+      "Gmail API: NOT CONFIGURED"
     );
+
+    gmailApiConfigured = false;
+    gmailClient = null;
+
+    return;
   }
-
-  if (!GOOGLE_CLIENT_SECRET) {
-    throw new Error(
-      "GOOGLE_CLIENT_SECRET is not configured."
-    );
-  }
-
-  if (!GOOGLE_REFRESH_TOKEN) {
-    throw new Error(
-      "GOOGLE_REFRESH_TOKEN is not configured."
-    );
-  }
-
-  if (typeof fetch !== "function") {
-    throw new Error(
-      "This server requires Node.js 18 or newer."
-    );
-  }
-
-  const params = new URLSearchParams();
-
-  params.append(
-    "client_id",
-    GOOGLE_CLIENT_ID
-  );
-
-  params.append(
-    "client_secret",
-    GOOGLE_CLIENT_SECRET
-  );
-
-  params.append(
-    "refresh_token",
-    GOOGLE_REFRESH_TOKEN
-  );
-
-  params.append(
-    "grant_type",
-    "refresh_token"
-  );
-
-  const response = await fetch(
-    GOOGLE_TOKEN_URL,
-    {
-      method: "POST",
-
-      headers: {
-        "Content-Type":
-          "application/x-www-form-urlencoded"
-      },
-
-      body:
-        params.toString()
-    }
-  );
-
-  const data =
-    await response.json();
-
-  if (!response.ok) {
-    console.error(
-      "Google token error:",
-      data
-    );
-
-    throw new Error(
-      data.error_description ||
-      data.error ||
-      "Unable to obtain Google access token."
-    );
-  }
-
-  if (!data.access_token) {
-    throw new Error(
-      "Google did not return an access token."
-    );
-  }
-
-  return data.access_token;
-}
-
-/* =====================================================
-   BASE64URL HELPER
-===================================================== */
-
-function base64UrlEncode(value) {
-  return Buffer
-    .from(String(value), "utf8")
-    .toString("base64")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/g, "");
-}
-
-/* =====================================================
-   GMAIL API SEND
-===================================================== */
-
-async function sendGmailMessage({
-  to,
-  subject,
-  text,
-  html
-}) {
-  if (!gmailApiConfigured()) {
-    throw new Error(
-      "Gmail API is not configured. Please configure GMAIL_USER, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET and GOOGLE_REFRESH_TOKEN."
-    );
-  }
-
-  const accessToken =
-    await getGoogleAccessToken();
-
-  const safeTo =
-    String(to || "").trim();
-
-  const safeSubject =
-    String(subject || "").trim();
-
-  const safeText =
-    String(text || "");
-
-  const safeHtml =
-    String(html || "");
-
-  const boundary =
-    "TaskEarnBoundary" +
-    crypto.randomBytes(12).toString("hex");
-
-  const mimeMessage =
-    [
-      `From: "TaskEarn" <${GMAIL_USER}>`,
-      `To: ${safeTo}`,
-      `Subject: ${safeSubject}`,
-      "MIME-Version: 1.0",
-      `Content-Type: multipart/alternative; boundary="${boundary}"`,
-      "",
-      `--${boundary}`,
-      "Content-Type: text/plain; charset=UTF-8",
-      "Content-Transfer-Encoding: 8bit",
-      "",
-      safeText,
-      "",
-      `--${boundary}`,
-      "Content-Type: text/html; charset=UTF-8",
-      "Content-Transfer-Encoding: 8bit",
-      "",
-      safeHtml,
-      "",
-      `--${boundary}--`
-    ].join("\r\n");
-
-  const raw =
-    base64UrlEncode(
-      mimeMessage
-    );
-
-  const response =
-    await fetch(
-      GMAIL_API_URL,
-      {
-        method: "POST",
-
-        headers: {
-          Authorization:
-            `Bearer ${accessToken}`,
-
-          "Content-Type":
-            "application/json"
-        },
-
-        body:
-          JSON.stringify({
-            raw
-          })
-      }
-    );
-
-  const data =
-    await response.json();
-
-  if (!response.ok) {
-    console.error(
-      "Gmail API send error:",
-      data
-    );
-
-    throw new Error(
-      data.error?.message ||
-      "Gmail API failed to send the email."
-    );
-  }
-
-  console.log(
-    "Gmail API email sent successfully:",
-    data.id,
-    "to:",
-    safeTo
-  );
-
-  return data;
-}
-
-/* =====================================================
-   SEND EMAIL OTP
-===================================================== */
-
-async function sendEmailOtp(
-  email,
-  otp
-) {
-  const html = `
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>TaskEarn OTP</title>
-</head>
-
-<body style="
-margin:0;
-padding:0;
-background:#f5f7fb;
-font-family:Arial,Helvetica,sans-serif;
-">
-
-<div style="
-max-width:600px;
-margin:30px auto;
-background:#ffffff;
-border-radius:16px;
-padding:30px;
-box-shadow:0 4px 20px rgba(0,0,0,0.08);
-">
-
-<h1 style="
-color:#ff5d2e;
-margin-top:0;
-">
-TaskEarn
-</h1>
-
-<h2>Email Verification</h2>
-
-<p>Hello,</p>
-
-<p>
-Your TaskEarn verification code is:
-</p>
-
-<div style="
-font-size:36px;
-font-weight:bold;
-letter-spacing:10px;
-text-align:center;
-background:#f1f3f5;
-padding:22px;
-border-radius:12px;
-margin:25px 0;
-">
-${otp}
-</div>
-
-<p>
-This OTP expires in
-<strong>10 minutes</strong>.
-</p>
-
-<p>
-If you did not request this code,
-please ignore this email.
-</p>
-
-<p style="
-margin-top:30px;
-color:#777;
-font-size:13px;
-">
-TaskEarn
-</p>
-
-</div>
-
-</body>
-</html>
-`;
-
-  const text =
-    `Your TaskEarn verification code is ${otp}. ` +
-    `This OTP expires in 10 minutes.`;
 
   try {
-    return await sendGmailMessage({
-      to: email,
-      subject:
-        "TaskEarn Email Verification Code",
-      text,
-      html
+    const oauth2Client =
+      new google.auth.OAuth2(
+        GOOGLE_CLIENT_ID,
+        GOOGLE_CLIENT_SECRET,
+        "https://developers.google.com/oauthplayground"
+      );
+
+    oauth2Client.setCredentials({
+      refresh_token:
+        GOOGLE_REFRESH_TOKEN
     });
 
-  } catch (error) {
+    gmailClient =
+      google.gmail({
+        version: "v1",
+        auth: oauth2Client
+      });
 
-    console.error(
-      "Gmail API OTP send error:",
-      error.message || error
+    gmailApiConfigured = true;
+
+    console.log(
+      "Gmail API: CONFIGURED"
     );
 
-    throw new Error(
-      "Unable to send Gmail OTP. Please check Gmail API OAuth configuration."
+  } catch (error) {
+    gmailApiConfigured = false;
+    gmailClient = null;
+
+    console.error(
+      "Gmail API configuration error:",
+      error.message || error
     );
   }
 }
+
+configureGmailApi();
 
 /* =====================================================
    DATABASE
@@ -396,44 +123,30 @@ function defaultDatabase() {
     tasks: [
       {
         id: 1,
-        title:
-          "Complete a simple online task",
+        title: "Complete a simple online task",
         description:
           "Complete the instructions carefully and submit the task for review.",
-        type:
-          "General",
-        reward:
-          10,
-        active:
-          true
+        type: "General",
+        reward: 10,
+        active: true
       },
-
       {
         id: 2,
-        title:
-          "Social Media Engagement",
+        title: "Social Media Engagement",
         description:
           "Complete the specified social media activity and submit your task.",
-        type:
-          "Social",
-        reward:
-          15,
-        active:
-          true
+        type: "Social",
+        reward: 15,
+        active: true
       },
-
       {
         id: 3,
-        title:
-          "Website Visit Task",
+        title: "Website Visit Task",
         description:
           "Visit the required website and complete the provided instructions.",
-        type:
-          "Website",
-        reward:
-          20,
-        active:
-          true
+        type: "Website",
+        reward: 20,
+        active: true
       }
     ],
 
@@ -444,16 +157,11 @@ function defaultDatabase() {
 }
 
 function saveDB(database) {
-  const tempFile =
-    DB_FILE + ".tmp";
+  const tempFile = DB_FILE + ".tmp";
 
   fs.writeFileSync(
     tempFile,
-    JSON.stringify(
-      database,
-      null,
-      2
-    ),
+    JSON.stringify(database, null, 2),
     "utf8"
   );
 
@@ -465,7 +173,6 @@ function saveDB(database) {
 
 function loadDB() {
   try {
-
     if (!fs.existsSync(DB_FILE)) {
       const database =
         defaultDatabase();
@@ -499,42 +206,27 @@ function loadDB() {
     database.withdrawals ||= [];
     database.otpCodes ||= [];
 
-    database.users.forEach(
-      user => {
+    database.users.forEach(user => {
+      user.mobile ??= "";
+      user.city ??= "";
+      user.profileImage ??= "";
+      user.emailVerified ??= false;
+      user.mobileVerified ??= false;
+      user.googleId ??= "";
 
-        user.mobile ??= "";
-        user.city ??= "";
-        user.profileImage ??= "";
+      user.authProvider ??=
+        user.googleId
+          ? "google"
+          : "local";
 
-        user.emailVerified ??=
-          false;
-
-        user.mobileVerified ??=
-          false;
-
-        user.googleId ??=
-          "";
-
-        user.authProvider ??=
-          user.googleId
-            ? "google"
-            : "local";
-
-        user.balance ??=
-          0;
-
-        user.role ??=
-          "Member";
-
-        user.passwordHash ??=
-          "";
-      }
-    );
+      user.balance ??= 0;
+      user.role ??= "Member";
+      user.passwordHash ??= "";
+    });
 
     return database;
 
   } catch (error) {
-
     console.error(
       "Database error:",
       error
@@ -549,8 +241,7 @@ function loadDB() {
   }
 }
 
-let db =
-  loadDB();
+let db = loadDB();
 
 /* =====================================================
    SESSION
@@ -600,24 +291,17 @@ function cleanText(
     value ?? ""
   )
     .trim()
-    .slice(
-      0,
-      max
-    );
+    .slice(0, max);
 }
 
-function normalizeEmail(
-  value
-) {
+function normalizeEmail(value) {
   return cleanText(
     value,
     160
   ).toLowerCase();
 }
 
-function normalizeMobile(
-  value
-) {
+function normalizeMobile(value) {
   return cleanText(
     value,
     20
@@ -627,25 +311,22 @@ function normalizeMobile(
   );
 }
 
-function validEmail(
-  email
-) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    .test(email);
+function validEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+    email
+  );
 }
 
-function validMobile(
-  mobile
-) {
-  return /^\+?[0-9]{7,15}$/
-    .test(mobile);
+function validMobile(mobile) {
+  return /^\+?[0-9]{7,15}$/.test(
+    mobile
+  );
 }
 
-function publicUser(
-  user
-) {
-  if (!user)
+function publicUser(user) {
+  if (!user) {
     return null;
+  }
 
   return {
     id:
@@ -693,9 +374,7 @@ function publicUser(
   };
 }
 
-function findUserById(
-  id
-) {
+function findUserById(id) {
   return db.users.find(
     user =>
       String(user.id) ===
@@ -703,9 +382,7 @@ function findUserById(
   );
 }
 
-function currentUser(
-  req
-) {
+function currentUser(req) {
   return req.session.userId
     ? findUserById(
         req.session.userId
@@ -722,12 +399,10 @@ function requireLogin(
     currentUser(req);
 
   if (!user) {
-    return res
-      .status(401)
-      .json({
-        error:
-          "Please login first."
-      });
+    return res.status(401).json({
+      error:
+        "Please login first."
+    });
   }
 
   req.user =
@@ -758,19 +433,13 @@ function randomOtp() {
   );
 }
 
-function hashOtp(
-  otp
-) {
+function hashOtp(otp) {
   return crypto
-    .createHash(
-      "sha256"
-    )
+    .createHash("sha256")
     .update(
       String(otp)
     )
-    .digest(
-      "hex"
-    );
+    .digest("hex");
 }
 
 function safeCompare(
@@ -920,97 +589,227 @@ function deleteOtpRecord(
 }
 
 /* =====================================================
-   OTP DISPATCHER
+   RFC 2047 / BASE64 GMAIL MESSAGE
 ===================================================== */
 
-async function sendOtpFor(
-  user,
-  type,
-  purpose,
-  force = false
-) {
-  const existing =
-    getOtpRecord(
-      user.id,
-      type,
-      purpose
-    );
+function createRawEmail({
+  from,
+  to,
+  subject,
+  text,
+  html
+}) {
+  const boundary =
+    "TaskEarnBoundary" +
+    crypto.randomBytes(16)
+      .toString("hex");
 
-  if (
-    existing &&
-    !force
-  ) {
-
-    const elapsed =
-      Date.now() -
-      new Date(
-        existing.lastSentAt
-      ).getTime();
-
-    if (
-      elapsed <
-      OTP_RESEND_MS
-    ) {
-
-      const remaining =
-        Math.ceil(
-          (
-            OTP_RESEND_MS -
-            elapsed
-          ) / 1000
-        );
-
-      throw new Error(
-        `Please wait ${remaining} seconds before requesting another OTP.`
+  const safeFrom =
+    String(from)
+      .replace(
+        /[\r\n]/g,
+        ""
       );
-    }
+
+  const safeTo =
+    String(to)
+      .replace(
+        /[\r\n]/g,
+        ""
+      );
+
+  const safeSubject =
+    String(subject)
+      .replace(
+        /[\r\n]/g,
+        " "
+      );
+
+  const message = [
+    `From: ${safeFrom}`,
+    `To: ${safeTo}`,
+    `Subject: ${safeSubject}`,
+    "MIME-Version: 1.0",
+    `Content-Type: multipart/alternative; boundary="${boundary}"`,
+    "",
+    `--${boundary}`,
+    'Content-Type: text/plain; charset="UTF-8"',
+    "Content-Transfer-Encoding: 8bit",
+    "",
+    text,
+    "",
+    `--${boundary}`,
+    'Content-Type: text/html; charset="UTF-8"',
+    "Content-Transfer-Encoding: 8bit",
+    "",
+    html,
+    "",
+    `--${boundary}--`
+  ].join("\r\n");
+
+  return Buffer.from(
+    message,
+    "utf8"
+  )
+    .toString("base64")
+    .replace(
+      /\+/g,
+      "-"
+    )
+    .replace(
+      /\//g,
+      "_"
+    )
+    .replace(
+      /=+$/,
+      ""
+    );
+}
+
+/* =====================================================
+   SEND EMAIL USING GMAIL API
+===================================================== */
+
+async function sendEmailOtp(
+  email,
+  otp
+) {
+  if (
+    !gmailApiConfigured ||
+    !gmailClient
+  ) {
+    throw new Error(
+      "Gmail API is not configured. Check GMAIL_USER, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET and GOOGLE_REFRESH_TOKEN."
+    );
   }
 
-  const otp =
-    createOtpRecord(
-      user,
-      type,
-      purpose
-    );
+  const text =
+    `Your TaskEarn verification code is ${otp}. ` +
+    `This OTP expires in 10 minutes.\n\n` +
+    `If you did not request this code, please ignore this email.`;
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>TaskEarn OTP</title>
+</head>
+
+<body style="
+margin:0;
+padding:0;
+background:#f5f7fb;
+font-family:Arial,Helvetica,sans-serif;
+">
+
+<div style="
+max-width:600px;
+margin:30px auto;
+background:#ffffff;
+border-radius:16px;
+padding:30px;
+box-shadow:0 4px 20px rgba(0,0,0,0.08);
+">
+
+<h1 style="color:#ff5d2e;">
+TaskEarn
+</h1>
+
+<h2>Email Verification</h2>
+
+<p>Hello,</p>
+
+<p>Your TaskEarn verification code is:</p>
+
+<div style="
+font-size:36px;
+font-weight:bold;
+letter-spacing:10px;
+text-align:center;
+background:#f1f3f5;
+padding:22px;
+border-radius:12px;
+margin:25px 0;
+">
+${otp}
+</div>
+
+<p>
+This OTP expires in
+<strong>10 minutes</strong>.
+</p>
+
+<p>
+If you did not request this code,
+please ignore this email.
+</p>
+
+<p style="
+margin-top:30px;
+color:#777;
+font-size:13px;
+">
+TaskEarn
+</p>
+
+</div>
+
+</body>
+</html>
+`;
+
+  const raw =
+    createRawEmail({
+      from:
+        EMAIL_FROM ||
+        GMAIL_USER,
+
+      to:
+        email,
+
+      subject:
+        "TaskEarn Email Verification Code",
+
+      text,
+
+      html
+    });
 
   try {
+    const result =
+      await gmailClient.users.messages.send({
+        userId:
+          "me",
 
-    if (
-      type ===
-      "email"
-    ) {
+        requestBody: {
+          raw
+        }
+      });
 
-      await sendEmailOtp(
-        user.email,
-        otp
-      );
-
-    } else if (
-      type ===
-      "mobile"
-    ) {
-
-      await sendSmsOtp(
-        user.mobile,
-        otp
-      );
-
-    } else {
-
-      throw new Error(
-        "Invalid OTP type."
-      );
-    }
-
-  } catch (error) {
-
-    deleteOtpRecord(
-      user.id,
-      type,
-      purpose
+    console.log(
+      "Gmail API OTP sent successfully:",
+      result.data.id,
+      "to:",
+      email
     );
 
-    throw error;
+    return result.data;
+
+  } catch (error) {
+    console.error(
+      "Gmail API send error:"
+    );
+
+    console.error(
+      error?.response?.data ||
+      error?.message ||
+      error
+    );
+
+    throw new Error(
+      "Unable to send Gmail OTP. Please check Gmail API OAuth configuration and GOOGLE_REFRESH_TOKEN."
+    );
   }
 }
 
@@ -1023,16 +822,13 @@ async function sendSmsOtp(
   otp
 ) {
   const sid =
-    process.env
-      .TWILIO_ACCOUNT_SID;
+    process.env.TWILIO_ACCOUNT_SID;
 
   const token =
-    process.env
-      .TWILIO_AUTH_TOKEN;
+    process.env.TWILIO_AUTH_TOKEN;
 
   const from =
-    process.env
-      .TWILIO_PHONE_NUMBER;
+    process.env.TWILIO_PHONE_NUMBER;
 
   if (
     !sid ||
@@ -1101,7 +897,6 @@ async function sendSmsOtp(
     );
 
   if (!response.ok) {
-
     const text =
       await response.text();
 
@@ -1122,6 +917,94 @@ async function sendSmsOtp(
 }
 
 /* =====================================================
+   OTP DISPATCHER
+===================================================== */
+
+async function sendOtpFor(
+  user,
+  type,
+  purpose,
+  force = false
+) {
+  const existing =
+    getOtpRecord(
+      user.id,
+      type,
+      purpose
+    );
+
+  if (
+    existing &&
+    !force
+  ) {
+    const elapsed =
+      Date.now() -
+      new Date(
+        existing.lastSentAt
+      ).getTime();
+
+    if (
+      elapsed <
+      OTP_RESEND_MS
+    ) {
+      const remaining =
+        Math.ceil(
+          (
+            OTP_RESEND_MS -
+            elapsed
+          ) / 1000
+        );
+
+      throw new Error(
+        `Please wait ${remaining} seconds before requesting another OTP.`
+      );
+    }
+  }
+
+  const otp =
+    createOtpRecord(
+      user,
+      type,
+      purpose
+    );
+
+  try {
+    if (
+      type ===
+      "email"
+    ) {
+      await sendEmailOtp(
+        user.email,
+        otp
+      );
+
+    } else if (
+      type ===
+      "mobile"
+    ) {
+      await sendSmsOtp(
+        user.mobile,
+        otp
+      );
+
+    } else {
+      throw new Error(
+        "Invalid OTP type."
+      );
+    }
+
+  } catch (error) {
+    deleteOtpRecord(
+      user.id,
+      type,
+      purpose
+    );
+
+    throw error;
+  }
+}
+
+/* =====================================================
    LOGIN
 ===================================================== */
 
@@ -1133,7 +1016,8 @@ function completeLogin(
   req.session.userId =
     user.id;
 
-  delete req.session.verification;
+  delete req.session
+    .verification;
 
   delete req.session
     .withdrawalVerification;
@@ -1158,7 +1042,9 @@ function completeLogin(
 async function verifyGoogleIdToken(
   idToken
 ) {
-  if (!GOOGLE_CLIENT_ID) {
+  if (
+    !GOOGLE_CLIENT_ID_FOR_LOGIN
+  ) {
     throw new Error(
       "Google Sign-In is not configured."
     );
@@ -1167,6 +1053,15 @@ async function verifyGoogleIdToken(
   if (!idToken) {
     throw new Error(
       "Google authentication token is missing."
+    );
+  }
+
+  if (
+    typeof fetch !==
+    "function"
+  ) {
+    throw new Error(
+      "This server requires Node.js 18 or newer."
     );
   }
 
@@ -1189,7 +1084,7 @@ async function verifyGoogleIdToken(
 
   if (
     data.aud !==
-    GOOGLE_CLIENT_ID
+    GOOGLE_CLIENT_ID_FOR_LOGIN
   ) {
     throw new Error(
       "Google client ID does not match."
@@ -1222,9 +1117,7 @@ async function verifyGoogleIdToken(
     name:
       cleanText(
         data.name ||
-          data.email.split(
-            "@"
-          )[0],
+          data.email.split("@")[0],
         80
       ),
 
@@ -1253,10 +1146,8 @@ app.post(
     req,
     res
   ) => {
-
     try {
-
-      const google =
+      const googleUser =
         await verifyGoogleIdToken(
           req.body.credential
         );
@@ -1269,34 +1160,31 @@ app.post(
               u.googleId
             ) ===
               String(
-                google.googleId
+                googleUser.googleId
               )
         );
 
       if (!user) {
-
         user =
           db.users.find(
             u =>
               normalizeEmail(
                 u.email
               ) ===
-                google.email
+                googleUser.email
           );
       }
 
       if (!user) {
-
         user = {
-
           id:
             crypto.randomUUID(),
 
           name:
-            google.name,
+            googleUser.name,
 
           email:
-            google.email,
+            googleUser.email,
 
           passwordHash:
             "",
@@ -1311,7 +1199,7 @@ app.post(
             "",
 
           profileImage:
-            google.picture,
+            googleUser.picture,
 
           emailVerified:
             true,
@@ -1320,7 +1208,7 @@ app.post(
             false,
 
           googleId:
-            google.googleId,
+            googleUser.googleId,
 
           authProvider:
             "google",
@@ -1329,8 +1217,7 @@ app.post(
             0,
 
           createdAt:
-            new Date()
-              .toISOString()
+            new Date().toISOString()
         };
 
         db.users.push(
@@ -1338,9 +1225,8 @@ app.post(
         );
 
       } else {
-
         user.googleId =
-          google.googleId;
+          googleUser.googleId;
 
         user.emailVerified =
           true;
@@ -1352,12 +1238,12 @@ app.post(
           !user.profileImage
         ) {
           user.profileImage =
-            google.picture;
+            googleUser.picture;
         }
 
         if (!user.name) {
           user.name =
-            google.name;
+            googleUser.name;
         }
       }
 
@@ -1380,19 +1266,16 @@ app.post(
       });
 
     } catch (error) {
-
       console.error(
         "Google login error:",
         error
       );
 
-      res
-        .status(401)
-        .json({
-          error:
-            error.message ||
-            "Google login failed."
-        });
+      res.status(401).json({
+        error:
+          error.message ||
+          "Google login failed."
+      });
     }
   }
 );
@@ -1433,9 +1316,7 @@ app.post(
     req,
     res
   ) => {
-
     try {
-
       const name =
         cleanText(
           req.body.name,
@@ -1461,7 +1342,7 @@ app.post(
       const password =
         String(
           req.body.password ||
-          ""
+            ""
         );
 
       if (
@@ -1471,12 +1352,10 @@ app.post(
         !city ||
         !password
       ) {
-        return res
-          .status(400)
-          .json({
-            error:
-              "Please complete all fields."
-          });
+        return res.status(400).json({
+          error:
+            "Please complete all fields."
+        });
       }
 
       if (
@@ -1484,12 +1363,10 @@ app.post(
           email
         )
       ) {
-        return res
-          .status(400)
-          .json({
-            error:
-              "Please enter a valid email address."
-          });
+        return res.status(400).json({
+          error:
+            "Please enter a valid email address."
+        });
       }
 
       if (
@@ -1497,24 +1374,20 @@ app.post(
           mobile
         )
       ) {
-        return res
-          .status(400)
-          .json({
-            error:
-              "Please enter a valid mobile number."
-          });
+        return res.status(400).json({
+          error:
+            "Please enter a valid mobile number."
+        });
       }
 
       if (
         password.length <
         6
       ) {
-        return res
-          .status(400)
-          .json({
-            error:
-              "Password must contain at least 6 characters."
-          });
+        return res.status(400).json({
+          error:
+            "Password must contain at least 6 characters."
+        });
       }
 
       if (
@@ -1526,12 +1399,10 @@ app.post(
               email
         )
       ) {
-        return res
-          .status(409)
-          .json({
-            error:
-              "An account with this email already exists. Please login."
-          });
+        return res.status(409).json({
+          error:
+            "An account with this email already exists. Please login."
+        });
       }
 
       if (
@@ -1541,16 +1412,13 @@ app.post(
             mobile
         )
       ) {
-        return res
-          .status(409)
-          .json({
-            error:
-              "This mobile number is already registered."
-          });
+        return res.status(409).json({
+          error:
+            "This mobile number is already registered."
+        });
       }
 
       const user = {
-
         id:
           crypto.randomUUID(),
 
@@ -1590,8 +1458,7 @@ app.post(
           0,
 
         createdAt:
-          new Date()
-            .toISOString()
+          new Date().toISOString()
       };
 
       db.users.push(
@@ -1612,7 +1479,6 @@ app.post(
       };
 
       try {
-
         await sendOtpFor(
           user,
           "email",
@@ -1621,16 +1487,15 @@ app.post(
         );
 
       } catch (error) {
-
         db.users =
           db.users.filter(
             u =>
               String(
                 u.id
               ) !==
-                String(
-                  user.id
-                )
+              String(
+                user.id
+              )
           );
 
         saveDB(db);
@@ -1646,7 +1511,6 @@ app.post(
         );
 
       res.json({
-
         verificationRequired:
           true,
 
@@ -1676,19 +1540,16 @@ app.post(
       });
 
     } catch (error) {
-
       console.error(
         "Register error:",
         error
       );
 
-      res
-        .status(500)
-        .json({
-          error:
-            error.message ||
-            "Unable to create account."
-        });
+      res.status(500).json({
+        error:
+          error.message ||
+          "Unable to create account."
+      });
     }
   }
 );
@@ -1703,9 +1564,7 @@ app.post(
     req,
     res
   ) => {
-
     try {
-
       const email =
         normalizeEmail(
           req.body.email
@@ -1714,7 +1573,7 @@ app.post(
       const password =
         String(
           req.body.password ||
-          ""
+            ""
         );
 
       const remember =
@@ -1735,12 +1594,10 @@ app.post(
         !user ||
         !user.passwordHash
       ) {
-        return res
-          .status(401)
-          .json({
-            error:
-              "Invalid email or password. If you registered with Google, use Google Sign-In."
-          });
+        return res.status(401).json({
+          error:
+            "Invalid email or password. If you registered with Google, use Google Sign-In."
+        });
       }
 
       const valid =
@@ -1750,20 +1607,16 @@ app.post(
         );
 
       if (!valid) {
-        return res
-          .status(401)
-          .json({
-            error:
-              "Invalid email or password."
-          });
+        return res.status(401).json({
+          error:
+            "Invalid email or password."
+        });
       }
 
       if (
         !user.emailVerified
       ) {
-
         req.session.verification = {
-
           userId:
             user.id,
 
@@ -1789,7 +1642,6 @@ app.post(
           );
 
         return res.json({
-
           verificationRequired:
             true,
 
@@ -1833,19 +1685,16 @@ app.post(
       });
 
     } catch (error) {
-
       console.error(
         "Login error:",
         error
       );
 
-      res
-        .status(500)
-        .json({
-          error:
-            error.message ||
-            "Unable to login."
-        });
+      res.status(500).json({
+        error:
+          error.message ||
+          "Unable to login."
+      });
     }
   }
 );
@@ -1860,19 +1709,15 @@ app.post(
     req,
     res
   ) => {
-
     try {
-
       const verification =
         req.session.verification;
 
       if (!verification) {
-        return res
-          .status(400)
-          .json({
-            error:
-              "Verification session expired. Please login again."
-          });
+        return res.status(400).json({
+          error:
+            "Verification session expired. Please login again."
+        });
       }
 
       const user =
@@ -1881,12 +1726,10 @@ app.post(
         );
 
       if (!user) {
-        return res
-          .status(404)
-          .json({
-            error:
-              "Account not found."
-          });
+        return res.status(404).json({
+          error:
+            "Account not found."
+        });
       }
 
       const otp =
@@ -1900,12 +1743,10 @@ app.post(
           otp
         )
       ) {
-        return res
-          .status(400)
-          .json({
-            error:
-              "Please enter the 6-digit OTP."
-          });
+        return res.status(400).json({
+          error:
+            "Please enter the 6-digit OTP."
+        });
       }
 
       const record =
@@ -1916,12 +1757,10 @@ app.post(
         );
 
       if (!record) {
-        return res
-          .status(400)
-          .json({
-            error:
-              "OTP not found. Please request a new OTP."
-          });
+        return res.status(400).json({
+          error:
+            "OTP not found. Please request a new OTP."
+        });
       }
 
       if (
@@ -1930,38 +1769,32 @@ app.post(
           record.expiresAt
         ).getTime()
       ) {
-
         deleteOtpRecord(
           user.id,
           "email",
           verification.purpose
         );
 
-        return res
-          .status(400)
-          .json({
-            error:
-              "OTP has expired. Please click Resend OTP."
-          });
+        return res.status(400).json({
+          error:
+            "OTP has expired. Please click Resend OTP."
+        });
       }
 
       if (
         record.attempts >=
         OTP_MAX_ATTEMPTS
       ) {
-
         deleteOtpRecord(
           user.id,
           "email",
           verification.purpose
         );
 
-        return res
-          .status(429)
-          .json({
-            error:
-              "Too many incorrect attempts. Please click Resend OTP."
-          });
+        return res.status(429).json({
+          error:
+            "Too many incorrect attempts. Please click Resend OTP."
+        });
       }
 
       if (
@@ -1972,17 +1805,14 @@ app.post(
           )
         )
       ) {
-
         record.attempts++;
 
         saveDB(db);
 
-        return res
-          .status(401)
-          .json({
-            error:
-              "Incorrect OTP."
-          });
+        return res.status(401).json({
+          error:
+            "Incorrect OTP."
+        });
       }
 
       deleteOtpRecord(
@@ -2003,7 +1833,6 @@ app.post(
       );
 
       res.json({
-
         step:
           "complete",
 
@@ -2014,19 +1843,16 @@ app.post(
       });
 
     } catch (error) {
-
       console.error(
         "Email OTP verification error:",
         error
       );
 
-      res
-        .status(500)
-        .json({
-          error:
-            error.message ||
-            "Unable to verify OTP."
-        });
+      res.status(500).json({
+        error:
+          error.message ||
+          "Unable to verify OTP."
+      });
     }
   }
 );
@@ -2041,19 +1867,15 @@ app.post(
     req,
     res
   ) => {
-
     try {
-
       const verification =
         req.session.verification;
 
       if (!verification) {
-        return res
-          .status(400)
-          .json({
-            error:
-              "Verification session expired. Please login again."
-          });
+        return res.status(400).json({
+          error:
+            "Verification session expired. Please login again."
+        });
       }
 
       const user =
@@ -2062,12 +1884,10 @@ app.post(
         );
 
       if (!user) {
-        return res
-          .status(404)
-          .json({
-            error:
-              "Account not found."
-          });
+        return res.status(404).json({
+          error:
+            "Account not found."
+        });
       }
 
       await sendOtpFor(
@@ -2085,7 +1905,6 @@ app.post(
         );
 
       res.json({
-
         success:
           true,
 
@@ -2109,19 +1928,16 @@ app.post(
       });
 
     } catch (error) {
-
       console.error(
         "Resend email OTP error:",
         error
       );
 
-      res
-        .status(400)
-        .json({
-          error:
-            error.message ||
-            "Unable to resend OTP."
-        });
+      res.status(400).json({
+        error:
+          error.message ||
+          "Unable to resend OTP."
+      });
     }
   }
 );
@@ -2132,8 +1948,10 @@ app.post(
 
 app.get(
   "/api/otp-status",
-  (req, res) => {
-
+  (
+    req,
+    res
+  ) => {
     const verification =
       req.session.verification;
 
@@ -2185,10 +2003,8 @@ app.get(
       OTP_RESEND_MS;
 
     res.json({
-
       active:
-        expiresAt >
-        now,
+        expiresAt > now,
 
       expiresAt:
         record.expiresAt,
@@ -2229,13 +2045,13 @@ app.get(
 
 app.get(
   "/api/me",
-  (req, res) => {
-
+  (
+    req,
+    res
+  ) => {
     res.json(
       publicUser(
-        currentUser(
-          req
-        )
+        currentUser(req)
       )
     );
   }
@@ -2247,18 +2063,17 @@ app.get(
 
 app.post(
   "/api/logout",
-  (req, res) => {
-
+  (
+    req,
+    res
+  ) => {
     req.session.destroy(
       error => {
-
         if (error) {
-          return res
-            .status(500)
-            .json({
-              error:
-                "Unable to logout."
-            });
+          return res.status(500).json({
+            error:
+              "Unable to logout."
+          });
         }
 
         res.clearCookie(
@@ -2281,10 +2096,11 @@ app.post(
 app.put(
   "/api/profile",
   requireLogin,
-  (req, res) => {
-
+  (
+    req,
+    res
+  ) => {
     try {
-
       const user =
         req.user;
 
@@ -2309,12 +2125,10 @@ app.put(
         !name ||
         !city
       ) {
-        return res
-          .status(400)
-          .json({
-            error:
-              "Name and city are required."
-          });
+        return res.status(400).json({
+          error:
+            "Name and city are required."
+        });
       }
 
       if (
@@ -2323,21 +2137,17 @@ app.put(
           mobile
         )
       ) {
-        return res
-          .status(400)
-          .json({
-            error:
-              "Please enter a valid mobile number."
-          });
+        return res.status(400).json({
+          error:
+            "Please enter a valid mobile number."
+        });
       }
 
       if (
         mobile !==
         user.mobile
       ) {
-
         if (mobile) {
-
           const duplicate =
             db.users.find(
               u =>
@@ -2352,12 +2162,10 @@ app.put(
             );
 
           if (duplicate) {
-            return res
-              .status(409)
-              .json({
-                error:
-                  "This mobile number is already registered."
-              });
+            return res.status(409).json({
+              error:
+                "This mobile number is already registered."
+            });
           }
         }
 
@@ -2377,7 +2185,6 @@ app.put(
       saveDB(db);
 
       res.json({
-
         message:
           "Profile saved successfully.",
 
@@ -2388,18 +2195,15 @@ app.put(
       });
 
     } catch (error) {
-
       console.error(
         "Profile error:",
         error
       );
 
-      res
-        .status(500)
-        .json({
-          error:
-            "Unable to save profile."
-        });
+      res.status(500).json({
+        error:
+          "Unable to save profile."
+      });
     }
   }
 );
@@ -2411,8 +2215,10 @@ app.put(
 app.get(
   "/api/tasks",
   requireLogin,
-  (req, res) => {
-
+  (
+    req,
+    res
+  ) => {
     res.json(
       db.tasks
         .filter(
@@ -2422,7 +2228,6 @@ app.get(
         )
         .map(
           task => ({
-
             id:
               task.id,
 
@@ -2452,8 +2257,10 @@ app.get(
 app.post(
   "/api/tasks/:id/submit",
   requireLogin,
-  (req, res) => {
-
+  (
+    req,
+    res
+  ) => {
     const taskId =
       Number(
         req.params.id
@@ -2471,12 +2278,10 @@ app.post(
       );
 
     if (!task) {
-      return res
-        .status(404)
-        .json({
-          error:
-            "Task not found."
-        });
+      return res.status(404).json({
+        error:
+          "Task not found."
+      });
     }
 
     const existing =
@@ -2497,16 +2302,13 @@ app.post(
       );
 
     if (existing) {
-      return res
-        .status(409)
-        .json({
-          error:
-            "You already submitted this task and it is under review."
-        });
+      return res.status(409).json({
+        error:
+          "You already submitted this task and it is under review."
+      });
     }
 
     db.submissions.push({
-
       id:
         crypto.randomUUID(),
 
@@ -2528,8 +2330,7 @@ app.post(
         "pending",
 
       submittedAt:
-        new Date()
-          .toISOString()
+        new Date().toISOString()
     });
 
     saveDB(db);
@@ -2548,8 +2349,10 @@ app.post(
 app.get(
   "/api/my-submissions",
   requireLogin,
-  (req, res) => {
-
+  (
+    req,
+    res
+  ) => {
     res.json(
       db.submissions
         .filter(
@@ -2581,8 +2384,10 @@ app.get(
 app.get(
   "/api/wallet",
   requireLogin,
-  (req, res) => {
-
+  (
+    req,
+    res
+  ) => {
     const withdrawals =
       db.withdrawals
         .filter(
@@ -2605,7 +2410,6 @@ app.get(
         );
 
     res.json({
-
       balance:
         Number(
           req.user.balance
@@ -2627,19 +2431,15 @@ app.post(
     req,
     res
   ) => {
-
     try {
-
       const user =
         req.user;
 
       if (!user.mobile) {
-        return res
-          .status(400)
-          .json({
-            error:
-              "Please add a mobile number in your profile before withdrawal."
-          });
+        return res.status(400).json({
+          error:
+            "Please add a mobile number in your profile before withdrawal."
+        });
       }
 
       if (
@@ -2655,7 +2455,6 @@ app.post(
       }
 
       req.session.withdrawalVerification = {
-
         userId:
           user.id,
 
@@ -2678,7 +2477,6 @@ app.post(
         );
 
       res.json({
-
         verificationRequired:
           true,
 
@@ -2705,19 +2503,16 @@ app.post(
       });
 
     } catch (error) {
-
       console.error(
         "Withdrawal mobile OTP:",
         error
       );
 
-      res
-        .status(400)
-        .json({
-          error:
-            error.message ||
-            "Unable to send mobile verification OTP."
-        });
+      res.status(400).json({
+        error:
+          error.message ||
+          "Unable to send mobile verification OTP."
+      });
     }
   }
 );
@@ -2733,12 +2528,9 @@ app.post(
     req,
     res
   ) => {
-
     try {
-
       const verification =
-        req.session
-          .withdrawalVerification;
+        req.session.withdrawalVerification;
 
       if (
         !verification ||
@@ -2749,12 +2541,10 @@ app.post(
             req.user.id
           )
       ) {
-        return res
-          .status(400)
-          .json({
-            error:
-              "Please request a new mobile verification OTP."
-          });
+        return res.status(400).json({
+          error:
+            "Please request a new mobile verification OTP."
+        });
       }
 
       const otp =
@@ -2768,12 +2558,10 @@ app.post(
           otp
         )
       ) {
-        return res
-          .status(400)
-          .json({
-            error:
-              "Please enter the 6-digit OTP."
-          });
+        return res.status(400).json({
+          error:
+            "Please enter the 6-digit OTP."
+        });
       }
 
       const record =
@@ -2784,12 +2572,10 @@ app.post(
         );
 
       if (!record) {
-        return res
-          .status(400)
-          .json({
-            error:
-              "OTP not found. Please request a new OTP."
-          });
+        return res.status(400).json({
+          error:
+            "OTP not found. Please request a new OTP."
+        });
       }
 
       if (
@@ -2798,38 +2584,32 @@ app.post(
           record.expiresAt
         ).getTime()
       ) {
-
         deleteOtpRecord(
           req.user.id,
           "mobile",
           "withdrawal"
         );
 
-        return res
-          .status(400)
-          .json({
-            error:
-              "OTP has expired. Please request a new OTP."
-          });
+        return res.status(400).json({
+          error:
+            "OTP has expired. Please request a new OTP."
+        });
       }
 
       if (
         record.attempts >=
         OTP_MAX_ATTEMPTS
       ) {
-
         deleteOtpRecord(
           req.user.id,
           "mobile",
           "withdrawal"
         );
 
-        return res
-          .status(429)
-          .json({
-            error:
-              "Too many incorrect attempts. Please request a new OTP."
-          });
+        return res.status(429).json({
+          error:
+            "Too many incorrect attempts. Please request a new OTP."
+        });
       }
 
       if (
@@ -2840,17 +2620,14 @@ app.post(
           )
         )
       ) {
-
         record.attempts++;
 
         saveDB(db);
 
-        return res
-          .status(401)
-          .json({
-            error:
-              "Incorrect OTP."
-          });
+        return res.status(401).json({
+          error:
+            "Incorrect OTP."
+        });
       }
 
       deleteOtpRecord(
@@ -2868,7 +2645,6 @@ app.post(
         .withdrawalVerification;
 
       res.json({
-
         verified:
           true,
 
@@ -2882,19 +2658,16 @@ app.post(
       });
 
     } catch (error) {
-
       console.error(
         "Mobile OTP verification:",
         error
       );
 
-      res
-        .status(500)
-        .json({
-          error:
-            error.message ||
-            "Unable to verify mobile number."
-        });
+      res.status(500).json({
+        error:
+          error.message ||
+          "Unable to verify mobile number."
+      });
     }
   }
 );
@@ -2910,9 +2683,7 @@ app.post(
     req,
     res
   ) => {
-
     try {
-
       if (
         req.user.mobileVerified
       ) {
@@ -2923,16 +2694,13 @@ app.post(
       }
 
       if (!req.user.mobile) {
-        return res
-          .status(400)
-          .json({
-            error:
-              "Please add a mobile number first."
-          });
+        return res.status(400).json({
+          error:
+            "Please add a mobile number first."
+        });
       }
 
       req.session.withdrawalVerification = {
-
         userId:
           req.user.id,
 
@@ -2955,7 +2723,6 @@ app.post(
         );
 
       res.json({
-
         message:
           "A new mobile OTP has been sent.",
 
@@ -2976,19 +2743,16 @@ app.post(
       });
 
     } catch (error) {
-
       console.error(
         "Resend mobile OTP:",
         error
       );
 
-      res
-        .status(400)
-        .json({
-          error:
-            error.message ||
-            "Unable to resend mobile OTP."
-        });
+      res.status(400).json({
+        error:
+          error.message ||
+          "Unable to resend mobile OTP."
+      });
     }
   }
 );
@@ -3000,19 +2764,18 @@ app.post(
 app.post(
   "/api/withdraw",
   requireLogin,
-  (req, res) => {
-
+  (
+    req,
+    res
+  ) => {
     try {
-
       if (
         !req.user.mobileVerified
       ) {
-        return res
-          .status(403)
-          .json({
-            error:
-              "Please verify your mobile number before requesting a withdrawal."
-          });
+        return res.status(403).json({
+          error:
+            "Please verify your mobile number before requesting a withdrawal."
+        });
       }
 
       const amount =
@@ -3036,47 +2799,43 @@ app.post(
         ) ||
         amount < 100
       ) {
-        return res
-          .status(400)
-          .json({
-            error:
-              "Minimum withdrawal amount is ₹100."
-          });
+        return res.status(400).json({
+          error:
+            "Minimum withdrawal amount is ₹100."
+        });
       }
 
       if (
         amount >
         Number(
           req.user.balance ||
-          0
+            0
         )
       ) {
-        return res
-          .status(400)
-          .json({
-            error:
-              "Insufficient wallet balance."
-          });
+        return res.status(400).json({
+          error:
+            "Insufficient wallet balance."
+        });
       }
 
       if (
-        method !== "UPI" &&
-        method !== "Bank Account"
+        method !==
+          "UPI" &&
+        method !==
+          "Bank Account"
       ) {
-        return res
-          .status(400)
-          .json({
-            error:
-              "Please select a valid payment method."
-          });
+        return res.status(400).json({
+          error:
+            "Please select a valid payment method."
+        });
       }
 
       let paymentDetails;
 
       if (
-        method === "UPI"
+        method ===
+        "UPI"
       ) {
-
         const upiId =
           cleanText(
             details.upiId,
@@ -3084,15 +2843,14 @@ app.post(
           );
 
         if (
-          !/^[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+$/
-            .test(upiId)
+          !/^[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+$/.test(
+            upiId
+          )
         ) {
-          return res
-            .status(400)
-            .json({
-              error:
-                "Please enter a valid UPI ID."
-            });
+          return res.status(400).json({
+            error:
+              "Please enter a valid UPI ID."
+          });
         }
 
         paymentDetails = {
@@ -3100,7 +2858,6 @@ app.post(
         };
 
       } else {
-
         const accountHolderName =
           cleanText(
             details.accountHolderName,
@@ -3131,30 +2888,24 @@ app.post(
           !ifscCode ||
           !bankName
         ) {
-          return res
-            .status(400)
-            .json({
-              error:
-                "Please complete all bank account details."
-            });
+          return res.status(400).json({
+            error:
+              "Please complete all bank account details."
+          });
         }
 
         if (
-          !/^[A-Z]{4}0[A-Z0-9]{6}$/
-            .test(
-              ifscCode
-            )
+          !/^[A-Z]{4}0[A-Z0-9]{6}$/.test(
+            ifscCode
+          )
         ) {
-          return res
-            .status(400)
-            .json({
-              error:
-                "Please enter a valid IFSC code."
-            });
+          return res.status(400).json({
+            error:
+              "Please enter a valid IFSC code."
+          });
         }
 
         paymentDetails = {
-
           accountHolderName,
 
           accountNumber,
@@ -3168,12 +2919,11 @@ app.post(
       req.user.balance =
         Number(
           req.user.balance ||
-          0
+            0
         ) -
         amount;
 
       db.withdrawals.push({
-
         id:
           crypto.randomUUID(),
 
@@ -3190,8 +2940,7 @@ app.post(
           "pending",
 
         createdAt:
-          new Date()
-            .toISOString()
+          new Date().toISOString()
       });
 
       saveDB(db);
@@ -3202,18 +2951,15 @@ app.post(
       });
 
     } catch (error) {
-
       console.error(
         "Withdrawal error:",
         error
       );
 
-      res
-        .status(500)
-        .json({
-          error:
-            "Unable to submit withdrawal."
-        });
+      res.status(500).json({
+        error:
+          "Unable to submit withdrawal."
+      });
     }
   }
 );
@@ -3224,10 +2970,11 @@ app.post(
 
 app.get(
   "/api/health",
-  (req, res) => {
-
+  (
+    req,
+    res
+  ) => {
     res.json({
-
       status:
         "ok",
 
@@ -3235,8 +2982,7 @@ app.get(
         "TaskEarn",
 
       time:
-        new Date()
-          .toISOString(),
+        new Date().toISOString(),
 
       gmailConfigured:
         Boolean(
@@ -3244,7 +2990,9 @@ app.get(
         ),
 
       gmailApiConfigured:
-        gmailApiConfigured(),
+        Boolean(
+          gmailApiConfigured
+        ),
 
       googleConfigured:
         Boolean(
@@ -3263,12 +3011,9 @@ app.get(
 
       twilioConfigured:
         Boolean(
-          process.env
-            .TWILIO_ACCOUNT_SID &&
-          process.env
-            .TWILIO_AUTH_TOKEN &&
-          process.env
-            .TWILIO_PHONE_NUMBER
+          process.env.TWILIO_ACCOUNT_SID &&
+          process.env.TWILIO_AUTH_TOKEN &&
+          process.env.TWILIO_PHONE_NUMBER
         ),
 
       emailProvider:
@@ -3286,14 +3031,14 @@ app.get(
 
 app.use(
   "/api",
-  (req, res) => {
-
+  (
+    req,
     res
-      .status(404)
-      .json({
-        error:
-          "API endpoint not found."
-      });
+  ) => {
+    res.status(404).json({
+      error:
+        "API endpoint not found."
+    });
   }
 );
 
@@ -3308,7 +3053,6 @@ app.use(
     res,
     next
   ) => {
-
     console.error(
       "Server error:",
       err
@@ -3320,12 +3064,10 @@ app.use(
       return next(err);
     }
 
-    res
-      .status(500)
-      .json({
-        error:
-          "Internal server error."
-      });
+    res.status(500).json({
+      error:
+        "Internal server error."
+    });
   }
 );
 
@@ -3337,13 +3079,20 @@ app.listen(
   PORT,
   "0.0.0.0",
   () => {
-
     console.log(
       `TaskEarn server running on port ${PORT}`
     );
 
     console.log(
-      `Gmail user configured: ${
+      `Gmail API configured: ${
+        gmailApiConfigured
+          ? "YES"
+          : "NO"
+      }`
+    );
+
+    console.log(
+      `Gmail User configured: ${
         GMAIL_USER
           ? "YES"
           : "NO"
@@ -3351,8 +3100,8 @@ app.listen(
     );
 
     console.log(
-      `Gmail API configured: ${
-        gmailApiConfigured()
+      `Email From configured: ${
+        EMAIL_FROM
           ? "YES"
           : "NO"
       }`
@@ -3397,7 +3146,7 @@ app.listen(
     );
 
     console.log(
-      "SMTP is NOT used."
+      "SMTP: DISABLED"
     );
   }
 );
