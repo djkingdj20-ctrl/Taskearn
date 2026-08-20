@@ -26,6 +26,12 @@ const SESSION_SECRET =
   process.env.SESSION_SECRET ||
   "CHANGE_THIS_TASKEARN_SECRET_2026";
 
+/*
+  IMPORTANT:
+  This is the TaskEarn Gmail account used
+  for sending verification OTPs.
+*/
+
 const GMAIL_USER =
   process.env.GMAIL_USER ||
   "taskearn.otp@gmail.com";
@@ -146,10 +152,7 @@ function loadDB() {
     try {
       saveDB(database);
     } catch (saveError) {
-      console.error(
-        "Database recovery error:",
-        saveError
-      );
+      console.error("Database recovery error:", saveError);
     }
 
     return database;
@@ -172,7 +175,6 @@ app.use(
 
     cookie: {
       httpOnly: true,
-
       sameSite: "lax",
 
       secure:
@@ -240,6 +242,9 @@ function publicUser(user) {
     authProvider:
       user.authProvider || "local",
 
+    balance:
+      Number(user.balance || 0),
+
     createdAt:
       user.createdAt
   };
@@ -277,9 +282,7 @@ function requireLogin(req, res, next) {
 }
 
 /* =====================================================
-   VERIFIED DUPLICATE HELPERS
-   IMPORTANT:
-   Only VERIFIED email/mobile blocks registration.
+   DUPLICATE CHECKS
 ===================================================== */
 
 function findVerifiedUserByEmail(email) {
@@ -306,13 +309,6 @@ function findVerifiedUserByMobile(mobile) {
   );
 }
 
-/*
-  Find an existing UNVERIFIED account.
-  This allows the user to continue/restart
-  verification instead of receiving
-  "Already registered".
-*/
-
 function findUnverifiedUser(email, mobile) {
   const normalizedEmail =
     normalizeEmail(email);
@@ -334,7 +330,7 @@ function findUnverifiedUser(email, mobile) {
 }
 
 /* =====================================================
-   OTP HELPERS
+   OTP CONFIGURATION
 ===================================================== */
 
 const OTP_EXPIRY_MS =
@@ -373,7 +369,7 @@ function safeCompare(a, b) {
 }
 
 /* =====================================================
-   EMAIL SMTP
+   GMAIL SMTP
 ===================================================== */
 
 const mailTransporter =
@@ -386,26 +382,67 @@ const mailTransporter =
     }
   });
 
+/*
+  Test Gmail connection at startup.
+  This does NOT expose the password.
+*/
+
+async function verifyMailConnection() {
+  if (!GMAIL_APP_PASSWORD) {
+    console.warn(
+      "WARNING: GMAIL_APP_PASSWORD is not configured."
+    );
+
+    return;
+  }
+
+  try {
+    await mailTransporter.verify();
+
+    console.log(
+      `Gmail SMTP ready: ${GMAIL_USER}`
+    );
+  } catch (error) {
+    console.error(
+      "Gmail SMTP connection failed:",
+      error.message
+    );
+  }
+}
+
+/* =====================================================
+   SEND EMAIL OTP
+===================================================== */
+
 async function sendEmailOtp(
   email,
   otp,
   purpose
 ) {
-  if (
-    !GMAIL_USER ||
-    !GMAIL_APP_PASSWORD
-  ) {
+  if (!GMAIL_USER) {
     throw new Error(
-      "Gmail email service is not configured."
+      "Gmail account is not configured."
     );
   }
 
-  const subject =
-    purpose === "login"
-      ? "TaskEarn Login Verification Code"
-      : purpose === "profile"
-      ? "TaskEarn Mobile Verification"
-      : "TaskEarn Email Verification Code";
+  if (!GMAIL_APP_PASSWORD) {
+    throw new Error(
+      "Gmail App Password is not configured. Please configure GMAIL_APP_PASSWORD in Environment Variables."
+    );
+  }
+
+  let subject;
+
+  if (purpose === "login") {
+    subject =
+      "TaskEarn Login Verification Code";
+  } else if (purpose === "profile") {
+    subject =
+      "TaskEarn Mobile Verification";
+  } else {
+    subject =
+      "TaskEarn Email Verification Code";
+  }
 
   const html = `
 <!DOCTYPE html>
@@ -500,9 +537,13 @@ TaskEarn Security Team
 
   try {
     await mailTransporter.sendMail({
-      from: `"TaskEarn" <${GMAIL_USER}>`,
+      from:
+        `"TaskEarn" <${GMAIL_USER}>`,
+
       to: email,
+
       subject,
+
       html
     });
 
@@ -522,7 +563,7 @@ TaskEarn Security Team
 }
 
 /* =====================================================
-   SMS OTP - TWILIO
+   TWILIO SMS OTP
 ===================================================== */
 
 async function sendSmsOtp(
@@ -759,17 +800,32 @@ async function sendOtpFor(
       purpose
     );
 
-  if (type === "email") {
-    await sendEmailOtp(
-      user.email,
-      otp,
+  try {
+    if (type === "email") {
+      await sendEmailOtp(
+        user.email,
+        otp,
+        purpose
+      );
+    } else {
+      await sendSmsOtp(
+        user.mobile,
+        otp
+      );
+    }
+  } catch (error) {
+    /*
+      If sending fails, remove the OTP
+      so the user can try again.
+    */
+
+    deleteOtpRecord(
+      user.id,
+      type,
       purpose
     );
-  } else {
-    await sendSmsOtp(
-      user.mobile,
-      otp
-    );
+
+    throw error;
   }
 }
 
@@ -1088,6 +1144,41 @@ app.post(
 
       saveDB(db);
 
+      /*
+        Google email is already verified.
+        Mobile verification can still be required
+        by the frontend/backend flow if mobile exists.
+      */
+
+      if (
+        user.mobile &&
+        !user.mobileVerified
+      ) {
+        req.session.remember = true;
+
+        const step =
+          await startVerification(
+            req,
+            user,
+            "login"
+          );
+
+        if (step !== "complete") {
+          return res.json({
+            verificationRequired:
+              true,
+
+            step,
+
+            email:
+              user.email,
+
+            mobile:
+              user.mobile
+          });
+        }
+      }
+
       completeLogin(
         req,
         user,
@@ -1147,8 +1238,6 @@ app.use(
 
 /* =====================================================
    REGISTER
-   IMPORTANT:
-   UNVERIFIED EMAIL/MOBILE IS NOT "REGISTERED"
 ===================================================== */
 
 app.post(
@@ -1223,12 +1312,7 @@ app.post(
       }
 
       /*
-        =================================================
-        IMPORTANT FIX #1
-
-        Only VERIFIED EMAIL can cause
-        "email already registered".
-        =================================================
+        VERIFIED EMAIL = ALREADY REGISTERED
       */
 
       const existingVerifiedEmail =
@@ -1244,12 +1328,7 @@ app.post(
       }
 
       /*
-        =================================================
-        IMPORTANT FIX #2
-
-        Only VERIFIED MOBILE can cause
-        "mobile already registered".
-        =================================================
+        VERIFIED MOBILE = ALREADY REGISTERED
       */
 
       const existingVerifiedMobile =
@@ -1265,16 +1344,8 @@ app.post(
       }
 
       /*
-        =================================================
-        IMPORTANT FIX #3
-
-        If an old account exists but its
-        email/mobile was NEVER verified,
-        do NOT say "Already registered".
-
-        Instead, reuse that account and
-        restart verification.
-        =================================================
+        UNVERIFIED ACCOUNT
+        -> REUSE IT
       */
 
       let user =
@@ -1283,16 +1354,7 @@ app.post(
           mobile
         );
 
-      /*
-        EXISTING UNVERIFIED ACCOUNT
-      */
-
       if (user) {
-        /*
-          Update registration details.
-          The account is still NOT verified.
-        */
-
         user.name =
           name;
 
@@ -1311,11 +1373,6 @@ app.post(
             12
           );
 
-        /*
-          Keep verification false
-          until OTP succeeds.
-        */
-
         user.emailVerified =
           false;
 
@@ -1324,12 +1381,6 @@ app.post(
 
         user.authProvider =
           "local";
-
-        /*
-          Clear old Google ID if this
-          is being converted to local
-          registration.
-        */
 
         user.googleId =
           "";
@@ -1366,11 +1417,6 @@ app.post(
           profileImage:
             "",
 
-          /*
-            VERY IMPORTANT:
-            Both are FALSE initially.
-          */
-
           emailVerified:
             false,
 
@@ -1400,32 +1446,12 @@ app.post(
           req.body.remember
         );
 
-      let step;
-
-      try {
-        step =
-          await startVerification(
-            req,
-            user,
-            "register"
-          );
-      } catch (otpError) {
-        console.error(
-          "Registration OTP error:",
-          otpError
+      const step =
+        await startVerification(
+          req,
+          user,
+          "register"
         );
-
-        /*
-          IMPORTANT:
-          Do NOT delete the user here.
-
-          The account can remain unverified
-          and the user can try registration
-          again to receive a new OTP.
-        */
-
-        throw otpError;
-      }
 
       return res.json({
         verificationRequired:
@@ -1507,11 +1533,6 @@ app.post(
         });
       }
 
-      /*
-        Unverified accounts are allowed
-        to continue verification.
-      */
-
       if (
         !user.passwordHash
       ) {
@@ -1538,7 +1559,7 @@ app.post(
         remember;
 
       /*
-        Fully verified account
+        Fully verified
       */
 
       if (
@@ -1558,7 +1579,7 @@ app.post(
       }
 
       /*
-        Continue verification.
+        Continue OTP verification
       */
 
       const step =
@@ -1612,7 +1633,7 @@ app.post(
 );
 
 /* =====================================================
-   VERIFY LOGIN / REGISTER OTP
+   VERIFY OTP
 ===================================================== */
 
 app.post(
@@ -1767,8 +1788,7 @@ app.post(
       saveDB(db);
 
       /*
-        EMAIL SUCCESS
-        -> SEND MOBILE OTP
+        EMAIL -> MOBILE
       */
 
       if (
@@ -1817,8 +1837,7 @@ app.post(
       }
 
       /*
-        BOTH VERIFIED
-        -> LOGIN
+        COMPLETE
       */
 
       const remember =
@@ -2051,11 +2070,6 @@ app.put(
           user.mobileVerified =
             false;
         } else {
-          /*
-            Only a VERIFIED mobile number
-            blocks changing to it.
-          */
-
           const duplicate =
             findVerifiedUserByMobile(
               mobile
@@ -2094,11 +2108,6 @@ app.put(
         profileImage;
 
       saveDB(db);
-
-      /*
-        If mobile was changed,
-        verify the new number.
-      */
 
       if (
         mobileChanged &&
@@ -2732,11 +2741,8 @@ app.post(
 
         paymentDetails = {
           accountHolderName,
-
           accountNumber,
-
           ifscCode,
-
           bankName
         };
       }
@@ -2805,7 +2811,25 @@ app.get(
         "TaskEarn",
 
       time:
-        new Date().toISOString()
+        new Date().toISOString(),
+
+      gmail:
+        Boolean(
+          GMAIL_USER &&
+          GMAIL_APP_PASSWORD
+        ),
+
+      google:
+        Boolean(
+          GOOGLE_CLIENT_ID
+        ),
+
+      mobileOtp:
+        Boolean(
+          process.env.TWILIO_ACCOUNT_SID &&
+          process.env.TWILIO_AUTH_TOKEN &&
+          process.env.TWILIO_PHONE_NUMBER
+        )
     });
   }
 );
@@ -2860,7 +2884,7 @@ app.use(
 app.listen(
   PORT,
   "0.0.0.0",
-  () => {
+  async () => {
     console.log(
       `TaskEarn server running on port ${PORT}`
     );
@@ -2886,5 +2910,7 @@ app.listen(
           : "NO"
       }`
     );
+
+    await verifyMailConnection();
   }
 );
