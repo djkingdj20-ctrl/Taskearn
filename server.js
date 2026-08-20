@@ -1,352 +1,609 @@
-const express = require("express");
-const session = require("express-session");
-const path = require("path");
-const fs = require("fs");
-const crypto = require("crypto");
-const bcrypt = require("bcryptjs");
-const nodemailer = require("nodemailer");
+/* STATE MANAGEMENT */
+let currentUser = null;
+let activeTab = "tasks";
+let isProfileVerification = false;
 
-const app = express();
-
-app.set("trust proxy", 1);
-
-app.use(express.json({ limit: "5mb" }));
-app.use(express.urlencoded({ extended: true, limit: "100kb" }));
-
-/* =====================================================
-   CONFIGURATION (Environment Variables)
-===================================================== */
-
-const PORT = Number(process.env.PORT) || 10000;
-const DATA_DIR = path.join(__dirname, "data");
-const DB_FILE = path.join(DATA_DIR, "database.json");
-
-const SESSION_SECRET = process.env.SESSION_SECRET || "CHANGE_THIS_TASKEARN_SECRET_2026";
-const GMAIL_USER = process.env.GMAIL_USER || "taskearn.otp@gmail.com";
-const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD || "";
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
-
-/* =====================================================
-   DATABASE MANAGEMENT
-===================================================== */
-
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
+/* UTILITIES */
+function escapeHtml(str) {
+  return String(str || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
-function defaultDatabase() {
-  return {
-    users: [],
-    tasks: [
-      { id: 1, title: "Complete a simple online task", description: "Complete instructions carefully.", type: "General", reward: 10, active: true },
-      { id: 2, title: "Social Media Engagement", description: "Complete social media activity.", type: "Social", reward: 15, active: true },
-      { id: 3, title: "Website Visit Task", description: "Visit required website.", type: "Website", reward: 20, active: true }
-    ],
-    submissions: [],
-    withdrawals: [],
-    otpCodes: []
-  };
-}
-
-function saveDB(database) {
-  const tempFile = DB_FILE + ".tmp";
-  fs.writeFileSync(tempFile, JSON.stringify(database, null, 2), "utf8");
-  fs.renameSync(tempFile, DB_FILE);
-}
-
-function loadDB() {
-  try {
-    if (!fs.existsSync(DB_FILE)) {
-      const database = defaultDatabase();
-      saveDB(database);
-      return database;
+async function api(url, options = {}) {
+  const res = await fetch(url, {
+    credentials: "same-origin",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(options.headers || {})
     }
-    const raw = fs.readFileSync(DB_FILE, "utf8");
-    if (!raw.trim()) {
-      const database = defaultDatabase();
-      saveDB(database);
-      return database;
-    }
-    const database = JSON.parse(raw);
-    database.users ||= [];
-    database.tasks ||= [];
-    database.submissions ||= [];
-    database.withdrawals ||= [];
-    database.otpCodes ||= [];
-    return database;
-  } catch (error) {
-    console.error("Database load error:", error);
-    const database = defaultDatabase();
-    saveDB(database);
-    return database;
-  }
-}
-
-let db = loadDB();
-
-/* =====================================================
-   SESSION CONFIGURATION (RENDER / PRODUCTION FIX)
-===================================================== */
-
-app.use(
-  session({
-    secret: SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      httpOnly: true,
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 1000 * 60 * 60 * 24 * 30
-    }
-  })
-);
-
-/* =====================================================
-   HELPERS & AUTHENTICATION
-===================================================== */
-
-function cleanText(value, maxLength = 200) { return String(value ?? "").trim().slice(0, maxLength); }
-function normalizeEmail(value) { return cleanText(value, 160).toLowerCase(); }
-function validEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
-
-function publicUser(user) {
-  if (!user) return null;
-  return {
-    id: user.id,
-    name: user.name || "",
-    email: user.email || "",
-    role: user.role || "Member",
-    mobile: user.mobile || "",
-    city: user.city || "",
-    profileImage: user.profileImage || "",
-    emailVerified: Boolean(user.emailVerified),
-    mobileVerified: Boolean(user.mobileVerified),
-    authProvider: user.authProvider || "local",
-    balance: user.balance || 0,
-    createdAt: user.createdAt
-  };
-}
-
-function currentUser(req) {
-  if (!req.session.userId) return null;
-  return db.users.find(u => String(u.id) === String(req.session.userId));
-}
-
-function requireLogin(req, res, next) {
-  const user = currentUser(req);
-  if (!user) return res.status(401).json({ error: "Please login first." });
-  req.user = user;
-  next();
-}
-
-/* =====================================================
-   GOOGLE AUTH VERIFICATION
-===================================================== */
-
-async function verifyGoogleIdToken(idToken) {
-  if (!GOOGLE_CLIENT_ID) throw new Error("Google Sign-In is not configured.");
-  if (!idToken) throw new Error("Google auth token missing.");
-
-  const response = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(idToken)}`);
-  if (!response.ok) throw new Error("Invalid Google token.");
-
-  const data = await response.json();
-  if (data.aud !== GOOGLE_CLIENT_ID) throw new Error("Google Client ID mismatch.");
-  if (data.email_verified !== "true" && data.email_verified !== true) throw new Error("Google email not verified.");
-
-  return {
-    googleId: cleanText(data.sub, 200),
-    email: normalizeEmail(data.email),
-    name: cleanText(data.name || data.email.split("@")[0], 80),
-    picture: cleanText(data.picture || "", 1000)
-  };
-}
-
-/* =====================================================
-   API ROUTES
-===================================================== */
-
-app.get("/api/google-config", (req, res) => {
-  return res.json({ clientId: GOOGLE_CLIENT_ID });
-});
-
-app.post("/api/auth/google", async (req, res) => {
-  try {
-    const google = await verifyGoogleIdToken(req.body.credential);
-    let user = db.users.find(u => u.googleId && String(u.googleId) === String(google.googleId));
-
-    if (!user) {
-      user = db.users.find(u => normalizeEmail(u.email) === google.email);
-    }
-
-    if (!user) {
-      user = {
-        id: crypto.randomUUID(),
-        name: google.name,
-        email: google.email,
-        passwordHash: "",
-        role: "Member",
-        mobile: "",
-        city: "",
-        profileImage: google.picture,
-        emailVerified: true,
-        mobileVerified: false,
-        googleId: google.googleId,
-        authProvider: "google",
-        balance: 0,
-        createdAt: new Date().toISOString()
-      };
-      db.users.push(user);
-    } else {
-      user.googleId = google.googleId;
-      user.emailVerified = true;
-      user.authProvider = "google";
-      if (!user.profileImage) user.profileImage = google.picture;
-    }
-
-    saveDB(db);
-    req.session.userId = user.id;
-
-    return res.json({ success: true, user: publicUser(user) });
-  } catch (error) {
-    return res.status(401).json({ error: error.message || "Google auth failed." });
-  }
-});
-
-app.post("/api/login", async (req, res) => {
-  try {
-    const email = normalizeEmail(req.body.email);
-    const password = String(req.body.password || "");
-
-    const user = db.users.find(u => normalizeEmail(u.email) === email);
-    if (!user || !user.passwordHash) {
-      return res.status(400).json({ error: "Invalid email or password." });
-    }
-
-    const match = await bcrypt.compare(password, user.passwordHash);
-    if (!match) {
-      return res.status(400).json({ error: "Invalid email or password." });
-    }
-
-    req.session.userId = user.id;
-    return res.json({ success: true, user: publicUser(user) });
-  } catch (err) {
-    return res.status(500).json({ error: "Login failed." });
-  }
-});
-
-app.post("/api/register", async (req, res) => {
-  try {
-    const email = normalizeEmail(req.body.email);
-    const name = cleanText(req.body.name, 100);
-    const mobile = cleanText(req.body.mobile, 15);
-    const city = cleanText(req.body.city, 50);
-    const password = String(req.body.password || "");
-
-    if (!validEmail(email)) return res.status(400).json({ error: "Invalid email address." });
-    if (password.length < 6) return res.status(400).json({ error: "Password must be at least 6 characters." });
-
-    const existing = db.users.find(u => normalizeEmail(u.email) === email);
-    if (existing) return res.status(400).json({ error: "Email already registered." });
-
-    const passwordHash = await bcrypt.hash(password, 10);
-    const user = {
-      id: crypto.randomUUID(),
-      name,
-      email,
-      mobile,
-      city,
-      passwordHash,
-      role: "Member",
-      balance: 0,
-      emailVerified: false,
-      mobileVerified: false,
-      authProvider: "local",
-      createdAt: new Date().toISOString()
-    };
-
-    db.users.push(user);
-    saveDB(db);
-
-    req.session.userId = user.id;
-    return res.json({ success: true, user: publicUser(user) });
-  } catch (err) {
-    return res.status(500).json({ error: "Registration failed." });
-  }
-});
-
-app.get("/api/me", (req, res) => {
-  return res.json(publicUser(currentUser(req)));
-});
-
-app.get("/api/tasks", requireLogin, (req, res) => {
-  return res.json(db.tasks.filter(t => t.active !== false));
-});
-
-app.post("/api/submissions", requireLogin, (req, res) => {
-  const { taskId, proofText, proofImage } = req.body;
-  const sub = {
-    id: crypto.randomUUID(),
-    userId: req.user.id,
-    taskId: Number(taskId),
-    proofText: cleanText(proofText, 500),
-    proofImage: proofImage || "",
-    status: "Pending",
-    createdAt: new Date().toISOString()
-  };
-  db.submissions.push(sub);
-  saveDB(db);
-  return res.json({ success: true, submission: sub });
-});
-
-app.get("/api/submissions/me", requireLogin, (req, res) => {
-  const userSubs = db.submissions.filter(s => String(s.userId) === String(req.user.id));
-  return res.json(userSubs);
-});
-
-app.post("/api/withdrawals", requireLogin, (req, res) => {
-  const { amount, paymentMethod, details } = req.body;
-  const numAmount = Number(amount);
-
-  if (numAmount > (req.user.balance || 0)) {
-    return res.status(400).json({ error: "Insufficient balance." });
-  }
-
-  const withdrawal = {
-    id: crypto.randomUUID(),
-    userId: req.user.id,
-    amount: numAmount,
-    paymentMethod: cleanText(paymentMethod, 50),
-    details: cleanText(details, 200),
-    status: "Pending",
-    createdAt: new Date().toISOString()
-  };
-
-  db.withdrawals.push(withdrawal);
-  saveDB(db);
-  return res.json({ success: true, withdrawal });
-});
-
-app.get("/api/withdrawals/me", requireLogin, (req, res) => {
-  const userList = db.withdrawals.filter(w => String(w.userId) === String(req.user.id));
-  return res.json(userList);
-});
-
-app.post("/api/logout", (req, res) => {
-  req.session.destroy(() => {
-    res.clearCookie("connect.sid");
-    return res.json({ message: "Logged out successfully" });
   });
+
+  let data = null;
+  try { data = await res.json(); } catch {}
+
+  if (!res.ok) {
+    throw new Error(data?.error || "An unexpected error occurred.");
+  }
+  return data;
+}
+
+function showAuthMessage(msg, type = "error") {
+  const box = document.getElementById("authMessage");
+  if (!msg) {
+    box.classList.add("hidden");
+    return;
+  }
+  box.className = "notice " + type;
+  box.textContent = msg;
+  box.classList.remove("hidden");
+}
+
+/* AUTHENTICATION & VIEWS CONTROL */
+function openAuth(mode = "login") {
+  document.getElementById("homeArea").classList.add("hidden");
+  document.getElementById("appArea").classList.add("hidden");
+  document.getElementById("authArea").classList.remove("hidden");
+  showAuthMode(mode);
+}
+
+function showAuthMode(mode) {
+  document.getElementById("loginForm").classList.toggle("hidden", mode !== "login");
+  document.getElementById("registerForm").classList.toggle("hidden", mode !== "register");
+  document.getElementById("loginTab").classList.toggle("active", mode === "login");
+  document.getElementById("registerTab").classList.toggle("active", mode === "register");
+  showAuthMessage("");
+  renderGoogleButtons();
+}
+
+function updateNavigationUI() {
+  const isLoggedIn = !!currentUser;
+  document.getElementById("mainNav").style.display = isLoggedIn ? "flex" : "none";
+  document.getElementById("headerProfile").style.display = isLoggedIn ? "block" : "none";
+  
+  const bottom = document.getElementById("mobileBottomNav");
+  if (isLoggedIn) {
+    bottom.classList.add("logged-in");
+    document.getElementById("headerAvatarInitials").textContent = (currentUser.name || "U").charAt(0).toUpperCase();
+    document.getElementById("profilePanelName").textContent = currentUser.name || "User";
+    document.getElementById("profilePanelEmail").textContent = currentUser.email || "";
+  } else {
+    bottom.classList.remove("logged-in");
+  }
+}
+
+function toggleProfilePanel(e) {
+  e.stopPropagation();
+  document.getElementById("profilePanel").classList.toggle("open");
+}
+
+window.addEventListener("click", () => {
+  const panel = document.getElementById("profilePanel");
+  if (panel) panel.classList.remove("open");
 });
 
-/* Static Files Serving */
-app.use(express.static(path.join(__dirname, "public")));
+/* GOOGLE AUTHENTICATION */
+async function renderGoogleButtons() {
+  if (!window.google || !window.google.accounts) return;
+  try {
+    const { clientId } = await api("/api/google-config");
+    if (!clientId) return;
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
+    window.google.accounts.id.initialize({
+      client_id: clientId,
+      callback: async (res) => {
+        if (res.credential) {
+          try {
+            showAuthMessage("Signing in with Google...", "success");
+            const data = await api("/api/auth/google", {
+              method: "POST",
+              body: JSON.stringify({ credential: res.credential })
+            });
+            currentUser = data.user;
+            updateNavigationUI();
+            renderTasksView();
+          } catch (err) {
+            showAuthMessage(err.message);
+          }
+        }
+      }
+    });
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server running on port ${PORT}`);
+    const lBtn = document.getElementById("googleLoginButton");
+    const rBtn = document.getElementById("googleRegisterButton");
+    if (lBtn) { lBtn.innerHTML = ""; window.google.accounts.id.renderButton(lBtn, { theme: "outline", size: "large" }); }
+    if (rBtn) { rBtn.innerHTML = ""; window.google.accounts.id.renderButton(rBtn, { theme: "outline", size: "large" }); }
+  } catch {}
+}
+
+/* REGISTER & LOGIN HANDLERS */
+async function registerUser(e) {
+  e.preventDefault();
+  const btn = document.getElementById("btnRegisterSubmit");
+  btn.disabled = true; btn.textContent = "Creating Account...";
+
+  try {
+    const data = await api("/api/register", {
+      method: "POST",
+      body: JSON.stringify({
+        name: document.getElementById("registerName").value,
+        email: document.getElementById("registerEmail").value,
+        mobile: document.getElementById("registerMobile").value,
+        city: document.getElementById("registerCity").value,
+        password: document.getElementById("registerPassword").value
+      })
+    });
+
+    if (data.verificationRequired) {
+      isProfileVerification = false;
+      openOtpModal(data.step, data.email, data.mobile);
+    }
+  } catch (err) {
+    showAuthMessage(err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = "Create Account";
+  }
+}
+
+async function loginUser(e) {
+  e.preventDefault();
+  const btn = document.getElementById("btnLoginSubmit");
+  btn.disabled = true; btn.textContent = "Logging in...";
+
+  try {
+    const data = await api("/api/login", {
+      method: "POST",
+      body: JSON.stringify({
+        email: document.getElementById("loginEmail").value,
+        password: document.getElementById("loginPassword").value,
+        remember: document.getElementById("loginRemember").checked
+      })
+    });
+
+    if (data.user) {
+      currentUser = data.user;
+      updateNavigationUI();
+      renderTasksView();
+      return;
+    }
+
+    if (data.verificationRequired) {
+      isProfileVerification = false;
+      openOtpModal(data.step, data.email, data.mobile);
+    }
+  } catch (err) {
+    showAuthMessage(err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = "Login";
+  }
+}
+
+/* OTP MODAL & VERIFICATION */
+function openOtpModal(step, email, mobile) {
+  const title = document.getElementById("otpTitle");
+  const msg = document.getElementById("otpMessage");
+
+  if (step === "email") {
+    title.textContent = "Verify Email Address";
+    msg.textContent = `A 6-digit OTP code has been sent to ${email}.`;
+  } else {
+    title.textContent = "Verify Mobile Number";
+    msg.textContent = `A 6-digit OTP code has been sent to ${mobile}.`;
+  }
+
+  document.getElementById("otpInput").value = "";
+  document.getElementById("otpModal").classList.add("open");
+}
+
+function closeOtpModal() {
+  document.getElementById("otpModal").classList.remove("open");
+}
+
+async function verifyOtp() {
+  const otp = document.getElementById("otpInput").value.trim();
+  if (!/^\d{6}$/.test(otp)) {
+    alert("Please enter a valid 6-digit OTP.");
+    return;
+  }
+
+  const btn = document.getElementById("btnVerifyOtp");
+  btn.disabled = true; btn.textContent = "Verifying...";
+
+  const endpoint = isProfileVerification ? "/api/profile/verify-otp" : "/api/verify-otp";
+
+  try {
+    const data = await api(endpoint, {
+      method: "POST",
+      body: JSON.stringify({ otp })
+    });
+
+    if (data.step === "mobile") {
+      openOtpModal("mobile", data.email, data.mobile);
+      return;
+    }
+
+    if (data.user) {
+      currentUser = data.user;
+      closeOtpModal();
+      updateNavigationUI();
+      if (isProfileVerification) {
+        alert("Mobile number verified successfully!");
+        renderProfileView();
+      } else {
+        renderTasksView();
+      }
+    }
+  } catch (err) {
+    alert(err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = "Verify OTP";
+  }
+}
+
+async function resendOtp() {
+  const endpoint = isProfileVerification ? "/api/profile/resend-otp" : "/api/resend-otp";
+  try {
+    const data = await api(endpoint, { method: "POST" });
+    alert(data.message || "OTP resent successfully.");
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+/* ROUTING & VIEWS RENDERING */
+function setActiveNav(tab) {
+  activeTab = tab;
+  document.querySelectorAll(".nav button").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".bottom-item").forEach(b => b.classList.remove("active"));
+
+  const navBtn = document.getElementById("nav" + tab.charAt(0).toUpperCase() + tab.slice(1));
+  const mbBtn = document.getElementById("mb" + tab.charAt(0).toUpperCase() + tab.slice(1));
+  if (navBtn) navBtn.classList.add("active");
+  if (mbBtn) mbBtn.classList.add("active");
+
+  document.getElementById("homeArea").classList.add("hidden");
+  document.getElementById("authArea").classList.add("hidden");
+  document.getElementById("appArea").classList.remove("hidden");
+}
+
+/* 1. TASKS VIEW */
+async function renderTasksView() {
+  if (!currentUser) return openAuth("login");
+  setActiveNav("tasks");
+
+  const app = document.getElementById("appContent");
+  app.innerHTML = `
+    <div class="card">
+      <h2>Available Tasks 📋</h2>
+      <p class="muted">Complete any task below and submit it for approval.</p>
+    </div>
+    <div id="tasksList">Loading available tasks...</div>
+  `;
+
+  try {
+    const tasks = await api("/api/tasks");
+    const container = document.getElementById("tasksList");
+
+    if (!tasks || !tasks.length) {
+      container.innerHTML = `<div class="card"><p class="muted">No active tasks available right now.</p></div>`;
+      return;
+    }
+
+    container.innerHTML = `<div class="grid">` + tasks.map(t => `
+      <div class="card" style="display:flex; flex-direction:column; justify-content:space-between;">
+        <div>
+          <span class="badge pending">${escapeHtml(t.type || "General")}</span>
+          <h3 style="margin:10px 0 5px;">${escapeHtml(t.title)}</h3>
+          <p class="muted" style="font-size:14px; margin-bottom:15px;">${escapeHtml(t.description)}</p>
+        </div>
+        <div>
+          <div class="reward">₹${Number(t.reward).toFixed(2)}</div>
+          <button class="primary" onclick="submitTask(${t.id}, this)">Submit Task</button>
+        </div>
+      </div>
+    `).join("") + `</div>`;
+  } catch (err) {
+    app.innerHTML = `<div class="notice error">${escapeHtml(err.message)}</div>`;
+  }
+}
+
+async function submitTask(taskId, btn) {
+  btn.disabled = true; btn.textContent = "Submitting...";
+  try {
+    const data = await api(`/api/tasks/${taskId}/submit`, { method: "POST" });
+    alert(data.message || "Task submitted successfully.");
+    renderSubmissionsView();
+  } catch (err) {
+    alert(err.message);
+    btn.disabled = false; btn.textContent = "Submit Task";
+  }
+}
+
+/* 2. SUBMISSIONS VIEW */
+async function renderSubmissionsView() {
+  if (!currentUser) return openAuth("login");
+  setActiveNav("submissions");
+
+  const app = document.getElementById("appContent");
+  app.innerHTML = `
+    <div class="card">
+      <h2>My Submissions 📜</h2>
+      <p class="muted">Track the review status of your completed tasks.</p>
+    </div>
+    <div id="submissionsList">Loading submissions...</div>
+  `;
+
+  try {
+    const list = await api("/api/my-submissions");
+    const container = document.getElementById("submissionsList");
+
+    if (!list || !list.length) {
+      container.innerHTML = `<div class="card"><p class="muted">You haven't submitted any tasks yet.</p></div>`;
+      return;
+    }
+
+    container.innerHTML = list.map(s => `
+      <div class="card" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+        <div>
+          <h4 style="margin:0 0 5px;">${escapeHtml(s.taskTitle)}</h4>
+          <span class="muted" style="font-size:12px;">Submitted: ${new Date(s.submittedAt).toLocaleString()}</span>
+        </div>
+        <div style="text-align:right;">
+          <div class="reward" style="font-size:18px;">+₹${Number(s.reward).toFixed(2)}</div>
+          <span class="badge ${s.status}">${escapeHtml(s.status)}</span>
+        </div>
+      </div>
+    `).join("");
+  } catch (err) {
+    app.innerHTML = `<div class="notice error">${escapeHtml(err.message)}</div>`;
+  }
+}
+
+/* 3. WALLET VIEW & WITHDRAWAL */
+async function renderWalletView() {
+  if (!currentUser) return openAuth("login");
+  setActiveNav("wallet");
+
+  const app = document.getElementById("appContent");
+  app.innerHTML = `
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
+        <div>
+          <span class="muted">Wallet Balance</span>
+          <h1 style="margin:5px 0; font-size:36px; color:#13a05a;">₹<span id="walletBalance">0.00</span></h1>
+        </div>
+        <button class="primary" style="width:auto; padding:12px 24px;" onclick="openWithdrawModal()">Request Withdrawal</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Withdrawal History</h3>
+      <div id="withdrawalsList">Loading history...</div>
+    </div>
+
+    <!-- WITHDRAW MODAL -->
+    <div id="withdrawModal" class="modal">
+      <div class="modal-box">
+        <div class="modal-head">
+          <h3 style="margin:0;">Withdraw Funds</h3>
+          <button class="close" onclick="closeWithdrawModal()">×</button>
+        </div>
+        <form onsubmit="handleWithdraw(event)">
+          <label>Amount (₹) (Min ₹100)</label>
+          <input id="withdrawAmount" type="number" min="100" step="1" required placeholder="100">
+          <br><br>
+          <label>Payment Method</label>
+          <select id="withdrawMethod" onchange="togglePaymentFields()">
+            <option value="UPI">UPI</option>
+            <option value="Bank Account">Bank Account</option>
+          </select>
+          <br><br>
+
+          <div id="upiFields">
+            <label>UPI ID</label>
+            <input id="withdrawUpiId" type="text" placeholder="username@upi">
+          </div>
+
+          <div id="bankFields" class="hidden">
+            <label>Account Holder Name</label>
+            <input id="withdrawBankName" type="text" placeholder="John Doe">
+            <br><br>
+            <label>Account Number</label>
+            <input id="withdrawAccNo" type="text" placeholder="1234567890">
+            <br><br>
+            <label>IFSC Code</label>
+            <input id="withdrawIfsc" type="text" placeholder="SBIN0001234">
+            <br><br>
+            <label>Bank Name</label>
+            <input id="withdrawBank" type="text" placeholder="State Bank of India">
+          </div>
+          <br>
+          <button class="primary" type="submit" id="btnWithdrawSubmit">Submit Request</button>
+        </form>
+      </div>
+    </div>
+  `;
+
+  try {
+    const data = await api("/api/wallet");
+    currentUser.balance = data.balance;
+    document.getElementById("walletBalance").textContent = Number(data.balance || 0).toFixed(2);
+
+    const historyBox = document.getElementById("withdrawalsList");
+    if (!data.withdrawals || !data.withdrawals.length) {
+      historyBox.innerHTML = `<p class="muted">No withdrawal history found.</p>`;
+      return;
+    }
+
+    historyBox.innerHTML = data.withdrawals.map(w => `
+      <div style="padding:12px 0; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <strong>₹${Number(w.amount).toFixed(2)} via ${escapeHtml(w.method)}</strong>
+          <div class="muted" style="font-size:12px;">${new Date(w.createdAt).toLocaleString()}</div>
+        </div>
+        <span class="badge ${w.status}">${escapeHtml(w.status)}</span>
+      </div>
+    `).join("");
+  } catch (err) {
+    app.innerHTML = `<div class="notice error">${escapeHtml(err.message)}</div>`;
+  }
+}
+
+function openWithdrawModal() { document.getElementById("withdrawModal").classList.add("open"); }
+function closeWithdrawModal() { document.getElementById("withdrawModal").classList.remove("open"); }
+
+function togglePaymentFields() {
+  const method = document.getElementById("withdrawMethod").value;
+  document.getElementById("upiFields").classList.toggle("hidden", method !== "UPI");
+  document.getElementById("bankFields").classList.toggle("hidden", method !== "Bank Account");
+}
+
+async function handleWithdraw(e) {
+  e.preventDefault();
+  const btn = document.getElementById("btnWithdrawSubmit");
+  btn.disabled = true; btn.textContent = "Processing...";
+
+  const method = document.getElementById("withdrawMethod").value;
+  const amount = Number(document.getElementById("withdrawAmount").value);
+  
+  let paymentDetails = {};
+  if (method === "UPI") {
+    paymentDetails = { upiId: document.getElementById("withdrawUpiId").value };
+  } else {
+    paymentDetails = {
+      accountHolderName: document.getElementById("withdrawBankName").value,
+      accountNumber: document.getElementById("withdrawAccNo").value,
+      ifscCode: document.getElementById("withdrawIfsc").value,
+      bankName: document.getElementById("withdrawBank").value
+    };
+  }
+
+  try {
+    const res = await api("/api/withdraw", {
+      method: "POST",
+      body: JSON.stringify({ amount, method, paymentDetails })
+    });
+    alert(res.message);
+    closeWithdrawModal();
+    renderWalletView();
+  } catch (err) {
+    alert(err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = "Submit Request";
+  }
+}
+
+/* 4. PROFILE VIEW & UPDATES */
+async function renderProfileView() {
+  if (!currentUser) return openAuth("login");
+  setActiveNav("profile");
+
+  const app = document.getElementById("appContent");
+  app.innerHTML = `
+    <div class="card" style="max-width:600px; margin:0 auto;">
+      <h2>User Profile 👤</h2>
+      <div id="profileNotice" class="hidden"></div>
+      
+      <form onsubmit="saveProfile(event)">
+        <label>Full Name</label>
+        <input id="profName" type="text" required value="${escapeHtml(currentUser.name)}">
+        <br><br>
+        <label>Email Address</label>
+        <input type="text" disabled value="${escapeHtml(currentUser.email)}" style="background:#f1f3f7;">
+        <span class="muted" style="font-size:12px;">Email cannot be changed directly.</span>
+        <br><br>
+        <label>Mobile Number</label>
+        <input id="profMobile" type="tel" value="${escapeHtml(currentUser.mobile)}" placeholder="+919876543210">
+        <span class="muted" style="font-size:12px;">
+          Status: ${currentUser.mobileVerified ? '✅ Verified' : '❌ Not Verified'}
+        </span>
+        <br><br>
+        <label>City</label>
+        <input id="profCity" type="text" required value="${escapeHtml(currentUser.city)}">
+        <br><br>
+        <button class="primary" type="submit" id="btnSaveProfile">Save Profile</button>
+      </form>
+    </div>
+  `;
+}
+
+async function saveProfile(e) {
+  e.preventDefault();
+  const btn = document.getElementById("btnSaveProfile");
+  btn.disabled = true; btn.textContent = "Saving...";
+
+  try {
+    const data = await api("/api/profile", {
+      method: "PUT",
+      body: JSON.stringify({
+        name: document.getElementById("profName").value,
+        mobile: document.getElementById("profMobile").value,
+        city: document.getElementById("profCity").value
+      })
+    });
+
+    if (data.verificationRequired) {
+      isProfileVerification = true;
+      openOtpModal("mobile", currentUser.email, document.getElementById("profMobile").value);
+    } else {
+      currentUser = data.user;
+      alert(data.message || "Profile updated.");
+      renderProfileView();
+    }
+  } catch (err) {
+    alert(err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = "Save Profile";
+  }
+}
+
+/* SESSION, LOGOUT & LOGO NAVIGATION */
+async function logoutUser() {
+  try { await api("/api/logout", { method: "POST" }); } catch {}
+  currentUser = null;
+  updateNavigationUI();
+  document.getElementById("appArea").classList.add("hidden");
+  document.getElementById("authArea").classList.add("hidden");
+  document.getElementById("homeArea").classList.remove("hidden");
+}
+
+function handleLogoClick() {
+  if (currentUser) {
+    renderTasksView();
+  } else {
+    document.getElementById("appArea").classList.add("hidden");
+    document.getElementById("authArea").classList.add("hidden");
+    document.getElementById("homeArea").classList.remove("hidden");
+  }
+}
+
+async function checkSession() {
+  try {
+    const user = await api("/api/me");
+    if (user && user.id) {
+      currentUser = user;
+      updateNavigationUI();
+      renderTasksView();
+    } else {
+      currentUser = null;
+      updateNavigationUI();
+      document.getElementById("appArea").classList.add("hidden");
+      document.getElementById("authArea").classList.add("hidden");
+      document.getElementById("homeArea").classList.remove("hidden");
+    }
+  } catch {
+    currentUser = null;
+    updateNavigationUI();
+    document.getElementById("appArea").classList.add("hidden");
+    document.getElementById("authArea").classList.add("hidden");
+    document.getElementById("homeArea").classList.remove("hidden");
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  checkSession();
 });
