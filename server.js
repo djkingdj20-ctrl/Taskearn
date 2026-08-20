@@ -1,6 +1,8 @@
 require("dotenv").config();
 const express = require("express");
 const session = require("express-session");
+const MemoryStore = require("memorystore")(session);
+
 const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
@@ -85,17 +87,14 @@ let db = loadDB();
 
 app.use(
   session({
-    secret: SESSION_SECRET,
-    resave: true,
-    saveUninitialized: true,
-    cookie: {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: false, // Set to true if pure HTTPS domain
-      maxAge: 1000 * 60 * 60 * 24
-    }
+    cookie: { maxAge: 86400000, httpOnly: true, sameSite: "lax" },
+    store: new MemoryStore({ checkPeriod: 86400000 }),
+    resave: false,
+    saveUninitialized: false,
+    secret: SESSION_SECRET
   })
 );
+
 
 /* =====================================================
    HELPERS & VALIDATIONS
