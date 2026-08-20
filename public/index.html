@@ -1,1 +1,2897 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>TaskEarn</title><script src="https://accounts.google.com/gsi/client" async defer></script><style>*{box-sizing:border-box}html,body{margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;background:#f7f8fc;color:#171b2d}button,input,select,textarea{font:inherit}button{cursor:pointer}.header{position:sticky;top:0;z-index:1000;background:rgba(255,255,255,.96);backdrop-filter:blur(18px);border-bottom:1px solid #e8eaf0}.header-inner{max-width:1100px;margin:auto;min-height:70px;padding:10px 18px;display:flex;align-items:center;justify-content:space-between}.logo{font-size:24px;font-weight:900;color:#ff5d2e}.nav{display:flex;align-items:center;gap:8px}.nav button{border:0;background:transparent;padding:10px 14px;border-radius:12px;font-weight:700;color:#596174}.nav button:hover,.nav button.active{background:#fff1eb;color:#ff5d2e}.header-profile{position:relative}.profile-avatar-button{width:44px;height:44px;border:0;border-radius:50%;background:#ff5d2e;color:white;font-weight:900}.header-profile-panel{position:absolute;right:0;top:52px;width:230px;background:white;border:1px solid #e7e9ef;border-radius:18px;box-shadow:0 15px 40px rgba(20,30,60,.16);padding:12px;display:none}.header-profile-panel.open{display:block}.header-profile-panel button{width:100%;border:0;background:transparent;text-align:left;padding:12px;border-radius:12px;font-weight:700}.header-profile-panel button:hover{background:#f5f6fa}.container{max-width:1100px;margin:auto;padding:25px 18px 100px}.hero{padding:50px 0 30px}.hero h1{font-size:clamp(36px,7vw,68px);line-height:1;margin:0 0 18px}.hero h1 span{color:#ff5d2e}.hero p{max-width:680px;color:#697286;font-size:17px;line-height:1.7}.card{background:white;border:1px solid #e7e9ef;border-radius:20px;padding:22px;margin-bottom:18px;box-shadow:0 8px 25px rgba(20,30,60,.05)}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.full{grid-column:1/-1}label{display:block;font-weight:700;margin-bottom:7px;font-size:14px}input,select,textarea{width:100%;padding:13px 14px;border:1px solid #dfe2e9;border-radius:12px;outline:none;background:white}input:focus,select:focus,textarea:focus{border-color:#ff5d2e;box-shadow:0 0 0 3px rgba(255,93,46,.1)}.primary{width:100%;border:0;background:#ff5d2e;color:white;padding:14px 18px;border-radius:13px;font-weight:800}.primary:hover{opacity:.92}.secondary{border:1px solid #e0e3ea;background:white;color:#30374a;padding:12px 16px;border-radius:12px;font-weight:700}.danger{background:#fff0f0!important;color:#d73535!important}.muted{color:#70798b}.hidden{display:none!important}.notice{padding:13px 15px;border-radius:12px;margin-bottom:15px;font-weight:700}.notice.error{background:#fff0f0;color:#c92e2e}.notice.success{background:#ecfff3;color:#168346}.auth-tabs{display:flex;gap:8px;margin-bottom:18px}.auth-tabs button{flex:1;padding:12px;border:0;border-radius:12px;background:#f1f3f7;font-weight:800}.auth-tabs button.active{background:#ff5d2e;color:white}.google-area{margin-top:15px;text-align:center}.divider{display:flex;align-items:center;gap:10px;margin:18px 0;color:#8a92a2;font-size:13px}.divider::before,.divider::after{content:"";height:1px;background:#e3e5eb;flex:1}.task-card h3{margin-top:0}.reward{font-size:20px;font-weight:900;color:#13a05a}.stat{text-align:center}.stat b{display:block;font-size:26px;margin-top:8px}.account-menu{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.account-option{border:1px solid #e3e5eb;background:white;border-radius:15px;padding:17px;font-weight:800}.account-option:hover{border-color:#ff5d2e;background:#fff8f5}.modal{position:fixed;inset:0;background:rgba(10,15,30,.55);display:none;align-items:center;justify-content:center;z-index:2000;padding:18px}.modal.open{display:flex}.modal-box{width:min(500px,100%);max-height:90vh;overflow:auto;background:white;border-radius:22px;padding:22px}.modal-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.close{border:0;background:#f1f3f7;width:36px;height:36px;border-radius:50%;font-size:20px}.mobile-bottom-nav{position:fixed;display:none;left:10px;right:10px;bottom:10px;height:60px;z-index:1500;background:rgba(255,255,255,.96);backdrop-filter:blur(18px);border:1px solid #e7e9ef;border-radius:20px;box-shadow:0 12px 35px rgba(20,30,60,.16);align-items:center;justify-content:space-around;padding:5px}.mobile-bottom-nav.logged-in{display:flex}.bottom-item{border:0;background:transparent;height:50px;min-width:75px;border-radius:15px;color:#70798b;font-size:10px;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}.bottom-item span:first-child{font-size:20px}.bottom-item.active{background:#fff1eb;color:#ff5d2e}@media(max-width:760px){.nav{display:none}.grid{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.full{grid-column:auto}.account-menu{grid-template-columns:1fr}.container{padding-bottom:90px}}</style></head><body><header class="header"><div class="header-inner"><div class="logo" onclick="goPublicHome()" style="cursor:pointer;">TaskEarn</div><nav id="mainNav" class="nav"><button onclick="tasksHome()" id="navTasks">Tasks</button><button onclick="walletHome()" id="navWallet">Wallet</button><button onclick="profileHome()" id="navProfile">Profile</button></nav><div id="headerProfile" class="header-profile" style="display:none;"><button id="headerAvatarButton" class="profile-avatar-button" onclick="toggleProfilePanel(event)"><span id="headerAvatarInitials">U</span></button><div id="profilePanel" class="header-profile-panel"><div id="profilePanelName" style="font-weight:900;padding:10px;">User</div><div id="profilePanelEmail" class="muted" style="padding:0 10px 10px;font-size:13px;"></div><button onclick="profileHome()">👤 Profile</button><button onclick="walletHome()">💰 Wallet</button><button class="danger" onclick="logoutUser()">🚪 Logout</button></div></div></div></header><main class="container"><section id="homeArea"><div id="publicHero" class="hero"><h1>Complete Tasks.<br><span>Earn Rewards.</span></h1><p>Welcome to TaskEarn. Complete available tasks, submit them for review and earn approved rewards.</p><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;"><button class="primary" style="width:auto;" onclick="openAuth('register')">Get Started</button><button class="secondary" onclick="openAuth('login')">Login</button></div></div><div id="loggedInWelcome" style="display:none;"></div><div class="features"><div class="grid"><div class="card"><h3>📋 Tasks</h3><p class="muted">Find available online tasks.</p></div><div class="card"><h3>💰 Rewards</h3><p class="muted">Earn rewards for approved work.</p></div><div class="card"><h3>🔐 Secure</h3><p class="muted">Email OTP and Google authentication.</p></div></div></div></section><section id="authArea" class="hidden"><div class="card" style="max-width:520px;margin:25px auto;"><div class="auth-tabs"><button id="loginTab" onclick="showAuthMode('login')">Login</button><button id="registerTab" onclick="showAuthMode('register')">Register</button></div><div id="authMessage" class="hidden"></div><form id="loginForm" onsubmit="loginUser(event)"><h2>Welcome Back 👋</h2><p class="muted">Login using your email or Google account.</p><label>Email</label><input id="loginEmail" type="email" required autocomplete="email"><br><br><label>Password</label><input id="loginPassword" type="password" required autocomplete="current-password"><br><label style="display:flex;gap:8px;align-items:center;font-weight:600;"><input id="loginRemember" type="checkbox" style="width:auto;">Remember me</label><br><button class="primary" type="submit">Login</button><div class="divider">OR</div><div id="googleLoginButton" class="google-area"></div></form><form id="registerForm" class="hidden" onsubmit="registerUser(event)"><h2>Create Account 🚀</h2><p class="muted">Create your TaskEarn account.</p><label>Full Name</label><input id="registerName" type="text" required maxlength="80" autocomplete="name"><br><br><label>Gmail / Email</label><input id="registerEmail" type="email" required autocomplete="email"><br><br><label>Mobile Number</label><input id="registerMobile" type="tel" required placeholder="+919876543210" autocomplete="tel"><br><br><label>City</label><input id="registerCity" type="text" required maxlength="80" autocomplete="address-level2"><br><br><label>Password</label><input id="registerPassword" type="password" required minlength="6" autocomplete="new-password"><br><label style="display:flex;gap:8px;align-items:center;font-weight:600;"><input id="registerRemember" type="checkbox" style="width:auto;">Remember me</label><br><button class="primary" type="submit">Create Account</button><div class="divider">OR</div><div id="googleRegisterButton" class="google-area"></div><p class="muted" style="font-size:12px;">Google registration verifies your Gmail automatically. You can add your mobile number and city later from Profile.</p></form></div></section><section id="appArea" class="hidden"><div id="appContent"></div></section></main><div id="otpModal" class="modal"><div class="modal-box"><div class="modal-head"><h2 id="otpTitle">Verify OTP</h2><button class="close" onclick="closeOtpModal()">×</button></div><div id="otpMessage" class="muted" style="margin-bottom:15px;">Enter the OTP sent to you.</div><input id="otpInput" type="text" inputmode="numeric" maxlength="6" placeholder="6-digit OTP" autocomplete="one-time-code"><br><br><button class="primary" onclick="verifyOtp()">Verify OTP</button><br><br><button class="secondary" style="width:100%;" onclick="resendOtp()">Resend OTP</button></div></div><div id="profileOtpModal" class="modal"><div class="modal-box"><div class="modal-head"><h2>Verify Mobile</h2><button class="close" onclick="closeProfileOtp()">×</button></div><p class="muted">Enter the OTP sent to your new mobile number.</p><input id="profileOtpInput" type="text" inputmode="numeric" maxlength="6" placeholder="6-digit OTP"><br><br><button class="primary" onclick="verifyProfileOtp()">Verify Mobile</button><br><br><button class="secondary" style="width:100%;" onclick="resendProfileOtp()">Resend OTP</button></div></div><div id="mobileBottomNav" class="mobile-bottom-nav"><button class="bottom-item active" onclick="tasksHome()"><span>🏠</span><span>Tasks</span></button><button class="bottom-item" onclick="walletHome()"><span>💰</span><span>Wallet</span></button><button class="bottom-item" onclick="profileHome()"><span>👤</span><span>Profile</span></button></div><script>let currentUser=null,currentAuthMode="login";function escapeHtml(e){return String(e||"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}async function api(e,t={}){const r=await fetch(e,{credentials:"same-origin",...t,headers:{"Content-Type":"application/json",...(t.headers||{})}});let a=null;try{a=await r.json()}catch{a=null}if(!r.ok)throw new Error(a?.error||"Something went wrong.");return a}function showMessage(e,t="error"){const r=document.getElementById("authMessage");r&&(r.className="notice "+t,r.textContent=e)}function showAuthArea(){document.getElementById("authArea").classList.remove("hidden"),document.getElementById("homeArea").classList.add("hidden"),document.getElementById("appArea").classList.add("hidden")}function showAppArea(){document.getElementById("authArea").classList.add("hidden"),document.getElementById("homeArea").classList.remove("hidden"),document.getElementById("appArea").classList.remove("hidden")}function openAuth(e="login"){showAuthArea(),showAuthMode(e),window.scrollTo({top:0,behavior:"smooth"})}function showAuthMode(e){currentAuthMode=e;const t=document.getElementById("loginForm"),r=document.getElementById("registerForm"),a=document.getElementById("loginTab"),l=document.getElementById("registerTab");t.classList.toggle("hidden","login"!==e),r.classList.toggle("hidden","register"!==e),a.classList.toggle("active","login"===e),l.classList.toggle("active","register"===e),showMessage("","success"),document.getElementById("authMessage").classList.add("hidden"),renderGoogleButtons()}function googleCredentialResponse(e){e&&e.credential?googleLogin(e.credential):showMessage("Google authentication failed.")}async function googleLogin(e){try{showMessage("Signing in with Google...","success");const t=await api("/api/auth/google",{method:"POST",body:JSON.stringify({credential:e})});t.user&&(currentUser=t.user,setLoggedInUI(currentUser),tasksHome())}catch(e){showMessage(e.message)}}function renderGoogleButtons(){window.google&&window.google.accounts&&window.google.accounts.id&&loadGoogleClientId().then(e=>{if(!e)return;const t={client_id:e,callback:googleCredentialResponse,auto_select:!1,cancel_on_tap_outside:!0},r=document.getElementById("googleLoginButton"),a=document.getElementById("googleRegisterButton");r&&(r.innerHTML="",window.google.accounts.id.renderButton(r,{theme:"outline",size:"large",width:360,text:"continue_with"})),a&&(a.innerHTML="",window.google.accounts.id.renderButton(a,{theme:"outline",size:"large",width:360,text:"signup_with"})),window.google.accounts.id.initialize(t)}).catch(()=>{})}async function loadGoogleClientId(){try{const e=await fetch("/api/google-config",{credentials:"same-origin"});if(!e.ok)return"";return(await e.json()).clientId||""}catch{return""}}async function registerUser(e){e.preventDefault();try{const e={name:document.getElementById("registerName").value,email:document.getElementById("registerEmail").value,mobile:document.getElementById("registerMobile").value,city:document.getElementById("registerCity").value,password:document.getElementById("registerPassword").value,remember:document.getElementById("registerRemember").checked},t=await api("/api/register",{method:"POST",body:JSON.stringify(e)});t.verificationRequired&&openOtpModal(t.step,t.email,t.mobile)}catch(e){showMessage(e.message)}}async function loginUser(e){e.preventDefault();try{const e={email:document.getElementById("loginEmail").value,password:document.getElementById("loginPassword").value,remember:document.getElementById("loginRemember").checked},t=await api("/api/login",{method:"POST",body:JSON.stringify(e)});if(t.user)return currentUser=t.user,setLoggedInUI(currentUser),void tasksHome();t.verificationRequired&&openOtpModal(t.step,t.email,t.mobile)}catch(e){showMessage(e.message)}}function openOtpModal(e,t,r){const a=document.getElementById("otpTitle"),l=document.getElementById("otpMessage");"email"===e?(a.textContent="Verify Gmail / Email",l.textContent=`Enter the 6-digit OTP sent to ${t}.`):(a.textContent="Verify Mobile",l.textContent=`Enter the 6-digit OTP sent to ${r}.`),document.getElementById("otpInput").value="",document.getElementById("otpModal").classList.add("open"),setTimeout(()=>{document.getElementById("otpInput").focus()},100)}function closeOtpModal(){document.getElementById("otpModal").classList.remove("open")}async function verifyOtp(){const e=document.getElementById("otpInput").value.trim();if(!/^\d{6}$/.test(e))return void alert("Please enter the 6-digit OTP.");try{const t=await api("/api/verify-otp",{method:"POST",body:JSON.stringify({otp:e})});"mobile"===t.step?openOtpModal("mobile",t.email,t.mobile):"complete"===t.step&&t.user&&(currentUser=t.user,closeOtpModal(),setLoggedInUI(currentUser),tasksHome())}catch(e){alert(e.message)}}async function resendOtp(){try{alert((await api("/api/resend-otp",{method:"POST"})).message)}catch(e){alert(e.message)}}function initials(e){return String(e||"User").trim().split(/\s+/).slice(0,2).map(e=>e.charAt(0).toUpperCase()).join("")}function setLoggedInUI(e){const t=document.getElementById("headerProfile"),r=document.getElementById("headerAvatarInitials"),a=document.getElementById("profilePanelName"),l=document.getElementById("profilePanelEmail"),n=document.getElementById("mobileBottomNav");if(e){t.style.display="block",r.textContent=initials(e.name),a.textContent=e.name||"User",l.textContent=e.email||"",n.classList.add("logged-in");const t=document.getElementById("loggedInWelcome");t&&(t.style.display="block",t.innerHTML=`<div class="card"><p class="muted" style="margin:0;">Welcome back</p><h2 style="margin:4px 0;">Hi, ${escapeHtml(e.name||"User")} 👋</h2><p class="muted" style="margin:0;">Complete available tasks and earn approved rewards.</p></div>`)}else t.style.display="none",n.classList.remove("logged-in")}function goPublicHome(){currentUser=null,setLoggedInUI(null),document.getElementById("authArea").classList.add("hidden"),document.getElementById("appArea").classList.add("hidden"),document.getElementById("homeArea").classList.remove("hidden");const e=document.getElementById("publicHero");e&&(e.style.display="block");const t=document.querySelector(".features");t&&(t.style.display="block")}function toggleProfilePanel(e){e.stopPropagation(),document.getElementById("profilePanel").classList.toggle("open")}function closeProfilePanel(){const e=document.getElementById("profilePanel");e&&e.classList.remove("open")}window.addEventListener("click",function(e){e.target.closest(".header-profile")||closeProfilePanel()});async function tasksHome(){if(!currentUser)return void openAuth("login");closeProfilePanel();const e=document.getElementById("appContent");showAppArea(),e.innerHTML=`<div class="card"><h2>Available Tasks 📋</h2><p class="muted">Complete tasks and submit them for review.</p></div><div id="tasksList"><div class="card">Loading tasks...</div></div>`;try{const t=await api("/api/tasks"),r=document.getElementById("tasksList");if(!t.length)return void(r.innerHTML=`<div class="card"><h3>No tasks available</h3><p class="muted">Please check again later.</p></div>`);r.innerHTML=t.map(e=>`<div class="card task-card"><div style="display:flex;justify-content:space-between;gap:15px;"><div><span class="muted">${escapeHtml(e.type)}</span><h3>${escapeHtml(e.title)}</h3></div><div class="reward">₹${Number(e.reward).toFixed(2)}</div></div><p class="muted">${escapeHtml(e.description)}</p><button class="primary" onclick="submitTask(${e.id})">Submit Task</button></div>`).join("")}catch(e){e.innerHTML=`<div class="card"><div class="notice error">${escapeHtml(e.message)}</div></div>`}}async function submitTask(e){if(!confirm("Submit this task for review?"))return;try{const t=await api(`/api/tasks/${e}/submit`,{method:"POST",body:JSON.stringify({})});alert(t.message),tasksHome()}catch(e){alert(e.message)}}async function walletHome(){if(!currentUser)return void openAuth("login");closeProfilePanel(),showAppArea();const e=document.getElementById("appContent");e.innerHTML=`<div class="card"><h2>Wallet 💰</h2><p class="muted">Your TaskEarn earnings and withdrawal history.</p></div><div id="walletContent">Loading wallet...</div>`;try{const t=await api("/api/wallet"),r=t.withdrawals||[];document.getElementById("walletContent").innerHTML=`<div class="grid"><div class="card stat"><span class="muted">Available Balance</span><b>₹${Number(t.balance||0).toFixed(2)}</b></div><div class="card stat"><span class="muted">Completed Tasks</span><b>${Number(t.completed||0)}</b></div><div class="card stat"><span class="muted">Minimum Withdrawal</span><b>₹100</b></div></div><div class="card"><h3>Request Withdrawal</h3><label>Amount</label><input id="withdrawAmount" type="number" min="100" step="0.01" placeholder="100"><br><br><label>Payment Method</label><select id="withdrawMethod" onchange="changePaymentMethod()"><option value="UPI">UPI</option><option value="Bank Account">Bank Account</option></select><br><br><div id="paymentFields"></div><br><button class="primary" onclick="withdrawMoney()">Submit Withdrawal</button></div><div class="card"><h3>Withdrawal History</h3>${r.length?r.map(e=>`<div style="padding:14px 0;border-bottom:1px solid #eee;"><b>₹${Number(e.amount).toFixed(2)}</b><span class="muted">· ${escapeHtml(e.method)}</span><div class="muted" style="font-size:13px;">${escapeHtml(e.status)} · ${new Date(e.createdAt).toLocaleString()}</div></div>`).join(""):`<p class="muted">No withdrawals yet.</p>`}</div>`,changePaymentMethod()}catch(e){document.getElementById("walletContent").innerHTML=`<div class="notice error">${escapeHtml(e.message)}</div>`}}function changePaymentMethod(){const e=document.getElementById("withdrawMethod"),t=document.getElementById("paymentFields");e&&t&&("UPI"===e.value?t.innerHTML=`<label>UPI ID</label><input id="upiId" type="text" placeholder="yourname@upi">`:t.innerHTML=`<label>Account Holder Name</label><input id="accountHolderName" type="text"><br><br><label>Account Number</label><input id="accountNumber" type="text"><br><br><label>IFSC Code</label><input id="ifscCode" type="text" maxlength="11"><br><br><label>Bank Name</label><input id="bankName" type="text">`)}async function withdrawMoney(){const e=Number(document.getElementById("withdrawAmount").value),t=document.getElementById("withdrawMethod").value;let r={};"UPI"===t?r={upiId:document.getElementById("upiId").value}:r={accountHolderName:document.getElementById("accountHolderName").value,accountNumber:document.getElementById("accountNumber").value,ifscCode:document.getElementById("ifscCode").value,bankName:document.getElementById("bankName").value};try{const t=await api("/api/withdraw",{method:"POST",body:JSON.stringify({amount:e,method:t,paymentDetails:r})});alert(t.message),walletHome()}catch(e){alert(e.message)}}async function profileHome(){if(!currentUser)return void openAuth("login");closeProfilePanel(),showAppArea();document.getElementById("appContent").innerHTML=`<div class="card"><h2>My Profile 👤</h2><p class="muted">Update your TaskEarn profile.</p><div id="profileMessage"></div><form onsubmit="saveProfile(event)"><label>Name</label><input id="profileName" value="${escapeHtml(currentUser.name)}" required><br><br><label>Email</label><input value="${escapeHtml(currentUser.email)}" disabled><br><br><label>Mobile</label><input id="profileMobile" value="${escapeHtml(currentUser.mobile)}" placeholder="+919876543210"><br><br><label>City</label><input id="profileCity" value="${escapeHtml(currentUser.city)}" required><br><br><label>Profile Image URL</label><input id="profileImage" value="${escapeHtml(currentUser.profileImage)}" placeholder="https://..."><br><br><button class="primary" type="submit">Save Profile</button></form></div><div class="card"><h3>Account Verification</h3><p>Email: ${currentUser.emailVerified?"✅ Verified":"❌ Not verified"}</p><p>Mobile: ${currentUser.mobileVerified?"✅ Verified":"❌ Not verified"}</p><p>Login method: <b>${escapeHtml(currentUser.authProvider||"local")}</b></p></div><div class="card"><h3>My Submissions</h3><div id="submissionList">Loading...</div></div>`,loadSubmissions()}async function saveProfile(e){e.preventDefault();try{const e=await api("/api/profile",{method:"PUT",body:JSON.stringify({name:document.getElementById("profileName").value,mobile:document.getElementById("profileMobile").value,city:document.getElementById("profileCity").value,profileImage:document.getElementById("profileImage").value})});if(e.verificationRequired)return void document.getElementById("profileOtpModal").classList.add("open");currentUser=e.user,setLoggedInUI(currentUser),alert(e.message),profileHome()}catch(e){const t=document.getElementById("profileMessage");t&&(t.innerHTML=`<div class="notice error">${escapeHtml(e.message)}</div>`)}}function closeProfileOtp(){document.getElementById("profileOtpModal").classList.remove("open")}async function verifyProfileOtp(){const e=document.getElementById("profileOtpInput").value.trim();try{const t=await api("/api/profile/verify-otp",{method:"POST",body:JSON.stringify({otp:e})});currentUser=t.user,closeProfileOtp(),setLoggedInUI(currentUser),alert(t.message),profileHome()}catch(e){alert(e.message)}}async function resendProfileOtp(){try{alert((await api("/api/profile/resend-otp",{method:"POST"})).message)}catch(e){alert(e.message)}}async function loadSubmissions(){try{const e=await api("/api/my-submissions"),t=document.getElementById("submissionList");if(!t)return;if(!e.length)return void(t.innerHTML=`<p class="muted">You have not submitted any tasks yet.</p>`);t.innerHTML=e.map(e=>`<div style="padding:13px 0;border-bottom:1px solid #eee;"><b>${escapeHtml(e.taskTitle)}</b><div class="muted">Reward: ₹${Number(e.reward).toFixed(2)}</div><div class="muted">Status: ${escapeHtml(e.status)}</div></div>`).join("")}catch(e){const t=document.getElementById("submissionList");t&&(t.textContent=e.message)}}async function logoutUser(){try{await api("/api/logout",{method:"POST"}),currentUser=null,closeProfilePanel(),goPublicHome()}catch(e){alert(e.message)}}async function checkSession(){try{const e=await api("/api/me");e?(currentUser=e,setLoggedInUI(e),tasksHome()):(currentUser=null,setLoggedInUI(null),goPublicHome())}catch(e){currentUser=null,setLoggedInUI(null),goPublicHome()}}window.addEventListener("resize",function(){const e=document.getElementById("mobileBottomNav");e&&(currentUser?e.classList.add("logged-in"):e.classList.remove("logged-in"))});appGoogleConfigFix();function appGoogleConfigFix(){setTimeout(renderGoogleButtons,800)}document.addEventListener("DOMContentLoaded",function(){checkSession(),setTimeout(renderGoogleButtons,1200)});</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>TaskEarn</title>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;background:#f7f8fc;color:#171b2d}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+
+.header{position:sticky;top:0;z-index:1000;background:rgba(255,255,255,.96);backdrop-filter:blur(18px);border-bottom:1px solid #e8eaf0}
+.header-inner{max-width:1100px;margin:auto;min-height:70px;padding:10px 18px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:24px;font-weight:900;color:#ff5d2e}
+.nav{display:flex;align-items:center;gap:8px}
+.nav button{border:0;background:transparent;padding:10px 14px;border-radius:12px;font-weight:700;color:#596174}
+.nav button:hover,.nav button.active{background:#fff1eb;color:#ff5d2e}
+
+.header-profile{position:relative}
+.profile-avatar-button{width:44px;height:44px;border:0;border-radius:50%;background:#ff5d2e;color:white;font-weight:900}
+.header-profile-panel{position:absolute;right:0;top:52px;width:230px;background:white;border:1px solid #e7e9ef;border-radius:18px;box-shadow:0 15px 40px rgba(20,30,60,.16);padding:12px;display:none}
+.header-profile-panel.open{display:block}
+.header-profile-panel button{width:100%;border:0;background:transparent;text-align:left;padding:12px;border-radius:12px;font-weight:700}
+.header-profile-panel button:hover{background:#f5f6fa}
+
+.container{max-width:1100px;margin:auto;padding:25px 18px 100px}
+.hero{padding:50px 0 30px}
+.hero h1{font-size:clamp(36px,7vw,68px);line-height:1;margin:0 0 18px}
+.hero h1 span{color:#ff5d2e}
+.hero p{max-width:680px;color:#697286;font-size:17px;line-height:1.7}
+
+.card{background:white;border:1px solid #e7e9ef;border-radius:20px;padding:22px;margin-bottom:18px;box-shadow:0 8px 25px rgba(20,30,60,.05)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.full{grid-column:1/-1}
+
+label{display:block;font-weight:700;margin-bottom:7px;font-size:14px}
+input,select,textarea{width:100%;padding:13px 14px;border:1px solid #dfe2e9;border-radius:12px;outline:none;background:white}
+input:focus,select:focus,textarea:focus{border-color:#ff5d2e;box-shadow:0 0 0 3px rgba(255,93,46,.1)}
+
+.primary{width:100%;border:0;background:#ff5d2e;color:white;padding:14px 18px;border-radius:13px;font-weight:800}
+.primary:hover{opacity:.92}
+.primary:disabled{opacity:.55;cursor:not-allowed}
+
+.secondary{border:1px solid #e0e3ea;background:white;color:#30374a;padding:12px 16px;border-radius:12px;font-weight:700}
+.danger{background:#fff0f0!important;color:#d73535!important}
+.muted{color:#70798b}
+.hidden{display:none!important}
+
+.notice{padding:13px 15px;border-radius:12px;margin-bottom:15px;font-weight:700}
+.notice.error{background:#fff0f0;color:#c92e2e}
+.notice.success{background:#ecfff3;color:#168346}
+.notice.info{background:#eef5ff;color:#2463a8}
+
+.auth-tabs{display:flex;gap:8px;margin-bottom:18px}
+.auth-tabs button{flex:1;padding:12px;border:0;border-radius:12px;background:#f1f3f7;font-weight:800}
+.auth-tabs button.active{background:#ff5d2e;color:white}
+
+.google-area{margin-top:15px;text-align:center}
+.divider{display:flex;align-items:center;gap:10px;margin:18px 0;color:#8a92a2;font-size:13px}
+.divider::before,.divider::after{content:"";height:1px;background:#e3e5eb;flex:1}
+
+.task-card h3{margin-top:0}
+.reward{font-size:20px;font-weight:900;color:#13a05a}
+.stat{text-align:center}
+.stat b{display:block;font-size:26px;margin-top:8px}
+
+.account-menu{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.account-option{border:1px solid #e3e5eb;background:white;border-radius:15px;padding:17px;font-weight:800}
+.account-option:hover{border-color:#ff5d2e;background:#fff8f5}
+
+.modal{position:fixed;inset:0;background:rgba(10,15,30,.55);display:none;align-items:center;justify-content:center;z-index:2000;padding:18px}
+.modal.open{display:flex}
+.modal-box{width:min(500px,100%);max-height:90vh;overflow:auto;background:white;border-radius:22px;padding:22px}
+.modal-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.close{border:0;background:#f1f3f7;width:36px;height:36px;border-radius:50%;font-size:20px}
+
+.otp-status{
+text-align:center;
+font-weight:800;
+font-size:14px;
+margin:12px 0;
+min-height:20px;
+}
+
+.spinner{
+display:inline-block;
+width:16px;
+height:16px;
+border:2px solid rgba(255,255,255,.5);
+border-top-color:#fff;
+border-radius:50%;
+animation:spin .7s linear infinite;
+vertical-align:-3px;
+margin-right:7px;
+}
+
+@keyframes spin{
+to{transform:rotate(360deg)}
+}
+
+.mobile-bottom-nav{position:fixed;display:none;left:10px;right:10px;bottom:10px;height:60px;z-index:1500;background:rgba(255,255,255,.96);backdrop-filter:blur(18px);border:1px solid #e7e9ef;border-radius:20px;box-shadow:0 12px 35px rgba(20,30,60,.16);align-items:center;justify-content:space-around;padding:5px}
+.mobile-bottom-nav.logged-in{display:flex}
+
+.bottom-item{border:0;background:transparent;height:50px;min-width:75px;border-radius:15px;color:#70798b;font-size:10px;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.bottom-item span:first-child{font-size:20px}
+.bottom-item.active{background:#fff1eb;color:#ff5d2e}
+
+@media(max-width:760px){
+.nav{display:none}
+.grid{grid-template-columns:1fr}
+.form-grid{grid-template-columns:1fr}
+.full{grid-column:auto}
+.account-menu{grid-template-columns:1fr}
+.container{padding-bottom:90px}
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+<div class="header-inner">
+
+<div class="logo" onclick="goPublicHome()" style="cursor:pointer;">
+TaskEarn
+</div>
+
+<nav id="mainNav" class="nav">
+<button onclick="tasksHome()" id="navTasks">Tasks</button>
+<button onclick="walletHome()" id="navWallet">Wallet</button>
+<button onclick="profileHome()" id="navProfile">Profile</button>
+</nav>
+
+<div id="headerProfile" class="header-profile" style="display:none;">
+
+<button id="headerAvatarButton"
+class="profile-avatar-button"
+onclick="toggleProfilePanel(event)">
+<span id="headerAvatarInitials">U</span>
+</button>
+
+<div id="profilePanel" class="header-profile-panel">
+
+<div id="profilePanelName" style="font-weight:900;padding:10px;">
+User
+</div>
+
+<div id="profilePanelEmail"
+class="muted"
+style="padding:0 10px 10px;font-size:13px;">
+</div>
+
+<button onclick="profileHome()">👤 Profile</button>
+<button onclick="walletHome()">💰 Wallet</button>
+<button class="danger" onclick="logoutUser()">🚪 Logout</button>
+
+</div>
+</div>
+</div>
+</header>
+
+<main class="container">
+
+<section id="homeArea">
+
+<div id="publicHero" class="hero">
+
+<h1>
+Complete Tasks.<br>
+<span>Earn Rewards.</span>
+</h1>
+
+<p>
+Welcome to TaskEarn. Complete available tasks,
+submit them for review and earn approved rewards.
+</p>
+
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;">
+
+<button class="primary"
+style="width:auto;"
+onclick="openAuth('register')">
+Get Started
+</button>
+
+<button class="secondary"
+onclick="openAuth('login')">
+Login
+</button>
+
+</div>
+</div>
+
+<div id="loggedInWelcome" style="display:none;"></div>
+
+<div class="features">
+<div class="grid">
+
+<div class="card">
+<h3>📋 Tasks</h3>
+<p class="muted">Find available online tasks.</p>
+</div>
+
+<div class="card">
+<h3>💰 Rewards</h3>
+<p class="muted">Earn rewards for approved work.</p>
+</div>
+
+<div class="card">
+<h3>🔐 Secure</h3>
+<p class="muted">
+Email OTP and Google authentication.
+</p>
+</div>
+
+</div>
+</div>
+
+</section>
+
+
+<section id="authArea" class="hidden">
+
+<div class="card" style="max-width:520px;margin:25px auto;">
+
+<div class="auth-tabs">
+
+<button id="loginTab"
+onclick="showAuthMode('login')">
+Login
+</button>
+
+<button id="registerTab"
+onclick="showAuthMode('register')">
+Register
+</button>
+
+</div>
+
+<div id="authMessage" class="hidden"></div>
+
+
+<form id="loginForm" onsubmit="loginUser(event)">
+
+<h2>Welcome Back 👋</h2>
+
+<p class="muted">
+Login using your email or Google account.
+</p>
+
+<label>Email</label>
+<input id="loginEmail"
+type="email"
+required
+autocomplete="email">
+
+<br><br>
+
+<label>Password</label>
+<input id="loginPassword"
+type="password"
+required
+autocomplete="current-password">
+
+<br>
+
+<label style="display:flex;gap:8px;align-items:center;font-weight:600;">
+<input id="loginRemember"
+type="checkbox"
+style="width:auto;">
+Remember me
+</label>
+
+<br>
+
+<button id="loginButton"
+class="primary"
+type="submit">
+Login
+</button>
+
+<div class="divider">OR</div>
+
+<div id="googleLoginButton" class="google-area"></div>
+
+</form>
+
+
+<form id="registerForm"
+class="hidden"
+onsubmit="registerUser(event)">
+
+<h2>Create Account 🚀</h2>
+
+<p class="muted">
+Create your TaskEarn account.
+</p>
+
+<label>Full Name</label>
+
+<input id="registerName"
+type="text"
+required
+maxlength="80"
+autocomplete="name">
+
+<br><br>
+
+<label>Gmail / Email</label>
+
+<input id="registerEmail"
+type="email"
+required
+autocomplete="email">
+
+<br><br>
+
+<label>Mobile Number</label>
+
+<input id="registerMobile"
+type="tel"
+required
+placeholder="+919876543210"
+autocomplete="tel">
+
+<br><br>
+
+<label>City</label>
+
+<input id="registerCity"
+type="text"
+required
+maxlength="80"
+autocomplete="address-level2">
+
+<br><br>
+
+<label>Password</label>
+
+<input id="registerPassword"
+type="password"
+required
+minlength="6"
+autocomplete="new-password">
+
+<br>
+
+<label style="display:flex;gap:8px;align-items:center;font-weight:600;">
+<input id="registerRemember"
+type="checkbox"
+style="width:auto;">
+Remember me
+</label>
+
+<br>
+
+<button id="registerButton"
+class="primary"
+type="submit">
+Create Account
+</button>
+
+<div class="divider">OR</div>
+
+<div id="googleRegisterButton" class="google-area"></div>
+
+<p class="muted" style="font-size:12px;">
+Google registration verifies your Gmail automatically.
+You can add your mobile number and city later from Profile.
+</p>
+
+</form>
+
+</div>
+</section>
+
+
+<section id="appArea" class="hidden">
+<div id="appContent"></div>
+</section>
+
+</main>
+
+
+<!-- =====================================================
+     EMAIL / MOBILE OTP MODAL
+===================================================== -->
+
+<div id="otpModal" class="modal">
+
+<div class="modal-box">
+
+<div class="modal-head">
+
+<h2 id="otpTitle">
+Verify OTP
+</h2>
+
+<button class="close"
+onclick="closeOtpModal()">
+×
+</button>
+
+</div>
+
+<div id="otpMessage"
+class="muted"
+style="margin-bottom:15px;">
+Enter the OTP sent to you.
+</div>
+
+<div id="otpStatus"
+class="otp-status">
+</div>
+
+<input id="otpInput"
+type="text"
+inputmode="numeric"
+maxlength="6"
+placeholder="6-digit OTP"
+autocomplete="one-time-code">
+
+<br><br>
+
+<button id="verifyOtpButton"
+class="primary"
+onclick="verifyOtp()">
+Verify OTP
+</button>
+
+<br><br>
+
+<button id="resendOtpButton"
+class="secondary"
+style="width:100%;"
+onclick="resendOtp()">
+Resend OTP
+</button>
+
+</div>
+</div>
+
+
+<!-- =====================================================
+     PROFILE MOBILE OTP
+===================================================== -->
+
+<div id="profileOtpModal" class="modal">
+
+<div class="modal-box">
+
+<div class="modal-head">
+
+<h2>
+Verify Mobile
+</h2>
+
+<button class="close"
+onclick="closeProfileOtp()">
+×
+</button>
+
+</div>
+
+<p class="muted">
+Enter the OTP sent to your new mobile number.
+</p>
+
+<input id="profileOtpInput"
+type="text"
+inputmode="numeric"
+maxlength="6"
+placeholder="6-digit OTP">
+
+<br><br>
+
+<button id="verifyProfileOtpButton"
+class="primary"
+onclick="verifyProfileOtp()">
+Verify Mobile
+</button>
+
+<br><br>
+
+<button id="resendProfileOtpButton"
+class="secondary"
+style="width:100%;"
+onclick="resendProfileOtp()">
+Resend OTP
+</button>
+
+</div>
+</div>
+
+
+<div id="mobileBottomNav" class="mobile-bottom-nav">
+
+<button class="bottom-item active"
+onclick="tasksHome()">
+<span>🏠</span>
+<span>Tasks</span>
+</button>
+
+<button class="bottom-item"
+onclick="walletHome()">
+<span>💰</span>
+<span>Wallet</span>
+</button>
+
+<button class="bottom-item"
+onclick="profileHome()">
+<span>👤</span>
+<span>Profile</span>
+</button>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   GLOBAL STATE
+===================================================== */
+
+let currentUser = null;
+let currentAuthMode = "login";
+let otpBusy = false;
+let registerBusy = false;
+let loginBusy = false;
+
+
+/* =====================================================
+   BASIC HELPERS
+===================================================== */
+
+function escapeHtml(value){
+return String(value || "")
+.replaceAll("&","&amp;")
+.replaceAll("<","&lt;")
+.replaceAll(">","&gt;")
+.replaceAll('"',"&quot;")
+.replaceAll("'","&#039;");
+}
+
+
+function setButtonLoading(button, loading, text){
+
+if(!button) return;
+
+if(loading){
+
+button.disabled = true;
+
+button.dataset.originalText =
+button.innerHTML;
+
+button.innerHTML =
+'<span class="spinner"></span>' +
+(text || "Please wait...");
+
+}else{
+
+button.disabled = false;
+
+button.innerHTML =
+button.dataset.originalText ||
+text ||
+"Submit";
+
+}
+}
+
+
+/* =====================================================
+   API FUNCTION
+===================================================== */
+
+async function api(url, options = {}){
+
+let response;
+
+try{
+
+response = await fetch(
+url,
+{
+credentials:"same-origin",
+...options,
+headers:{
+"Content-Type":"application/json",
+...(options.headers || {})
+}
+}
+);
+
+}catch(error){
+
+throw new Error(
+"Unable to connect to TaskEarn server. Please check your internet connection or server status."
+);
+
+}
+
+let data = null;
+
+try{
+data = await response.json();
+}catch{
+data = null;
+}
+
+if(!response.ok){
+
+throw new Error(
+data?.error ||
+`Server error (${response.status}). Please try again.`
+);
+
+}
+
+return data;
+}
+
+
+/* =====================================================
+   AUTH MESSAGE
+===================================================== */
+
+function showMessage(message,type="error"){
+
+const box =
+document.getElementById("authMessage");
+
+if(!box) return;
+
+if(!message){
+
+box.className="hidden";
+box.textContent="";
+return;
+}
+
+box.className =
+"notice " +
+(type || "error");
+
+box.textContent=message;
+}
+
+
+/* =====================================================
+   AUTH AREA
+===================================================== */
+
+function showAuthArea(){
+
+document
+.getElementById("authArea")
+.classList.remove("hidden");
+
+document
+.getElementById("homeArea")
+.classList.add("hidden");
+
+document
+.getElementById("appArea")
+.classList.add("hidden");
+}
+
+
+function showAppArea(){
+
+document
+.getElementById("authArea")
+.classList.add("hidden");
+
+document
+.getElementById("homeArea")
+.classList.remove("hidden");
+
+document
+.getElementById("appArea")
+.classList.remove("hidden");
+}
+
+
+function openAuth(mode="login"){
+
+showAuthArea();
+
+showAuthMode(mode);
+
+window.scrollTo({
+top:0,
+behavior:"smooth"
+});
+
+}
+
+
+function showAuthMode(mode){
+
+currentAuthMode=mode;
+
+const loginForm =
+document.getElementById("loginForm");
+
+const registerForm =
+document.getElementById("registerForm");
+
+const loginTab =
+document.getElementById("loginTab");
+
+const registerTab =
+document.getElementById("registerTab");
+
+loginForm.classList.toggle(
+"hidden",
+mode !== "login"
+);
+
+registerForm.classList.toggle(
+"hidden",
+mode !== "register"
+);
+
+loginTab.classList.toggle(
+"active",
+mode === "login"
+);
+
+registerTab.classList.toggle(
+"active",
+mode === "register"
+);
+
+showMessage("");
+
+setTimeout(
+renderGoogleButtons,
+300
+);
+
+}
+
+
+/* =====================================================
+   REGISTER
+   IMPORTANT:
+   BUTTON NOW HAS EXPLICIT REQUEST + LOADING + ERROR
+===================================================== */
+
+async function registerUser(event){
+
+event.preventDefault();
+event.stopPropagation();
+
+if(registerBusy) return;
+
+registerBusy=true;
+
+const button =
+document.getElementById("registerButton");
+
+setButtonLoading(
+button,
+true,
+"Creating account..."
+);
+
+showMessage(
+"Creating your TaskEarn account...",
+"info"
+);
+
+const payload={
+
+name:
+document
+.getElementById("registerName")
+.value
+.trim(),
+
+email:
+document
+.getElementById("registerEmail")
+.value
+.trim(),
+
+mobile:
+document
+.getElementById("registerMobile")
+.value
+.trim(),
+
+city:
+document
+.getElementById("registerCity")
+.value
+.trim(),
+
+password:
+document
+.getElementById("registerPassword")
+.value,
+
+remember:
+document
+.getElementById("registerRemember")
+.checked
+
+};
+
+try{
+
+const result =
+await api(
+"/api/register",
+{
+method:"POST",
+body:JSON.stringify(payload)
+}
+);
+
+if(result.verificationRequired){
+
+showMessage(
+result.message ||
+"Verification code sent successfully.",
+"success"
+);
+
+openOtpModal(
+result.step,
+result.email,
+result.mobile
+);
+
+return;
+}
+
+if(result.user){
+
+currentUser=result.user;
+
+setLoggedInUI(currentUser);
+
+tasksHome();
+
+return;
+}
+
+showMessage(
+"Account created successfully. Please continue.",
+"success"
+);
+
+}catch(error){
+
+console.error(
+"REGISTER ERROR:",
+error
+);
+
+showMessage(
+error.message ||
+"Unable to create account."
+);
+
+}finally{
+
+registerBusy=false;
+
+setButtonLoading(
+button,
+false
+);
+
+}
+
+}
+
+
+/* =====================================================
+   LOGIN
+===================================================== */
+
+async function loginUser(event){
+
+event.preventDefault();
+event.stopPropagation();
+
+if(loginBusy) return;
+
+loginBusy=true;
+
+const button =
+document.getElementById("loginButton");
+
+setButtonLoading(
+button,
+true,
+"Logging in..."
+);
+
+showMessage(
+"Checking your account...",
+"info"
+);
+
+const payload={
+
+email:
+document
+.getElementById("loginEmail")
+.value
+.trim(),
+
+password:
+document
+.getElementById("loginPassword")
+.value,
+
+remember:
+document
+.getElementById("loginRemember")
+.checked
+
+};
+
+try{
+
+const result =
+await api(
+"/api/login",
+{
+method:"POST",
+body:JSON.stringify(payload)
+}
+);
+
+if(result.user){
+
+currentUser=result.user;
+
+setLoggedInUI(currentUser);
+
+tasksHome();
+
+return;
+}
+
+if(result.verificationRequired){
+
+showMessage(
+"Verification required.",
+"success"
+);
+
+openOtpModal(
+result.step,
+result.email,
+result.mobile
+);
+
+return;
+}
+
+throw new Error(
+"Login response was incomplete."
+);
+
+}catch(error){
+
+console.error(
+"LOGIN ERROR:",
+error
+);
+
+showMessage(
+error.message ||
+"Unable to login."
+);
+
+}finally{
+
+loginBusy=false;
+
+setButtonLoading(
+button,
+false
+);
+
+}
+
+}
+
+
+/* =====================================================
+   OTP MODAL
+===================================================== */
+
+function openOtpModal(
+step,
+email,
+mobile
+){
+
+const title =
+document.getElementById("otpTitle");
+
+const message =
+document.getElementById("otpMessage");
+
+const input =
+document.getElementById("otpInput");
+
+const status =
+document.getElementById("otpStatus");
+
+if(step==="email"){
+
+title.textContent =
+"Verify Gmail / Email";
+
+message.textContent =
+"Enter the 6-digit OTP sent to " +
+email +
+".";
+
+}else{
+
+title.textContent =
+"Verify Mobile";
+
+message.textContent =
+"Enter the 6-digit OTP sent to " +
+mobile +
+".";
+
+}
+
+input.value="";
+status.textContent="";
+
+document
+.getElementById("otpModal")
+.classList.add("open");
+
+setTimeout(
+()=>{
+input.focus();
+},
+150
+);
+
+}
+
+
+function closeOtpModal(){
+
+document
+.getElementById("otpModal")
+.classList.remove("open");
+
+}
+
+
+/* =====================================================
+   VERIFY OTP
+===================================================== */
+
+async function verifyOtp(){
+
+if(otpBusy) return;
+
+const input =
+document.getElementById("otpInput");
+
+const button =
+document.getElementById("verifyOtpButton");
+
+const status =
+document.getElementById("otpStatus");
+
+const otp =
+input.value.trim();
+
+if(!/^\d{6}$/.test(otp)){
+
+status.textContent =
+"Please enter the 6-digit OTP.";
+
+status.style.color="#c92e2e";
+
+input.focus();
+
+return;
+}
+
+otpBusy=true;
+
+setButtonLoading(
+button,
+true,
+"Verifying..."
+);
+
+status.textContent =
+"Checking OTP...";
+
+status.style.color="#2463a8";
+
+try{
+
+const result =
+await api(
+"/api/verify-otp",
+{
+method:"POST",
+body:JSON.stringify({
+otp
+})
+}
+);
+
+if(result.step==="mobile"){
+
+status.textContent =
+"Email verified. Mobile OTP sent.";
+
+status.style.color="#168346";
+
+openOtpModal(
+"mobile",
+result.email,
+result.mobile
+);
+
+return;
+}
+
+if(
+result.step==="complete" &&
+result.user
+){
+
+currentUser=result.user;
+
+closeOtpModal();
+
+setLoggedInUI(currentUser);
+
+showMessage(
+"Verification completed successfully.",
+"success"
+);
+
+tasksHome();
+
+return;
+}
+
+throw new Error(
+"Verification response was incomplete."
+);
+
+}catch(error){
+
+console.error(
+"OTP VERIFY ERROR:",
+error
+);
+
+status.textContent =
+error.message ||
+"OTP verification failed.";
+
+status.style.color="#c92e2e";
+
+}finally{
+
+otpBusy=false;
+
+setButtonLoading(
+button,
+false
+);
+
+}
+
+}
+
+
+/* =====================================================
+   RESEND OTP
+===================================================== */
+
+async function resendOtp(){
+
+const button =
+document.getElementById("resendOtpButton");
+
+const status =
+document.getElementById("otpStatus");
+
+if(otpBusy) return;
+
+otpBusy=true;
+
+button.disabled=true;
+
+button.textContent=
+"Sending...";
+
+status.textContent=
+"Requesting a new OTP...";
+
+status.style.color="#2463a8";
+
+try{
+
+const result =
+await api(
+"/api/resend-otp",
+{
+method:"POST"
+}
+);
+
+status.textContent =
+result.message ||
+"New OTP sent successfully.";
+
+status.style.color="#168346";
+
+}catch(error){
+
+status.textContent =
+error.message ||
+"Unable to resend OTP.";
+
+status.style.color="#c92e2e";
+
+}finally{
+
+otpBusy=false;
+
+button.disabled=false;
+
+button.textContent=
+"Resend OTP";
+
+}
+
+}
+
+
+/* =====================================================
+   GOOGLE
+===================================================== */
+
+function googleCredentialResponse(response){
+
+if(
+response &&
+response.credential
+){
+
+googleLogin(
+response.credential
+);
+
+}else{
+
+showMessage(
+"Google authentication failed."
+);
+
+}
+
+}
+
+
+async function googleLogin(credential){
+
+try{
+
+showMessage(
+"Signing in with Google...",
+"info"
+);
+
+const result =
+await api(
+"/api/auth/google",
+{
+method:"POST",
+body:JSON.stringify({
+credential
+})
+}
+);
+
+if(result.verificationRequired){
+
+showMessage(
+"Mobile verification required.",
+"success"
+);
+
+openOtpModal(
+result.step,
+result.email,
+result.mobile
+);
+
+return;
+}
+
+if(result.user){
+
+currentUser=result.user;
+
+setLoggedInUI(currentUser);
+
+tasksHome();
+
+}
+
+}catch(error){
+
+console.error(
+"GOOGLE LOGIN ERROR:",
+error
+);
+
+showMessage(
+error.message ||
+"Google login failed."
+);
+
+}
+
+}
+
+
+async function loadGoogleClientId(){
+
+try{
+
+const response =
+await fetch(
+"/api/google-config",
+{
+credentials:"same-origin"
+}
+);
+
+if(!response.ok)
+return "";
+
+const data =
+await response.json();
+
+return data.clientId || "";
+
+}catch{
+
+return "";
+
+}
+
+}
+
+
+async function renderGoogleButtons(){
+
+if(
+!window.google ||
+!window.google.accounts ||
+!window.google.accounts.id
+){
+return;
+}
+
+try{
+
+const clientId =
+await loadGoogleClientId();
+
+if(!clientId)
+return;
+
+window.google.accounts.id.initialize({
+client_id:clientId,
+callback:googleCredentialResponse,
+auto_select:false,
+cancel_on_tap_outside:true
+});
+
+const loginButton =
+document.getElementById(
+"googleLoginButton"
+);
+
+const registerButton =
+document.getElementById(
+"googleRegisterButton"
+);
+
+if(loginButton){
+
+loginButton.innerHTML="";
+
+window.google.accounts.id.renderButton(
+loginButton,
+{
+theme:"outline",
+size:"large",
+width:360,
+text:"continue_with"
+}
+);
+
+}
+
+if(registerButton){
+
+registerButton.innerHTML="";
+
+window.google.accounts.id.renderButton(
+registerButton,
+{
+theme:"outline",
+size:"large",
+width:360,
+text:"signup_with"
+}
+);
+
+}
+
+}catch(error){
+
+console.error(
+"Google button error:",
+error
+);
+
+}
+
+}
+
+
+/* =====================================================
+   USER UI
+===================================================== */
+
+function initials(value){
+
+return String(
+value || "User"
+)
+.trim()
+.split(/\s+/)
+.slice(0,2)
+.map(
+part =>
+part.charAt(0).toUpperCase()
+)
+.join("");
+
+}
+
+
+function setLoggedInUI(user){
+
+const profile =
+document.getElementById(
+"headerProfile"
+);
+
+const avatar =
+document.getElementById(
+"headerAvatarInitials"
+);
+
+const panelName =
+document.getElementById(
+"profilePanelName"
+);
+
+const panelEmail =
+document.getElementById(
+"profilePanelEmail"
+);
+
+const bottomNav =
+document.getElementById(
+"mobileBottomNav"
+);
+
+const welcome =
+document.getElementById(
+"loggedInWelcome"
+);
+
+if(user){
+
+profile.style.display="block";
+
+avatar.textContent=
+initials(user.name);
+
+panelName.textContent=
+user.name || "User";
+
+panelEmail.textContent=
+user.email || "";
+
+bottomNav.classList.add(
+"logged-in"
+);
+
+if(welcome){
+
+welcome.style.display="block";
+
+welcome.innerHTML=
+`
+<div class="card">
+<p class="muted" style="margin:0;">
+Welcome back
+</p>
+
+<h2 style="margin:4px 0;">
+Hi, ${escapeHtml(user.name || "User")} 👋
+</h2>
+
+<p class="muted" style="margin:0;">
+Complete available tasks and earn approved rewards.
+</p>
+</div>
+`;
+
+}
+
+}else{
+
+profile.style.display="none";
+
+bottomNav.classList.remove(
+"logged-in"
+);
+
+if(welcome){
+
+welcome.style.display="none";
+
+}
+
+}
+
+}
+
+
+/* =====================================================
+   PUBLIC HOME
+===================================================== */
+
+function goPublicHome(){
+
+currentUser=null;
+
+setLoggedInUI(null);
+
+document
+.getElementById("authArea")
+.classList.add("hidden");
+
+document
+.getElementById("appArea")
+.classList.add("hidden");
+
+document
+.getElementById("homeArea")
+.classList.remove("hidden");
+
+const hero =
+document.getElementById(
+"publicHero"
+);
+
+if(hero)
+hero.style.display="block";
+
+const features =
+document.querySelector(
+".features"
+);
+
+if(features)
+features.style.display="block";
+
+}
+
+
+/* =====================================================
+   PROFILE MENU
+===================================================== */
+
+function toggleProfilePanel(event){
+
+event.stopPropagation();
+
+document
+.getElementById("profilePanel")
+.classList.toggle("open");
+
+}
+
+
+function closeProfilePanel(){
+
+const panel =
+document.getElementById(
+"profilePanel"
+);
+
+if(panel)
+panel.classList.remove("open");
+
+}
+
+
+window.addEventListener(
+"click",
+function(event){
+
+if(
+!event.target.closest(
+".header-profile"
+)
+){
+
+closeProfilePanel();
+
+}
+
+}
+);
+
+
+/* =====================================================
+   TASKS
+===================================================== */
+
+async function tasksHome(){
+
+if(!currentUser){
+
+openAuth("login");
+
+return;
+
+}
+
+closeProfilePanel();
+
+showAppArea();
+
+const content =
+document.getElementById(
+"appContent"
+);
+
+content.innerHTML=
+`
+<div class="card">
+<h2>Available Tasks 📋</h2>
+<p class="muted">
+Complete tasks and submit them for review.
+</p>
+</div>
+
+<div id="tasksList">
+<div class="card">
+Loading tasks...
+</div>
+</div>
+`;
+
+try{
+
+const tasks =
+await api("/api/tasks");
+
+const list =
+document.getElementById(
+"tasksList"
+);
+
+if(!tasks.length){
+
+list.innerHTML=
+`
+<div class="card">
+<h3>No tasks available</h3>
+<p class="muted">
+Please check again later.
+</p>
+</div>
+`;
+
+return;
+
+}
+
+list.innerHTML =
+tasks.map(
+task =>
+`
+<div class="card task-card">
+
+<div style="
+display:flex;
+justify-content:space-between;
+gap:15px;
+">
+
+<div>
+
+<span class="muted">
+${escapeHtml(task.type)}
+</span>
+
+<h3>
+${escapeHtml(task.title)}
+</h3>
+
+</div>
+
+<div class="reward">
+₹${Number(task.reward).toFixed(2)}
+</div>
+
+</div>
+
+<p class="muted">
+${escapeHtml(task.description)}
+</p>
+
+<button
+class="primary"
+onclick="submitTask(${task.id})">
+Submit Task
+</button>
+
+</div>
+`
+).join("");
+
+}catch(error){
+
+console.error(
+"Tasks error:",
+error
+);
+
+document.getElementById(
+"tasksList"
+).innerHTML=
+`
+<div class="card">
+<div class="notice error">
+${escapeHtml(error.message)}
+</div>
+</div>
+`;
+
+}
+
+}
+
+
+/* =====================================================
+   SUBMIT TASK
+===================================================== */
+
+async function submitTask(taskId){
+
+if(
+!confirm(
+"Submit this task for review?"
+)
+){
+
+return;
+
+}
+
+try{
+
+const result =
+await api(
+`/api/tasks/${taskId}/submit`,
+{
+method:"POST",
+body:JSON.stringify({})
+}
+);
+
+alert(
+result.message
+);
+
+tasksHome();
+
+}catch(error){
+
+alert(
+error.message
+);
+
+}
+
+}
+
+
+/* =====================================================
+   WALLET
+===================================================== */
+
+async function walletHome(){
+
+if(!currentUser){
+
+openAuth("login");
+
+return;
+
+}
+
+closeProfilePanel();
+
+showAppArea();
+
+const content =
+document.getElementById(
+"appContent"
+);
+
+content.innerHTML=
+`
+<div class="card">
+<h2>Wallet 💰</h2>
+<p class="muted">
+Your TaskEarn earnings and withdrawal history.
+</p>
+</div>
+
+<div id="walletContent">
+Loading wallet...
+</div>
+`;
+
+try{
+
+const data =
+await api("/api/wallet");
+
+const withdrawals =
+data.withdrawals || [];
+
+document.getElementById(
+"walletContent"
+).innerHTML=
+`
+<div class="grid">
+
+<div class="card stat">
+<span class="muted">
+Available Balance
+</span>
+<b>
+₹${Number(data.balance || 0).toFixed(2)}
+</b>
+</div>
+
+<div class="card stat">
+<span class="muted">
+Completed Tasks
+</span>
+<b>
+${Number(data.completed || 0)}
+</b>
+</div>
+
+<div class="card stat">
+<span class="muted">
+Minimum Withdrawal
+</span>
+<b>
+₹100
+</b>
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>
+Request Withdrawal
+</h3>
+
+<label>
+Amount
+</label>
+
+<input
+id="withdrawAmount"
+type="number"
+min="100"
+step="0.01"
+placeholder="100">
+
+<br><br>
+
+<label>
+Payment Method
+</label>
+
+<select
+id="withdrawMethod"
+onchange="changePaymentMethod()">
+
+<option value="UPI">
+UPI
+</option>
+
+<option value="Bank Account">
+Bank Account
+</option>
+
+</select>
+
+<br><br>
+
+<div id="paymentFields"></div>
+
+<br>
+
+<button
+class="primary"
+onclick="withdrawMoney()">
+Submit Withdrawal
+</button>
+
+</div>
+
+<div class="card">
+
+<h3>
+Withdrawal History
+</h3>
+
+${
+withdrawals.length
+?
+withdrawals.map(
+item =>
+`
+<div style="
+padding:14px 0;
+border-bottom:1px solid #eee;
+">
+
+<b>
+₹${Number(item.amount).toFixed(2)}
+</b>
+
+<span class="muted">
+· ${escapeHtml(item.method)}
+</span>
+
+<div
+class="muted"
+style="font-size:13px;">
+
+${escapeHtml(item.status)}
+·
+${new Date(item.createdAt).toLocaleString()}
+
+</div>
+
+</div>
+`
+).join("")
+:
+`<p class="muted">
+No withdrawals yet.
+</p>`
+}
+
+</div>
+`;
+
+changePaymentMethod();
+
+}catch(error){
+
+document.getElementById(
+"walletContent"
+).innerHTML=
+`
+<div class="notice error">
+${escapeHtml(error.message)}
+</div>
+`;
+
+}
+
+}
+
+
+function changePaymentMethod(){
+
+const method =
+document.getElementById(
+"withdrawMethod"
+);
+
+const fields =
+document.getElementById(
+"paymentFields"
+);
+
+if(!method || !fields)
+return;
+
+if(method.value==="UPI"){
+
+fields.innerHTML=
+`
+<label>
+UPI ID
+</label>
+
+<input
+id="upiId"
+type="text"
+placeholder="yourname@upi">
+`;
+
+}else{
+
+fields.innerHTML=
+`
+<label>
+Account Holder Name
+</label>
+
+<input
+id="accountHolderName"
+type="text">
+
+<br><br>
+
+<label>
+Account Number
+</label>
+
+<input
+id="accountNumber"
+type="text">
+
+<br><br>
+
+<label>
+IFSC Code
+</label>
+
+<input
+id="ifscCode"
+type="text"
+maxlength="11">
+
+<br><br>
+
+<label>
+Bank Name
+</label>
+
+<input
+id="bankName"
+type="text">
+`;
+
+}
+
+}
+
+
+async function withdrawMoney(){
+
+const amount =
+Number(
+document.getElementById(
+"withdrawAmount"
+).value
+);
+
+const method =
+document.getElementById(
+"withdrawMethod"
+).value;
+
+let paymentDetails={};
+
+if(method==="UPI"){
+
+paymentDetails={
+upiId:
+document
+.getElementById("upiId")
+.value
+};
+
+}else{
+
+paymentDetails={
+accountHolderName:
+document
+.getElementById(
+"accountHolderName"
+).value,
+
+accountNumber:
+document
+.getElementById(
+"accountNumber"
+).value,
+
+ifscCode:
+document
+.getElementById(
+"ifscCode"
+).value,
+
+bankName:
+document
+.getElementById(
+"bankName"
+).value
+};
+
+}
+
+try{
+
+const result =
+await api(
+"/api/withdraw",
+{
+method:"POST",
+body:JSON.stringify({
+amount,
+method,
+paymentDetails
+})
+}
+);
+
+alert(
+result.message
+);
+
+walletHome();
+
+}catch(error){
+
+alert(
+error.message
+);
+
+}
+
+}
+
+
+/* =====================================================
+   PROFILE
+===================================================== */
+
+async function profileHome(){
+
+if(!currentUser){
+
+openAuth("login");
+
+return;
+
+}
+
+closeProfilePanel();
+
+showAppArea();
+
+document.getElementById(
+"appContent"
+).innerHTML=
+`
+<div class="card">
+
+<h2>
+My Profile 👤
+</h2>
+
+<p class="muted">
+Update your TaskEarn profile.
+</p>
+
+<div id="profileMessage"></div>
+
+<form onsubmit="saveProfile(event)">
+
+<label>
+Name
+</label>
+
+<input
+id="profileName"
+value="${escapeHtml(currentUser.name)}"
+required>
+
+<br><br>
+
+<label>
+Email
+</label>
+
+<input
+value="${escapeHtml(currentUser.email)}"
+disabled>
+
+<br><br>
+
+<label>
+Mobile
+</label>
+
+<input
+id="profileMobile"
+value="${escapeHtml(currentUser.mobile)}"
+placeholder="+919876543210">
+
+<br><br>
+
+<label>
+City
+</label>
+
+<input
+id="profileCity"
+value="${escapeHtml(currentUser.city)}"
+required>
+
+<br><br>
+
+<label>
+Profile Image URL
+</label>
+
+<input
+id="profileImage"
+value="${escapeHtml(currentUser.profileImage)}"
+placeholder="https://...">
+
+<br><br>
+
+<button
+class="primary"
+type="submit">
+Save Profile
+</button>
+
+</form>
+
+</div>
+
+<div class="card">
+
+<h3>
+Account Verification
+</h3>
+
+<p>
+Email:
+${currentUser.emailVerified
+?"✅ Verified"
+:"❌ Not verified"}
+</p>
+
+<p>
+Mobile:
+${currentUser.mobileVerified
+?"✅ Verified"
+:"❌ Not verified"}
+</p>
+
+<p>
+Login method:
+<b>
+${escapeHtml(
+currentUser.authProvider || "local"
+)}
+</b>
+</p>
+
+</div>
+
+<div class="card">
+
+<h3>
+My Submissions
+</h3>
+
+<div id="submissionList">
+Loading...
+</div>
+
+</div>
+`;
+
+loadSubmissions();
+
+}
+
+
+/* =====================================================
+   SAVE PROFILE
+===================================================== */
+
+async function saveProfile(event){
+
+event.preventDefault();
+
+try{
+
+const result =
+await api(
+"/api/profile",
+{
+method:"PUT",
+body:JSON.stringify({
+
+name:
+document
+.getElementById(
+"profileName"
+).value,
+
+mobile:
+document
+.getElementById(
+"profileMobile"
+).value,
+
+city:
+document
+.getElementById(
+"profileCity"
+).value,
+
+profileImage:
+document
+.getElementById(
+"profileImage"
+).value
+
+})
+}
+);
+
+if(result.verificationRequired){
+
+document
+.getElementById(
+"profileOtpModal"
+)
+.classList.add("open");
+
+return;
+
+}
+
+currentUser=result.user;
+
+setLoggedInUI(
+currentUser
+);
+
+alert(
+result.message
+);
+
+profileHome();
+
+}catch(error){
+
+const box =
+document.getElementById(
+"profileMessage"
+);
+
+if(box){
+
+box.innerHTML=
+`
+<div class="notice error">
+${escapeHtml(error.message)}
+</div>
+`;
+
+}
+
+}
+
+}
+
+
+/* =====================================================
+   PROFILE OTP
+===================================================== */
+
+function closeProfileOtp(){
+
+document
+.getElementById(
+"profileOtpModal"
+)
+.classList.remove("open");
+
+}
+
+
+async function verifyProfileOtp(){
+
+const input =
+document.getElementById(
+"profileOtpInput"
+);
+
+const button =
+document.getElementById(
+"verifyProfileOtpButton"
+);
+
+const otp =
+input.value.trim();
+
+if(!/^\d{6}$/.test(otp)){
+
+alert(
+"Please enter the 6-digit OTP."
+);
+
+return;
+
+}
+
+setButtonLoading(
+button,
+true,
+"Verifying..."
+);
+
+try{
+
+const result =
+await api(
+"/api/profile/verify-otp",
+{
+method:"POST",
+body:JSON.stringify({
+otp
+})
+}
+);
+
+currentUser=result.user;
+
+closeProfileOtp();
+
+setLoggedInUI(
+currentUser
+);
+
+alert(
+result.message
+);
+
+profileHome();
+
+}catch(error){
+
+alert(
+error.message
+);
+
+}finally{
+
+setButtonLoading(
+button,
+false
+);
+
+}
+
+}
+
+
+async function resendProfileOtp(){
+
+const button =
+document.getElementById(
+"resendProfileOtpButton"
+);
+
+button.disabled=true;
+button.textContent="Sending...";
+
+try{
+
+const result =
+await api(
+"/api/profile/resend-otp",
+{
+method:"POST"
+}
+);
+
+alert(
+result.message
+);
+
+}catch(error){
+
+alert(
+error.message
+);
+
+}finally{
+
+button.disabled=false;
+button.textContent="Resend OTP";
+
+}
+
+}
+
+
+/* =====================================================
+   SUBMISSIONS
+===================================================== */
+
+async function loadSubmissions(){
+
+try{
+
+const data =
+await api(
+"/api/my-submissions"
+);
+
+const list =
+document.getElementById(
+"submissionList"
+);
+
+if(!list)
+return;
+
+if(!data.length){
+
+list.innerHTML=
+`
+<p class="muted">
+You have not submitted any tasks yet.
+</p>
+`;
+
+return;
+
+}
+
+list.innerHTML =
+data.map(
+item =>
+`
+<div style="
+padding:13px 0;
+border-bottom:1px solid #eee;
+">
+
+<b>
+${escapeHtml(item.taskTitle)}
+</b>
+
+<div class="muted">
+Reward:
+₹${Number(item.reward).toFixed(2)}
+</div>
+
+<div class="muted">
+Status:
+${escapeHtml(item.status)}
+</div>
+
+</div>
+`
+).join("");
+
+}catch(error){
+
+const list =
+document.getElementById(
+"submissionList"
+);
+
+if(list){
+
+list.textContent=
+error.message;
+
+}
+
+}
+
+}
+
+
+/* =====================================================
+   LOGOUT
+===================================================== */
+
+async function logoutUser(){
+
+try{
+
+await api(
+"/api/logout",
+{
+method:"POST"
+}
+);
+
+currentUser=null;
+
+closeProfilePanel();
+
+goPublicHome();
+
+}catch(error){
+
+alert(
+error.message
+);
+
+}
+
+}
+
+
+/* =====================================================
+   SESSION CHECK
+===================================================== */
+
+async function checkSession(){
+
+try{
+
+const user =
+await api("/api/me");
+
+if(user){
+
+currentUser=user;
+
+setLoggedInUI(user);
+
+tasksHome();
+
+}else{
+
+currentUser=null;
+
+setLoggedInUI(null);
+
+goPublicHome();
+
+}
+
+}catch(error){
+
+console.error(
+"SESSION CHECK ERROR:",
+error
+);
+
+currentUser=null;
+
+setLoggedInUI(null);
+
+goPublicHome();
+
+}
+
+}
+
+
+/* =====================================================
+   OTP INPUT
+===================================================== */
+
+document.addEventListener(
+"input",
+function(event){
+
+if(
+event.target &&
+(
+event.target.id==="otpInput" ||
+event.target.id==="profileOtpInput"
+)
+){
+
+event.target.value =
+event.target.value
+.replace(/\D/g,"")
+.slice(0,6);
+
+}
+
+}
+);
+
+
+/* =====================================================
+   ENTER KEY OTP
+===================================================== */
+
+document.addEventListener(
+"keydown",
+function(event){
+
+if(
+event.key==="Enter" &&
+event.target.id==="otpInput"
+){
+
+event.preventDefault();
+
+verifyOtp();
+
+}
+
+if(
+event.key==="Enter" &&
+event.target.id==="profileOtpInput"
+){
+
+event.preventDefault();
+
+verifyProfileOtp();
+
+}
+
+}
+);
+
+
+/* =====================================================
+   CLOSE MODAL ON BACKDROP
+===================================================== */
+
+document.getElementById(
+"otpModal"
+).addEventListener(
+"click",
+function(event){
+
+if(event.target===this){
+
+closeOtpModal();
+
+}
+
+}
+);
+
+
+document.getElementById(
+"profileOtpModal"
+).addEventListener(
+"click",
+function(event){
+
+if(event.target===this){
+
+closeProfileOtp();
+
+}
+
+}
+);
+
+
+/* =====================================================
+   GOOGLE INITIALIZATION
+===================================================== */
+
+function initializeGoogle(){
+
+setTimeout(
+renderGoogleButtons,
+500
+);
+
+setTimeout(
+renderGoogleButtons,
+1500
+);
+
+setTimeout(
+renderGoogleButtons,
+3000
+);
+
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+window.addEventListener(
+"resize",
+function(){
+
+const nav =
+document.getElementById(
+"mobileBottomNav"
+);
+
+if(!nav)
+return;
+
+if(currentUser){
+
+nav.classList.add(
+"logged-in"
+);
+
+}else{
+
+nav.classList.remove(
+"logged-in"
+);
+
+}
+
+}
+);
+
+
+document.addEventListener(
+"DOMContentLoaded",
+function(){
+
+initializeGoogle();
+
+checkSession();
+
+}
+);
+
+</script>
+
+</body>
+  </html>
