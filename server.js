@@ -6,6 +6,7 @@ const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
+const nodemailer = require("nodemailer");
 
 const app = express();
 
@@ -16,29 +17,25 @@ app.use(express.urlencoded({ extended: true, limit: "100kb" }));
 
 const PORT = Number(process.env.PORT) || 10000;
 
+/* =====================================================
+   PATHS / DATABASE
+===================================================== */
+
 const DATA_DIR = path.join(__dirname, "data");
 const DB_FILE = path.join(DATA_DIR, "database.json");
-
-/* =====================================================
-   ENVIRONMENT VARIABLES
-===================================================== */
 
 const SESSION_SECRET =
   process.env.SESSION_SECRET ||
   "CHANGE_THIS_TASKEARN_SECRET_2026";
 
-const RESEND_API_KEY =
-  process.env.RESEND_API_KEY || "";
+const GMAIL_USER =
+  process.env.GMAIL_USER || "";
 
-const EMAIL_FROM =
-  process.env.EMAIL_FROM ||
-  "taskearn.otp@gmail.com";
+const GMAIL_APP_PASSWORD =
+  process.env.GMAIL_APP_PASSWORD || "";
 
 const GOOGLE_CLIENT_ID =
   process.env.GOOGLE_CLIENT_ID || "";
-
-const NODE_ENV =
-  process.env.NODE_ENV || "development";
 
 if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -89,15 +86,15 @@ function defaultDatabase() {
 }
 
 function saveDB(database) {
-  const temp = DB_FILE + ".tmp";
+  const tempFile = DB_FILE + ".tmp";
 
   fs.writeFileSync(
-    temp,
+    tempFile,
     JSON.stringify(database, null, 2),
     "utf8"
   );
 
-  fs.renameSync(temp, DB_FILE);
+  fs.renameSync(tempFile, DB_FILE);
 }
 
 function loadDB() {
@@ -138,9 +135,7 @@ function loadDB() {
       user.googleId ??= "";
 
       user.authProvider ??=
-        user.googleId
-          ? "google"
-          : "local";
+        user.googleId ? "google" : "local";
 
       user.balance ??= 0;
       user.role ??= "Member";
@@ -177,11 +172,10 @@ app.use(
 
     cookie: {
       httpOnly: true,
-
       sameSite: "lax",
 
       secure:
-        NODE_ENV === "production",
+        process.env.NODE_ENV === "production",
 
       maxAge:
         1000 *
@@ -197,13 +191,8 @@ app.use(
    HELPERS
 ===================================================== */
 
-function cleanText(
-  value,
-  max = 200
-) {
-  return String(
-    value ?? ""
-  )
+function cleanText(value, max = 200) {
+  return String(value ?? "")
     .trim()
     .slice(0, max);
 }
@@ -314,12 +303,10 @@ function requireLogin(
     currentUser(req);
 
   if (!user) {
-    return res
-      .status(401)
-      .json({
-        error:
-          "Please login first."
-      });
+    return res.status(401).json({
+      error:
+        "Please login first."
+    });
   }
 
   req.user = user;
@@ -337,7 +324,8 @@ const OTP_EXPIRY_MS =
 const OTP_RESEND_MS =
   60 * 1000;
 
-const OTP_MAX_ATTEMPTS = 5;
+const OTP_MAX_ATTEMPTS =
+  5;
 
 function randomOtp() {
   return String(
@@ -351,7 +339,9 @@ function randomOtp() {
 function hashOtp(otp) {
   return crypto
     .createHash("sha256")
-    .update(String(otp))
+    .update(
+      String(otp)
+    )
     .digest("hex");
 }
 
@@ -395,16 +385,16 @@ function createOtpRecord(
 
   db.otpCodes =
     db.otpCodes.filter(
-      x =>
+      item =>
         !(
           String(
-            x.userId
+            item.userId
           ) ===
-            String(
-              user.id
-            ) &&
-          x.type === type &&
-          x.purpose === purpose
+            String(user.id) &&
+          item.type ===
+            type &&
+          item.purpose ===
+            purpose
         )
     );
 
@@ -449,15 +439,17 @@ function getOtpRecord(
 ) {
   return db.otpCodes
     .filter(
-      x =>
+      item =>
         String(
-          x.userId
+          item.userId
         ) ===
           String(
             userId
           ) &&
-        x.type === type &&
-        x.purpose === purpose
+        item.type ===
+          type &&
+        item.purpose ===
+          purpose
     )
     .sort(
       (a, b) =>
@@ -477,16 +469,16 @@ function deleteOtpRecord(
 ) {
   db.otpCodes =
     db.otpCodes.filter(
-      x =>
+      item =>
         !(
           String(
-            x.userId
+            item.userId
           ) ===
-            String(
-              userId
-            ) &&
-          x.type === type &&
-          x.purpose === purpose
+            String(userId) &&
+          item.type ===
+            type &&
+          item.purpose ===
+            purpose
         )
     );
 
@@ -494,150 +486,129 @@ function deleteOtpRecord(
 }
 
 /* =====================================================
-   RESEND EMAIL OTP
+   GMAIL SMTP
 ===================================================== */
+
+const mailTransporter =
+  nodemailer.createTransport({
+    service: "gmail",
+
+    auth: {
+      user: GMAIL_USER,
+
+      pass:
+        GMAIL_APP_PASSWORD
+    }
+  });
 
 async function sendEmailOtp(
   email,
   otp
 ) {
-  if (!RESEND_API_KEY) {
-    throw new Error(
-      "Resend email service is not configured. Please add RESEND_API_KEY in Render."
-    );
-  }
-
-  if (!EMAIL_FROM) {
-    throw new Error(
-      "EMAIL_FROM is not configured."
-    );
-  }
-
   if (
-    typeof fetch !==
-    "function"
+    !GMAIL_USER ||
+    !GMAIL_APP_PASSWORD
   ) {
     throw new Error(
-      "This server requires Node.js 18 or newer."
+      "Gmail OTP service is not configured. Please check GMAIL_USER and GMAIL_APP_PASSWORD in Render."
     );
   }
 
-  const response =
-    await fetch(
-      "https://api.resend.com/emails",
-      {
-        method: "POST",
+  await mailTransporter.sendMail({
+    from:
+      `"TaskEarn" <${GMAIL_USER}>`,
 
-        headers: {
-          Authorization:
-            `Bearer ${RESEND_API_KEY}`,
+    to: email,
 
-          "Content-Type":
-            "application/json"
-        },
+    subject:
+      "TaskEarn Email Verification Code",
 
-        body:
-          JSON.stringify({
-            from:
-              EMAIL_FROM,
+    text:
+      `Your TaskEarn verification code is ${otp}. This OTP expires in 10 minutes.`,
 
-            to: [
-              email
-            ],
+    html: `
+      <!DOCTYPE html>
 
-            subject:
-              "TaskEarn Email Verification Code",
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport"
+          content="width=device-width,initial-scale=1.0">
+      </head>
 
-            html: `
-              <div style="
-                font-family:Arial,Helvetica,sans-serif;
-                padding:30px;
-                max-width:600px;
-                margin:auto;
-                background:#ffffff;
-              ">
+      <body style="
+        margin:0;
+        padding:0;
+        background:#f5f7fb;
+        font-family:Arial,Helvetica,sans-serif;
+      ">
 
-                <h1 style="
-                  color:#ff5d2e;
-                  margin-bottom:10px;
-                ">
-                  TaskEarn
-                </h1>
+        <div style="
+          max-width:600px;
+          margin:30px auto;
+          background:#ffffff;
+          border-radius:16px;
+          padding:30px;
+          box-shadow:0 5px 25px rgba(0,0,0,.08);
+        ">
 
-                <h2>
-                  Email Verification
-                </h2>
+          <h1 style="
+            margin-top:0;
+            color:#ff5d2e;
+          ">
+            TaskEarn
+          </h1>
 
-                <p>
-                  Your TaskEarn verification code is:
-                </p>
+          <h2>
+            Email Verification
+          </h2>
 
-                <div style="
-                  font-size:34px;
-                  font-weight:bold;
-                  letter-spacing:10px;
-                  text-align:center;
-                  background:#f1f3f5;
-                  padding:20px;
-                  border-radius:12px;
-                  margin:20px 0;
-                ">
-                  ${otp}
-                </div>
+          <p>
+            Your TaskEarn verification code is:
+          </p>
 
-                <p>
-                  This OTP expires in 10 minutes.
-                </p>
+          <div style="
+            font-size:34px;
+            font-weight:bold;
+            letter-spacing:10px;
+            text-align:center;
+            background:#f1f3f5;
+            padding:20px;
+            border-radius:12px;
+            margin:20px 0;
+          ">
+            ${otp}
+          </div>
 
-                <p>
-                  If you did not request this code,
-                  please ignore this email.
-                </p>
+          <p>
+            This OTP expires in
+            <strong>10 minutes</strong>.
+          </p>
 
-                <hr>
+          <p>
+            If you did not request this code,
+            please ignore this email.
+          </p>
 
-                <p style="
-                  color:#777;
-                  font-size:12px;
-                ">
-                  This is an automated email from TaskEarn.
-                </p>
+          <hr style="
+            border:0;
+            border-top:1px solid #eeeeee;
+            margin:25px 0;
+          ">
 
-              </div>
-            `
-          })
-      }
-    );
+          <p style="
+            color:#777;
+            font-size:13px;
+          ">
+            TaskEarn Email Verification
+          </p>
 
-  let data = {};
+        </div>
 
-  try {
-    data =
-      await response.json();
-  } catch {
-    data = {};
-  }
-
-  if (!response.ok) {
-    console.error(
-      "Resend API error:",
-      data
-    );
-
-    throw new Error(
-      data?.message ||
-        data?.name ||
-        "Unable to send email verification OTP."
-    );
-  }
-
-  console.log(
-    "Email OTP sent successfully via Resend:",
-    data?.id ||
-      "unknown"
-  );
-
-  return data;
+      </body>
+      </html>
+    `
+  });
 }
 
 /* =====================================================
@@ -725,7 +696,9 @@ async function sendSmsOtp(
       }
     );
 
-  if (!response.ok) {
+  if (
+    !response.ok
+  ) {
     const text =
       await response.text();
 
@@ -738,10 +711,6 @@ async function sendSmsOtp(
       "Unable to send mobile verification OTP."
     );
   }
-
-  console.log(
-    "Mobile OTP sent successfully."
-  );
 }
 
 /* =====================================================
@@ -798,7 +767,8 @@ async function sendOtpFor(
 
   try {
     if (
-      type === "email"
+      type ===
+      "email"
     ) {
       await sendEmailOtp(
         user.email,
@@ -810,7 +780,9 @@ async function sendOtpFor(
         otp
       );
     }
-  } catch (error) {
+  } catch (
+    error
+  ) {
     deleteOtpRecord(
       user.id,
       type,
@@ -822,20 +794,22 @@ async function sendOtpFor(
 }
 
 /* =====================================================
-   LOGIN
+   LOGIN SESSION
 ===================================================== */
 
 function completeLogin(
   req,
   user,
-  remember = false
+  remember
 ) {
   req.session.userId =
     user.id;
 
-  delete req.session.verification;
+  delete req.session
+    .verification;
 
-  delete req.session.withdrawalVerification;
+  delete req.session
+    .withdrawalVerification;
 
   req.session.cookie.maxAge =
     remember
@@ -857,7 +831,9 @@ function completeLogin(
 async function verifyGoogleIdToken(
   idToken
 ) {
-  if (!GOOGLE_CLIENT_ID) {
+  if (
+    !GOOGLE_CLIENT_ID
+  ) {
     throw new Error(
       "Google Sign-In is not configured."
     );
@@ -886,7 +862,9 @@ async function verifyGoogleIdToken(
         )
     );
 
-  if (!response.ok) {
+  if (
+    !response.ok
+  ) {
     throw new Error(
       "Invalid Google authentication token."
     );
@@ -1070,21 +1048,24 @@ app.post(
       );
 
       res.json({
-        success:
-          true,
+        success: true,
 
         user:
           publicUser(
             user
           )
       });
-    } catch (error) {
+    } catch (
+      error
+    ) {
       console.error(
         "Google error:",
         error
       );
 
-      res.status(401).json({
+      res.status(
+        401
+      ).json({
         error:
           error.message ||
           "Google login failed."
@@ -1094,7 +1075,7 @@ app.post(
 );
 
 /* =====================================================
-   STATIC FILES
+   STATIC WEBSITE
 ===================================================== */
 
 app.get(
@@ -1310,7 +1291,9 @@ app.post(
           "register",
           true
         );
-      } catch (error) {
+      } catch (
+        error
+      ) {
         db.users =
           db.users.filter(
             u =>
@@ -1340,13 +1323,17 @@ app.post(
         mobile:
           user.mobile
       });
-    } catch (error) {
+    } catch (
+      error
+    ) {
       console.error(
         "Register error:",
         error
       );
 
-      res.status(500).json({
+      res.status(
+        500
+      ).json({
         error:
           error.message ||
           "Unable to create account."
@@ -1432,9 +1419,6 @@ app.post(
               "email"
           };
 
-        req.session.remember =
-          remember;
-
         await sendOtpFor(
           user,
           "email",
@@ -1469,13 +1453,17 @@ app.post(
             user
           )
       });
-    } catch (error) {
+    } catch (
+      error
+    ) {
       console.error(
         "Login error:",
         error
       );
 
-      res.status(500).json({
+      res.status(
+        500
+      ).json({
         error:
           error.message ||
           "Unable to login."
@@ -1623,15 +1611,12 @@ app.post(
 
       saveDB(db);
 
-      const remember =
-        Boolean(
-          req.session.remember
-        );
-
       completeLogin(
         req,
         user,
-        remember
+        Boolean(
+          req.session.remember
+        )
       );
 
       res.json({
@@ -1643,13 +1628,17 @@ app.post(
             user
           )
       });
-    } catch (error) {
+    } catch (
+      error
+    ) {
       console.error(
         "Verify email OTP:",
         error
       );
 
-      res.status(500).json({
+      res.status(
+        500
+      ).json({
         error:
           error.message ||
           "Unable to verify OTP."
@@ -1704,21 +1693,18 @@ app.post(
 
       res.json({
         message:
-          "A new Email OTP has been sent."
+          "A new Gmail OTP has been sent."
       });
-    } catch (error) {
-      console.error(
-        "Resend email OTP:",
-        error
-      );
-
-      res
-        .status(400)
-        .json({
-          error:
-            error.message ||
-            "Unable to resend OTP."
-        });
+    } catch (
+      error
+    ) {
+      res.status(
+        400
+      ).json({
+        error:
+          error.message ||
+          "Unable to resend OTP."
+      });
     }
   }
 );
@@ -1776,10 +1762,7 @@ app.post(
 app.put(
   "/api/profile",
   requireLogin,
-  (
-    req,
-    res
-  ) => {
+  (req, res) => {
     try {
       const user =
         req.user;
@@ -1881,13 +1864,17 @@ app.put(
             user
           )
       });
-    } catch (error) {
+    } catch (
+      error
+    ) {
       console.error(
         "Profile error:",
         error
       );
 
-      res.status(500).json({
+      res.status(
+        500
+      ).json({
         error:
           "Unable to save profile."
       });
@@ -1902,34 +1889,31 @@ app.put(
 app.get(
   "/api/tasks",
   requireLogin,
-  (
-    req,
-    res
-  ) => {
+  (req, res) => {
     res.json(
       db.tasks
         .filter(
-          t =>
-            t.active !==
+          task =>
+            task.active !==
             false
         )
         .map(
-          t => ({
+          task => ({
             id:
-              t.id,
+              task.id,
 
             title:
-              t.title,
+              task.title,
 
             description:
-              t.description,
+              task.description,
 
             type:
-              t.type,
+              task.type,
 
             reward:
               Number(
-                t.reward
+                task.reward
               ) || 0
           })
         )
@@ -1944,10 +1928,7 @@ app.get(
 app.post(
   "/api/tasks/:id/submit",
   requireLogin,
-  (
-    req,
-    res
-  ) => {
+  (req, res) => {
     const taskId =
       Number(
         req.params.id
@@ -1958,7 +1939,8 @@ app.post(
         t =>
           Number(
             t.id
-          ) === taskId &&
+          ) ===
+            taskId &&
           t.active !==
             false
       );
@@ -2039,16 +2021,13 @@ app.post(
 app.get(
   "/api/my-submissions",
   requireLogin,
-  (
-    req,
-    res
-  ) => {
+  (req, res) => {
     res.json(
       db.submissions
         .filter(
-          s =>
+          submission =>
             String(
-              s.userId
+              submission.userId
             ) ===
             String(
               req.user.id
@@ -2074,16 +2053,13 @@ app.get(
 app.get(
   "/api/wallet",
   requireLogin,
-  (
-    req,
-    res
-  ) => {
+  (req, res) => {
     const withdrawals =
       db.withdrawals
         .filter(
-          w =>
+          withdrawal =>
             String(
-              w.userId
+              withdrawal.userId
             ) ===
             String(
               req.user.id
@@ -2112,7 +2088,7 @@ app.get(
 );
 
 /* =====================================================
-   MOBILE VERIFICATION BEFORE WITHDRAWAL
+   MOBILE OTP - WITHDRAWAL
 ===================================================== */
 
 app.post(
@@ -2173,19 +2149,21 @@ app.post(
         message:
           "Mobile verification OTP sent successfully."
       });
-    } catch (error) {
+    } catch (
+      error
+    ) {
       console.error(
         "Withdrawal mobile OTP:",
         error
       );
 
-      res
-        .status(400)
-        .json({
-          error:
-            error.message ||
-            "Unable to send mobile verification OTP."
-        });
+      res.status(
+        400
+      ).json({
+        error:
+          error.message ||
+          "Unable to send mobile verification OTP."
+      });
     }
   }
 );
@@ -2340,13 +2318,17 @@ app.post(
         message:
           "Mobile number verified successfully."
       });
-    } catch (error) {
+    } catch (
+      error
+    ) {
       console.error(
         "Withdrawal OTP verification:",
         error
       );
 
-      res.status(500).json({
+      res.status(
+        500
+      ).json({
         error:
           error.message ||
           "Unable to verify mobile number."
@@ -2376,9 +2358,7 @@ app.post(
         });
       }
 
-      if (
-        !req.user.mobile
-      ) {
+      if (!req.user.mobile) {
         return res
           .status(400)
           .json({
@@ -2407,19 +2387,16 @@ app.post(
         message:
           "A new mobile OTP has been sent."
       });
-    } catch (error) {
-      console.error(
-        "Resend mobile OTP:",
-        error
-      );
-
-      res
-        .status(400)
-        .json({
-          error:
-            error.message ||
-            "Unable to resend mobile OTP."
-        });
+    } catch (
+      error
+    ) {
+      res.status(
+        400
+      ).json({
+        error:
+          error.message ||
+          "Unable to resend mobile OTP."
+      });
     }
   }
 );
@@ -2431,10 +2408,7 @@ app.post(
 app.post(
   "/api/withdraw",
   requireLogin,
-  (
-    req,
-    res
-  ) => {
+  (req, res) => {
     try {
       if (
         !req.user.mobileVerified
@@ -2530,10 +2504,9 @@ app.post(
             });
         }
 
-        paymentDetails =
-          {
-            upiId
-          };
+        paymentDetails = {
+          upiId
+        };
       } else {
         const accountHolderName =
           cleanText(
@@ -2586,24 +2559,22 @@ app.post(
             });
         }
 
-        paymentDetails =
-          {
-            accountHolderName,
+        paymentDetails = {
+          accountHolderName,
 
-            accountNumber,
+          accountNumber,
 
-            ifscCode,
+          ifscCode,
 
-            bankName
-          };
+          bankName
+        };
       }
 
       req.user.balance =
         Number(
           req.user.balance ||
             0
-        ) -
-        amount;
+        ) - amount;
 
       db.withdrawals.push({
         id:
@@ -2631,13 +2602,17 @@ app.post(
         message:
           "Withdrawal request submitted successfully."
       });
-    } catch (error) {
+    } catch (
+      error
+    ) {
       console.error(
         "Withdrawal error:",
         error
       );
 
-      res.status(500).json({
+      res.status(
+        500
+      ).json({
         error:
           "Unable to submit withdrawal."
       });
@@ -2663,25 +2638,20 @@ app.get(
         new Date().toISOString(),
 
       emailOtp:
-        Boolean(
-          RESEND_API_KEY &&
-            EMAIL_FROM
-        ),
-
-      googleLogin:
-        Boolean(
-          GOOGLE_CLIENT_ID
-        ),
+        GMAIL_USER &&
+        GMAIL_APP_PASSWORD
+          ? "gmail"
+          : "not-configured",
 
       mobileOtp:
-        Boolean(
-          process.env
-            .TWILIO_ACCOUNT_SID &&
-          process.env
-            .TWILIO_AUTH_TOKEN &&
-          process.env
-            .TWILIO_PHONE_NUMBER
-        )
+        process.env
+          .TWILIO_ACCOUNT_SID &&
+        process.env
+          .TWILIO_AUTH_TOKEN &&
+        process.env
+          .TWILIO_PHONE_NUMBER
+          ? "twilio"
+          : "not-configured"
     });
   }
 );
@@ -2692,10 +2662,7 @@ app.get(
 
 app.use(
   "/api",
-  (
-    req,
-    res
-  ) => {
+  (req, res) => {
     res
       .status(404)
       .json({
@@ -2706,7 +2673,7 @@ app.use(
 );
 
 /* =====================================================
-   ERROR HANDLER
+   GLOBAL ERROR
 ===================================================== */
 
 app.use(
@@ -2749,16 +2716,12 @@ app.listen(
     );
 
     console.log(
-      `Resend Email OTP configured: ${
-        RESEND_API_KEY &&
-        EMAIL_FROM
+      `Gmail OTP configured: ${
+        GMAIL_USER &&
+        GMAIL_APP_PASSWORD
           ? "YES"
           : "NO"
       }`
-    );
-
-    console.log(
-      `Email From: ${EMAIL_FROM}`
     );
 
     console.log(
