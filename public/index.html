@@ -162,7 +162,7 @@ input:focus, select:focus, textarea:focus {
 
 <header class="header">
   <div class="header-inner">
-    <div class="logo" onclick="handleLogoClick()">TaskEarn</div>
+    <div class="logo" onclick="checkSession()">TaskEarn</div>
     <nav id="mainNav" class="nav" style="display:none;">
       <button onclick="renderTasksView()" id="navTasks">Tasks</button>
       <button onclick="renderSubmissionsView()" id="navSubmissions">Submissions</button>
@@ -237,7 +237,7 @@ input:focus, select:focus, textarea:focus {
       <label style="font-weight:normal; cursor:pointer;">
         <input type="checkbox" id="loginRemember" style="width:auto;"> Remember me for 30 days
       </label>
-      <br><br>
+      <br>
       <button class="primary" type="submit" id="btnLoginSubmit">Login</button>
       
       <div class="divider">OR</div>
@@ -390,8 +390,7 @@ function toggleProfilePanel(e) {
 }
 
 window.addEventListener("click", () => {
-  const panel = document.getElementById("profilePanel");
-  if (panel) panel.classList.remove("open");
+  document.getElementById("profilePanel").classList.remove("open");
 });
 
 /* GOOGLE AUTHENTICATION */
@@ -602,7 +601,7 @@ async function renderTasksView() {
     }
 
     container.innerHTML = `<div class="grid">` + tasks.map(t => `
-      <div class="card" style="display:flex; flex-direction:column; justify-content:space-between;">
+      <div class="card" style="display:flex; flex-direction:column; justify-space-between;">
         <div>
           <span class="badge pending">${escapeHtml(t.type || "General")}</span>
           <h3 style="margin:10px 0 5px;">${escapeHtml(t.title)}</h3>
@@ -679,7 +678,7 @@ async function renderWalletView() {
   const app = document.getElementById("appContent");
   app.innerHTML = `
     <div class="card">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
         <div>
           <span class="muted">Wallet Balance</span>
           <h1 style="margin:5px 0; font-size:36px; color:#13a05a;">₹<span id="walletBalance">0.00</span></h1>
@@ -869,7 +868,7 @@ async function saveProfile(e) {
   }
 }
 
-/* SESSION, LOGOUT & LOGO NAVIGATION */
+/* SESSION & LOGOUT */
 async function logoutUser() {
   try { await api("/api/logout", { method: "POST" }); } catch {}
   currentUser = null;
@@ -877,16 +876,6 @@ async function logoutUser() {
   document.getElementById("appArea").classList.add("hidden");
   document.getElementById("authArea").classList.add("hidden");
   document.getElementById("homeArea").classList.remove("hidden");
-}
-
-function handleLogoClick() {
-  if (currentUser) {
-    renderTasksView();
-  } else {
-    document.getElementById("appArea").classList.add("hidden");
-    document.getElementById("authArea").classList.add("hidden");
-    document.getElementById("homeArea").classList.remove("hidden");
-  }
 }
 
 async function checkSession() {
