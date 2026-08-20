@@ -3,1681 +3,3277 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TaskEarn - Complete Tasks & Earn Rewards</title>
+<title>TaskEarn</title>
+
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 
 <style>
-*{box-sizing:border-box}
-html,body{margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;background:#f7f8fc;color:#171b2d}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
-.header{position:sticky;top:0;z-index:1000;background:rgba(255,255,255,.96);backdrop-filter:blur(18px);border-bottom:1px solid #e8eaf0}
-.header-inner{max-width:1100px;margin:auto;min-height:70px;padding:10px 18px;display:flex;align-items:center;justify-content:space-between}
-.logo{font-size:24px;font-weight:900;color:#ff5d2e;cursor:pointer}
-.nav{display:flex;align-items:center;gap:8px}
-.nav button{border:0;background:transparent;padding:10px 14px;border-radius:12px;font-weight:700;color:#596174}
-.nav button:hover,.nav button.active{background:#fff1eb;color:#ff5d2e}
-.header-profile{position:relative}
-.profile-avatar-button{width:44px;height:44px;border:0;border-radius:50%;background:#ff5d2e;color:#fff;font-weight:900;font-size:18px}
-.header-profile-panel{position:absolute;right:0;top:52px;width:230px;background:#fff;border:1px solid #e7e9ef;border-radius:18px;box-shadow:0 15px 40px rgba(20,30,60,.16);padding:12px;display:none;z-index:1001}
-.header-profile-panel.open{display:block}
-.header-profile-panel button{width:100%;border:0;background:transparent;text-align:left;padding:12px;border-radius:12px;font-weight:700}
-.header-profile-panel button:hover{background:#f5f6fa}
-.container{max-width:1100px;margin:auto;padding:25px 18px 100px}
-.hero{padding:40px 0 20px}
-.hero h1{font-size:clamp(32px,6vw,56px);line-height:1.1;margin:0 0 18px}
-.hero h1 span{color:#ff5d2e}
-.hero p{max-width:680px;color:#697286;font-size:16px;line-height:1.6}
-.card{background:#fff;border:1px solid #e7e9ef;border-radius:20px;padding:22px;margin-bottom:18px;box-shadow:0 8px 25px rgba(20,30,60,.05)}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-label{display:block;font-weight:700;margin-bottom:7px;font-size:14px}
-input,select,textarea{width:100%;padding:13px 14px;border:1px solid #dfe2e9;border-radius:12px;outline:none;background:#fff}
-input:focus,select:focus,textarea:focus{border-color:#ff5d2e;box-shadow:0 0 0 3px rgba(255,93,46,.1)}
-.primary{width:100%;border:0;background:#ff5d2e;color:#fff;padding:14px 18px;border-radius:13px;font-weight:800}
-.primary:hover{opacity:.92}
-.primary:disabled{background:#ccc;cursor:not-allowed}
-.secondary{border:1px solid #e0e3ea;background:#fff;color:#30374a;padding:12px 16px;border-radius:12px;font-weight:700}
-.danger{background:#fff0f0!important;color:#d73535!important}
-.muted{color:#70798b}
-.hidden{display:none!important}
-.notice{padding:13px 15px;border-radius:12px;margin-bottom:15px;font-weight:700;font-size:14px}
-.notice.error{background:#fff0f0;color:#c92e2e}
-.notice.success{background:#ecfff3;color:#168346}
-.auth-tabs{display:flex;gap:8px;margin-bottom:18px}
-.auth-tabs button{flex:1;padding:12px;border:0;border-radius:12px;background:#f1f3f7;font-weight:800;color:#596174}
-.auth-tabs button.active{background:#ff5d2e;color:#fff}
-.google-area{margin-top:15px;display:flex;justify-content:center;min-height:44px}
-.divider{display:flex;align-items:center;gap:10px;margin:18px 0;color:#8a92a2;font-size:13px}
-.divider:before,.divider:after{content:"";height:1px;background:#e3e5eb;flex:1}
-.reward{font-size:22px;font-weight:900;color:#13a05a;margin:8px 0}
-.badge{display:inline-block;padding:4px 10px;border-radius:8px;font-size:12px;font-weight:800;text-transform:uppercase}
-.badge.pending{background:#fff8e6;color:#b7791f}
-.badge.approved{background:#e6fffa;color:#234e52}
-.badge.rejected{background:#ffe6e6;color:#9b2c2c}
-.modal{position:fixed;inset:0;background:rgba(10,15,30,.55);display:none;align-items:center;justify-content:center;z-index:3000;padding:18px}
-.modal.open{display:flex}
-.modal-box{width:min(480px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:22px;padding:22px}
-.modal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
-.close{border:0;background:#f1f3f7;width:36px;height:36px;border-radius:50%;font-size:20px}
-.mobile-bottom-nav{position:fixed;display:none;left:10px;right:10px;bottom:10px;height:60px;z-index:1500;background:rgba(255,255,255,.96);backdrop-filter:blur(18px);border:1px solid #e7e9ef;border-radius:20px;box-shadow:0 12px 35px rgba(20,30,60,.16);align-items:center;justify-content:space-around;padding:5px}
-.mobile-bottom-nav.logged-in{display:flex}
-.bottom-item{border:0;background:transparent;height:50px;min-width:75px;border-radius:15px;color:#70798b;font-size:11px;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
-.bottom-item.active{background:#fff1eb;color:#ff5d2e}
-.status-box{background:#f7f8fc;padding:14px;border-radius:12px;margin:12px 0}
-@media(max-width:760px){
-.nav{display:none}
-.form-grid{grid-template-columns:1fr}
-.container{padding-bottom:90px}
+*{
+  box-sizing:border-box;
+}
+
+html,body{
+  margin:0;
+  padding:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#f5f7fb;
+  color:#171a21;
+}
+
+button,
+input,
+select{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+.hidden{
+  display:none !important;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.header{
+  background:linear-gradient(135deg,#ff5d2e,#ff2f68);
+  color:white;
+  padding:18px 20px;
+  position:sticky;
+  top:0;
+  z-index:50;
+  box-shadow:0 3px 15px rgba(0,0,0,.15);
+}
+
+.header-inner{
+  max-width:1100px;
+  margin:auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.logo{
+  font-size:25px;
+  font-weight:800;
+}
+
+.header-user{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.avatar-small{
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  object-fit:cover;
+  background:white;
+  color:#ff4d3a;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-weight:bold;
+}
+
+/* =========================
+   MAIN
+========================= */
+
+.container{
+  max-width:1100px;
+  margin:auto;
+  padding:25px 16px 90px;
+}
+
+.card{
+  background:#fff;
+  border-radius:18px;
+  padding:22px;
+  margin-bottom:18px;
+  box-shadow:0 5px 25px rgba(0,0,0,.06);
+}
+
+h1,h2,h3{
+  margin-top:0;
+}
+
+/* =========================
+   AUTH
+========================= */
+
+.auth-wrapper{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:
+    radial-gradient(circle at top left,#ffe2d8,transparent 35%),
+    radial-gradient(circle at bottom right,#ffdbe7,transparent 35%),
+    #f5f7fb;
+}
+
+.auth-card{
+  width:100%;
+  max-width:460px;
+  background:white;
+  border-radius:24px;
+  padding:28px;
+  box-shadow:0 15px 50px rgba(0,0,0,.10);
+}
+
+.auth-logo{
+  text-align:center;
+  font-size:34px;
+  font-weight:900;
+  color:#ff4c39;
+  margin-bottom:5px;
+}
+
+.auth-subtitle{
+  text-align:center;
+  color:#777;
+  margin-bottom:25px;
+}
+
+.form-group{
+  margin-bottom:15px;
+}
+
+label{
+  display:block;
+  font-weight:700;
+  font-size:14px;
+  margin-bottom:7px;
+}
+
+input,
+select{
+  width:100%;
+  padding:13px 14px;
+  border:1px solid #ddd;
+  border-radius:11px;
+  outline:none;
+  background:#fff;
+}
+
+input:focus,
+select:focus{
+  border-color:#ff5938;
+  box-shadow:0 0 0 3px rgba(255,89,56,.10);
+}
+
+.primary-btn{
+  width:100%;
+  border:0;
+  border-radius:12px;
+  padding:14px;
+  background:linear-gradient(135deg,#ff5d2e,#ff2f68);
+  color:#fff;
+  font-weight:800;
+  margin-top:5px;
+}
+
+.primary-btn:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}
+
+.secondary-btn{
+  width:100%;
+  border:1px solid #ddd;
+  border-radius:12px;
+  padding:13px;
+  background:#fff;
+  font-weight:700;
+}
+
+.google-box{
+  margin:18px 0;
+  display:flex;
+  justify-content:center;
+}
+
+.divider{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:18px 0;
+  color:#999;
+  font-size:13px;
+}
+
+.divider::before,
+.divider::after{
+  content:"";
+  flex:1;
+  height:1px;
+  background:#ddd;
+}
+
+.auth-switch{
+  text-align:center;
+  margin-top:20px;
+  color:#666;
+}
+
+.link-btn{
+  border:0;
+  background:none;
+  color:#ff4c39;
+  font-weight:800;
+}
+
+/* =========================
+   ALERT
+========================= */
+
+.alert{
+  padding:12px 14px;
+  border-radius:10px;
+  margin-bottom:15px;
+  font-size:14px;
+  font-weight:600;
+}
+
+.alert.error{
+  background:#ffe9e9;
+  color:#b42318;
+}
+
+.alert.success{
+  background:#e7f8ed;
+  color:#147a3e;
+}
+
+/* =========================
+   DASHBOARD
+========================= */
+
+.hero{
+  background:linear-gradient(135deg,#ff5d2e,#ff2f68);
+  color:#fff;
+  border-radius:22px;
+  padding:25px;
+  margin-bottom:20px;
+}
+
+.hero h1{
+  margin-bottom:8px;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:15px;
+}
+
+.stat{
+  background:white;
+  border-radius:16px;
+  padding:18px;
+  box-shadow:0 5px 20px rgba(0,0,0,.05);
+}
+
+.stat-title{
+  color:#777;
+  font-size:13px;
+}
+
+.stat-value{
+  font-size:25px;
+  font-weight:900;
+  margin-top:7px;
+}
+
+/* =========================
+   TASKS
+========================= */
+
+.task-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+}
+
+.task-card{
+  background:#fff;
+  border-radius:17px;
+  padding:20px;
+  box-shadow:0 5px 20px rgba(0,0,0,.05);
+  display:flex;
+  flex-direction:column;
+}
+
+.task-type{
+  display:inline-block;
+  background:#fff0eb;
+  color:#ff4c39;
+  border-radius:20px;
+  padding:6px 10px;
+  font-size:12px;
+  font-weight:800;
+  margin-bottom:10px;
+}
+
+.task-card h3{
+  margin-bottom:8px;
+}
+
+.task-description{
+  color:#666;
+  line-height:1.5;
+  font-size:14px;
+  flex:1;
+}
+
+.reward{
+  font-size:22px;
+  font-weight:900;
+  color:#1b9a55;
+  margin:15px 0;
+}
+
+/* =========================
+   PROFILE
+========================= */
+
+.profile-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+}
+
+/* =========================
+   WALLET
+========================= */
+
+.balance-card{
+  background:linear-gradient(135deg,#111827,#374151);
+  color:#fff;
+  border-radius:20px;
+  padding:25px;
+}
+
+.balance{
+  font-size:38px;
+  font-weight:900;
+  margin-top:8px;
+}
+
+/* =========================
+   TABLE
+========================= */
+
+.table-wrap{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+th,td{
+  text-align:left;
+  padding:12px 10px;
+  border-bottom:1px solid #eee;
+  font-size:14px;
+}
+
+.status{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:800;
+}
+
+.status.pending{
+  background:#fff4d8;
+  color:#9a6700;
+}
+
+.status.approved{
+  background:#e7f8ed;
+  color:#147a3e;
+}
+
+.status.rejected{
+  background:#ffe9e9;
+  color:#b42318;
+}
+
+/* =========================
+   NAVIGATION
+========================= */
+
+.bottom-nav{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:white;
+  border-top:1px solid #eee;
+  z-index:40;
+  box-shadow:0 -5px 20px rgba(0,0,0,.08);
+}
+
+.bottom-nav-inner{
+  max-width:700px;
+  margin:auto;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+}
+
+.nav-btn{
+  border:0;
+  background:white;
+  padding:12px 5px;
+  color:#777;
+  font-size:12px;
+  font-weight:700;
+}
+
+.nav-btn.active{
+  color:#ff4c39;
+}
+
+/* =========================
+   MODAL
+========================= */
+
+.modal-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.65);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:18px;
+  z-index:1000;
+}
+
+.modal{
+  width:100%;
+  max-width:430px;
+  background:white;
+  border-radius:22px;
+  padding:25px;
+  box-shadow:0 20px 70px rgba(0,0,0,.30);
+  animation:popup .2s ease-out;
+}
+
+@keyframes popup{
+  from{
+    opacity:0;
+    transform:scale(.92);
+  }
+  to{
+    opacity:1;
+    transform:scale(1);
+  }
+}
+
+.modal-icon{
+  width:65px;
+  height:65px;
+  border-radius:50%;
+  background:#fff0eb;
+  color:#ff4c39;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:28px;
+  margin:0 auto 15px;
+}
+
+.modal h2{
+  text-align:center;
+}
+
+.modal-text{
+  text-align:center;
+  color:#666;
+  line-height:1.5;
+}
+
+.otp-input{
+  text-align:center;
+  font-size:30px;
+  letter-spacing:10px;
+  font-weight:900;
+  margin:18px 0;
+}
+
+.resend-row{
+  text-align:center;
+  margin-top:15px;
+  font-size:14px;
+  color:#777;
+}
+
+.resend-btn{
+  border:0;
+  background:none;
+  color:#ff4c39;
+  font-weight:800;
+}
+
+.close-modal{
+  width:100%;
+  margin-top:10px;
+}
+
+/* =========================
+   LOADING
+========================= */
+
+.loading{
+  text-align:center;
+  padding:30px;
+  color:#777;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:800px){
+  .task-grid{
+    grid-template-columns:1fr;
+  }
+
+  .stats{
+    grid-template-columns:1fr;
+  }
+}
+
+@media(max-width:600px){
+  .profile-grid{
+    grid-template-columns:1fr;
+  }
+
+  .auth-card{
+    padding:22px;
+  }
+
+  .container{
+    padding:18px 12px 90px;
+  }
+
+  .hero{
+    padding:20px;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<header class="header">
-<div class="header-inner">
+<!-- =====================================================
+     AUTH PAGE
+===================================================== -->
 
-<div class="logo" onclick="goHome()">TaskEarn</div>
+<div id="authPage" class="auth-wrapper">
 
-<nav id="mainNav" class="nav" style="display:none">
-<button onclick="renderTasksView()" id="navTasks">Tasks</button>
-<button onclick="renderSubmissionsView()" id="navSubmissions">Submissions</button>
-<button onclick="renderWalletView()" id="navWallet">Wallet</button>
-<button onclick="renderProfileView()" id="navProfile">Profile</button>
-</nav>
+  <div class="auth-card">
 
-<div id="headerProfile" class="header-profile" style="display:none">
-<button class="profile-avatar-button" onclick="toggleProfilePanel(event)">
-<span id="headerAvatarInitials">U</span>
-</button>
+    <div class="auth-logo">
+      TaskEarn
+    </div>
 
-<div id="profilePanel" class="header-profile-panel">
-<div id="profilePanelName" style="font-weight:900;padding:8px 10px 2px">User</div>
-<div id="profilePanelEmail" class="muted" style="padding:0 10px 10px;font-size:12px"></div>
-<button onclick="renderProfileView()">👤 Profile</button>
-<button onclick="renderWalletView()">💰 Wallet</button>
-<button onclick="renderSubmissionsView()">📜 Submissions</button>
-<button class="danger" onclick="logoutUser()">🚪 Logout</button>
-</div>
-</div>
+    <div class="auth-subtitle">
+      Complete tasks. Earn rewards.
+    </div>
 
-</div>
-</header>
+    <div id="authAlert"></div>
 
-<main class="container">
+    <!-- LOGIN -->
 
-<section id="homeArea">
+    <div id="loginForm">
 
-<div class="hero">
-<h1>Complete Tasks.<br><span>Earn Rewards.</span></h1>
-<p>Complete simple online tasks, submit them for review and earn rewards.</p>
+      <h2>Welcome Back</h2>
 
-<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:20px">
-<button class="primary" style="width:auto;padding:12px 24px" onclick="openAuth('register')">Get Started</button>
-<button class="secondary" onclick="openAuth('login')">Login</button>
-</div>
-</div>
+      <div class="form-group">
+        <label>Email</label>
+        <input
+          id="loginEmail"
+          type="email"
+          placeholder="Enter your Gmail"
+          autocomplete="email"
+        >
+      </div>
 
-<div class="grid">
-<div class="card">
-<h3>📋 Easy Tasks</h3>
-<p class="muted">Complete available tasks anytime.</p>
-</div>
+      <div class="form-group">
+        <label>Password</label>
+        <input
+          id="loginPassword"
+          type="password"
+          placeholder="Enter your password"
+          autocomplete="current-password"
+        >
+      </div>
 
-<div class="card">
-<h3>💰 Fair Rewards</h3>
-<p class="muted">Approved tasks add rewards to your wallet.</p>
-</div>
+      <div class="form-group">
+        <label>
+          <input
+            id="rememberMe"
+            type="checkbox"
+            style="width:auto;margin-right:6px"
+          >
+          Remember me
+        </label>
+      </div>
 
-<div class="card">
-<h3>🔐 Secure</h3>
-<p class="muted">Gmail OTP protects your account and mobile OTP protects withdrawals.</p>
-</div>
-</div>
+      <button
+        id="loginBtn"
+        class="primary-btn"
+        onclick="loginUser()"
+      >
+        Login
+      </button>
 
-</section>
+      <div class="divider">
+        OR
+      </div>
 
-<section id="authArea" class="hidden">
+      <div id="googleLoginButton" class="google-box"></div>
 
-<div class="card" style="max-width:480px;margin:20px auto">
+      <div class="auth-switch">
+        Don't have an account?
+        <button
+          class="link-btn"
+          onclick="showRegister()"
+        >
+          Register
+        </button>
+      </div>
 
-<div class="auth-tabs">
-<button id="loginTab" onclick="showAuthMode('login')">Login</button>
-<button id="registerTab" onclick="showAuthMode('register')">Register</button>
-</div>
+    </div>
 
-<div id="authMessage" class="hidden"></div>
 
-<form id="loginForm" onsubmit="loginUser(event)">
+    <!-- REGISTER -->
 
-<h2>Welcome Back 👋</h2>
-<p class="muted">Login using your email/password or Google.</p>
+    <div id="registerForm" class="hidden">
 
-<label>Email Address</label>
-<input id="loginEmail" type="email" required placeholder="name@example.com">
+      <h2>Create Account</h2>
 
-<br><br>
+      <div class="form-group">
+        <label>Full Name</label>
+        <input
+          id="registerName"
+          type="text"
+          placeholder="Enter your full name"
+          maxlength="80"
+        >
+      </div>
 
-<label>Password</label>
-<input id="loginPassword" type="password" required placeholder="••••••••">
+      <div class="form-group">
+        <label>Email</label>
+        <input
+          id="registerEmail"
+          type="email"
+          placeholder="Enter your Gmail"
+          autocomplete="email"
+        >
+      </div>
 
-<br><br>
+      <div class="form-group">
+        <label>Mobile Number</label>
+        <input
+          id="registerMobile"
+          type="tel"
+          placeholder="+919876543210"
+          maxlength="16"
+        >
+      </div>
 
-<label style="font-weight:normal">
-<input type="checkbox" id="loginRemember" style="width:auto">
-Remember me for 30 days
-</label>
+      <div class="form-group">
+        <label>City</label>
+        <input
+          id="registerCity"
+          type="text"
+          placeholder="Enter your city"
+          maxlength="80"
+        >
+      </div>
 
-<br>
+      <div class="form-group">
+        <label>Password</label>
+        <input
+          id="registerPassword"
+          type="password"
+          placeholder="Minimum 6 characters"
+          autocomplete="new-password"
+        >
+      </div>
 
-<button class="primary" type="submit" id="btnLoginSubmit">Login</button>
+      <button
+        id="registerBtn"
+        class="primary-btn"
+        onclick="registerUser()"
+      >
+        Create Account
+      </button>
 
-<div class="divider">OR</div>
-<div id="googleLoginButton" class="google-area"></div>
+      <div class="divider">
+        OR
+      </div>
 
-</form>
+      <div id="googleRegisterButton" class="google-box"></div>
 
-<form id="registerForm" class="hidden" onsubmit="registerUser(event)">
+      <div class="auth-switch">
+        Already have an account?
+        <button
+          class="link-btn"
+          onclick="showLogin()"
+        >
+          Login
+        </button>
+      </div>
 
-<h2>Create Account 🚀</h2>
-<p class="muted">Create your TaskEarn account.</p>
+    </div>
 
-<label>Full Name</label>
-<input id="registerName" required>
-
-<br><br>
-
-<label>Gmail / Email</label>
-<input id="registerEmail" type="email" required placeholder="name@gmail.com">
-
-<br><br>
-
-<label>Mobile Number</label>
-<input id="registerMobile" type="tel" required placeholder="+919876543210">
-
-<br><br>
-
-<label>City</label>
-<input id="registerCity" required>
-
-<br><br>
-
-<label>Password</label>
-<input id="registerPassword" type="password" minlength="6" required>
-
-<br><br>
-
-<button class="primary" type="submit" id="btnRegisterSubmit">Create Account</button>
-
-<div class="divider">OR</div>
-<div id="googleRegisterButton" class="google-area"></div>
-
-</form>
-
-</div>
-</section>
-
-<section id="appArea" class="hidden">
-<div id="appContent"></div>
-</section>
-
-</main>
-
-<!-- GMAIL OTP -->
-<div id="otpModal" class="modal">
-
-<div class="modal-box">
-
-<div class="modal-head">
-<h3 id="otpTitle" style="margin:0">Verify Email</h3>
-<button class="close" onclick="closeOtpModal()">×</button>
-</div>
-
-<p id="otpMessage" class="muted"></p>
-
-<label>6-Digit OTP</label>
-<input id="otpInput" maxlength="6" inputmode="numeric" placeholder="123456" style="text-align:center;font-size:22px;letter-spacing:6px">
-
-<br><br>
-
-<button class="primary" id="btnVerifyOtp" onclick="verifyOtp()">Verify OTP</button>
-
-<br><br>
-
-<button class="secondary" style="width:100%" onclick="resendOtp()">Resend OTP</button>
-
-</div>
+  </div>
 </div>
 
-<!-- MOBILE WITHDRAWAL OTP -->
-<div id="mobileOtpModal" class="modal">
 
-<div class="modal-box">
+<!-- =====================================================
+     DASHBOARD
+===================================================== -->
 
-<div class="modal-head">
-<h3 style="margin:0">Mobile Verification 📱</h3>
-<button class="close" onclick="closeMobileOtpModal()">×</button>
+<div id="appPage" class="hidden">
+
+  <header class="header">
+
+    <div class="header-inner">
+
+      <div class="logo">
+        TaskEarn
+      </div>
+
+      <div class="header-user">
+
+        <span id="headerName">
+          User
+        </span>
+
+        <div
+          id="headerAvatar"
+          class="avatar-small"
+        >
+          U
+        </div>
+
+      </div>
+
+    </div>
+
+  </header>
+
+
+  <main class="container">
+
+    <!-- HOME -->
+
+    <section id="homeSection">
+
+      <div class="hero">
+
+        <h1>
+          Hello, <span id="welcomeName">User</span> 👋
+        </h1>
+
+        <p>
+          Complete available tasks and earn rewards.
+        </p>
+
+      </div>
+
+      <div class="stats">
+
+        <div class="stat">
+          <div class="stat-title">
+            Wallet Balance
+          </div>
+
+          <div
+            id="homeBalance"
+            class="stat-value"
+          >
+            ₹0
+          </div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-title">
+            Email
+          </div>
+
+          <div
+            id="emailStatus"
+            class="stat-value"
+            style="font-size:16px"
+          >
+            —
+          </div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-title">
+            Mobile
+          </div>
+
+          <div
+            id="mobileStatus"
+            class="stat-value"
+            style="font-size:16px"
+          >
+            —
+          </div>
+        </div>
+
+      </div>
+
+      <div class="card" style="margin-top:20px">
+
+        <h2>
+          Available Tasks
+        </h2>
+
+        <div
+          id="homeTasks"
+          class="task-grid"
+        >
+          <div class="loading">
+            Loading tasks...
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- TASKS -->
+
+    <section id="tasksSection" class="hidden">
+
+      <div class="card">
+
+        <h2>
+          Available Tasks
+        </h2>
+
+        <div
+          id="tasksList"
+          class="task-grid"
+        >
+          <div class="loading">
+            Loading tasks...
+          </div>
+        </div>
+
+      </div>
+
+      <div class="card">
+
+        <h2>
+          My Submissions
+        </h2>
+
+        <div
+          id="submissionsList"
+          class="table-wrap"
+        >
+          Loading...
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- WALLET -->
+
+    <section id="walletSection" class="hidden">
+
+      <div class="balance-card">
+
+        <div>
+          Available Balance
+        </div>
+
+        <div
+          id="walletBalance"
+          class="balance"
+        >
+          ₹0
+        </div>
+
+      </div>
+
+      <div class="card">
+
+        <h2>
+          Withdraw Earnings
+        </h2>
+
+        <div id="withdrawAlert"></div>
+
+        <div class="form-group">
+
+          <label>
+            Amount
+          </label>
+
+          <input
+            id="withdrawAmount"
+            type="number"
+            min="100"
+            placeholder="Minimum ₹100"
+          >
+
+        </div>
+
+        <div class="form-group">
+
+          <label>
+            Payment Method
+          </label>
+
+          <select
+            id="withdrawMethod"
+            onchange="changePaymentMethod()"
+          >
+
+            <option value="UPI">
+              UPI
+            </option>
+
+            <option value="Bank Account">
+              Bank Account
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <!-- UPI -->
+
+        <div id="upiFields">
+
+          <div class="form-group">
+
+            <label>
+              UPI ID
+            </label>
+
+            <input
+              id="upiId"
+              type="text"
+              placeholder="example@upi"
+            >
+
+          </div>
+
+        </div>
+
+
+        <!-- BANK -->
+
+        <div id="bankFields" class="hidden">
+
+          <div class="form-group">
+
+            <label>
+              Account Holder Name
+            </label>
+
+            <input
+              id="accountHolderName"
+              type="text"
+            >
+
+          </div>
+
+          <div class="form-group">
+
+            <label>
+              Account Number
+            </label>
+
+            <input
+              id="accountNumber"
+              type="text"
+            >
+
+          </div>
+
+          <div class="form-group">
+
+            <label>
+              IFSC Code
+            </label>
+
+            <input
+              id="ifscCode"
+              type="text"
+              maxlength="11"
+            >
+
+          </div>
+
+          <div class="form-group">
+
+            <label>
+              Bank Name
+            </label>
+
+            <input
+              id="bankName"
+              type="text"
+            >
+
+          </div>
+
+        </div>
+
+
+        <button
+          class="primary-btn"
+          onclick="withdrawMoney()"
+        >
+          Request Withdrawal
+        </button>
+
+      </div>
+
+
+      <div class="card">
+
+        <h2>
+          Withdrawal History
+        </h2>
+
+        <div
+          id="withdrawalHistory"
+          class="table-wrap"
+        >
+          Loading...
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- PROFILE -->
+
+    <section id="profileSection" class="hidden">
+
+      <div class="card">
+
+        <h2>
+          My Profile
+        </h2>
+
+        <div id="profileAlert"></div>
+
+        <div class="profile-grid">
+
+          <div class="form-group">
+
+            <label>
+              Name
+            </label>
+
+            <input
+              id="profileName"
+              type="text"
+            >
+
+          </div>
+
+          <div class="form-group">
+
+            <label>
+              Email
+            </label>
+
+            <input
+              id="profileEmail"
+              type="email"
+              disabled
+            >
+
+          </div>
+
+          <div class="form-group">
+
+            <label>
+              Mobile
+            </label>
+
+            <input
+              id="profileMobile"
+              type="tel"
+            >
+
+          </div>
+
+          <div class="form-group">
+
+            <label>
+              City
+            </label>
+
+            <input
+              id="profileCity"
+              type="text"
+            >
+
+          </div>
+
+        </div>
+
+        <button
+          class="primary-btn"
+          onclick="saveProfile()"
+        >
+          Save Profile
+        </button>
+
+        <button
+          class="secondary-btn"
+          style="margin-top:10px"
+          onclick="logoutUser()"
+        >
+          Logout
+        </button>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- BOTTOM NAV -->
+
+  <nav class="bottom-nav">
+
+    <div class="bottom-nav-inner">
+
+      <button
+        id="navHome"
+        class="nav-btn active"
+        onclick="showSection('home')"
+      >
+        🏠<br>
+        Home
+      </button>
+
+      <button
+        id="navTasks"
+        class="nav-btn"
+        onclick="showSection('tasks')"
+      >
+        📋<br>
+        Tasks
+      </button>
+
+      <button
+        id="navWallet"
+        class="nav-btn"
+        onclick="showSection('wallet')"
+      >
+        💰<br>
+        Wallet
+      </button>
+
+      <button
+        id="navProfile"
+        class="nav-btn"
+        onclick="showSection('profile')"
+      >
+        👤<br>
+        Profile
+      </button>
+
+    </div>
+
+  </nav>
+
 </div>
 
-<div id="mobileOtpStatus" class="status-box">
-A verification code will be sent to your registered mobile number.
+
+<!-- =====================================================
+     EMAIL OTP MODAL
+===================================================== -->
+
+<div
+  id="emailOtpModal"
+  class="modal-overlay hidden"
+>
+
+  <div class="modal">
+
+    <div class="modal-icon">
+      ✉️
+    </div>
+
+    <h2>
+      Verify Your Email
+    </h2>
+
+    <p class="modal-text">
+
+      We sent a 6-digit verification code to
+
+      <strong id="otpEmail">
+        your email
+      </strong>.
+
+      <br><br>
+
+      Please enter the OTP below.
+
+    </p>
+
+    <div id="otpAlert"></div>
+
+    <input
+      id="otpInput"
+      class="otp-input"
+      type="text"
+      inputmode="numeric"
+      autocomplete="one-time-code"
+      maxlength="6"
+      placeholder="000000"
+    >
+
+    <button
+      id="verifyOtpBtn"
+      class="primary-btn"
+      onclick="verifyEmailOtp()"
+    >
+      Verify OTP
+    </button>
+
+    <div class="resend-row">
+
+      <span id="resendText">
+        You can resend OTP in 60 seconds.
+      </span>
+
+      <br>
+
+      <button
+        id="resendOtpBtn"
+        class="resend-btn"
+        onclick="resendEmailOtp()"
+        disabled
+      >
+        Resend OTP
+      </button>
+
+    </div>
+
+    <button
+      class="secondary-btn close-modal"
+      onclick="closeOtpModal()"
+    >
+      Cancel
+    </button>
+
+  </div>
+
 </div>
 
-<div id="mobileOtpInputArea" class="hidden">
 
-<label>6-Digit Mobile OTP</label>
+<!-- =====================================================
+     MOBILE OTP MODAL
+===================================================== -->
 
-<input id="mobileOtpInput" maxlength="6" inputmode="numeric" placeholder="123456" style="text-align:center;font-size:22px;letter-spacing:6px">
+<div
+  id="mobileOtpModal"
+  class="modal-overlay hidden"
+>
 
-<br><br>
+  <div class="modal">
 
-<button class="primary" id="btnVerifyMobileOtp" onclick="verifyMobileOtp()">Verify Mobile</button>
+    <div class="modal-icon">
+      📱
+    </div>
 
-<br><br>
+    <h2>
+      Verify Mobile
+    </h2>
 
-<button class="secondary" style="width:100%" onclick="resendMobileOtp()">Resend OTP</button>
+    <p class="modal-text">
+
+      A 6-digit OTP was sent to
+
+      <strong id="mobileOtpNumber">
+        your mobile
+      </strong>.
+
+    </p>
+
+    <div id="mobileOtpAlert"></div>
+
+    <input
+      id="mobileOtpInput"
+      class="otp-input"
+      type="text"
+      inputmode="numeric"
+      autocomplete="one-time-code"
+      maxlength="6"
+      placeholder="000000"
+    >
+
+    <button
+      id="verifyMobileBtn"
+      class="primary-btn"
+      onclick="verifyMobileOtp()"
+    >
+      Verify Mobile
+    </button>
+
+    <div class="resend-row">
+
+      <span id="mobileResendText">
+        Resend available soon.
+      </span>
+
+      <br>
+
+      <button
+        id="resendMobileBtn"
+        class="resend-btn"
+        onclick="resendMobileOtp()"
+        disabled
+      >
+        Resend OTP
+      </button>
+
+    </div>
+
+    <button
+      class="secondary-btn close-modal"
+      onclick="closeMobileOtpModal()"
+    >
+      Cancel
+    </button>
+
+  </div>
 
 </div>
 
-<div id="mobileOtpSendArea">
-<button class="primary" onclick="sendMobileOtp()" id="btnSendMobileOtp">Send OTP</button>
-</div>
-
-</div>
-</div>
-
-<!-- MOBILE NAV -->
-<div id="mobileBottomNav" class="mobile-bottom-nav">
-
-<button class="bottom-item" id="mbTasks" onclick="renderTasksView()">
-<span>🏠</span><span>Tasks</span>
-</button>
-
-<button class="bottom-item" id="mbSubmissions" onclick="renderSubmissionsView()">
-<span>📜</span><span>History</span>
-</button>
-
-<button class="bottom-item" id="mbWallet" onclick="renderWalletView()">
-<span>💰</span><span>Wallet</span>
-</button>
-
-<button class="bottom-item" id="mbProfile" onclick="renderProfileView()">
-<span>👤</span><span>Profile</span>
-</button>
-
-</div>
 
 <script>
 
+/* =====================================================
+   GLOBAL STATE
+===================================================== */
+
 let currentUser = null;
-let activeTab = "tasks";
+let otpTimer = null;
+let mobileOtpTimer = null;
 
-function escapeHtml(str) {
-return String(str ?? "")
-.replaceAll("&","&amp;")
-.replaceAll("<","&lt;")
-.replaceAll(">","&gt;")
-.replaceAll('"',"&quot;")
-.replaceAll("'","&#039;");
+
+/* =====================================================
+   DOM HELPERS
+===================================================== */
+
+function $(id){
+  return document.getElementById(id);
 }
 
-async function api(url, options={}) {
 
-const config = {
-credentials:"same-origin",
-...options,
-headers:{
-"Content-Type":"application/json",
-...(options.headers || {})
-}
-};
+/* =====================================================
+   ALERT
+===================================================== */
 
-const response = await fetch(url, config);
+function showAlert(containerId,message,type="error"){
 
-let data = null;
+  const box = $(containerId);
 
-try {
-data = await response.json();
-} catch {}
+  if(!box) return;
 
-if (!response.ok) {
-throw new Error(data?.error || "Something went wrong.");
-}
-
-return data;
-}
-
-function showAuthMessage(message,type="error") {
-
-const box = document.getElementById("authMessage");
-
-if (!message) {
-box.classList.add("hidden");
-return;
-}
-
-box.className = "notice " + type;
-box.textContent = message;
-box.classList.remove("hidden");
-}
-
-function openAuth(mode="login") {
-
-document.getElementById("homeArea").classList.add("hidden");
-document.getElementById("appArea").classList.add("hidden");
-document.getElementById("authArea").classList.remove("hidden");
-
-showAuthMode(mode);
-}
-
-function showAuthMode(mode) {
-
-document.getElementById("loginForm").classList.toggle("hidden",mode!=="login");
-document.getElementById("registerForm").classList.toggle("hidden",mode!=="register");
-
-document.getElementById("loginTab").classList.toggle("active",mode==="login");
-document.getElementById("registerTab").classList.toggle("active",mode==="register");
-
-showAuthMessage("");
-
-setTimeout(renderGoogleButtons,500);
-}
-
-function goHome() {
-
-if (currentUser) {
-renderTasksView();
-return;
-}
-
-document.getElementById("appArea").classList.add("hidden");
-document.getElementById("authArea").classList.add("hidden");
-document.getElementById("homeArea").classList.remove("hidden");
-}
-
-function updateNavigationUI() {
-
-const logged = !!currentUser;
-
-document.getElementById("mainNav").style.display =
-logged ? "flex" : "none";
-
-document.getElementById("headerProfile").style.display =
-logged ? "block" : "none";
-
-const bottom =
-document.getElementById("mobileBottomNav");
-
-bottom.classList.toggle("logged-in",logged);
-
-if (logged) {
-
-const name = currentUser.name || "User";
-
-document.getElementById("headerAvatarInitials")
-.textContent =
-name.charAt(0).toUpperCase();
-
-document.getElementById("profilePanelName")
-.textContent = name;
-
-document.getElementById("profilePanelEmail")
-.textContent = currentUser.email || "";
-}
-}
-
-function toggleProfilePanel(event) {
-
-event.stopPropagation();
-
-document
-.getElementById("profilePanel")
-.classList.toggle("open");
-}
-
-window.addEventListener("click",()=>{
-document
-.getElementById("profilePanel")
-.classList.remove("open");
-});
-
-/* GOOGLE */
-
-async function renderGoogleButtons() {
-
-if (
-!window.google ||
-!window.google.accounts ||
-!window.google.accounts.id
-) {
-return;
-}
-
-try {
-
-const config =
-await api("/api/google-config");
-
-if (!config.clientId) return;
-
-window.google.accounts.id.initialize({
-
-client_id:config.clientId,
-
-callback:async response=>{
-
-try {
-
-const data =
-await api("/api/auth/google",{
-method:"POST",
-body:JSON.stringify({
-credential:response.credential
-})
-});
-
-currentUser=data.user;
-
-updateNavigationUI();
-
-renderTasksView();
-
-} catch(error) {
-
-showAuthMessage(error.message);
+  box.innerHTML = `
+    <div class="alert ${type}">
+      ${escapeHtml(message)}
+    </div>
+  `;
 
 }
 
+
+function clearAlert(containerId){
+
+  const box = $(containerId);
+
+  if(box){
+    box.innerHTML="";
+  }
+
 }
 
-});
 
-const loginBox =
-document.getElementById("googleLoginButton");
+/* =====================================================
+   HTML ESCAPE
+===================================================== */
 
-const registerBox =
-document.getElementById("googleRegisterButton");
+function escapeHtml(value){
 
-if (loginBox) {
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
 
-loginBox.innerHTML="";
-
-window.google.accounts.id.renderButton(
-loginBox,
-{
-theme:"outline",
-size:"large",
-width:300
 }
+
+
+/* =====================================================
+   API REQUEST
+===================================================== */
+
+async function api(url,options={}){
+
+  const config = {
+    credentials:"include",
+    ...options,
+    headers:{
+      ...(options.body && typeof options.body === "string"
+        ? {"Content-Type":"application/json"}
+        : {}),
+      ...(options.headers || {})
+    }
+  };
+
+  const response = await fetch(url,config);
+
+  let data = {};
+
+  try{
+    data = await response.json();
+  }catch(e){
+    data = {};
+  }
+
+  if(!response.ok){
+
+    throw new Error(
+      data.error ||
+      "Something went wrong. Please try again."
+    );
+
+  }
+
+  return data;
+}
+
+
+/* =====================================================
+   AUTH PAGE
+===================================================== */
+
+function showRegister(){
+
+  $("loginForm").classList.add("hidden");
+  $("registerForm").classList.remove("hidden");
+
+  clearAlert("authAlert");
+
+}
+
+
+function showLogin(){
+
+  $("registerForm").classList.add("hidden");
+  $("loginForm").classList.remove("hidden");
+
+  clearAlert("authAlert");
+
+}
+
+
+/* =====================================================
+   REGISTER
+===================================================== */
+
+async function registerUser(){
+
+  const btn = $("registerBtn");
+
+  const name =
+    $("registerName").value.trim();
+
+  const email =
+    $("registerEmail").value.trim();
+
+  const mobile =
+    $("registerMobile").value.trim();
+
+  const city =
+    $("registerCity").value.trim();
+
+  const password =
+    $("registerPassword").value;
+
+  clearAlert("authAlert");
+
+  if(!name || !email || !mobile || !city || !password){
+
+    showAlert(
+      "authAlert",
+      "Please complete all fields."
+    );
+
+    return;
+  }
+
+  if(password.length < 6){
+
+    showAlert(
+      "authAlert",
+      "Password must contain at least 6 characters."
+    );
+
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "Creating account...";
+
+  try{
+
+    const data = await api(
+      "/api/register",
+      {
+        method:"POST",
+        body:JSON.stringify({
+          name,
+          email,
+          mobile,
+          city,
+          password
+        })
+      }
+    );
+
+    if(data.verificationRequired){
+
+      openEmailOtpModal(
+        data.email,
+        data.expiresAt,
+        data.resendAt
+      );
+
+      showAlert(
+        "authAlert",
+        "Account created. Check your Gmail for the OTP.",
+        "success"
+      );
+
+    }
+
+  }catch(error){
+
+    showAlert(
+      "authAlert",
+      error.message
+    );
+
+  }finally{
+
+    btn.disabled = false;
+    btn.textContent = "Create Account";
+
+  }
+
+}
+
+
+/* =====================================================
+   LOGIN
+===================================================== */
+
+async function loginUser(){
+
+  const btn = $("loginBtn");
+
+  const email =
+    $("loginEmail").value.trim();
+
+  const password =
+    $("loginPassword").value;
+
+  const remember =
+    $("rememberMe").checked;
+
+  clearAlert("authAlert");
+
+  if(!email || !password){
+
+    showAlert(
+      "authAlert",
+      "Please enter your email and password."
+    );
+
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "Logging in...";
+
+  try{
+
+    const data = await api(
+      "/api/login",
+      {
+        method:"POST",
+        body:JSON.stringify({
+          email,
+          password,
+          remember
+        })
+      }
+    );
+
+    if(data.verificationRequired){
+
+      openEmailOtpModal(
+        data.email,
+        data.expiresAt,
+        data.resendAt
+      );
+
+      showAlert(
+        "authAlert",
+        "Your email is not verified. Check Gmail for the OTP.",
+        "success"
+      );
+
+      return;
+    }
+
+    if(data.user){
+
+      currentUser = data.user;
+
+      enterDashboard();
+
+    }
+
+  }catch(error){
+
+    showAlert(
+      "authAlert",
+      error.message
+    );
+
+  }finally{
+
+    btn.disabled = false;
+    btn.textContent = "Login";
+
+  }
+
+}
+
+
+/* =====================================================
+   EMAIL OTP MODAL
+===================================================== */
+
+function openEmailOtpModal(
+  email,
+  expiresAt,
+  resendAt
+){
+
+  $("otpEmail").textContent =
+    email || "";
+
+  $("otpInput").value = "";
+
+  clearAlert("otpAlert");
+
+  $("emailOtpModal")
+    .classList.remove("hidden");
+
+  document.body.style.overflow =
+    "hidden";
+
+  setTimeout(() => {
+
+    $("otpInput").focus();
+
+  },150);
+
+  startOtpTimer(
+    expiresAt,
+    resendAt
+  );
+
+}
+
+
+function closeOtpModal(){
+
+  $("emailOtpModal")
+    .classList.add("hidden");
+
+  document.body.style.overflow =
+    "";
+
+  if(otpTimer){
+
+    clearInterval(otpTimer);
+    otpTimer = null;
+
+  }
+
+}
+
+
+/* =====================================================
+   EMAIL OTP TIMER
+===================================================== */
+
+function startOtpTimer(
+  expiresAt,
+  resendAt
+){
+
+  if(otpTimer){
+
+    clearInterval(otpTimer);
+
+  }
+
+  function update(){
+
+    const now =
+      Date.now();
+
+    const expiry =
+      expiresAt
+        ? new Date(expiresAt).getTime()
+        : now;
+
+    const resend =
+      resendAt
+        ? new Date(resendAt).getTime()
+        : now;
+
+    const expirySeconds =
+      Math.max(
+        0,
+        Math.ceil(
+          (expiry-now)/1000
+        )
+      );
+
+    const resendSeconds =
+      Math.max(
+        0,
+        Math.ceil(
+          (resend-now)/1000
+        )
+      );
+
+    if(expirySeconds > 0){
+
+      const minutes =
+        Math.floor(
+          expirySeconds/60
+        );
+
+      const seconds =
+        expirySeconds % 60;
+
+      $("resendText").textContent =
+        `OTP expires in ${minutes}:${String(seconds).padStart(2,"0")}`;
+
+    }else{
+
+      $("resendText").textContent =
+        "OTP expired. Please resend a new OTP.";
+
+    }
+
+    $("resendOtpBtn").disabled =
+      resendSeconds > 0;
+
+    if(resendSeconds > 0){
+
+      $("resendOtpBtn").textContent =
+        `Resend OTP (${resendSeconds}s)`;
+
+    }else{
+
+      $("resendOtpBtn").textContent =
+        "Resend OTP";
+
+    }
+
+  }
+
+  update();
+
+  otpTimer =
+    setInterval(
+      update,
+      1000
+    );
+
+}
+
+
+/* =====================================================
+   VERIFY EMAIL OTP
+===================================================== */
+
+async function verifyEmailOtp(){
+
+  const btn =
+    $("verifyOtpBtn");
+
+  const otp =
+    $("otpInput").value
+      .replace(/\D/g,"")
+      .slice(0,6);
+
+  $("otpInput").value =
+    otp;
+
+  clearAlert("otpAlert");
+
+  if(!/^\d{6}$/.test(otp)){
+
+    showAlert(
+      "otpAlert",
+      "Please enter the 6-digit OTP."
+    );
+
+    $("otpInput").focus();
+
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "Verifying...";
+
+  try{
+
+    const data =
+      await api(
+        "/api/verify-otp",
+        {
+          method:"POST",
+          body:JSON.stringify({
+            otp
+          })
+        }
+      );
+
+    if(data.user){
+
+      currentUser =
+        data.user;
+
+      closeOtpModal();
+
+      showAlert(
+        "authAlert",
+        "Email verified successfully!",
+        "success"
+      );
+
+      enterDashboard();
+
+    }
+
+  }catch(error){
+
+    showAlert(
+      "otpAlert",
+      error.message
+    );
+
+  }finally{
+
+    btn.disabled = false;
+    btn.textContent = "Verify OTP";
+
+  }
+
+}
+
+
+/* =====================================================
+   RESEND EMAIL OTP
+===================================================== */
+
+async function resendEmailOtp(){
+
+  const btn =
+    $("resendOtpBtn");
+
+  if(btn.disabled) return;
+
+  btn.disabled = true;
+  btn.textContent = "Sending...";
+
+  clearAlert("otpAlert");
+
+  try{
+
+    const data =
+      await api(
+        "/api/resend-otp",
+        {
+          method:"POST",
+          body:"{}"
+        }
+      );
+
+    showAlert(
+      "otpAlert",
+      "A new OTP has been sent to your Gmail.",
+      "success"
+    );
+
+    startOtpTimer(
+      data.expiresAt,
+      data.resendAt
+    );
+
+    $("otpInput").value = "";
+
+    $("otpInput").focus();
+
+  }catch(error){
+
+    showAlert(
+      "otpAlert",
+      error.message
+    );
+
+    btn.disabled = false;
+
+  }
+
+}
+
+
+/* =====================================================
+   OTP INPUT
+===================================================== */
+
+$("otpInput").addEventListener(
+  "input",
+  function(){
+
+    this.value =
+      this.value
+        .replace(/\D/g,"")
+        .slice(0,6);
+
+  }
 );
 
-}
 
-if (registerBox) {
+/* =====================================================
+   ENTER DASHBOARD
+===================================================== */
 
-registerBox.innerHTML="";
+function enterDashboard(){
 
-window.google.accounts.id.renderButton(
-registerBox,
-{
-theme:"outline",
-size:"large",
-width:300
-}
-);
+  $("authPage")
+    .classList.add("hidden");
 
-}
+  $("appPage")
+    .classList.remove("hidden");
 
-} catch(error) {
+  updateUserUI();
 
-console.log("Google button error:",error);
+  showSection("home");
 
-}
+  loadTasks();
+
+  loadWallet();
 
 }
 
-/* REGISTER */
 
-async function registerUser(event) {
+/* =====================================================
+   USER UI
+===================================================== */
 
-event.preventDefault();
+function updateUserUI(){
 
-const btn =
-document.getElementById("btnRegisterSubmit");
+  if(!currentUser) return;
 
-btn.disabled=true;
-btn.textContent="Creating Account...";
+  const name =
+    currentUser.name || "User";
 
-try {
+  $("headerName").textContent =
+    name;
 
-const data =
-await api("/api/register",{
-method:"POST",
-body:JSON.stringify({
+  $("welcomeName").textContent =
+    name;
 
-name:
-document.getElementById("registerName").value,
+  $("profileName").value =
+    currentUser.name || "";
 
-email:
-document.getElementById("registerEmail").value,
+  $("profileEmail").value =
+    currentUser.email || "";
 
-mobile:
-document.getElementById("registerMobile").value,
+  $("profileMobile").value =
+    currentUser.mobile || "";
 
-city:
-document.getElementById("registerCity").value,
+  $("profileCity").value =
+    currentUser.city || "";
 
-password:
-document.getElementById("registerPassword").value
+  $("emailStatus").textContent =
+    currentUser.emailVerified
+      ? "✓ Verified"
+      : "Not verified";
 
-})
-});
+  $("mobileStatus").textContent =
+    currentUser.mobileVerified
+      ? "✓ Verified"
+      : "Not verified";
 
-if (data.verificationRequired) {
+  if(currentUser.profileImage){
 
-openEmailOtpModal(
-data.email
-);
+    $("headerAvatar").innerHTML =
+      `<img
+        src="${escapeHtml(currentUser.profileImage)}"
+        style="width:100%;height:100%;border-radius:50%;object-fit:cover"
+      >`;
 
-}
+  }else{
 
-} catch(error) {
+    $("headerAvatar").textContent =
+      name.charAt(0).toUpperCase();
 
-showAuthMessage(error.message);
-
-} finally {
-
-btn.disabled=false;
-btn.textContent="Create Account";
-
-}
-
-}
-
-/* LOGIN */
-
-async function loginUser(event) {
-
-event.preventDefault();
-
-const btn =
-document.getElementById("btnLoginSubmit");
-
-btn.disabled=true;
-btn.textContent="Logging in...";
-
-try {
-
-const data =
-await api("/api/login",{
-method:"POST",
-body:JSON.stringify({
-
-email:
-document.getElementById("loginEmail").value,
-
-password:
-document.getElementById("loginPassword").value,
-
-remember:
-document.getElementById("loginRemember").checked
-
-})
-});
-
-if (data.user) {
-
-currentUser=data.user;
-
-updateNavigationUI();
-
-renderTasksView();
-
-return;
+  }
 
 }
 
-if (data.verificationRequired) {
 
-openEmailOtpModal(data.email);
+/* =====================================================
+   SECTIONS
+===================================================== */
 
-}
+function showSection(section){
 
-} catch(error) {
+  const sections = [
+    "home",
+    "tasks",
+    "wallet",
+    "profile"
+  ];
 
-showAuthMessage(error.message);
+  sections.forEach(name => {
 
-} finally {
+    const element =
+      $(name + "Section");
 
-btn.disabled=false;
-btn.textContent="Login";
+    if(element){
 
-}
+      element.classList.toggle(
+        "hidden",
+        name !== section
+      );
 
-}
+    }
 
-/* EMAIL OTP */
+  });
 
-function openEmailOtpModal(email) {
+  document
+    .querySelectorAll(".nav-btn")
+    .forEach(btn =>
+      btn.classList.remove("active")
+    );
 
-document.getElementById("otpTitle")
-.textContent="Verify Gmail Address";
+  const nav =
+    $("nav" +
+      section.charAt(0).toUpperCase() +
+      section.slice(1));
 
-document.getElementById("otpMessage")
-.textContent=
-`A 6-digit OTP has been sent to ${email}.`;
+  if(nav){
 
-document.getElementById("otpInput").value="";
+    nav.classList.add("active");
 
-document
-.getElementById("otpModal")
-.classList.add("open");
-}
+  }
 
-function closeOtpModal() {
+  if(section === "tasks"){
 
-document
-.getElementById("otpModal")
-.classList.remove("open");
+    loadTasks();
+    loadSubmissions();
 
-}
+  }
 
-async function verifyOtp() {
+  if(section === "wallet"){
 
-const otp =
-document.getElementById("otpInput").value.trim();
+    loadWallet();
 
-if (!/^\d{6}$/.test(otp)) {
-
-alert("Please enter a valid 6-digit OTP.");
-
-return;
-}
-
-const btn =
-document.getElementById("btnVerifyOtp");
-
-btn.disabled=true;
-btn.textContent="Verifying...";
-
-try {
-
-const data =
-await api("/api/verify-otp",{
-method:"POST",
-body:JSON.stringify({otp})
-});
-
-if (data.user) {
-
-currentUser=data.user;
-
-closeOtpModal();
-
-updateNavigationUI();
-
-renderTasksView();
+  }
 
 }
 
-} catch(error) {
 
-alert(error.message);
+/* =====================================================
+   LOAD TASKS
+===================================================== */
 
-} finally {
+async function loadTasks(){
 
-btn.disabled=false;
-btn.textContent="Verify OTP";
+  try{
 
-}
+    const tasks =
+      await api(
+        "/api/tasks"
+      );
 
-}
+    renderTasks(
+      tasks,
+      "homeTasks"
+    );
 
-async function resendOtp() {
+    renderTasks(
+      tasks,
+      "tasksList"
+    );
 
-try {
+  }catch(error){
 
-const data =
-await api("/api/resend-otp",{
-method:"POST"
-});
+    $("homeTasks").innerHTML =
+      `<div class="alert error">${escapeHtml(error.message)}</div>`;
 
-alert(
-data.message ||
-"Gmail OTP sent."
-);
+    $("tasksList").innerHTML =
+      `<div class="alert error">${escapeHtml(error.message)}</div>`;
 
-} catch(error) {
-
-alert(error.message);
-
-}
-
-}
-
-/* NAV */
-
-function setActiveNav(tab) {
-
-activeTab=tab;
-
-document
-.querySelectorAll(".nav button")
-.forEach(x=>x.classList.remove("active"));
-
-document
-.querySelectorAll(".bottom-item")
-.forEach(x=>x.classList.remove("active"));
-
-const nav =
-document.getElementById(
-"nav"+tab.charAt(0).toUpperCase()+tab.slice(1)
-);
-
-const mobile =
-document.getElementById(
-"mb"+tab.charAt(0).toUpperCase()+tab.slice(1)
-);
-
-if(nav) nav.classList.add("active");
-if(mobile) mobile.classList.add("active");
-
-document.getElementById("homeArea")
-.classList.add("hidden");
-
-document.getElementById("authArea")
-.classList.add("hidden");
-
-document.getElementById("appArea")
-.classList.remove("hidden");
+  }
 
 }
 
-/* TASKS */
 
-async function renderTasksView() {
+function renderTasks(
+  tasks,
+  containerId
+){
 
-if(!currentUser) return openAuth("login");
+  const container =
+    $(containerId);
 
-setActiveNav("tasks");
+  if(!container) return;
 
-const app =
-document.getElementById("appContent");
+  if(!tasks || tasks.length === 0){
 
-app.innerHTML=`
-<div class="card">
-<h2>Available Tasks 📋</h2>
-<p class="muted">Complete any task below and submit it for approval.</p>
-</div>
-<div id="tasksList">Loading...</div>
-`;
+    container.innerHTML =
+      `<div class="loading">No tasks available right now.</div>`;
 
-try {
+    return;
 
-const tasks =
-await api("/api/tasks");
+  }
 
-const box =
-document.getElementById("tasksList");
+  container.innerHTML =
+    tasks.map(task => `
 
-if(!tasks.length){
+      <div class="task-card">
 
-box.innerHTML=`
-<div class="card">
-<p class="muted">No active tasks available right now.</p>
-</div>`;
+        <div>
+          <span class="task-type">
+            ${escapeHtml(task.type)}
+          </span>
+        </div>
 
-return;
-}
+        <h3>
+          ${escapeHtml(task.title)}
+        </h3>
 
-box.innerHTML=
-`<div class="grid">`+
-tasks.map(task=>`
+        <div class="task-description">
+          ${escapeHtml(task.description)}
+        </div>
 
-<div class="card">
+        <div class="reward">
+          ₹${Number(task.reward || 0).toFixed(2)}
+        </div>
 
-<span class="badge pending">
-${escapeHtml(task.type||"General")}
-</span>
+        <button
+          class="primary-btn"
+          onclick="submitTask(${Number(task.id)})"
+        >
+          Submit Task
+        </button>
 
-<h3>${escapeHtml(task.title)}</h3>
+      </div>
 
-<p class="muted">
-${escapeHtml(task.description)}
-</p>
-
-<div class="reward">
-₹${Number(task.reward||0).toFixed(2)}
-</div>
-
-<button class="primary"
-onclick="submitTask(${Number(task.id)},this)">
-Submit Task
-</button>
-
-</div>
-
-`).join("")+
-`</div>`;
-
-} catch(error) {
-
-app.innerHTML=
-`<div class="notice error">
-${escapeHtml(error.message)}
-</div>`;
+    `).join("");
 
 }
 
-}
 
-async function submitTask(taskId,button) {
+/* =====================================================
+   SUBMIT TASK
+===================================================== */
 
-button.disabled=true;
-button.textContent="Submitting...";
+async function submitTask(taskId){
 
-try {
+  if(!confirm(
+    "Are you sure you want to submit this task?"
+  )){
 
-const data =
-await api(
-`/api/tasks/${taskId}/submit`,
-{method:"POST"}
-);
+    return;
 
-alert(data.message);
+  }
 
-renderSubmissionsView();
+  try{
 
-} catch(error) {
+    const data =
+      await api(
+        `/api/tasks/${encodeURIComponent(taskId)}/submit`,
+        {
+          method:"POST",
+          body:"{}"
+        }
+      );
 
-alert(error.message);
+    alert(
+      data.message ||
+      "Task submitted successfully."
+    );
 
-button.disabled=false;
-button.textContent="Submit Task";
+    loadSubmissions();
 
-}
+  }catch(error){
 
-}
+    alert(
+      error.message
+    );
 
-/* SUBMISSIONS */
-
-async function renderSubmissionsView() {
-
-if(!currentUser) return openAuth("login");
-
-setActiveNav("submissions");
-
-const app =
-document.getElementById("appContent");
-
-app.innerHTML=`
-<div class="card">
-<h2>My Submissions 📜</h2>
-<p class="muted">Track your task review status.</p>
-</div>
-<div id="submissionsList">Loading...</div>
-`;
-
-try {
-
-const list =
-await api("/api/my-submissions");
-
-const box =
-document.getElementById("submissionsList");
-
-if(!list.length){
-
-box.innerHTML=`
-<div class="card">
-<p class="muted">You haven't submitted any tasks yet.</p>
-</div>`;
-
-return;
-}
-
-box.innerHTML=
-list.map(item=>`
-
-<div class="card"
-style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">
-
-<div>
-<h4>${escapeHtml(item.taskTitle)}</h4>
-<span class="muted">
-Submitted:
-${new Date(item.submittedAt).toLocaleString()}
-</span>
-</div>
-
-<div style="text-align:right">
-
-<div class="reward">
-+₹${Number(item.reward||0).toFixed(2)}
-</div>
-
-<span class="badge ${escapeHtml(item.status)}">
-${escapeHtml(item.status)}
-</span>
-
-</div>
-
-</div>
-
-`).join("");
-
-} catch(error) {
-
-app.innerHTML=
-`<div class="notice error">${escapeHtml(error.message)}</div>`;
+  }
 
 }
 
-}
 
-/* WALLET */
+/* =====================================================
+   SUBMISSIONS
+===================================================== */
 
-async function renderWalletView() {
+async function loadSubmissions(){
 
-if(!currentUser) return openAuth("login");
+  try{
 
-setActiveNav("wallet");
+    const submissions =
+      await api(
+        "/api/my-submissions"
+      );
 
-const app =
-document.getElementById("appContent");
+    const container =
+      $("submissionsList");
 
-app.innerHTML=`
-<div class="card">
+    if(!submissions.length){
 
-<div style="display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap">
+      container.innerHTML =
+        `<div class="loading">No task submissions yet.</div>`;
 
-<div>
+      return;
 
-<span class="muted">Wallet Balance</span>
+    }
 
-<h1 style="margin:5px 0;color:#13a05a">
-₹<span id="walletBalance">0.00</span>
-</h1>
+    container.innerHTML = `
 
-</div>
+      <table>
 
-<button class="primary"
-style="width:auto"
-onclick="startWithdrawal()">
-Request Withdrawal
-</button>
+        <thead>
+          <tr>
+            <th>Task</th>
+            <th>Reward</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
 
-</div>
+        <tbody>
 
-</div>
+          ${submissions.map(item => `
 
-<div class="card">
+            <tr>
 
-<h3>Withdrawal History</h3>
+              <td>
+                ${escapeHtml(item.taskTitle)}
+              </td>
 
-<div id="withdrawalsList">
-Loading...
-</div>
+              <td>
+                ₹${Number(item.reward || 0).toFixed(2)}
+              </td>
 
-</div>
+              <td>
+                <span class="status ${escapeHtml(item.status)}">
+                  ${escapeHtml(item.status)}
+                </span>
+              </td>
 
-<div id="withdrawFormArea"></div>
-`;
+              <td>
+                ${formatDate(item.submittedAt)}
+              </td>
 
-try {
+            </tr>
 
-const data =
-await api("/api/wallet");
+          `).join("")}
 
-currentUser.balance=data.balance;
+        </tbody>
 
-document.getElementById("walletBalance")
-.textContent=
-Number(data.balance||0).toFixed(2);
+      </table>
 
-const box =
-document.getElementById("withdrawalsList");
+    `;
 
-if(!data.withdrawals.length){
+  }catch(error){
 
-box.innerHTML=
-`<p class="muted">No withdrawal history found.</p>`;
+    $("submissionsList").innerHTML =
+      `<div class="alert error">${escapeHtml(error.message)}</div>`;
 
-return;
-}
-
-box.innerHTML=
-data.withdrawals.map(w=>`
-
-<div style="
-padding:12px 0;
-border-bottom:1px solid #eee;
-display:flex;
-justify-content:space-between;
-gap:10px;
-">
-
-<div>
-<strong>
-₹${Number(w.amount).toFixed(2)} via
-${escapeHtml(w.method)}
-</strong>
-
-<div class="muted" style="font-size:12px">
-${new Date(w.createdAt).toLocaleString()}
-</div>
-</div>
-
-<span class="badge ${escapeHtml(w.status)}">
-${escapeHtml(w.status)}
-</span>
-
-</div>
-
-`).join("");
-
-} catch(error) {
-
-app.innerHTML=
-`<div class="notice error">${escapeHtml(error.message)}</div>`;
+  }
 
 }
 
-}
 
-/* WITHDRAWAL START */
+/* =====================================================
+   WALLET
+===================================================== */
 
-async function startWithdrawal() {
+async function loadWallet(){
 
-if(!currentUser) return openAuth("login");
+  try{
 
-if(Number(currentUser.balance||0)<100){
+    const data =
+      await api(
+        "/api/wallet"
+      );
 
-alert("Minimum withdrawal amount is ₹100.");
+    const balance =
+      Number(data.balance || 0);
 
-return;
-}
+    $("homeBalance").textContent =
+      "₹" + balance.toFixed(2);
 
-if(currentUser.mobileVerified){
+    $("walletBalance").textContent =
+      "₹" + balance.toFixed(2);
 
-showWithdrawalForm();
+    renderWithdrawals(
+      data.withdrawals || []
+    );
 
-return;
-}
+  }catch(error){
 
-if(!currentUser.mobile){
+    console.error(
+      "Wallet error:",
+      error
+    );
 
-alert(
-"Please add your mobile number in Profile before withdrawal."
-);
-
-renderProfileView();
-
-return;
-}
-
-document.getElementById("mobileOtpInput").value="";
-document.getElementById("mobileOtpInputArea").classList.add("hidden");
-document.getElementById("mobileOtpSendArea").classList.remove("hidden");
-
-document.getElementById("mobileOtpStatus").textContent=
-`Your mobile number ${currentUser.mobile} needs verification before withdrawal.`;
-
-document.getElementById("mobileOtpModal")
-.classList.add("open");
+  }
 
 }
 
-function closeMobileOtpModal(){
 
-document
-.getElementById("mobileOtpModal")
-.classList.remove("open");
+function renderWithdrawals(
+  withdrawals
+){
+
+  const container =
+    $("withdrawalHistory");
+
+  if(!withdrawals.length){
+
+    container.innerHTML =
+      `<div class="loading">No withdrawal requests yet.</div>`;
+
+    return;
+
+  }
+
+  container.innerHTML = `
+
+    <table>
+
+      <thead>
+
+        <tr>
+          <th>Amount</th>
+          <th>Method</th>
+          <th>Status</th>
+          <th>Date</th>
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        ${withdrawals.map(item => `
+
+          <tr>
+
+            <td>
+              ₹${Number(item.amount || 0).toFixed(2)}
+            </td>
+
+            <td>
+              ${escapeHtml(item.method)}
+            </td>
+
+            <td>
+
+              <span class="status ${escapeHtml(item.status)}">
+                ${escapeHtml(item.status)}
+              </span>
+
+            </td>
+
+            <td>
+              ${formatDate(item.createdAt)}
+            </td>
+
+          </tr>
+
+        `).join("")}
+
+      </tbody>
+
+    </table>
+
+  `;
 
 }
+
+
+/* =====================================================
+   PAYMENT METHOD
+===================================================== */
+
+function changePaymentMethod(){
+
+  const method =
+    $("withdrawMethod").value;
+
+  if(method === "UPI"){
+
+    $("upiFields")
+      .classList.remove("hidden");
+
+    $("bankFields")
+      .classList.add("hidden");
+
+  }else{
+
+    $("upiFields")
+      .classList.add("hidden");
+
+    $("bankFields")
+      .classList.remove("hidden");
+
+  }
+
+}
+
+
+/* =====================================================
+   WITHDRAW
+===================================================== */
+
+async function withdrawMoney(){
+
+  clearAlert("withdrawAlert");
+
+  const amount =
+    Number(
+      $("withdrawAmount").value
+    );
+
+  const method =
+    $("withdrawMethod").value;
+
+  if(!Number.isFinite(amount) || amount < 100){
+
+    showAlert(
+      "withdrawAlert",
+      "Minimum withdrawal amount is ₹100."
+    );
+
+    return;
+
+  }
+
+  let paymentDetails = {};
+
+  if(method === "UPI"){
+
+    paymentDetails = {
+      upiId:
+        $("upiId").value.trim()
+    };
+
+  }else{
+
+    paymentDetails = {
+
+      accountHolderName:
+        $("accountHolderName").value.trim(),
+
+      accountNumber:
+        $("accountNumber").value.trim(),
+
+      ifscCode:
+        $("ifscCode").value.trim().toUpperCase(),
+
+      bankName:
+        $("bankName").value.trim()
+
+    };
+
+  }
+
+  try{
+
+    const data =
+      await api(
+        "/api/withdraw",
+        {
+          method:"POST",
+          body:JSON.stringify({
+            amount,
+            method,
+            paymentDetails
+          })
+        }
+      );
+
+    showAlert(
+      "withdrawAlert",
+      data.message ||
+      "Withdrawal request submitted.",
+      "success"
+    );
+
+    $("withdrawAmount").value = "";
+
+    $("upiId").value = "";
+
+    loadWallet();
+
+  }catch(error){
+
+    /*
+      If mobile verification is required,
+      the server returns HTTP 403.
+    */
+
+    if(
+      error.message &&
+      error.message.toLowerCase().includes(
+        "verify your mobile"
+      )
+    ){
+
+      await sendMobileOtp();
+
+      return;
+
+    }
+
+    showAlert(
+      "withdrawAlert",
+      error.message
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   SEND MOBILE OTP
+===================================================== */
 
 async function sendMobileOtp(){
 
-const btn =
-document.getElementById("btnSendMobileOtp");
+  clearAlert("withdrawAlert");
 
-btn.disabled=true;
-btn.textContent="Sending...";
+  try{
 
-try {
+    const data =
+      await api(
+        "/api/withdrawal/send-mobile-otp",
+        {
+          method:"POST",
+          body:"{}"
+        }
+      );
 
-const data =
-await api(
-"/api/withdrawal/send-mobile-otp",
-{method:"POST"}
-);
+    if(data.alreadyVerified){
 
-if(data.alreadyVerified){
+      showAlert(
+        "withdrawAlert",
+        "Your mobile number is already verified.",
+        "success"
+      );
 
-currentUser.mobileVerified=true;
+      return;
 
-closeMobileOtpModal();
+    }
 
-showWithdrawalForm();
+    $("mobileOtpNumber").textContent =
+      data.mobile || currentUser.mobile;
 
-return;
+    $("mobileOtpInput").value = "";
+
+    clearAlert("mobileOtpAlert");
+
+    $("mobileOtpModal")
+      .classList.remove("hidden");
+
+    document.body.style.overflow =
+      "hidden";
+
+    setTimeout(() => {
+
+      $("mobileOtpInput").focus();
+
+    },150);
+
+    startMobileOtpTimer(
+      data.expiresAt,
+      data.resendAt
+    );
+
+  }catch(error){
+
+    showAlert(
+      "withdrawAlert",
+      error.message
+    );
+
+  }
+
 }
 
-document.getElementById("mobileOtpStatus")
-.textContent=
-`OTP sent to ${data.mobile || currentUser.mobile}. Enter the 6-digit code below.`;
 
-document.getElementById("mobileOtpInputArea")
-.classList.remove("hidden");
+/* =====================================================
+   MOBILE OTP TIMER
+===================================================== */
 
-document.getElementById("mobileOtpSendArea")
-.classList.add("hidden");
+function startMobileOtpTimer(
+  expiresAt,
+  resendAt
+){
 
-} catch(error) {
+  if(mobileOtpTimer){
 
-alert(error.message);
+    clearInterval(
+      mobileOtpTimer
+    );
 
-} finally {
+  }
 
-btn.disabled=false;
-btn.textContent="Send OTP";
+  function update(){
+
+    const now =
+      Date.now();
+
+    const expiry =
+      new Date(
+        expiresAt
+      ).getTime();
+
+    const resend =
+      new Date(
+        resendAt
+      ).getTime();
+
+    const expirySeconds =
+      Math.max(
+        0,
+        Math.ceil(
+          (expiry-now)/1000
+        )
+      );
+
+    const resendSeconds =
+      Math.max(
+        0,
+        Math.ceil(
+          (resend-now)/1000
+        )
+      );
+
+    $("mobileResendText").textContent =
+      expirySeconds > 0
+        ? `OTP expires in ${Math.floor(expirySeconds/60)}:${String(expirySeconds%60).padStart(2,"0")}`
+        : "OTP expired. Request a new OTP.";
+
+    $("resendMobileBtn").disabled =
+      resendSeconds > 0;
+
+    $("resendMobileBtn").textContent =
+      resendSeconds > 0
+        ? `Resend OTP (${resendSeconds}s)`
+        : "Resend OTP";
+
+  }
+
+  update();
+
+  mobileOtpTimer =
+    setInterval(
+      update,
+      1000
+    );
 
 }
 
-}
+
+/* =====================================================
+   VERIFY MOBILE OTP
+===================================================== */
 
 async function verifyMobileOtp(){
 
-const otp =
-document.getElementById("mobileOtpInput").value.trim();
+  const btn =
+    $("verifyMobileBtn");
 
-if(!/^\d{6}$/.test(otp)){
+  const otp =
+    $("mobileOtpInput")
+      .value
+      .replace(/\D/g,"")
+      .slice(0,6);
 
-alert("Please enter the 6-digit mobile OTP.");
+  $("mobileOtpInput").value =
+    otp;
 
-return;
+  clearAlert("mobileOtpAlert");
+
+  if(!/^\d{6}$/.test(otp)){
+
+    showAlert(
+      "mobileOtpAlert",
+      "Please enter the 6-digit OTP."
+    );
+
+    return;
+
+  }
+
+  btn.disabled = true;
+  btn.textContent = "Verifying...";
+
+  try{
+
+    const data =
+      await api(
+        "/api/withdrawal/verify-mobile-otp",
+        {
+          method:"POST",
+          body:JSON.stringify({
+            otp
+          })
+        }
+      );
+
+    if(data.verified){
+
+      currentUser =
+        data.user;
+
+      updateUserUI();
+
+      closeMobileOtpModal();
+
+      showAlert(
+        "withdrawAlert",
+        "Mobile verified successfully. You can now request your withdrawal.",
+        "success"
+      );
+
+    }
+
+  }catch(error){
+
+    showAlert(
+      "mobileOtpAlert",
+      error.message
+    );
+
+  }finally{
+
+    btn.disabled = false;
+    btn.textContent =
+      "Verify Mobile";
+
+  }
+
 }
 
-const btn =
-document.getElementById("btnVerifyMobileOtp");
 
-btn.disabled=true;
-btn.textContent="Verifying...";
-
-try {
-
-const data =
-await api(
-"/api/withdrawal/verify-mobile-otp",
-{
-method:"POST",
-body:JSON.stringify({otp})
-}
-);
-
-if(data.verified){
-
-currentUser=data.user;
-
-closeMobileOtpModal();
-
-alert("Mobile number verified successfully.");
-
-showWithdrawalForm();
-
-}
-
-} catch(error){
-
-alert(error.message);
-
-} finally {
-
-btn.disabled=false;
-btn.textContent="Verify Mobile";
-
-}
-
-}
+/* =====================================================
+   RESEND MOBILE OTP
+===================================================== */
 
 async function resendMobileOtp(){
 
-try {
+  const btn =
+    $("resendMobileBtn");
 
-const data =
-await api(
-"/api/withdrawal/resend-mobile-otp",
-{method:"POST"}
+  if(btn.disabled) return;
+
+  btn.disabled = true;
+  btn.textContent =
+    "Sending...";
+
+  try{
+
+    const data =
+      await api(
+        "/api/withdrawal/resend-mobile-otp",
+        {
+          method:"POST",
+          body:"{}"
+        }
+      );
+
+    if(data.alreadyVerified){
+
+      closeMobileOtpModal();
+
+      return;
+
+    }
+
+    showAlert(
+      "mobileOtpAlert",
+      "A new mobile OTP has been sent.",
+      "success"
+    );
+
+    startMobileOtpTimer(
+      data.expiresAt,
+      data.resendAt
+    );
+
+  }catch(error){
+
+    showAlert(
+      "mobileOtpAlert",
+      error.message
+    );
+
+    btn.disabled = false;
+
+  }
+
+}
+
+
+function closeMobileOtpModal(){
+
+  $("mobileOtpModal")
+    .classList.add("hidden");
+
+  document.body.style.overflow =
+    "";
+
+  if(mobileOtpTimer){
+
+    clearInterval(
+      mobileOtpTimer
+    );
+
+    mobileOtpTimer = null;
+
+  }
+
+}
+
+
+/* =====================================================
+   MOBILE OTP INPUT
+===================================================== */
+
+$("mobileOtpInput").addEventListener(
+  "input",
+  function(){
+
+    this.value =
+      this.value
+        .replace(/\D/g,"")
+        .slice(0,6);
+
+  }
 );
 
-alert(
-data.message ||
-"Mobile OTP sent."
-);
 
-} catch(error){
+/* =====================================================
+   PROFILE
+===================================================== */
 
-alert(error.message);
+async function saveProfile(){
 
-}
+  clearAlert("profileAlert");
 
-}
+  const name =
+    $("profileName").value.trim();
 
-/* WITHDRAWAL FORM */
+  const mobile =
+    $("profileMobile").value.trim();
 
-function showWithdrawalForm(){
+  const city =
+    $("profileCity").value.trim();
 
-const area =
-document.getElementById("withdrawFormArea");
+  try{
 
-if(!area){
+    const data =
+      await api(
+        "/api/profile",
+        {
+          method:"PUT",
+          body:JSON.stringify({
+            name,
+            mobile,
+            city
+          })
+        }
+      );
 
-renderWalletView();
+    currentUser =
+      data.user;
 
-setTimeout(showWithdrawalForm,100);
+    updateUserUI();
 
-return;
-}
+    showAlert(
+      "profileAlert",
+      data.message ||
+      "Profile saved successfully.",
+      "success"
+    );
 
-area.innerHTML=`
+  }catch(error){
 
-<div class="card">
+    showAlert(
+      "profileAlert",
+      error.message
+    );
 
-<div class="modal-head">
-<h3 style="margin:0">Withdraw Funds</h3>
-</div>
-
-<div class="notice success">
-✅ Mobile number verified. You can now request a withdrawal.
-</div>
-
-<form onsubmit="handleWithdraw(event)">
-
-<label>Amount (₹) — Minimum ₹100</label>
-
-<input
-id="withdrawAmount"
-type="number"
-min="100"
-step="1"
-required
-placeholder="100">
-
-<br><br>
-
-<label>Payment Method</label>
-
-<select id="withdrawMethod"
-onchange="togglePaymentFields()">
-
-<option value="UPI">UPI</option>
-<option value="Bank Account">Bank Account</option>
-
-</select>
-
-<br><br>
-
-<div id="upiFields">
-
-<label>UPI ID</label>
-
-<input
-id="withdrawUpiId"
-placeholder="username@upi">
-
-</div>
-
-<div id="bankFields" class="hidden">
-
-<label>Account Holder Name</label>
-
-<input id="withdrawBankName">
-
-<br><br>
-
-<label>Account Number</label>
-
-<input id="withdrawAccNo">
-
-<br><br>
-
-<label>IFSC Code</label>
-
-<input id="withdrawIfsc">
-
-<br><br>
-
-<label>Bank Name</label>
-
-<input id="withdrawBank">
-
-</div>
-
-<br>
-
-<button class="primary"
-id="btnWithdrawSubmit"
-type="submit">
-Submit Withdrawal Request
-</button>
-
-</form>
-
-</div>
-`;
-
-area.scrollIntoView({
-behavior:"smooth",
-block:"start"
-});
+  }
 
 }
 
-function togglePaymentFields(){
 
-const method =
-document.getElementById("withdrawMethod").value;
-
-document
-.getElementById("upiFields")
-.classList.toggle("hidden",method!=="UPI");
-
-document
-.getElementById("bankFields")
-.classList.toggle("hidden",method!=="Bank Account");
-
-}
-
-async function handleWithdraw(event){
-
-event.preventDefault();
-
-const btn =
-document.getElementById("btnWithdrawSubmit");
-
-btn.disabled=true;
-btn.textContent="Processing...";
-
-const method =
-document.getElementById("withdrawMethod").value;
-
-const amount =
-Number(document.getElementById("withdrawAmount").value);
-
-let paymentDetails={};
-
-if(method==="UPI"){
-
-paymentDetails={
-upiId:
-document.getElementById("withdrawUpiId").value
-};
-
-}else{
-
-paymentDetails={
-accountHolderName:
-document.getElementById("withdrawBankName").value,
-
-accountNumber:
-document.getElementById("withdrawAccNo").value,
-
-ifscCode:
-document.getElementById("withdrawIfsc").value,
-
-bankName:
-document.getElementById("withdrawBank").value
-};
-
-}
-
-try{
-
-const data =
-await api(
-"/api/withdraw",
-{
-method:"POST",
-body:JSON.stringify({
-amount,
-method,
-paymentDetails
-})
-}
-);
-
-alert(data.message);
-
-renderWalletView();
-
-}catch(error){
-
-alert(error.message);
-
-}finally{
-
-btn.disabled=false;
-btn.textContent="Submit Withdrawal Request";
-
-}
-
-}
-
-/* PROFILE */
-
-async function renderProfileView(){
-
-if(!currentUser) return openAuth("login");
-
-setActiveNav("profile");
-
-const app =
-document.getElementById("appContent");
-
-app.innerHTML=`
-
-<div class="card"
-style="max-width:600px;margin:auto">
-
-<h2>User Profile 👤</h2>
-
-<form onsubmit="saveProfile(event)">
-
-<label>Full Name</label>
-
-<input
-id="profName"
-required
-value="${escapeHtml(currentUser.name)}">
-
-<br><br>
-
-<label>Email Address</label>
-
-<input
-disabled
-value="${escapeHtml(currentUser.email)}"
-style="background:#f1f3f7">
-
-<br><br>
-
-<label>Mobile Number</label>
-
-<input
-id="profMobile"
-type="tel"
-value="${escapeHtml(currentUser.mobile)}"
-placeholder="+919876543210">
-
-<div class="muted" style="font-size:12px;margin-top:5px">
-Status:
-${currentUser.mobileVerified
-?"✅ Verified"
-:"❌ Not Verified — verification is required before withdrawal"}
-</div>
-
-<br>
-
-<label>City</label>
-
-<input
-id="profCity"
-required
-value="${escapeHtml(currentUser.city)}">
-
-<br><br>
-
-<button class="primary"
-id="btnSaveProfile"
-type="submit">
-Save Profile
-</button>
-
-</form>
-
-</div>
-`;
-
-}
-
-async function saveProfile(event){
-
-event.preventDefault();
-
-const btn =
-document.getElementById("btnSaveProfile");
-
-btn.disabled=true;
-btn.textContent="Saving...";
-
-try{
-
-const data =
-await api(
-"/api/profile",
-{
-method:"PUT",
-body:JSON.stringify({
-
-name:
-document.getElementById("profName").value,
-
-mobile:
-document.getElementById("profMobile").value,
-
-city:
-document.getElementById("profCity").value
-
-})
-}
-);
-
-currentUser=data.user;
-
-alert(data.message);
-
-updateNavigationUI();
-
-renderProfileView();
-
-}catch(error){
-
-alert(error.message);
-
-}finally{
-
-btn.disabled=false;
-btn.textContent="Save Profile";
-
-}
-
-}
-
-/* LOGOUT */
+/* =====================================================
+   LOGOUT
+===================================================== */
 
 async function logoutUser(){
 
-try{
+  try{
 
-await api(
-"/api/logout",
-{method:"POST"}
+    await api(
+      "/api/logout",
+      {
+        method:"POST",
+        body:"{}"
+      }
+    );
+
+  }catch(error){
+
+    console.error(
+      "Logout error:",
+      error
+    );
+
+  }
+
+  currentUser = null;
+
+  $("appPage")
+    .classList.add("hidden");
+
+  $("authPage")
+    .classList.remove("hidden");
+
+  showLogin();
+
+  $("loginPassword").value = "";
+
+}
+
+
+/* =====================================================
+   GOOGLE LOGIN
+===================================================== */
+
+async function googleCredentialResponse(
+  response
+){
+
+  clearAlert("authAlert");
+
+  try{
+
+    const data =
+      await api(
+        "/api/auth/google",
+        {
+          method:"POST",
+          body:JSON.stringify({
+            credential:
+              response.credential
+          })
+        }
+      );
+
+    if(data.user){
+
+      currentUser =
+        data.user;
+
+      enterDashboard();
+
+    }
+
+  }catch(error){
+
+    showAlert(
+      "authAlert",
+      error.message
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   LOAD GOOGLE BUTTON
+===================================================== */
+
+async function setupGoogleLogin(){
+
+  try{
+
+    const config =
+      await api(
+        "/api/google-config"
+      );
+
+    if(
+      !config.clientId
+    ){
+
+      console.log(
+        "Google Sign-In is not configured."
+      );
+
+      return;
+
+    }
+
+    if(
+      !window.google ||
+      !google.accounts ||
+      !google.accounts.id
+    ){
+
+      setTimeout(
+        setupGoogleLogin,
+        1000
+      );
+
+      return;
+
+    }
+
+    google.accounts.id.initialize({
+
+      client_id:
+        config.clientId,
+
+      callback:
+        googleCredentialResponse
+
+    });
+
+    if($("googleLoginButton")){
+
+      google.accounts.id.renderButton(
+        $("googleLoginButton"),
+        {
+          theme:"outline",
+          size:"large",
+          width:320,
+          text:"continue_with",
+          shape:"rectangular"
+        }
+      );
+
+    }
+
+    if($("googleRegisterButton")){
+
+      google.accounts.id.renderButton(
+        $("googleRegisterButton"),
+        {
+          theme:"outline",
+          size:"large",
+          width:320,
+          text:"signup_with",
+          shape:"rectangular"
+        }
+      );
+
+    }
+
+  }catch(error){
+
+    console.log(
+      "Google button setup:",
+      error.message
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   CHECK CURRENT LOGIN
+===================================================== */
+
+async function checkCurrentUser(){
+
+  try{
+
+    const user =
+      await api(
+        "/api/me"
+      );
+
+    if(user){
+
+      currentUser =
+        user;
+
+      enterDashboard();
+
+    }
+
+  }catch(error){
+
+    console.log(
+      "No active session."
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   DATE FORMAT
+===================================================== */
+
+function formatDate(value){
+
+  if(!value) return "—";
+
+  try{
+
+    return new Date(value)
+      .toLocaleString(
+        "en-IN",
+        {
+          dateStyle:"medium",
+          timeStyle:"short"
+        }
+      );
+
+  }catch(e){
+
+    return value;
+
+  }
+
+}
+
+
+/* =====================================================
+   KEYBOARD SUPPORT
+===================================================== */
+
+$("otpInput").addEventListener(
+  "keydown",
+  function(event){
+
+    if(
+      event.key === "Enter"
+    ){
+
+      verifyEmailOtp();
+
+    }
+
+  }
 );
 
-}catch{}
 
-currentUser=null;
+$("mobileOtpInput").addEventListener(
+  "keydown",
+  function(event){
 
-updateNavigationUI();
+    if(
+      event.key === "Enter"
+    ){
 
-document.getElementById("appArea")
-.classList.add("hidden");
+      verifyMobileOtp();
 
-document.getElementById("authArea")
-.classList.add("hidden");
+    }
 
-document.getElementById("homeArea")
-.classList.remove("hidden");
+  }
+);
 
-}
 
-/* SESSION */
-
-async function checkSession(){
-
-try{
-
-const user =
-await api("/api/me");
-
-if(user && user.id){
-
-currentUser=user;
-
-updateNavigationUI();
-
-renderTasksView();
-
-}else{
-
-currentUser=null;
-
-updateNavigationUI();
-
-goHome();
-
-}
-
-}catch{
-
-currentUser=null;
-
-updateNavigationUI();
-
-goHome();
-
-}
-
-}
-
-/* START */
+/* =====================================================
+   START
+===================================================== */
 
 document.addEventListener(
-"DOMContentLoaded",
-()=>{
+  "DOMContentLoaded",
+  function(){
 
-checkSession();
+    setupGoogleLogin();
 
-setTimeout(
-renderGoogleButtons,
-1000
-);
+    checkCurrentUser();
 
-}
+  }
 );
 
 </script>
 
 </body>
-</html>
+  </html>
