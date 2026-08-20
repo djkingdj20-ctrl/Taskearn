@@ -6,11 +6,7 @@ const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
-const { Resend } = require("resend");
-
-const resend = new Resend(
-  process.env.RESEND_API_KEY
-);
+const nodemailer = require("nodemailer");
 
 const app = express();
 
@@ -44,6 +40,45 @@ const GOOGLE_CLIENT_ID =
 
 if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
+}
+
+/* =====================================================
+   GMAIL SMTP
+===================================================== */
+
+let mailTransporter = null;
+
+if (GMAIL_USER && GMAIL_APP_PASSWORD) {
+  mailTransporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+
+    connectionTimeout: 30000,
+    greetingTimeout: 30000,
+    socketTimeout: 30000,
+
+    auth: {
+      user: GMAIL_USER,
+      pass: GMAIL_APP_PASSWORD
+    }
+  });
+
+  mailTransporter.verify()
+    .then(() => {
+      console.log("Gmail SMTP connection: OK");
+    })
+    .catch((error) => {
+      console.error(
+        "Gmail SMTP connection error:",
+        error.code || "UNKNOWN",
+        error.message || error
+      );
+    });
+} else {
+  console.log(
+    "Gmail SMTP connection: NOT CONFIGURED"
+  );
 }
 
 /* =====================================================
@@ -133,10 +168,8 @@ function loadDB() {
       user.emailVerified ??= false;
       user.mobileVerified ??= false;
       user.googleId ??= "";
-
       user.authProvider ??=
         user.googleId ? "google" : "local";
-
       user.balance ??= 0;
       user.role ??= "Member";
       user.passwordHash ??= "";
@@ -246,7 +279,7 @@ function requireLogin(req, res, next) {
 }
 
 /* =====================================================
-   OTP CONFIGURATION
+   OTP
 ===================================================== */
 
 const OTP_EXPIRY_MS = 10 * 60 * 1000;
@@ -254,7 +287,9 @@ const OTP_RESEND_MS = 60 * 1000;
 const OTP_MAX_ATTEMPTS = 5;
 
 function randomOtp() {
-  return String(crypto.randomInt(100000, 1000000));
+  return String(
+    crypto.randomInt(100000, 1000000)
+  );
 }
 
 function hashOtp(otp) {
@@ -272,11 +307,6 @@ function safeCompare(a, b) {
 
   return crypto.timingSafeEqual(aa, bb);
 }
-
-/* =====================================================
-   OTP DATABASE
-   ONLY ONE ACTIVE OTP PER USER/PURPOSE
-===================================================== */
 
 function createOtpRecord(user, type, purpose) {
   const otp = randomOtp();
@@ -296,15 +326,11 @@ function createOtpRecord(user, type, purpose) {
     type,
     purpose,
     otpHash: hashOtp(otp),
-
     createdAt: new Date(now).toISOString(),
-
     expiresAt: new Date(
       now + OTP_EXPIRY_MS
     ).toISOString(),
-
     attempts: 0,
-
     lastSentAt: new Date(now).toISOString()
   });
 
@@ -342,84 +368,27 @@ function deleteOtpRecord(userId, type, purpose) {
 }
 
 /* =====================================================
-   GMAIL SMTP
-   PORT 465 + SSL
-===================================================== */
-
-const mailTransporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
-  connectionTimeout: 30000,
-  greetingTimeout: 30000,
-  socketTimeout: 30000,
-
-  auth: {
-    user: GMAIL_USER,
-    pass: GMAIL_APP_PASSWORD
-  }
-});
-
-mailTransporter.verify()
-  .then(() => {
-    console.log("Gmail SMTP connection: OK");
-  })
-  .catch((error) => {
-    console.error(
-      "Gmail SMTP connection error:",
-      error.code || "",
-      error.message
-    );
-  });
-
-/* =====================================================
-   GMAIL SMTP CONNECTION TEST
-===================================================== */
-
-if (GMAIL_USER && GMAIL_APP_PASSWORD) {
-  mailTransporter.verify()
-    .then(() => {
-      console.log("Gmail SMTP connection: OK");
-    })
-    .catch(error => {
-      console.error(
-        "Gmail SMTP connection error:",
-        error.code || "UNKNOWN",
-        error.message || error
-      );
-    });
-} else {
-  console.log(
-    "Gmail SMTP connection: NOT CONFIGURED"
-  );
-}
-
-/* =====================================================
    SEND EMAIL OTP
 ===================================================== */
 
 async function sendEmailOtp(email, otp) {
-  if (!GMAIL_USER || !GMAIL_APP_PASSWORD) {
+  if (!mailTransporter) {
     throw new Error(
-      "Gmail OTP service is not configured."
+      "Gmail OTP service is not configured. Check GMAIL_USER and GMAIL_APP_PASSWORD."
     );
   }
 
   try {
-    const info =
-      await mailTransporter.sendMail({
-        from:
-          `"TaskEarn" <${GMAIL_USER}>`,
+    const info = await mailTransporter.sendMail({
+      from: `"TaskEarn" <${GMAIL_USER}>`,
+      to: email,
+      subject: "TaskEarn Email Verification Code",
 
-        to: email,
+      text:
+        `Your TaskEarn verification code is ${otp}. ` +
+        `This OTP expires in 10 minutes.`,
 
-        subject:
-          "TaskEarn Email Verification Code",
-
-        text:
-          `Your TaskEarn verification code is ${otp}. This OTP expires in 10 minutes.`,
-
-        html: `
+      html: `
 <!DOCTYPE html>
 <html>
 <head>
@@ -443,10 +412,7 @@ padding:30px;
 box-shadow:0 4px 20px rgba(0,0,0,0.08);
 ">
 
-<h1 style="
-margin:0 0 10px;
-color:#ff5d2e;
-">
+<h1 style="color:#ff5d2e;">
 TaskEarn
 </h1>
 
@@ -490,7 +456,7 @@ TaskEarn
 </body>
 </html>
 `
-      });
+    });
 
     console.log(
       "Gmail OTP sent successfully:",
@@ -500,6 +466,7 @@ TaskEarn
     );
 
     return info;
+
   } catch (error) {
     console.error(
       "Gmail OTP send error:",
@@ -509,7 +476,7 @@ TaskEarn
     );
 
     throw new Error(
-      "Unable to send Gmail OTP. Please try again."
+      "Unable to send Gmail OTP. Please check Gmail SMTP configuration."
     );
   }
 }
@@ -574,6 +541,7 @@ async function sendOtpFor(
         "Invalid OTP type."
       );
     }
+
   } catch (error) {
     deleteOtpRecord(
       user.id,
@@ -586,7 +554,7 @@ async function sendOtpFor(
 }
 
 /* =====================================================
-   TWILIO
+   TWILIO SMS OTP
 ===================================================== */
 
 async function sendSmsOtp(mobile, otp) {
@@ -620,7 +588,6 @@ async function sendSmsOtp(mobile, otp) {
     new URLSearchParams();
 
   params.append("To", mobile);
-
   params.append("From", from);
 
   params.append(
@@ -704,12 +671,6 @@ async function verifyGoogleIdToken(idToken) {
   if (!idToken) {
     throw new Error(
       "Google authentication token is missing."
-    );
-  }
-
-  if (typeof fetch !== "function") {
-    throw new Error(
-      "This server requires Node.js 18 or newer."
     );
   }
 
@@ -848,6 +809,7 @@ app.post(
         };
 
         db.users.push(user);
+
       } else {
         user.googleId =
           google.googleId;
@@ -884,6 +846,7 @@ app.post(
         user:
           publicUser(user)
       });
+
     } catch (error) {
       console.error(
         "Google login error:",
@@ -1085,7 +1048,9 @@ app.post(
           "register",
           true
         );
+
       } catch (error) {
+
         db.users =
           db.users.filter(
             u =>
@@ -1098,6 +1063,13 @@ app.post(
         throw error;
       }
 
+      const record =
+        getOtpRecord(
+          user.id,
+          "email",
+          "register"
+        );
+
       res.json({
         verificationRequired:
           true,
@@ -1109,9 +1081,26 @@ app.post(
           user.email,
 
         mobile:
-          user.mobile
+          user.mobile,
+
+        expiresAt:
+          record
+            ? record.expiresAt
+            : null,
+
+        resendAt:
+          record
+            ? new Date(
+                new Date(
+                  record.lastSentAt
+                ).getTime() +
+                  OTP_RESEND_MS
+              ).toISOString()
+            : null
       });
+
     } catch (error) {
+
       console.error(
         "Register error:",
         error
@@ -1181,6 +1170,7 @@ app.post(
       }
 
       if (!user.emailVerified) {
+
         req.session.verification = {
           userId:
             user.id,
@@ -1199,6 +1189,13 @@ app.post(
           true
         );
 
+        const record =
+          getOtpRecord(
+            user.id,
+            "email",
+            "login"
+          );
+
         return res.json({
           verificationRequired:
             true,
@@ -1210,7 +1207,22 @@ app.post(
             user.email,
 
           mobile:
-            user.mobile
+            user.mobile,
+
+          expiresAt:
+            record
+              ? record.expiresAt
+              : null,
+
+          resendAt:
+            record
+              ? new Date(
+                  new Date(
+                    record.lastSentAt
+                  ).getTime() +
+                    OTP_RESEND_MS
+                ).toISOString()
+              : null
         });
       }
 
@@ -1224,7 +1236,9 @@ app.post(
         user:
           publicUser(user)
       });
+
     } catch (error) {
+
       console.error(
         "Login error:",
         error
@@ -1310,7 +1324,7 @@ app.post(
 
         return res.status(400).json({
           error:
-            "OTP has expired. Please request a new OTP."
+            "OTP has expired. Please click Resend OTP."
         });
       }
 
@@ -1326,7 +1340,7 @@ app.post(
 
         return res.status(429).json({
           error:
-            "Too many incorrect attempts. Please request a new OTP."
+            "Too many incorrect attempts. Please click Resend OTP."
         });
       }
 
@@ -1370,7 +1384,9 @@ app.post(
         user:
           publicUser(user)
       });
+
     } catch (error) {
+
       console.error(
         "Email OTP verification error:",
         error
@@ -1387,7 +1403,6 @@ app.post(
 
 /* =====================================================
    RESEND EMAIL OTP
-   NEW OTP + 60 SECOND SERVER COOLDOWN
 ===================================================== */
 
 app.post(
@@ -1437,7 +1452,12 @@ app.post(
         message:
           "A new Gmail OTP has been sent.",
 
-        resendAfter:
+        expiresAt:
+          record
+            ? record.expiresAt
+            : null,
+
+        resendAt:
           record
             ? new Date(
                 new Date(
@@ -1445,14 +1465,11 @@ app.post(
                 ).getTime() +
                   OTP_RESEND_MS
               ).toISOString()
-            : null,
-
-        expiresAt:
-          record
-            ? record.expiresAt
             : null
       });
+
     } catch (error) {
+
       console.error(
         "Resend email OTP error:",
         error
@@ -1469,7 +1486,6 @@ app.post(
 
 /* =====================================================
    OTP STATUS
-   FRONTEND CAN USE THIS FOR COUNTDOWN
 ===================================================== */
 
 app.get(
@@ -1648,23 +1664,23 @@ app.put(
         });
       }
 
-      const mobileChanged =
-        mobile !== user.mobile;
+      if (mobile !== user.mobile) {
 
-      if (mobileChanged && mobile) {
-        const duplicate =
-          db.users.find(
-            u =>
-              String(u.id) !==
-                String(user.id) &&
-              u.mobile === mobile
-          );
+        if (mobile) {
+          const duplicate =
+            db.users.find(
+              u =>
+                String(u.id) !==
+                  String(user.id) &&
+                u.mobile === mobile
+            );
 
-        if (duplicate) {
-          return res.status(409).json({
-            error:
-              "This mobile number is already registered."
-          });
+          if (duplicate) {
+            return res.status(409).json({
+              error:
+                "This mobile number is already registered."
+            });
+          }
         }
 
         user.mobile =
@@ -1689,7 +1705,9 @@ app.put(
         user:
           publicUser(user)
       });
+
     } catch (error) {
+
       console.error(
         "Profile error:",
         error
@@ -1972,7 +1990,9 @@ app.post(
         message:
           "Mobile verification OTP sent successfully."
       });
+
     } catch (error) {
+
       console.error(
         "Withdrawal mobile OTP:",
         error
@@ -2117,7 +2137,9 @@ app.post(
         message:
           "Mobile number verified successfully."
       });
+
     } catch (error) {
+
       console.error(
         "Mobile OTP verification:",
         error
@@ -2198,7 +2220,9 @@ app.post(
               ).toISOString()
             : null
       });
+
     } catch (error) {
+
       console.error(
         "Resend mobile OTP:",
         error
@@ -2279,6 +2303,7 @@ app.post(
       let paymentDetails;
 
       if (method === "UPI") {
+
         const upiId =
           cleanText(
             details.upiId,
@@ -2299,7 +2324,9 @@ app.post(
         paymentDetails = {
           upiId
         };
+
       } else {
+
         const accountHolderName =
           cleanText(
             details.accountHolderName,
@@ -2386,7 +2413,9 @@ app.post(
         message:
           "Withdrawal request submitted successfully."
       });
+
     } catch (error) {
+
       console.error(
         "Withdrawal error:",
         error
@@ -2485,6 +2514,7 @@ app.listen(
   PORT,
   "0.0.0.0",
   () => {
+
     console.log(
       `TaskEarn server running on port ${PORT}`
     );
@@ -2519,14 +2549,6 @@ app.listen(
         process.env.TWILIO_ACCOUNT_SID &&
         process.env.TWILIO_AUTH_TOKEN &&
         process.env.TWILIO_PHONE_NUMBER
-          ? "YES"
-          : "NO"
-      }`
-    );
-
-    console.log(
-      `Resend API key present: ${
-        process.env.RESEND_API_KEY
           ? "YES"
           : "NO"
       }`
