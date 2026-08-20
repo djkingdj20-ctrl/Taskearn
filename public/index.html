@@ -73,11 +73,12 @@ input:focus,select:focus,textarea:focus{border-color:#ff5d2e;box-shadow:0 0 0 3p
 .account-option{border:1px solid #e3e5eb;background:white;border-radius:15px;padding:17px;font-weight:800}
 .account-option:hover{border-color:#ff5d2e;background:#fff8f5}
 
-.modal{position:fixed;inset:0;background:rgba(10,15,30,.55);display:none;align-items:center;justify-content:center;z-index:2000;padding:18px}
-.modal.open{display:flex}
-.modal-box{width:min(500px,100%);max-height:90vh;overflow:auto;background:white;border-radius:22px;padding:22px}
+/* Fixed OTP Popup Modal CSS */
+.modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(10,15,30,.65);display:none;align-items:center;justify-content:center;z-index:99999;padding:18px}
+.modal.open{display:flex !important}
+.modal-box{width:min(500px,100%);max-height:90vh;overflow:auto;background:white;border-radius:22px;padding:25px;box-shadow:0 20px 40px rgba(0,0,0,0.2)}
 .modal-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.close{border:0;background:#f1f3f7;width:36px;height:36px;border-radius:50%;font-size:20px}
+.close{border:0;background:#f1f3f7;width:36px;height:36px;border-radius:50%;font-size:20px;cursor:pointer}
 
 .otp-status{
 text-align:center;
@@ -85,6 +86,14 @@ font-weight:800;
 font-size:14px;
 margin:12px 0;
 min-height:20px;
+}
+
+#otpInput, #profileOtpInput {
+font-size:20px;
+letter-spacing:6px;
+text-align:center;
+font-weight:bold;
+border:2px solid #ff5d2e;
 }
 
 .spinner{
@@ -418,11 +427,12 @@ Enter the OTP sent to you.
 class="otp-status">
 </div>
 
+<label style="margin-bottom:8px;">Enter 6-Digit OTP:</label>
 <input id="otpInput"
 type="text"
 inputmode="numeric"
 maxlength="6"
-placeholder="6-digit OTP"
+placeholder="------"
 autocomplete="one-time-code">
 
 <br><br>
@@ -430,7 +440,7 @@ autocomplete="one-time-code">
 <button id="verifyOtpButton"
 class="primary"
 onclick="verifyOtp()">
-Verify OTP
+Verify & Continue
 </button>
 
 <br><br>
@@ -475,7 +485,7 @@ Enter the OTP sent to your new mobile number.
 type="text"
 inputmode="numeric"
 maxlength="6"
-placeholder="6-digit OTP">
+placeholder="------">
 
 <br><br>
 
@@ -825,7 +835,7 @@ body:JSON.stringify(payload)
 }
 );
 
-if(result.verificationRequired){
+if(result.verificationRequired || result.email || result.step){
 
 showMessage(
 result.message ||
@@ -953,7 +963,7 @@ tasksHome();
 return;
 }
 
-if(result.verificationRequired){
+if(result.verificationRequired || result.step){
 
 showMessage(
 "Verification required.",
@@ -1000,7 +1010,7 @@ false
 
 
 /* =====================================================
-   OTP MODAL
+   OTP MODAL (FIXED FORCE DISPLAY)
 ===================================================== */
 
 function openOtpModal(
@@ -1020,6 +1030,9 @@ document.getElementById("otpInput");
 
 const status =
 document.getElementById("otpStatus");
+
+const modal = 
+document.getElementById("otpModal");
 
 if(step==="email"){
 
@@ -1046,9 +1059,8 @@ message.textContent =
 input.value="";
 status.textContent="";
 
-document
-.getElementById("otpModal")
-.classList.add("open");
+/* Force Display Modal */
+modal.classList.add("open");
 
 setTimeout(
 ()=>{
