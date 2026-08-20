@@ -344,9 +344,7 @@ function deleteOtpRecord(userId, type, purpose) {
 
 const mailTransporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
-
   port: 465,
-
   secure: true,
 
   auth: {
@@ -355,9 +353,7 @@ const mailTransporter = nodemailer.createTransport({
   },
 
   connectionTimeout: 20000,
-
   greetingTimeout: 20000,
-
   socketTimeout: 20000
 });
 
