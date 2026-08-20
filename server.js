@@ -346,16 +346,27 @@ const mailTransporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 465,
   secure: true,
+  connectionTimeout: 30000,
+  greetingTimeout: 30000,
+  socketTimeout: 30000,
 
   auth: {
     user: GMAIL_USER,
     pass: GMAIL_APP_PASSWORD
-  },
-
-  connectionTimeout: 20000,
-  greetingTimeout: 20000,
-  socketTimeout: 20000
+  }
 });
+
+mailTransporter.verify()
+  .then(() => {
+    console.log("Gmail SMTP connection: OK");
+  })
+  .catch((error) => {
+    console.error(
+      "Gmail SMTP connection error:",
+      error.code || "",
+      error.message
+    );
+  });
 
 /* =====================================================
    GMAIL SMTP CONNECTION TEST
