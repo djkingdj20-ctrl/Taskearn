@@ -287,23 +287,40 @@ const OTP_RESEND_MS =
 const OTP_MAX_ATTEMPTS = 5;
 
 /* =====================================================
-   EMAIL OTP
+   EMAIL OTP - GMAIL SMTP
 ===================================================== */
+
+const nodemailer = require("nodemailer");
+
+const gmailUser =
+  process.env.GMAIL_USER ||
+  "taskearn.otp@gmail.com";
+
+const gmailAppPassword =
+  process.env.GMAIL_APP_PASSWORD || "";
+
+const mailTransporter =
+  nodemailer.createTransport({
+    service: "gmail",
+
+    auth: {
+      user: gmailUser,
+
+      pass: gmailAppPassword
+    }
+  });
 
 async function sendEmailOtp(
   email,
   otp,
   purpose
 ) {
-  const apiKey =
-    process.env.RESEND_API_KEY;
-
-  const from =
-    process.env.EMAIL_FROM;
-
-  if (!apiKey || !from) {
+  if (
+    !gmailUser ||
+    !gmailAppPassword
+  ) {
     throw new Error(
-      "Email verification service is not configured. Please contact the administrator."
+      "Gmail email service is not configured."
     );
   }
 
@@ -319,58 +336,69 @@ async function sendEmailOtp(
       margin:auto;
       padding:25px;
       color:#171b2d;
+      background:#ffffff;
     ">
-      <h2>TaskEarn Email Verification</h2>
 
-      <p>Your TaskEarn verification code is:</p>
+      <h2 style="color:#171b2d;">
+        TaskEarn Email Verification
+      </h2>
+
+      <p>
+        Your TaskEarn verification code is:
+      </p>
 
       <div style="
         font-size:32px;
         font-weight:900;
         letter-spacing:8px;
         margin:20px 0;
+        padding:15px;
+        background:#f3f4f6;
+        border-radius:10px;
+        text-align:center;
       ">
         ${otp}
       </div>
 
-      <p>This code expires in 10 minutes.</p>
+      <p>
+        This code expires in 10 minutes.
+      </p>
 
       <p>
         If you did not request this code,
         you can safely ignore this email.
       </p>
+
+      <hr>
+
+      <p style="
+        color:#777;
+        font-size:12px;
+      ">
+        TaskEarn Security Team
+      </p>
+
     </div>
   `;
 
-  const response = await fetch(
-    "https://api.resend.com/emails",
-    {
-      method: "POST",
+  try {
+    await mailTransporter.sendMail({
+      from: `"TaskEarn" <${gmailUser}>`,
 
-      headers: {
-        Authorization:
-          "Bearer " + apiKey,
+      to: email,
 
-        "Content-Type":
-          "application/json"
-      },
+      subject,
 
-      body: JSON.stringify({
-        from,
-        to: [email],
-        subject,
-        html
-      })
-    }
-  );
+      html
+    });
 
-  if (!response.ok) {
-    const text =
-      await response.text();
-
+    console.log(
+      `Email OTP sent successfully to ${email}`
+    );
+  } catch (error) {
     console.error(
-      "Resend error:",
-      text
+      "Gmail SMTP error:",
+      error
     );
 
     throw new Error(
