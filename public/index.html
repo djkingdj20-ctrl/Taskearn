@@ -2,466 +2,158 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaskEarn - Complete Tasks & Earn Rewards</title>
 
-<meta
-  name="viewport"
-  content="width=device-width,initial-scale=1.0"
->
-
-<title>TaskEarn</title>
-
-<!-- =====================================================
-     GOOGLE IDENTITY SERVICES
-===================================================== -->
-
-<script
-  src="https://accounts.google.com/gsi/client"
-  async
-  defer
-></script>
+<!-- GOOGLE IDENTITY SERVICES -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 
 <style>
-* {
-  box-sizing: border-box;
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f7f8fc; color: #171b2d;
 }
-
-html,
-body {
-  margin: 0;
-  padding: 0;
-  font-family:
-    Arial,
-    Helvetica,
-    sans-serif;
-  background: #f7f8fc;
-  color: #171b2d;
-}
-
-button,
-input,
-select,
-textarea {
-  font: inherit;
-}
-
-button {
-  cursor: pointer;
-}
+button, input, select, textarea { font: inherit; }
+button { cursor: pointer; }
 
 .header {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
+  position: sticky; top: 0; z-index: 1000;
   background: rgba(255,255,255,.96);
   backdrop-filter: blur(18px);
   border-bottom: 1px solid #e8eaf0;
 }
-
 .header-inner {
-  max-width: 1100px;
-  margin: auto;
-  min-height: 70px;
-  padding: 10px 18px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  max-width: 1100px; margin: auto; min-height: 70px;
+  padding: 10px 18px; display: flex;
+  align-items: center; justify-content: space-between;
 }
-
-.logo {
-  font-size: 24px;
-  font-weight: 900;
-  color: #ff5d2e;
-}
-
-.nav {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
+.logo { font-size: 24px; font-weight: 900; color: #ff5d2e; cursor: pointer; }
+.nav { display: flex; align-items: center; gap: 8px; }
 .nav button {
-  border: 0;
-  background: transparent;
-  padding: 10px 14px;
-  border-radius: 12px;
-  font-weight: 700;
-  color: #596174;
+  border: 0; background: transparent; padding: 10px 14px;
+  border-radius: 12px; font-weight: 700; color: #596174;
 }
+.nav button:hover, .nav button.active { background: #fff1eb; color: #ff5d2e; }
 
-.nav button:hover,
-.nav button.active {
-  background: #fff1eb;
-  color: #ff5d2e;
-}
-
-.header-profile {
-  position: relative;
-}
-
+.header-profile { position: relative; }
 .profile-avatar-button {
-  width: 44px;
-  height: 44px;
-  border: 0;
-  border-radius: 50%;
-  background: #ff5d2e;
-  color: white;
-  font-weight: 900;
+  width: 44px; height: 44px; border: 0; border-radius: 50%;
+  background: #ff5d2e; color: white; font-weight: 900; font-size: 18px;
 }
-
 .header-profile-panel {
-  position: absolute;
-  right: 0;
-  top: 52px;
-  width: 230px;
-  background: white;
-  border: 1px solid #e7e9ef;
-  border-radius: 18px;
-  box-shadow: 0 15px 40px rgba(20,30,60,.16);
-  padding: 12px;
-  display: none;
+  position: absolute; right: 0; top: 52px; width: 230px;
+  background: white; border: 1px solid #e7e9ef;
+  border-radius: 18px; box-shadow: 0 15px 40px rgba(20,30,60,.16);
+  padding: 12px; display: none; z-index: 1001;
 }
-
-.header-profile-panel.open {
-  display: block;
-}
-
+.header-profile-panel.open { display: block; }
 .header-profile-panel button {
-  width: 100%;
-  border: 0;
-  background: transparent;
-  text-align: left;
-  padding: 12px;
-  border-radius: 12px;
-  font-weight: 700;
+  width: 100%; border: 0; background: transparent;
+  text-align: left; padding: 12px; border-radius: 12px; font-weight: 700;
 }
+.header-profile-panel button:hover { background: #f5f6fa; }
 
-.header-profile-panel button:hover {
-  background: #f5f6fa;
-}
-
-.container {
-  max-width: 1100px;
-  margin: auto;
-  padding: 25px 18px 100px;
-}
-
-.hero {
-  padding: 50px 0 30px;
-}
-
-.hero h1 {
-  font-size: clamp(36px, 7vw, 68px);
-  line-height: 1;
-  margin: 0 0 18px;
-}
-
-.hero h1 span {
-  color: #ff5d2e;
-}
-
-.hero p {
-  max-width: 680px;
-  color: #697286;
-  font-size: 17px;
-  line-height: 1.7;
-}
+.container { max-width: 1100px; margin: auto; padding: 25px 18px 100px; }
+.hero { padding: 40px 0 20px; }
+.hero h1 { font-size: clamp(32px, 6vw, 56px); line-height: 1.1; margin: 0 0 18px; }
+.hero h1 span { color: #ff5d2e; }
+.hero p { max-width: 680px; color: #697286; font-size: 16px; line-height: 1.6; }
 
 .card {
-  background: white;
-  border: 1px solid #e7e9ef;
-  border-radius: 20px;
-  padding: 22px;
-  margin-bottom: 18px;
+  background: white; border: 1px solid #e7e9ef;
+  border-radius: 20px; padding: 22px; margin-bottom: 18px;
   box-shadow: 0 8px 25px rgba(20,30,60,.05);
 }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.full { grid-column: 1 / -1; }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
+label { display: block; font-weight: 700; margin-bottom: 7px; font-size: 14px; }
+input, select, textarea {
+  width: 100%; padding: 13px 14px; border: 1px solid #dfe2e9;
+  border-radius: 12px; outline: none; background: white;
 }
-
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
-
-.full {
-  grid-column: 1 / -1;
-}
-
-label {
-  display: block;
-  font-weight: 700;
-  margin-bottom: 7px;
-  font-size: 14px;
-}
-
-input,
-select,
-textarea {
-  width: 100%;
-  padding: 13px 14px;
-  border: 1px solid #dfe2e9;
-  border-radius: 12px;
-  outline: none;
-  background: white;
-}
-
-input:focus,
-select:focus,
-textarea:focus {
-  border-color: #ff5d2e;
-  box-shadow: 0 0 0 3px rgba(255,93,46,.1);
+input:focus, select:focus, textarea:focus {
+  border-color: #ff5d2e; box-shadow: 0 0 0 3px rgba(255,93,46,.1);
 }
 
 .primary {
-  width: 100%;
-  border: 0;
-  background: #ff5d2e;
-  color: white;
-  padding: 14px 18px;
-  border-radius: 13px;
-  font-weight: 800;
+  width: 100%; border: 0; background: #ff5d2e; color: white;
+  padding: 14px 18px; border-radius: 13px; font-weight: 800;
 }
-
-.primary:hover {
-  opacity: .92;
-}
+.primary:hover { opacity: .92; }
+.primary:disabled { background: #ccc; cursor: not-allowed; }
 
 .secondary {
-  border: 1px solid #e0e3ea;
-  background: white;
-  color: #30374a;
-  padding: 12px 16px;
-  border-radius: 12px;
-  font-weight: 700;
+  border: 1px solid #e0e3ea; background: white; color: #30374a;
+  padding: 12px 16px; border-radius: 12px; font-weight: 700;
 }
+.danger { background: #fff0f0 !important; color: #d73535 !important; }
+.muted { color: #70798b; }
+.hidden { display: none !important; }
 
-.danger {
-  background: #fff0f0 !important;
-  color: #d73535 !important;
-}
+.notice { padding: 13px 15px; border-radius: 12px; margin-bottom: 15px; font-weight: 700; font-size: 14px; }
+.notice.error { background: #fff0f0; color: #c92e2e; }
+.notice.success { background: #ecfff3; color: #168346; }
 
-.muted {
-  color: #70798b;
-}
-
-.hidden {
-  display: none !important;
-}
-
-.notice {
-  padding: 13px 15px;
-  border-radius: 12px;
-  margin-bottom: 15px;
-  font-weight: 700;
-}
-
-.notice.error {
-  background: #fff0f0;
-  color: #c92e2e;
-}
-
-.notice.success {
-  background: #ecfff3;
-  color: #168346;
-}
-
-.auth-tabs {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 18px;
-}
-
+.auth-tabs { display: flex; gap: 8px; margin-bottom: 18px; }
 .auth-tabs button {
-  flex: 1;
-  padding: 12px;
-  border: 0;
-  border-radius: 12px;
-  background: #f1f3f7;
-  font-weight: 800;
+  flex: 1; padding: 12px; border: 0; border-radius: 12px;
+  background: #f1f3f7; font-weight: 800; color: #596174;
 }
+.auth-tabs button.active { background: #ff5d2e; color: white; }
 
-.auth-tabs button.active {
-  background: #ff5d2e;
-  color: white;
-}
-
-.google-area {
-  margin-top: 15px;
-  text-align: center;
-}
-
+.google-area { margin-top: 15px; display: flex; justify-content: center; min-height: 44px; }
 .divider {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 18px 0;
-  color: #8a92a2;
-  font-size: 13px;
+  display: flex; align-items: center; gap: 10px; margin: 18px 0;
+  color: #8a92a2; font-size: 13px;
+}
+.divider::before, .divider::after {
+  content: ""; height: 1px; background: #e3e5eb; flex: 1;
 }
 
-.divider::before,
-.divider::after {
-  content: "";
-  height: 1px;
-  background: #e3e5eb;
-  flex: 1;
+.reward { font-size: 22px; font-weight: 900; color: #13a05a; margin: 8px 0; }
+.badge {
+  display: inline-block; padding: 4px 10px; border-radius: 8px;
+  font-size: 12px; font-weight: 800; text-transform: uppercase;
 }
-
-.task-card h3 {
-  margin-top: 0;
-}
-
-.reward {
-  font-size: 20px;
-  font-weight: 900;
-  color: #13a05a;
-}
-
-.stat {
-  text-align: center;
-}
-
-.stat b {
-  display: block;
-  font-size: 26px;
-  margin-top: 8px;
-}
-
-.account-menu {
-  display: grid;
-  grid-template-columns: repeat(2,1fr);
-  gap: 12px;
-}
-
-.account-option {
-  border: 1px solid #e3e5eb;
-  background: white;
-  border-radius: 15px;
-  padding: 17px;
-  font-weight: 800;
-}
-
-.account-option:hover {
-  border-color: #ff5d2e;
-  background: #fff8f5;
-}
+.badge.pending { background: #fff8e6; color: #b7791f; }
+.badge.approved { background: #e6fffa; color: #234e52; }
+.badge.rejected { background: #ffe6e6; color: #9b2c2c; }
 
 .modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(10,15,30,.55);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-  padding: 18px;
+  position: fixed; inset: 0; background: rgba(10,15,30,.55);
+  display: none; align-items: center; justify-content: center;
+  z-index: 2000; padding: 18px;
 }
-
-.modal.open {
-  display: flex;
-}
-
+.modal.open { display: flex; }
 .modal-box {
-  width: min(500px,100%);
-  max-height: 90vh;
-  overflow: auto;
-  background: white;
-  border-radius: 22px;
-  padding: 22px;
+  width: min(480px,100%); max-height: 90vh; overflow: auto;
+  background: white; border-radius: 22px; padding: 22px;
 }
-
-.modal-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.close {
-  border: 0;
-  background: #f1f3f7;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  font-size: 20px;
-}
+.modal-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.close { border: 0; background: #f1f3f7; width: 36px; height: 36px; border-radius: 50%; font-size: 20px; }
 
 .mobile-bottom-nav {
-  position: fixed;
-  display: none;
-  left: 10px;
-  right: 10px;
-  bottom: 10px;
-  height: 60px;
-  z-index: 1500;
-  background: rgba(255,255,255,.96);
-  backdrop-filter: blur(18px);
-  border: 1px solid #e7e9ef;
-  border-radius: 20px;
-  box-shadow: 0 12px 35px rgba(20,30,60,.16);
-  align-items: center;
-  justify-content: space-around;
-  padding: 5px;
+  position: fixed; display: none; left: 10px; right: 10px; bottom: 10px;
+  height: 60px; z-index: 1500; background: rgba(255,255,255,.96);
+  backdrop-filter: blur(18px); border: 1px solid #e7e9ef; border-radius: 20px;
+  box-shadow: 0 12px 35px rgba(20,30,60,.16); align-items: center; justify-content: space-around; padding: 5px;
 }
-
-.mobile-bottom-nav.logged-in {
-  display: flex;
-}
-
+.mobile-bottom-nav.logged-in { display: flex; }
 .bottom-item {
-  border: 0;
-  background: transparent;
-  height: 50px;
-  min-width: 75px;
-  border-radius: 15px;
-  color: #70798b;
-  font-size: 10px;
-  font-weight: 700;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
+  border: 0; background: transparent; height: 50px; min-width: 75px;
+  border-radius: 15px; color: #70798b; font-size: 11px; font-weight: 700;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
 }
-
-.bottom-item span:first-child {
-  font-size: 20px;
-}
-
-.bottom-item.active {
-  background: #fff1eb;
-  color: #ff5d2e;
-}
+.bottom-item.active { background: #fff1eb; color: #ff5d2e; }
 
 @media(max-width:760px) {
-
-  .nav {
-    display: none;
-  }
-
-  .grid {
-    grid-template-columns: 1fr;
-  }
-
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .full {
-    grid-column: auto;
-  }
-
-  .account-menu {
-    grid-template-columns: 1fr;
-  }
-
-  .container {
-    padding-bottom: 90px;
-  }
+  .nav { display: none; }
+  .form-grid { grid-template-columns: 1fr; }
+  .container { padding-bottom: 90px; }
 }
 </style>
 </head>
@@ -469,639 +161,159 @@ textarea:focus {
 <body>
 
 <header class="header">
-
   <div class="header-inner">
-
-    <div
-      class="logo"
-      onclick="goPublicHome()"
-      style="cursor:pointer;"
-    >
-      TaskEarn
-    </div>
-
-    <nav
-      id="mainNav"
-      class="nav"
-    >
-      <button
-        onclick="tasksHome()"
-        id="navTasks"
-      >
-        Tasks
-      </button>
-
-      <button
-        onclick="walletHome()"
-        id="navWallet"
-      >
-        Wallet
-      </button>
-
-      <button
-        onclick="profileHome()"
-        id="navProfile"
-      >
-        Profile
-      </button>
+    <div class="logo" onclick="checkSession()">TaskEarn</div>
+    <nav id="mainNav" class="nav" style="display:none;">
+      <button onclick="renderTasksView()" id="navTasks">Tasks</button>
+      <button onclick="renderSubmissionsView()" id="navSubmissions">Submissions</button>
+      <button onclick="renderWalletView()" id="navWallet">Wallet</button>
+      <button onclick="renderProfileView()" id="navProfile">Profile</button>
     </nav>
-
-    <div
-      id="headerProfile"
-      class="header-profile"
-      style="display:none;"
-    >
-
-      <button
-        id="headerAvatarButton"
-        class="profile-avatar-button"
-        onclick="toggleProfilePanel(event)"
-      >
-        <span id="headerAvatarInitials">
-          U
-        </span>
+    <div id="headerProfile" class="header-profile" style="display:none;">
+      <button id="headerAvatarButton" class="profile-avatar-button" onclick="toggleProfilePanel(event)">
+        <span id="headerAvatarInitials">U</span>
       </button>
-
-      <div
-        id="profilePanel"
-        class="header-profile-panel"
-      >
-
-        <div
-          id="profilePanelName"
-          style="
-            font-weight:900;
-            padding:10px;
-          "
-        >
-          User
-        </div>
-
-        <div
-          id="profilePanelEmail"
-          class="muted"
-          style="
-            padding:0 10px 10px;
-            font-size:13px;
-          "
-        ></div>
-
-        <button onclick="profileHome()">
-          👤 Profile
-        </button>
-
-        <button onclick="walletHome()">
-          💰 Wallet
-        </button>
-
-        <button
-          class="danger"
-          onclick="logoutUser()"
-        >
-          🚪 Logout
-        </button>
-
+      <div id="profilePanel" class="header-profile-panel">
+        <div id="profilePanelName" style="font-weight:900; padding:8px 10px 2px;">User</div>
+        <div id="profilePanelEmail" class="muted" style="padding:0 10px 10px; font-size:12px;"></div>
+        <button onclick="renderProfileView()">👤 Profile</button>
+        <button onclick="renderWalletView()">💰 Wallet</button>
+        <button onclick="renderSubmissionsView()">📜 Submissions</button>
+        <button class="danger" onclick="logoutUser()">🚪 Logout</button>
       </div>
     </div>
-
   </div>
-
 </header>
 
 <main class="container">
 
-<!-- =====================================================
-     PUBLIC HOME
-===================================================== -->
-
-<section
-  id="homeArea"
->
-
-  <div
-    id="publicHero"
-    class="hero"
-  >
-
-    <h1>
-      Complete Tasks.<br>
-      <span>Earn Rewards.</span>
-    </h1>
-
-    <p>
-      Welcome to TaskEarn. Complete available
-      tasks, submit them for review and earn
-      approved rewards.
-    </p>
-
-    <div
-      style="
-        display:flex;
-        gap:10px;
-        flex-wrap:wrap;
-        margin-top:20px;
-      "
-    >
-
-      <button
-        class="primary"
-        style="width:auto;"
-        onclick="openAuth('register')"
-      >
-        Get Started
-      </button>
-
-      <button
-        class="secondary"
-        onclick="openAuth('login')"
-      >
-        Login
-      </button>
-
+<!-- PUBLIC HOME AREA -->
+<section id="homeArea">
+  <div class="hero">
+    <h1>Complete Tasks.<br><span>Earn Rewards.</span></h1>
+    <p>Welcome to TaskEarn. Complete simple online tasks, submit your proof, and earn instant wallet rewards.</p>
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:20px;">
+      <button class="primary" style="width:auto; padding:12px 24px;" onclick="openAuth('register')">Get Started</button>
+      <button class="secondary" onclick="openAuth('login')">Login</button>
     </div>
-
   </div>
-
-  <div
-    id="loggedInWelcome"
-    style="display:none;"
-  ></div>
-
-  <div class="features">
-
-    <div class="grid">
-
-      <div class="card">
-        <h3>📋 Tasks</h3>
-        <p class="muted">
-          Find available online tasks.
-        </p>
-      </div>
-
-      <div class="card">
-        <h3>💰 Rewards</h3>
-        <p class="muted">
-          Earn rewards for approved work.
-        </p>
-      </div>
-
-      <div class="card">
-        <h3>🔐 Secure</h3>
-        <p class="muted">
-          Email OTP and Google authentication.
-        </p>
-      </div>
-
+  <div class="grid" style="margin-top:30px;">
+    <div class="card">
+      <h3>📋 Easy Tasks</h3>
+      <p class="muted">Access active tasks anytime and follow simple guidelines to complete them.</p>
     </div>
-
+    <div class="card">
+      <h3>💰 Fair Rewards</h3>
+      <p class="muted">Earn real money directly in your wallet balance upon task approval.</p>
+    </div>
+    <div class="card">
+      <h3>🔐 Verified & Safe</h3>
+      <p class="muted">Protected with Dual-OTP (Gmail & SMS) verification and Google Sign-In.</p>
+    </div>
   </div>
-
 </section>
 
-<!-- =====================================================
-     AUTH AREA
-===================================================== -->
-
-<section
-  id="authArea"
-  class="hidden"
->
-
-  <div
-    class="card"
-    style="max-width:520px;margin:25px auto;"
-  >
-
+<!-- AUTH AREA -->
+<section id="authArea" class="hidden">
+  <div class="card" style="max-width:480px; margin:20px auto;">
     <div class="auth-tabs">
-
-      <button
-        id="loginTab"
-        onclick="showAuthMode('login')"
-      >
-        Login
-      </button>
-
-      <button
-        id="registerTab"
-        onclick="showAuthMode('register')"
-      >
-        Register
-      </button>
-
+      <button id="loginTab" onclick="showAuthMode('login')">Login</button>
+      <button id="registerTab" onclick="showAuthMode('register')">Register</button>
     </div>
+    
+    <div id="authMessage" class="hidden"></div>
 
-    <div
-      id="authMessage"
-      class="hidden"
-    ></div>
-
-    <!-- LOGIN -->
-
-    <form
-      id="loginForm"
-      onsubmit="loginUser(event)"
-    >
-
+    <!-- LOGIN FORM -->
+    <form id="loginForm" onsubmit="loginUser(event)">
       <h2>Welcome Back 👋</h2>
-
-      <p class="muted">
-        Login using your email or Google account.
-      </p>
-
-      <label>
-        Email
-      </label>
-
-      <input
-        id="loginEmail"
-        type="email"
-        required
-        autocomplete="email"
-      >
-
+      <p class="muted" style="margin-bottom:15px;">Login using your email or Google account.</p>
+      
+      <label>Email Address</label>
+      <input id="loginEmail" type="email" required placeholder="name@example.com">
       <br><br>
-
-      <label>
-        Password
+      <label>Password</label>
+      <input id="loginPassword" type="password" required placeholder="••••••••">
+      <br><br>
+      <label style="font-weight:normal; cursor:pointer;">
+        <input type="checkbox" id="loginRemember" style="width:auto;"> Remember me for 30 days
       </label>
-
-      <input
-        id="loginPassword"
-        type="password"
-        required
-        autocomplete="current-password"
-      >
-
       <br>
-
-      <label
-        style="
-          display:flex;
-          gap:8px;
-          align-items:center;
-          font-weight:600;
-        "
-      >
-
-        <input
-          id="loginRemember"
-          type="checkbox"
-          style="width:auto;"
-        >
-
-        Remember me
-
-      </label>
-
-      <br>
-
-      <button
-        class="primary"
-        type="submit"
-      >
-        Login
-      </button>
-
-      <div class="divider">
-        OR
-      </div>
-
-      <div
-        id="googleLoginButton"
-        class="google-area"
-      ></div>
-
+      <button class="primary" type="submit" id="btnLoginSubmit">Login</button>
+      
+      <div class="divider">OR</div>
+      <div id="googleLoginButton" class="google-area"></div>
     </form>
 
-    <!-- REGISTER -->
-
-    <form
-      id="registerForm"
-      class="hidden"
-      onsubmit="registerUser(event)"
-    >
-
+    <!-- REGISTER FORM -->
+    <form id="registerForm" class="hidden" onsubmit="registerUser(event)">
       <h2>Create Account 🚀</h2>
-
-      <p class="muted">
-        Create your TaskEarn account.
-      </p>
-
-      <label>
-        Full Name
-      </label>
-
-      <input
-        id="registerName"
-        type="text"
-        required
-        maxlength="80"
-        autocomplete="name"
-      >
-
+      <p class="muted" style="margin-bottom:15px;">Join TaskEarn and start earning today.</p>
+      
+      <label>Full Name</label>
+      <input id="registerName" type="text" required placeholder="John Doe">
       <br><br>
-
-      <label>
-        Gmail / Email
-      </label>
-
-      <input
-        id="registerEmail"
-        type="email"
-        required
-        autocomplete="email"
-      >
-
+      <label>Gmail / Email</label>
+      <input id="registerEmail" type="email" required placeholder="name@gmail.com">
       <br><br>
-
-      <label>
-        Mobile Number
-      </label>
-
-      <input
-        id="registerMobile"
-        type="tel"
-        required
-        placeholder="+919876543210"
-        autocomplete="tel"
-      >
-
+      <label>Mobile Number (with country code)</label>
+      <input id="registerMobile" type="tel" required placeholder="+919876543210">
       <br><br>
-
-      <label>
-        City
-      </label>
-
-      <input
-        id="registerCity"
-        type="text"
-        required
-        maxlength="80"
-        autocomplete="address-level2"
-      >
-
+      <label>City</label>
+      <input id="registerCity" type="text" required placeholder="Hyderabad">
       <br><br>
-
-      <label>
-        Password
-      </label>
-
-      <input
-        id="registerPassword"
-        type="password"
-        required
-        minlength="6"
-        autocomplete="new-password"
-      >
-
-      <br>
-
-      <label
-        style="
-          display:flex;
-          gap:8px;
-          align-items:center;
-          font-weight:600;
-        "
-      >
-
-        <input
-          id="registerRemember"
-          type="checkbox"
-          style="width:auto;"
-        >
-
-        Remember me
-
-      </label>
-
-      <br>
-
-      <button
-        class="primary"
-        type="submit"
-      >
-        Create Account
-      </button>
-
-      <div class="divider">
-        OR
-      </div>
-
-      <div
-        id="googleRegisterButton"
-        class="google-area"
-      ></div>
-
-      <p
-        class="muted"
-        style="font-size:12px;"
-      >
-        Google registration verifies your Gmail
-        automatically. You can add your mobile
-        number and city later from Profile.
-      </p>
-
+      <label>Password</label>
+      <input id="registerPassword" type="password" required minlength="6" placeholder="Min 6 characters">
+      <br><br>
+      <button class="primary" type="submit" id="btnRegisterSubmit">Create Account</button>
+      
+      <div class="divider">OR</div>
+      <div id="googleRegisterButton" class="google-area"></div>
     </form>
-
   </div>
-
 </section>
 
-<!-- =====================================================
-     APP AREA
-===================================================== -->
-
-<section
-  id="appArea"
-  class="hidden"
->
-
-  <div
-    id="appContent"
-  ></div>
-
+<!-- APPLICATION AREA -->
+<section id="appArea" class="hidden">
+  <div id="appContent"></div>
 </section>
 
 </main>
 
-<!-- =====================================================
-     OTP MODAL
-===================================================== -->
-
-<div
-  id="otpModal"
-  class="modal"
->
-
+<!-- OTP MODAL -->
+<div id="otpModal" class="modal">
   <div class="modal-box">
-
     <div class="modal-head">
-
-      <h2 id="otpTitle">
-        Verify OTP
-      </h2>
-
-      <button
-        class="close"
-        onclick="closeOtpModal()"
-      >
-        ×
-      </button>
-
+      <h3 id="otpTitle" style="margin:0;">Verify Verification Code</h3>
+      <button class="close" onclick="closeOtpModal()">×</button>
     </div>
-
-    <div
-      id="otpMessage"
-      class="muted"
-      style="margin-bottom:15px;"
-    >
-      Enter the OTP sent to you.
-    </div>
-
-    <input
-      id="otpInput"
-      type="text"
-      inputmode="numeric"
-      maxlength="6"
-      placeholder="6-digit OTP"
-      autocomplete="one-time-code"
-    >
-
+    <div id="otpMessage" class="muted" style="margin-bottom:15px; font-size:14px;"></div>
+    
+    <label>6-Digit OTP</label>
+    <input id="otpInput" type="text" inputmode="numeric" maxlength="6" placeholder="123456" style="text-align:center; font-size:20px; letter-spacing:6px;">
     <br><br>
-
-    <button
-      class="primary"
-      onclick="verifyOtp()"
-    >
-      Verify OTP
-    </button>
-
+    <button class="primary" onclick="verifyOtp()" id="btnVerifyOtp">Verify OTP</button>
     <br><br>
-
-    <button
-      class="secondary"
-      style="width:100%;"
-      onclick="resendOtp()"
-    >
-      Resend OTP
-    </button>
-
+    <button class="secondary" style="width:100%;" onclick="resendOtp()">Resend OTP</button>
   </div>
-
 </div>
 
-<!-- =====================================================
-     PROFILE OTP MODAL
-===================================================== -->
-
-<div
-  id="profileOtpModal"
-  class="modal"
->
-
-  <div class="modal-box">
-
-    <div class="modal-head">
-
-      <h2>
-        Verify Mobile
-      </h2>
-
-      <button
-        class="close"
-        onclick="closeProfileOtp()"
-      >
-        ×
-      </button>
-
-    </div>
-
-    <p class="muted">
-      Enter the OTP sent to your new mobile number.
-    </p>
-
-    <input
-      id="profileOtpInput"
-      type="text"
-      inputmode="numeric"
-      maxlength="6"
-      placeholder="6-digit OTP"
-    >
-
-    <br><br>
-
-    <button
-      class="primary"
-      onclick="verifyProfileOtp()"
-    >
-      Verify Mobile
-    </button>
-
-    <br><br>
-
-    <button
-      class="secondary"
-      style="width:100%;"
-      onclick="resendProfileOtp()"
-    >
-      Resend OTP
-    </button>
-
-  </div>
-
-</div>
-
-<!-- =====================================================
-     MOBILE NAV
-===================================================== -->
-
-<div
-  id="mobileBottomNav"
-  class="mobile-bottom-nav"
->
-
-  <button
-    class="bottom-item active"
-    onclick="tasksHome()"
-  >
-    <span>🏠</span>
-    <span>Tasks</span>
-  </button>
-
-  <button
-    class="bottom-item"
-    onclick="walletHome()"
-  >
-    <span>💰</span>
-    <span>Wallet</span>
-  </button>
-
-  <button
-    class="bottom-item"
-    onclick="profileHome()"
-  >
-    <span>👤</span>
-    <span>Profile</span>
-  </button>
-
+<!-- MOBILE BOTTOM NAVIGATION -->
+<div id="mobileBottomNav" class="mobile-bottom-nav">
+  <button class="bottom-item" id="mbTasks" onclick="renderTasksView()"><span>🏠</span><span>Tasks</span></button>
+  <button class="bottom-item" id="mbSubmissions" onclick="renderSubmissionsView()"><span>📜</span><span>History</span></button>
+  <button class="bottom-item" id="mbWallet" onclick="renderWalletView()"><span>💰</span><span>Wallet</span></button>
+  <button class="bottom-item" id="mbProfile" onclick="renderProfileView()"><span>👤</span><span>Profile</span></button>
 </div>
 
 <script>
-
-/* =====================================================
-   STATE
-===================================================== */
-
+/* STATE MANAGEMENT */
 let currentUser = null;
-let currentAuthMode = "login";
+let activeTab = "tasks";
+let isProfileVerification = false;
 
-/* =====================================================
-   HELPERS
-===================================================== */
-
-function escapeHtml(value) {
-  return String(value || "")
+/* UTILITIES */
+function escapeHtml(str) {
+  return String(str || "")
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
@@ -1109,1984 +321,589 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-async function api(
-  url,
-  options = {}
-) {
-  const response =
-    await fetch(
-      url,
-      {
-        credentials: "same-origin",
-        ...options,
-        headers: {
-          "Content-Type":
-            "application/json",
-          ...(options.headers || {})
-        }
-      }
-    );
+async function api(url, options = {}) {
+  const res = await fetch(url, {
+    credentials: "same-origin",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(options.headers || {})
+    }
+  });
 
   let data = null;
+  try { data = await res.json(); } catch {}
 
-  try {
-    data =
-      await response.json();
-  } catch {
-    data = null;
+  if (!res.ok) {
+    throw new Error(data?.error || "An unexpected error occurred.");
   }
-
-  if (!response.ok) {
-    throw new Error(
-      data?.error ||
-      "Something went wrong."
-    );
-  }
-
   return data;
 }
 
-function showMessage(
-  message,
-  type = "error"
-) {
-  const box =
-    document.getElementById(
-      "authMessage"
-    );
-
-  if (!box) return;
-
-  box.className =
-    "notice " + type;
-
-  box.textContent =
-    message;
+function showAuthMessage(msg, type = "error") {
+  const box = document.getElementById("authMessage");
+  if (!msg) {
+    box.classList.add("hidden");
+    return;
+  }
+  box.className = "notice " + type;
+  box.textContent = msg;
+  box.classList.remove("hidden");
 }
 
-function showAuthArea() {
-  document
-    .getElementById("authArea")
-    .classList.remove("hidden");
-
-  document
-    .getElementById("homeArea")
-    .classList.add("hidden");
-
-  document
-    .getElementById("appArea")
-    .classList.add("hidden");
-}
-
-function showAppArea() {
-  document
-    .getElementById("authArea")
-    .classList.add("hidden");
-
-  document
-    .getElementById("homeArea")
-    .classList.remove("hidden");
-
-  document
-    .getElementById("appArea")
-    .classList.remove("hidden");
-}
-
-function openAuth(
-  mode = "login"
-) {
-  showAuthArea();
+/* AUTHENTICATION & VIEWS CONTROL */
+function openAuth(mode = "login") {
+  document.getElementById("homeArea").classList.add("hidden");
+  document.getElementById("appArea").classList.add("hidden");
+  document.getElementById("authArea").classList.remove("hidden");
   showAuthMode(mode);
-
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth"
-  });
 }
 
 function showAuthMode(mode) {
-  currentAuthMode = mode;
-
-  const login =
-    document.getElementById(
-      "loginForm"
-    );
-
-  const register =
-    document.getElementById(
-      "registerForm"
-    );
-
-  const loginTab =
-    document.getElementById(
-      "loginTab"
-    );
-
-  const registerTab =
-    document.getElementById(
-      "registerTab"
-    );
-
-  login.classList.toggle(
-    "hidden",
-    mode !== "login"
-  );
-
-  register.classList.toggle(
-    "hidden",
-    mode !== "register"
-  );
-
-  loginTab.classList.toggle(
-    "active",
-    mode === "login"
-  );
-
-  registerTab.classList.toggle(
-    "active",
-    mode === "register"
-  );
-
-  showMessage("", "success");
-  document
-    .getElementById(
-      "authMessage"
-    )
-    .classList.add("hidden");
-
+  document.getElementById("loginForm").classList.toggle("hidden", mode !== "login");
+  document.getElementById("registerForm").classList.toggle("hidden", mode !== "register");
+  document.getElementById("loginTab").classList.toggle("active", mode === "login");
+  document.getElementById("registerTab").classList.toggle("active", mode === "register");
+  showAuthMessage("");
   renderGoogleButtons();
 }
 
-/* =====================================================
-   GOOGLE BUTTONS
-===================================================== */
-
-function googleCredentialResponse(
-  response
-) {
-  if (
-    !response ||
-    !response.credential
-  ) {
-    showMessage(
-      "Google authentication failed."
-    );
-
-    return;
+function updateNavigationUI() {
+  const isLoggedIn = !!currentUser;
+  document.getElementById("mainNav").style.display = isLoggedIn ? "flex" : "none";
+  document.getElementById("headerProfile").style.display = isLoggedIn ? "block" : "none";
+  
+  const bottom = document.getElementById("mobileBottomNav");
+  if (isLoggedIn) {
+    bottom.classList.add("logged-in");
+    document.getElementById("headerAvatarInitials").textContent = (currentUser.name || "U").charAt(0).toUpperCase();
+    document.getElementById("profilePanelName").textContent = currentUser.name || "User";
+    document.getElementById("profilePanelEmail").textContent = currentUser.email || "";
+  } else {
+    bottom.classList.remove("logged-in");
   }
-
-  googleLogin(
-    response.credential
-  );
 }
 
-async function googleLogin(
-  credential
-) {
+function toggleProfilePanel(e) {
+  e.stopPropagation();
+  document.getElementById("profilePanel").classList.toggle("open");
+}
+
+window.addEventListener("click", () => {
+  document.getElementById("profilePanel").classList.remove("open");
+});
+
+/* GOOGLE AUTHENTICATION */
+async function renderGoogleButtons() {
+  if (!window.google || !window.google.accounts) return;
   try {
+    const { clientId } = await api("/api/google-config");
+    if (!clientId) return;
 
-    showMessage(
-      "Signing in with Google...",
-      "success"
-    );
-
-    const data =
-      await api(
-        "/api/auth/google",
-        {
-          method: "POST",
-
-          body:
-            JSON.stringify({
-              credential
-            })
+    window.google.accounts.id.initialize({
+      client_id: clientId,
+      callback: async (res) => {
+        if (res.credential) {
+          try {
+            showAuthMessage("Signing in with Google...", "success");
+            const data = await api("/api/auth/google", {
+              method: "POST",
+              body: JSON.stringify({ credential: res.credential })
+            });
+            currentUser = data.user;
+            updateNavigationUI();
+            renderTasksView();
+          } catch (err) {
+            showAuthMessage(err.message);
+          }
         }
-      );
-
-    if (data.user) {
-      currentUser =
-        data.user;
-
-      setLoggedInUI(
-        currentUser
-      );
-
-      tasksHome();
-    }
-
-  } catch (error) {
-
-    showMessage(
-      error.message
-    );
-  }
-}
-
-function renderGoogleButtons() {
-
-  if (
-    !window.google ||
-    !window.google.accounts ||
-    !window.google.accounts.id
-  ) {
-    return;
-  }
-
-  const clientId =
-    "YOUR_GOOGLE_CLIENT_ID";
-
-  /*
-    The actual Client ID is injected
-    into the page through the server
-    endpoint below.
-  */
-
-  loadGoogleClientId()
-    .then(
-      (realClientId) => {
-
-        if (!realClientId) {
-          return;
-        }
-
-        const options = {
-          client_id:
-            realClientId,
-
-          callback:
-            googleCredentialResponse,
-
-          auto_select:
-            false,
-
-          cancel_on_tap_outside:
-            true
-        };
-
-        const loginBox =
-          document.getElementById(
-            "googleLoginButton"
-          );
-
-        const registerBox =
-          document.getElementById(
-            "googleRegisterButton"
-          );
-
-        if (loginBox) {
-          loginBox.innerHTML = "";
-
-          window.google.accounts.id.renderButton(
-            loginBox,
-            {
-              theme: "outline",
-              size: "large",
-              width: 360,
-              text: "continue_with"
-            }
-          );
-        }
-
-        if (registerBox) {
-          registerBox.innerHTML = "";
-
-          window.google.accounts.id.renderButton(
-            registerBox,
-            {
-              theme: "outline",
-              size: "large",
-              width: 360,
-              text: "signup_with"
-            }
-          );
-        }
-
-        /*
-          initialize is called after the
-          client ID is loaded.
-        */
-
-        window.google.accounts.id.initialize(
-          options
-        );
       }
-    )
-    .catch(() => {});
+    });
+
+    const lBtn = document.getElementById("googleLoginButton");
+    const rBtn = document.getElementById("googleRegisterButton");
+    if (lBtn) { lBtn.innerHTML = ""; window.google.accounts.id.renderButton(lBtn, { theme: "outline", size: "large" }); }
+    if (rBtn) { rBtn.innerHTML = ""; window.google.accounts.id.renderButton(rBtn, { theme: "outline", size: "large" }); }
+  } catch {}
 }
 
-async function loadGoogleClientId() {
+/* REGISTER & LOGIN HANDLERS */
+async function registerUser(e) {
+  e.preventDefault();
+  const btn = document.getElementById("btnRegisterSubmit");
+  btn.disabled = true; btn.textContent = "Creating Account...";
+
   try {
+    const data = await api("/api/register", {
+      method: "POST",
+      body: JSON.stringify({
+        name: document.getElementById("registerName").value,
+        email: document.getElementById("registerEmail").value,
+        mobile: document.getElementById("registerMobile").value,
+        city: document.getElementById("registerCity").value,
+        password: document.getElementById("registerPassword").value
+      })
+    });
 
-    const response =
-      await fetch(
-        "/api/google-config",
-        {
-          credentials:
-            "same-origin"
-        }
-      );
-
-    if (!response.ok) {
-      return "";
+    if (data.verificationRequired) {
+      isProfileVerification = false;
+      openOtpModal(data.step, data.email, data.mobile);
     }
-
-    const data =
-      await response.json();
-
-    return data.clientId || "";
-
-  } catch {
-    return "";
+  } catch (err) {
+    showAuthMessage(err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = "Create Account";
   }
 }
 
-/* =====================================================
-   REGISTER
-===================================================== */
-
-async function registerUser(
-  event
-) {
-  event.preventDefault();
+async function loginUser(e) {
+  e.preventDefault();
+  const btn = document.getElementById("btnLoginSubmit");
+  btn.disabled = true; btn.textContent = "Logging in...";
 
   try {
-
-    const payload = {
-      name:
-        document.getElementById(
-          "registerName"
-        ).value,
-
-      email:
-        document.getElementById(
-          "registerEmail"
-        ).value,
-
-      mobile:
-        document.getElementById(
-          "registerMobile"
-        ).value,
-
-      city:
-        document.getElementById(
-          "registerCity"
-        ).value,
-
-      password:
-        document.getElementById(
-          "registerPassword"
-        ).value,
-
-      remember:
-        document.getElementById(
-          "registerRemember"
-        ).checked
-    };
-
-    const data =
-      await api(
-        "/api/register",
-        {
-          method:
-            "POST",
-
-          body:
-            JSON.stringify(
-              payload
-            )
-        }
-      );
-
-    if (
-      data.verificationRequired
-    ) {
-
-      openOtpModal(
-        data.step,
-        data.email,
-        data.mobile
-      );
-    }
-
-  } catch (error) {
-
-    showMessage(
-      error.message
-    );
-  }
-}
-
-/* =====================================================
-   LOGIN
-===================================================== */
-
-async function loginUser(
-  event
-) {
-  event.preventDefault();
-
-  try {
-
-    const payload = {
-      email:
-        document.getElementById(
-          "loginEmail"
-        ).value,
-
-      password:
-        document.getElementById(
-          "loginPassword"
-        ).value,
-
-      remember:
-        document.getElementById(
-          "loginRemember"
-        ).checked
-    };
-
-    const data =
-      await api(
-        "/api/login",
-        {
-          method:
-            "POST",
-
-          body:
-            JSON.stringify(
-              payload
-            )
-        }
-      );
+    const data = await api("/api/login", {
+      method: "POST",
+      body: JSON.stringify({
+        email: document.getElementById("loginEmail").value,
+        password: document.getElementById("loginPassword").value,
+        remember: document.getElementById("loginRemember").checked
+      })
+    });
 
     if (data.user) {
-
-      currentUser =
-        data.user;
-
-      setLoggedInUI(
-        currentUser
-      );
-
-      tasksHome();
-
+      currentUser = data.user;
+      updateNavigationUI();
+      renderTasksView();
       return;
     }
 
-    if (
-      data.verificationRequired
-    ) {
-
-      openOtpModal(
-        data.step,
-        data.email,
-        data.mobile
-      );
+    if (data.verificationRequired) {
+      isProfileVerification = false;
+      openOtpModal(data.step, data.email, data.mobile);
     }
-
-  } catch (error) {
-
-    showMessage(
-      error.message
-    );
+  } catch (err) {
+    showAuthMessage(err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = "Login";
   }
 }
 
-/* =====================================================
-   OTP
-===================================================== */
-
-function openOtpModal(
-  step,
-  email,
-  mobile
-) {
-
-  const title =
-    document.getElementById(
-      "otpTitle"
-    );
-
-  const message =
-    document.getElementById(
-      "otpMessage"
-    );
+/* OTP MODAL & VERIFICATION */
+function openOtpModal(step, email, mobile) {
+  const title = document.getElementById("otpTitle");
+  const msg = document.getElementById("otpMessage");
 
   if (step === "email") {
-
-    title.textContent =
-      "Verify Gmail / Email";
-
-    message.textContent =
-      `Enter the 6-digit OTP sent to ${email}.`;
-
+    title.textContent = "Verify Email Address";
+    msg.textContent = `A 6-digit OTP code has been sent to ${email}.`;
   } else {
-
-    title.textContent =
-      "Verify Mobile";
-
-    message.textContent =
-      `Enter the 6-digit OTP sent to ${mobile}.`;
+    title.textContent = "Verify Mobile Number";
+    msg.textContent = `A 6-digit OTP code has been sent to ${mobile}.`;
   }
 
-  document
-    .getElementById(
-      "otpInput"
-    ).value = "";
-
-  document
-    .getElementById(
-      "otpModal"
-    )
-    .classList.add("open");
-
-  setTimeout(
-    () => {
-      document
-        .getElementById(
-          "otpInput"
-        )
-        .focus();
-    },
-    100
-  );
+  document.getElementById("otpInput").value = "";
+  document.getElementById("otpModal").classList.add("open");
 }
 
 function closeOtpModal() {
-  document
-    .getElementById(
-      "otpModal"
-    )
-    .classList.remove("open");
+  document.getElementById("otpModal").classList.remove("open");
 }
 
 async function verifyOtp() {
-
-  const otp =
-    document.getElementById(
-      "otpInput"
-    ).value.trim();
-
+  const otp = document.getElementById("otpInput").value.trim();
   if (!/^\d{6}$/.test(otp)) {
-
-    alert(
-      "Please enter the 6-digit OTP."
-    );
-
+    alert("Please enter a valid 6-digit OTP.");
     return;
   }
 
+  const btn = document.getElementById("btnVerifyOtp");
+  btn.disabled = true; btn.textContent = "Verifying...";
+
+  const endpoint = isProfileVerification ? "/api/profile/verify-otp" : "/api/verify-otp";
+
   try {
+    const data = await api(endpoint, {
+      method: "POST",
+      body: JSON.stringify({ otp })
+    });
 
-    const data =
-      await api(
-        "/api/verify-otp",
-        {
-          method:
-            "POST",
-
-          body:
-            JSON.stringify({
-              otp
-            })
-        }
-      );
-
-    if (
-      data.step === "mobile"
-    ) {
-
-      openOtpModal(
-        "mobile",
-        data.email,
-        data.mobile
-      );
-
+    if (data.step === "mobile") {
+      openOtpModal("mobile", data.email, data.mobile);
       return;
     }
 
-    if (
-      data.step === "complete" &&
-      data.user
-    ) {
-
-      currentUser =
-        data.user;
-
+    if (data.user) {
+      currentUser = data.user;
       closeOtpModal();
-
-      setLoggedInUI(
-        currentUser
-      );
-
-      tasksHome();
+      updateNavigationUI();
+      if (isProfileVerification) {
+        alert("Mobile number verified successfully!");
+        renderProfileView();
+      } else {
+        renderTasksView();
+      }
     }
-
-  } catch (error) {
-
-    alert(
-      error.message
-    );
+  } catch (err) {
+    alert(err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = "Verify OTP";
   }
 }
 
 async function resendOtp() {
-
+  const endpoint = isProfileVerification ? "/api/profile/resend-otp" : "/api/resend-otp";
   try {
-
-    const data =
-      await api(
-        "/api/resend-otp",
-        {
-          method:
-            "POST"
-        }
-      );
-
-    alert(
-      data.message
-    );
-
-  } catch (error) {
-
-    alert(
-      error.message
-    );
+    const data = await api(endpoint, { method: "POST" });
+    alert(data.message || "OTP resent successfully.");
+  } catch (err) {
+    alert(err.message);
   }
 }
 
-/* =====================================================
-   LOGGED IN UI
-===================================================== */
+/* ROUTING & VIEWS RENDERING */
+function setActiveNav(tab) {
+  activeTab = tab;
+  document.querySelectorAll(".nav button").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".bottom-item").forEach(b => b.classList.remove("active"));
 
-function initials(
-  name
-) {
-  const parts =
-    String(name || "User")
-      .trim()
-      .split(/\s+/)
-      .slice(0,2);
+  const navBtn = document.getElementById("nav" + tab.charAt(0).toUpperCase() + tab.slice(1));
+  const mbBtn = document.getElementById("mb" + tab.charAt(0).toUpperCase() + tab.slice(1));
+  if (navBtn) navBtn.classList.add("active");
+  if (mbBtn) mbBtn.classList.add("active");
 
-  return parts
-    .map(
-      p =>
-        p.charAt(0)
-          .toUpperCase()
-    )
-    .join("");
+  document.getElementById("homeArea").classList.add("hidden");
+  document.getElementById("authArea").classList.add("hidden");
+  document.getElementById("appArea").classList.remove("hidden");
 }
 
-function setLoggedInUI(
-  user
-) {
+/* 1. TASKS VIEW */
+async function renderTasksView() {
+  if (!currentUser) return openAuth("login");
+  setActiveNav("tasks");
 
-  const headerProfile =
-    document.getElementById(
-      "headerProfile"
-    );
-
-  const initialsBox =
-    document.getElementById(
-      "headerAvatarInitials"
-    );
-
-  const panelName =
-    document.getElementById(
-      "profilePanelName"
-    );
-
-  const panelEmail =
-    document.getElementById(
-      "profilePanelEmail"
-    );
-
-  const bottom =
-    document.getElementById(
-      "mobileBottomNav"
-    );
-
-  if (user) {
-
-    headerProfile.style.display =
-      "block";
-
-    initialsBox.textContent =
-      initials(user.name);
-
-    panelName.textContent =
-      user.name || "User";
-
-    panelEmail.textContent =
-      user.email || "";
-
-    bottom.classList.add(
-      "logged-in"
-    );
-
-    const welcome =
-      document.getElementById(
-        "loggedInWelcome"
-      );
-
-    if (welcome) {
-
-      welcome.style.display =
-        "block";
-
-      welcome.innerHTML = `
-        <div class="card">
-          <p class="muted" style="margin:0;">
-            Welcome back
-          </p>
-
-          <h2 style="margin:4px 0;">
-            Hi,
-            ${escapeHtml(
-              user.name ||
-              "User"
-            )}
-            👋
-          </h2>
-
-          <p class="muted" style="margin:0;">
-            Complete available tasks
-            and earn approved rewards.
-          </p>
-        </div>
-      `;
-    }
-
-  } else {
-
-    headerProfile.style.display =
-      "none";
-
-    bottom.classList.remove(
-      "logged-in"
-    );
-  }
-}
-
-/* =====================================================
-   PUBLIC HOME
-===================================================== */
-
-function goPublicHome() {
-
-  currentUser = null;
-
-  setLoggedInUI(null);
-
-  document
-    .getElementById(
-      "authArea"
-    )
-    .classList.add(
-      "hidden"
-    );
-
-  document
-    .getElementById(
-      "appArea"
-    )
-    .classList.add(
-      "hidden"
-    );
-
-  document
-    .getElementById(
-      "homeArea"
-    )
-    .classList.remove(
-      "hidden"
-    );
-
-  const hero =
-    document.getElementById(
-      "publicHero"
-    );
-
-  if (hero) {
-    hero.style.display =
-      "block";
-  }
-
-  const features =
-    document.querySelector(
-      ".features"
-    );
-
-  if (features) {
-    features.style.display =
-      "block";
-  }
-}
-
-/* =====================================================
-   PROFILE PANEL
-===================================================== */
-
-function toggleProfilePanel(
-  event
-) {
-
-  event.stopPropagation();
-
-  document
-    .getElementById(
-      "profilePanel"
-    )
-    .classList.toggle(
-      "open"
-    );
-}
-
-function closeProfilePanel() {
-
-  const panel =
-    document.getElementById(
-      "profilePanel"
-    );
-
-  if (panel) {
-    panel.classList.remove(
-      "open"
-    );
-  }
-}
-
-window.addEventListener(
-  "click",
-  function(event) {
-
-    if (
-      !event.target.closest(
-        ".header-profile"
-      )
-    ) {
-      closeProfilePanel();
-    }
-
-  }
-);
-
-/* =====================================================
-   TASKS HOME
-===================================================== */
-
-async function tasksHome() {
-
-  if (!currentUser) {
-    openAuth("login");
-    return;
-  }
-
-  closeProfilePanel();
-
-  const app =
-    document.getElementById(
-      "appContent"
-    );
-
-  showAppArea();
-
+  const app = document.getElementById("appContent");
   app.innerHTML = `
     <div class="card">
       <h2>Available Tasks 📋</h2>
-      <p class="muted">
-        Complete tasks and submit them for review.
-      </p>
+      <p class="muted">Complete any task below and submit it for approval.</p>
     </div>
-
-    <div id="tasksList">
-      <div class="card">
-        Loading tasks...
-      </div>
-    </div>
+    <div id="tasksList">Loading available tasks...</div>
   `;
 
   try {
+    const tasks = await api("/api/tasks");
+    const container = document.getElementById("tasksList");
 
-    const tasks =
-      await api(
-        "/api/tasks"
-      );
-
-    const list =
-      document.getElementById(
-        "tasksList"
-      );
-
-    if (!tasks.length) {
-
-      list.innerHTML = `
-        <div class="card">
-          <h3>No tasks available</h3>
-          <p class="muted">
-            Please check again later.
-          </p>
-        </div>
-      `;
-
+    if (!tasks || !tasks.length) {
+      container.innerHTML = `<div class="card"><p class="muted">No active tasks available right now.</p></div>`;
       return;
     }
 
-    list.innerHTML =
-      tasks.map(
-        task => `
-          <div class="card task-card">
-
-            <div
-              style="
-                display:flex;
-                justify-content:space-between;
-                gap:15px;
-              "
-            >
-
-              <div>
-
-                <span class="muted">
-                  ${escapeHtml(
-                    task.type
-                  )}
-                </span>
-
-                <h3>
-                  ${escapeHtml(
-                    task.title
-                  )}
-                </h3>
-
-              </div>
-
-              <div class="reward">
-                ₹${Number(
-                  task.reward
-                ).toFixed(2)}
-              </div>
-
-            </div>
-
-            <p class="muted">
-              ${escapeHtml(
-                task.description
-              )}
-            </p>
-
-            <button
-              class="primary"
-              onclick="submitTask(${task.id})"
-            >
-              Submit Task
-            </button>
-
-          </div>
-        `
-      ).join("");
-
-  } catch (error) {
-
-    app.innerHTML = `
-      <div class="card">
-        <div class="notice error">
-          ${escapeHtml(
-            error.message
-          )}
+    container.innerHTML = `<div class="grid">` + tasks.map(t => `
+      <div class="card" style="display:flex; flex-direction:column; justify-space-between;">
+        <div>
+          <span class="badge pending">${escapeHtml(t.type || "General")}</span>
+          <h3 style="margin:10px 0 5px;">${escapeHtml(t.title)}</h3>
+          <p class="muted" style="font-size:14px; margin-bottom:15px;">${escapeHtml(t.description)}</p>
+        </div>
+        <div>
+          <div class="reward">₹${Number(t.reward).toFixed(2)}</div>
+          <button class="primary" onclick="submitTask(${t.id}, this)">Submit Task</button>
         </div>
       </div>
-    `;
+    `).join("") + `</div>`;
+  } catch (err) {
+    app.innerHTML = `<div class="notice error">${escapeHtml(err.message)}</div>`;
   }
 }
 
-async function submitTask(
-  id
-) {
-
-  if (
-    !confirm(
-      "Submit this task for review?"
-    )
-  ) {
-    return;
-  }
-
+async function submitTask(taskId, btn) {
+  btn.disabled = true; btn.textContent = "Submitting...";
   try {
-
-    const data =
-      await api(
-        `/api/tasks/${id}/submit`,
-        {
-          method:
-            "POST",
-
-          body:
-            JSON.stringify({})
-        }
-      );
-
-    alert(
-      data.message
-    );
-
-    tasksHome();
-
-  } catch (error) {
-
-    alert(
-      error.message
-    );
+    const data = await api(`/api/tasks/${taskId}/submit`, { method: "POST" });
+    alert(data.message || "Task submitted successfully.");
+    renderSubmissionsView();
+  } catch (err) {
+    alert(err.message);
+    btn.disabled = false; btn.textContent = "Submit Task";
   }
 }
 
-/* =====================================================
-   WALLET
-===================================================== */
+/* 2. SUBMISSIONS VIEW */
+async function renderSubmissionsView() {
+  if (!currentUser) return openAuth("login");
+  setActiveNav("submissions");
 
-async function walletHome() {
-
-  if (!currentUser) {
-    openAuth("login");
-    return;
-  }
-
-  closeProfilePanel();
-
-  showAppArea();
-
-  const app =
-    document.getElementById(
-      "appContent"
-    );
-
+  const app = document.getElementById("appContent");
   app.innerHTML = `
     <div class="card">
-      <h2>Wallet 💰</h2>
-      <p class="muted">
-        Your TaskEarn earnings and withdrawal history.
-      </p>
+      <h2>My Submissions 📜</h2>
+      <p class="muted">Track the review status of your completed tasks.</p>
+    </div>
+    <div id="submissionsList">Loading submissions...</div>
+  `;
+
+  try {
+    const list = await api("/api/my-submissions");
+    const container = document.getElementById("submissionsList");
+
+    if (!list || !list.length) {
+      container.innerHTML = `<div class="card"><p class="muted">You haven't submitted any tasks yet.</p></div>`;
+      return;
+    }
+
+    container.innerHTML = list.map(s => `
+      <div class="card" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+        <div>
+          <h4 style="margin:0 0 5px;">${escapeHtml(s.taskTitle)}</h4>
+          <span class="muted" style="font-size:12px;">Submitted: ${new Date(s.submittedAt).toLocaleString()}</span>
+        </div>
+        <div style="text-align:right;">
+          <div class="reward" style="font-size:18px;">+₹${Number(s.reward).toFixed(2)}</div>
+          <span class="badge ${s.status}">${escapeHtml(s.status)}</span>
+        </div>
+      </div>
+    `).join("");
+  } catch (err) {
+    app.innerHTML = `<div class="notice error">${escapeHtml(err.message)}</div>`;
+  }
+}
+
+/* 3. WALLET VIEW & WITHDRAWAL */
+async function renderWalletView() {
+  if (!currentUser) return openAuth("login");
+  setActiveNav("wallet");
+
+  const app = document.getElementById("appContent");
+  app.innerHTML = `
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+        <div>
+          <span class="muted">Wallet Balance</span>
+          <h1 style="margin:5px 0; font-size:36px; color:#13a05a;">₹<span id="walletBalance">0.00</span></h1>
+        </div>
+        <button class="primary" style="width:auto; padding:12px 24px;" onclick="openWithdrawModal()">Request Withdrawal</button>
+      </div>
     </div>
 
-    <div id="walletContent">
-      Loading wallet...
+    <div class="card">
+      <h3>Withdrawal History</h3>
+      <div id="withdrawalsList">Loading history...</div>
+    </div>
+
+    <!-- WITHDRAW MODAL -->
+    <div id="withdrawModal" class="modal">
+      <div class="modal-box">
+        <div class="modal-head">
+          <h3 style="margin:0;">Withdraw Funds</h3>
+          <button class="close" onclick="closeWithdrawModal()">×</button>
+        </div>
+        <form onsubmit="handleWithdraw(event)">
+          <label>Amount (₹) (Min ₹100)</label>
+          <input id="withdrawAmount" type="number" min="100" step="1" required placeholder="100">
+          <br><br>
+          <label>Payment Method</label>
+          <select id="withdrawMethod" onchange="togglePaymentFields()">
+            <option value="UPI">UPI</option>
+            <option value="Bank Account">Bank Account</option>
+          </select>
+          <br><br>
+
+          <div id="upiFields">
+            <label>UPI ID</label>
+            <input id="withdrawUpiId" type="text" placeholder="username@upi">
+          </div>
+
+          <div id="bankFields" class="hidden">
+            <label>Account Holder Name</label>
+            <input id="withdrawBankName" type="text" placeholder="John Doe">
+            <br><br>
+            <label>Account Number</label>
+            <input id="withdrawAccNo" type="text" placeholder="1234567890">
+            <br><br>
+            <label>IFSC Code</label>
+            <input id="withdrawIfsc" type="text" placeholder="SBIN0001234">
+            <br><br>
+            <label>Bank Name</label>
+            <input id="withdrawBank" type="text" placeholder="State Bank of India">
+          </div>
+          <br>
+          <button class="primary" type="submit" id="btnWithdrawSubmit">Submit Request</button>
+        </form>
+      </div>
     </div>
   `;
 
   try {
+    const data = await api("/api/wallet");
+    currentUser.balance = data.balance;
+    document.getElementById("walletBalance").textContent = Number(data.balance || 0).toFixed(2);
 
-    const data =
-      await api(
-        "/api/wallet"
-      );
+    const historyBox = document.getElementById("withdrawalsList");
+    if (!data.withdrawals || !data.withdrawals.length) {
+      historyBox.innerHTML = `<p class="muted">No withdrawal history found.</p>`;
+      return;
+    }
 
-    const withdrawals =
-      data.withdrawals || [];
-
-    document.getElementById(
-      "walletContent"
-    ).innerHTML = `
-
-      <div class="grid">
-
-        <div class="card stat">
-          <span class="muted">
-            Available Balance
-          </span>
-
-          <b>
-            ₹${Number(
-              data.balance || 0
-            ).toFixed(2)}
-          </b>
+    historyBox.innerHTML = data.withdrawals.map(w => `
+      <div style="padding:12px 0; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <strong>₹${Number(w.amount).toFixed(2)} via ${escapeHtml(w.method)}</strong>
+          <div class="muted" style="font-size:12px;">${new Date(w.createdAt).toLocaleString()}</div>
         </div>
-
-        <div class="card stat">
-          <span class="muted">
-            Completed Tasks
-          </span>
-
-          <b>
-            ${Number(
-              data.completed || 0
-            )}
-          </b>
-        </div>
-
-        <div class="card stat">
-          <span class="muted">
-            Minimum Withdrawal
-          </span>
-
-          <b>
-            ₹100
-          </b>
-        </div>
-
+        <span class="badge ${w.status}">${escapeHtml(w.status)}</span>
       </div>
-
-      <div class="card">
-
-        <h3>
-          Request Withdrawal
-        </h3>
-
-        <label>
-          Amount
-        </label>
-
-        <input
-          id="withdrawAmount"
-          type="number"
-          min="100"
-          step="0.01"
-          placeholder="100"
-        >
-
-        <br><br>
-
-        <label>
-          Payment Method
-        </label>
-
-        <select
-          id="withdrawMethod"
-          onchange="changePaymentMethod()"
-        >
-          <option value="UPI">
-            UPI
-          </option>
-
-          <option value="Bank Account">
-            Bank Account
-          </option>
-        </select>
-
-        <br><br>
-
-        <div id="paymentFields"></div>
-
-        <br>
-
-        <button
-          class="primary"
-          onclick="withdrawMoney()"
-        >
-          Submit Withdrawal
-        </button>
-
-      </div>
-
-      <div class="card">
-
-        <h3>
-          Withdrawal History
-        </h3>
-
-        ${
-          withdrawals.length
-            ? withdrawals.map(
-                item => `
-                  <div
-                    style="
-                      padding:14px 0;
-                      border-bottom:
-                        1px solid #eee;
-                    "
-                  >
-
-                    <b>
-                      ₹${Number(
-                        item.amount
-                      ).toFixed(2)}
-                    </b>
-
-                    <span class="muted">
-                      · ${escapeHtml(
-                        item.method
-                      )}
-                    </span>
-
-                    <div
-                      class="muted"
-                      style="font-size:13px;"
-                    >
-                      ${escapeHtml(
-                        item.status
-                      )}
-                      ·
-                      ${new Date(
-                        item.createdAt
-                      ).toLocaleString()}
-                    </div>
-
-                  </div>
-                `
-              ).join("")
-            : `
-              <p class="muted">
-                No withdrawals yet.
-              </p>
-            `
-        }
-
-      </div>
-    `;
-
-    changePaymentMethod();
-
-  } catch (error) {
-
-    document.getElementById(
-      "walletContent"
-    ).innerHTML = `
-      <div class="notice error">
-        ${escapeHtml(
-          error.message
-        )}
-      </div>
-    `;
+    `).join("");
+  } catch (err) {
+    app.innerHTML = `<div class="notice error">${escapeHtml(err.message)}</div>`;
   }
 }
 
-function changePaymentMethod() {
+function openWithdrawModal() { document.getElementById("withdrawModal").classList.add("open"); }
+function closeWithdrawModal() { document.getElementById("withdrawModal").classList.remove("open"); }
 
-  const method =
-    document.getElementById(
-      "withdrawMethod"
-    );
-
-  const fields =
-    document.getElementById(
-      "paymentFields"
-    );
-
-  if (!method || !fields) {
-    return;
-  }
-
-  if (
-    method.value ===
-    "UPI"
-  ) {
-
-    fields.innerHTML = `
-      <label>
-        UPI ID
-      </label>
-
-      <input
-        id="upiId"
-        type="text"
-        placeholder="yourname@upi"
-      >
-    `;
-
-  } else {
-
-    fields.innerHTML = `
-      <label>
-        Account Holder Name
-      </label>
-
-      <input
-        id="accountHolderName"
-        type="text"
-      >
-
-      <br><br>
-
-      <label>
-        Account Number
-      </label>
-
-      <input
-        id="accountNumber"
-        type="text"
-      >
-
-      <br><br>
-
-      <label>
-        IFSC Code
-      </label>
-
-      <input
-        id="ifscCode"
-        type="text"
-        maxlength="11"
-      >
-
-      <br><br>
-
-      <label>
-        Bank Name
-      </label>
-
-      <input
-        id="bankName"
-        type="text"
-      >
-    `;
-  }
+function togglePaymentFields() {
+  const method = document.getElementById("withdrawMethod").value;
+  document.getElementById("upiFields").classList.toggle("hidden", method !== "UPI");
+  document.getElementById("bankFields").classList.toggle("hidden", method !== "Bank Account");
 }
 
-async function withdrawMoney() {
+async function handleWithdraw(e) {
+  e.preventDefault();
+  const btn = document.getElementById("btnWithdrawSubmit");
+  btn.disabled = true; btn.textContent = "Processing...";
 
-  const amount =
-    Number(
-      document.getElementById(
-        "withdrawAmount"
-      ).value
-    );
-
-  const method =
-    document.getElementById(
-      "withdrawMethod"
-    ).value;
-
+  const method = document.getElementById("withdrawMethod").value;
+  const amount = Number(document.getElementById("withdrawAmount").value);
+  
   let paymentDetails = {};
-
-  if (
-    method === "UPI"
-  ) {
-
-    paymentDetails = {
-      upiId:
-        document.getElementById(
-          "upiId"
-        ).value
-    };
-
+  if (method === "UPI") {
+    paymentDetails = { upiId: document.getElementById("withdrawUpiId").value };
   } else {
-
     paymentDetails = {
-
-      accountHolderName:
-        document.getElementById(
-          "accountHolderName"
-        ).value,
-
-      accountNumber:
-        document.getElementById(
-          "accountNumber"
-        ).value,
-
-      ifscCode:
-        document.getElementById(
-          "ifscCode"
-        ).value,
-
-      bankName:
-        document.getElementById(
-          "bankName"
-        ).value
+      accountHolderName: document.getElementById("withdrawBankName").value,
+      accountNumber: document.getElementById("withdrawAccNo").value,
+      ifscCode: document.getElementById("withdrawIfsc").value,
+      bankName: document.getElementById("withdrawBank").value
     };
   }
 
   try {
-
-    const data =
-      await api(
-        "/api/withdraw",
-        {
-          method:
-            "POST",
-
-          body:
-            JSON.stringify({
-              amount,
-              method,
-              paymentDetails
-            })
-        }
-      );
-
-    alert(
-      data.message
-    );
-
-    walletHome();
-
-  } catch (error) {
-
-    alert(
-      error.message
-    );
+    const res = await api("/api/withdraw", {
+      method: "POST",
+      body: JSON.stringify({ amount, method, paymentDetails })
+    });
+    alert(res.message);
+    closeWithdrawModal();
+    renderWalletView();
+  } catch (err) {
+    alert(err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = "Submit Request";
   }
 }
 
-/* =====================================================
-   PROFILE
-===================================================== */
+/* 4. PROFILE VIEW & UPDATES */
+async function renderProfileView() {
+  if (!currentUser) return openAuth("login");
+  setActiveNav("profile");
 
-async function profileHome() {
-
-  if (!currentUser) {
-    openAuth("login");
-    return;
-  }
-
-  closeProfilePanel();
-
-  showAppArea();
-
-  const app =
-    document.getElementById(
-      "appContent"
-    );
-
+  const app = document.getElementById("appContent");
   app.innerHTML = `
-    <div class="card">
-
-      <h2>
-        My Profile 👤
-      </h2>
-
-      <p class="muted">
-        Update your TaskEarn profile.
-      </p>
-
-      <div id="profileMessage"></div>
-
-      <form
-        onsubmit="saveProfile(event)"
-      >
-
-        <label>
-          Name
-        </label>
-
-        <input
-          id="profileName"
-          value="${escapeHtml(
-            currentUser.name
-          )}"
-          required
-        >
-
+    <div class="card" style="max-width:600px; margin:0 auto;">
+      <h2>User Profile 👤</h2>
+      <div id="profileNotice" class="hidden"></div>
+      
+      <form onsubmit="saveProfile(event)">
+        <label>Full Name</label>
+        <input id="profName" type="text" required value="${escapeHtml(currentUser.name)}">
         <br><br>
-
-        <label>
-          Email
-        </label>
-
-        <input
-          value="${escapeHtml(
-            currentUser.email
-          )}"
-          disabled
-        >
-
+        <label>Email Address</label>
+        <input type="text" disabled value="${escapeHtml(currentUser.email)}" style="background:#f1f3f7;">
+        <span class="muted" style="font-size:12px;">Email cannot be changed directly.</span>
         <br><br>
-
-        <label>
-          Mobile
-        </label>
-
-        <input
-          id="profileMobile"
-          value="${escapeHtml(
-            currentUser.mobile
-          )}"
-          placeholder="+919876543210"
-        >
-
+        <label>Mobile Number</label>
+        <input id="profMobile" type="tel" value="${escapeHtml(currentUser.mobile)}" placeholder="+919876543210">
+        <span class="muted" style="font-size:12px;">
+          Status: ${currentUser.mobileVerified ? '✅ Verified' : '❌ Not Verified'}
+        </span>
         <br><br>
-
-        <label>
-          City
-        </label>
-
-        <input
-          id="profileCity"
-          value="${escapeHtml(
-            currentUser.city
-          )}"
-          required
-        >
-
+        <label>City</label>
+        <input id="profCity" type="text" required value="${escapeHtml(currentUser.city)}">
         <br><br>
-
-        <label>
-          Profile Image URL
-        </label>
-
-        <input
-          id="profileImage"
-          value="${escapeHtml(
-            currentUser.profileImage
-          )}"
-          placeholder="https://..."
-        >
-
-        <br><br>
-
-        <button
-          class="primary"
-          type="submit"
-        >
-          Save Profile
-        </button>
-
+        <button class="primary" type="submit" id="btnSaveProfile">Save Profile</button>
       </form>
-
-    </div>
-
-    <div class="card">
-
-      <h3>
-        Account Verification
-      </h3>
-
-      <p>
-        Email:
-        ${
-          currentUser.emailVerified
-            ? "✅ Verified"
-            : "❌ Not verified"
-        }
-      </p>
-
-      <p>
-        Mobile:
-        ${
-          currentUser.mobileVerified
-            ? "✅ Verified"
-            : "❌ Not verified"
-        }
-      </p>
-
-      <p>
-        Login method:
-        <b>
-          ${escapeHtml(
-            currentUser.authProvider ||
-            "local"
-          )}
-        </b>
-      </p>
-
-    </div>
-
-    <div class="card">
-
-      <h3>
-        My Submissions
-      </h3>
-
-      <div id="submissionList">
-        Loading...
-      </div>
-
     </div>
   `;
-
-  loadSubmissions();
 }
 
-async function saveProfile(
-  event
-) {
-
-  event.preventDefault();
+async function saveProfile(e) {
+  e.preventDefault();
+  const btn = document.getElementById("btnSaveProfile");
+  btn.disabled = true; btn.textContent = "Saving...";
 
   try {
+    const data = await api("/api/profile", {
+      method: "PUT",
+      body: JSON.stringify({
+        name: document.getElementById("profName").value,
+        mobile: document.getElementById("profMobile").value,
+        city: document.getElementById("profCity").value
+      })
+    });
 
-    const data =
-      await api(
-        "/api/profile",
-        {
-          method:
-            "PUT",
-
-          body:
-            JSON.stringify({
-
-              name:
-                document.getElementById(
-                  "profileName"
-                ).value,
-
-              mobile:
-                document.getElementById(
-                  "profileMobile"
-                ).value,
-
-              city:
-                document.getElementById(
-                  "profileCity"
-                ).value,
-
-              profileImage:
-                document.getElementById(
-                  "profileImage"
-                ).value
-            })
-        }
-      );
-
-    if (
-      data.verificationRequired
-    ) {
-
-      document
-        .getElementById(
-          "profileOtpModal"
-        )
-        .classList.add(
-          "open"
-        );
-
-      return;
+    if (data.verificationRequired) {
+      isProfileVerification = true;
+      openOtpModal("mobile", currentUser.email, document.getElementById("profMobile").value);
+    } else {
+      currentUser = data.user;
+      alert(data.message || "Profile updated.");
+      renderProfileView();
     }
-
-    currentUser =
-      data.user;
-
-    setLoggedInUI(
-      currentUser
-    );
-
-    alert(
-      data.message
-    );
-
-    profileHome();
-
-  } catch (error) {
-
-    const box =
-      document.getElementById(
-        "profileMessage"
-      );
-
-    if (box) {
-
-      box.innerHTML = `
-        <div class="notice error">
-          ${escapeHtml(
-            error.message
-          )}
-        </div>
-      `;
-    }
+  } catch (err) {
+    alert(err.message);
+  } finally {
+    btn.disabled = false; btn.textContent = "Save Profile";
   }
 }
 
-/* =====================================================
-   PROFILE OTP
-===================================================== */
-
-function closeProfileOtp() {
-
-  document
-    .getElementById(
-      "profileOtpModal"
-    )
-    .classList.remove(
-      "open"
-    );
-}
-
-async function verifyProfileOtp() {
-
-  const otp =
-    document.getElementById(
-      "profileOtpInput"
-    ).value.trim();
-
-  try {
-
-    const data =
-      await api(
-        "/api/profile/verify-otp",
-        {
-          method:
-            "POST",
-
-          body:
-            JSON.stringify({
-              otp
-            })
-        }
-      );
-
-    currentUser =
-      data.user;
-
-    closeProfileOtp();
-
-    setLoggedInUI(
-      currentUser
-    );
-
-    alert(
-      data.message
-    );
-
-    profileHome();
-
-  } catch (error) {
-
-    alert(
-      error.message
-    );
-  }
-}
-
-async function resendProfileOtp() {
-
-  try {
-
-    const data =
-      await api(
-        "/api/profile/resend-otp",
-        {
-          method:
-            "POST"
-        }
-      );
-
-    alert(
-      data.message
-    );
-
-  } catch (error) {
-
-    alert(
-      error.message
-    );
-  }
-}
-
-/* =====================================================
-   SUBMISSIONS
-===================================================== */
-
-async function loadSubmissions() {
-
-  try {
-
-    const submissions =
-      await api(
-        "/api/my-submissions"
-      );
-
-    const box =
-      document.getElementById(
-        "submissionList"
-      );
-
-    if (!box) {
-      return;
-    }
-
-    if (!submissions.length) {
-
-      box.innerHTML = `
-        <p class="muted">
-          You have not submitted any tasks yet.
-        </p>
-      `;
-
-      return;
-    }
-
-    box.innerHTML =
-      submissions.map(
-        item => `
-          <div
-            style="
-              padding:13px 0;
-              border-bottom:
-                1px solid #eee;
-            "
-          >
-
-            <b>
-              ${escapeHtml(
-                item.taskTitle
-              )}
-            </b>
-
-            <div class="muted">
-              Reward:
-              ₹${Number(
-                item.reward
-              ).toFixed(2)}
-            </div>
-
-            <div class="muted">
-              Status:
-              ${escapeHtml(
-                item.status
-              )}
-            </div>
-
-          </div>
-        `
-      ).join("");
-
-  } catch (error) {
-
-    const box =
-      document.getElementById(
-        "submissionList"
-      );
-
-    if (box) {
-      box.textContent =
-        error.message;
-    }
-  }
-}
-
-/* =====================================================
-   LOGOUT
-===================================================== */
-
+/* SESSION & LOGOUT */
 async function logoutUser() {
-
-  try {
-
-    await api(
-      "/api/logout",
-      {
-        method:
-          "POST"
-      }
-    );
-
-    currentUser = null;
-
-    closeProfilePanel();
-
-    goPublicHome();
-
-  } catch (error) {
-
-    alert(
-      error.message
-    );
-  }
+  try { await api("/api/logout", { method: "POST" }); } catch {}
+  currentUser = null;
+  updateNavigationUI();
+  document.getElementById("appArea").classList.add("hidden");
+  document.getElementById("authArea").classList.add("hidden");
+  document.getElementById("homeArea").classList.remove("hidden");
 }
-
-/* =====================================================
-   SESSION
-===================================================== */
 
 async function checkSession() {
-
   try {
-
-    const user =
-      await api(
-        "/api/me"
-      );
-
-    if (user) {
-
-      currentUser =
-        user;
-
-      setLoggedInUI(
-        user
-      );
-
-      tasksHome();
-
+    const user = await api("/api/me");
+    if (user && user.id) {
+      currentUser = user;
+      updateNavigationUI();
+      renderTasksView();
     } else {
-
-      currentUser =
-        null;
-
-      setLoggedInUI(
-        null
-      );
-
-      goPublicHome();
+      currentUser = null;
+      updateNavigationUI();
+      document.getElementById("appArea").classList.add("hidden");
+      document.getElementById("authArea").classList.add("hidden");
+      document.getElementById("homeArea").classList.remove("hidden");
     }
-
-  } catch (error) {
-
-    currentUser =
-      null;
-
-    setLoggedInUI(
-      null
-    );
-
-    goPublicHome();
+  } catch {
+    currentUser = null;
+    updateNavigationUI();
+    document.getElementById("appArea").classList.add("hidden");
+    document.getElementById("authArea").classList.add("hidden");
+    document.getElementById("homeArea").classList.remove("hidden");
   }
 }
 
-/* =====================================================
-   RESIZE
-===================================================== */
-
-window.addEventListener(
-  "resize",
-  function() {
-
-    const bottom =
-      document.getElementById(
-        "mobileBottomNav"
-      );
-
-    if (!bottom) {
-      return;
-    }
-
-    if (currentUser) {
-      bottom.classList.add(
-        "logged-in"
-      );
-    } else {
-      bottom.classList.remove(
-        "logged-in"
-      );
-    }
-
-  }
-);
-
-/* =====================================================
-   GOOGLE CONFIG
-===================================================== */
-
-appGoogleConfigFix();
-
-/*
-  This function is intentionally kept
-  on the frontend only.
-*/
-
-function appGoogleConfigFix() {
-  setTimeout(
-    renderGoogleButtons,
-    800
-  );
-}
-
-/* =====================================================
-   START
-===================================================== */
-
-document.addEventListener(
-  "DOMContentLoaded",
-  function() {
-
-    checkSession();
-
-    setTimeout(
-      renderGoogleButtons,
-      1200
-    );
-
-  }
-);
-
+document.addEventListener("DOMContentLoaded", () => {
+  checkSession();
+});
 </script>
-
 </body>
-     </html>
+</html>
