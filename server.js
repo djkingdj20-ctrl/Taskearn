@@ -14,14 +14,14 @@ app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: true, limit: "100kb" }));
 
 /* =====================================================
-   CONFIGURATION
+   CONFIGURATION & ENV VARIABLES
 ===================================================== */
 
 const PORT = Number(process.env.PORT) || 10000;
 const DATA_DIR = path.join("/tmp", "data");
 const DB_FILE = path.join(DATA_DIR, "database.json");
 
-const SESSION_SECRET = process.env.SESSION_SECRET || "CHANGE_THIS_TASKEARN_SECRET_2026";
+const SESSION_SECRET = process.env.SESSION_SECRET || "TASKEARN_SECRET_KEY_2026";
 const GMAIL_USER = process.env.GMAIL_USER || "";
 const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD || "";
 
@@ -29,10 +29,8 @@ const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID || "";
 const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN || "";
 const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER || "";
 
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
-
 /* =====================================================
-   DATABASE (TMP DIRECTORY SAFE FOR RENDER)
+   DATABASE (TMP DIRECTORY FOR RENDER SAFETY)
 ===================================================== */
 
 if (!fs.existsSync(DATA_DIR)) {
@@ -43,12 +41,9 @@ function defaultDatabase() {
   return {
     users: [],
     tasks: [
-      { id: 1, title: "Complete a simple online task", description: "Complete the instructions carefully and submit the task for review.", type: "General", reward: 10, active: true },
-      { id: 2, title: "Social Media Engagement", description: "Complete the specified social media activity and submit your task.", type: "Social", reward: 15, active: true },
-      { id: 3, title: "Website Visit Task", description: "Visit the required website and complete the provided instructions.", type: "Website", reward: 20, active: true }
+      { id: 1, title: "Complete a simple task", reward: 10, active: true },
+      { id: 2, title: "Social Media Task", reward: 15, active: true }
     ],
-    submissions: [],
-    withdrawals: [],
     otpCodes: []
   };
 }
@@ -66,23 +61,16 @@ function saveDB(database) {
 function loadDB() {
   try {
     if (!fs.existsSync(DB_FILE)) {
-      const database = defaultDatabase();
-      saveDB(database);
-      return database;
+      const dbData = defaultDatabase();
+      saveDB(dbData);
+      return dbData;
     }
     const raw = fs.readFileSync(DB_FILE, "utf8");
-    if (!raw.trim()) {
-      const database = defaultDatabase();
-      saveDB(database);
-      return database;
-    }
-    const database = JSON.parse(raw);
-    database.users ||= [];
-    database.tasks ||= [];
-    database.submissions ||= [];
-    database.withdrawals ||= [];
-    database.otpCodes ||= [];
-    return database;
+    if (!raw.trim()) return defaultDatabase();
+    const parsed = JSON.parse(raw);
+    parsed.users ||= [];
+    parsed.otpCodes ||= [];
+    return parsed;
   } catch (error) {
     console.error("Database load error:", error);
     return defaultDatabase();
@@ -92,91 +80,59 @@ function loadDB() {
 let db = loadDB();
 
 /* =====================================================
-   SESSION
+   SESSION CONFIGURATION
 ===================================================== */
 
 app.use(
   session({
     secret: SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
+    resave: true,
+    saveUninitialized: true,
     cookie: {
       httpOnly: true,
       sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 1000 * 60 * 60 * 24 * 30
+      secure: false, // Set to true if pure HTTPS domain
+      maxAge: 1000 * 60 * 60 * 24
     }
   })
 );
 
 /* =====================================================
-   HELPERS
+   HELPERS & VALIDATIONS
 ===================================================== */
 
-function cleanText(value, maxLength = 200) {
-  return String(value ?? "").trim().slice(0, maxLength);
+function cleanText(val) {
+  return String(val || "").trim();
 }
 
-function normalizeEmail(value) {
-  return cleanText(value, 160).toLowerCase();
+function normalizeEmail(email) {
+  return cleanText(email).toLowerCase();
 }
 
-function validEmail(email) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-function normalizeMobile(value) {
-  let clean = cleanText(value, 20).replace(/[\s()-]/g, "");
+function normalizeMobile(mobile) {
+  let clean = cleanText(mobile).replace(/[\s()-]/g, "");
   if (/^[0-9]{10}$/.test(clean)) {
     clean = "+91" + clean;
   }
   return clean;
 }
 
-function validMobile(mobile) {
-  return /^\+?[0-9]{10,15}$/.test(mobile);
-}
-
 function publicUser(user) {
   if (!user) return null;
   return {
     id: user.id,
-    name: user.name || "",
-    email: user.email || "",
-    role: user.role || "Member",
-    mobile: user.mobile || "",
-    city: user.city || "",
-    profileImage: user.profileImage || "",
+    name: user.name,
+    email: user.email,
+    mobile: user.mobile,
     emailVerified: Boolean(user.emailVerified),
     mobileVerified: Boolean(user.mobileVerified),
-    authProvider: user.authProvider || "local",
-    balance: Number(user.balance || 0),
-    createdAt: user.createdAt
+    balance: user.balance || 0
   };
 }
 
-function findUserById(id) {
-  return db.users.find((user) => String(user.id) === String(id));
-}
-
-function currentUser(req) {
-  if (!req.session.userId) return null;
-  return findUserById(req.session.userId);
-}
-
 /* =====================================================
-   OTP & MAIL LOGIC
+   OTP & MAILER SERVICES
 ===================================================== */
-
-const OTP_EXPIRY_MS = 10 * 60 * 1000;
-
-function randomOtp() {
-  return String(crypto.randomInt(100000, 1000000));
-}
-
-function hashOtp(otp) {
-  return crypto.createHash("sha256").update(String(otp)).digest("hex");
-}
 
 const mailTransporter = nodemailer.createTransport({
   service: "gmail",
@@ -186,31 +142,43 @@ const mailTransporter = nodemailer.createTransport({
   }
 });
 
+function randomOtp() {
+  return String(crypto.randomInt(100000, 1000000));
+}
+
+function hashOtp(otp) {
+  return crypto.createHash("sha256").update(String(otp)).digest("hex");
+}
+
 async function sendEmailOtp(email, otp) {
   if (!GMAIL_USER || !GMAIL_APP_PASSWORD) {
-    throw new Error("GMAIL_USER or GMAIL_APP_PASSWORD is not set in Render Environment Variables.");
+    console.warn("Gmail Env variables missing! OTP email skipped.");
+    return;
   }
-
   await mailTransporter.sendMail({
     from: `"TaskEarn" <${GMAIL_USER}>`,
     to: email,
     subject: "TaskEarn Verification Code",
-    html: `<h2>Your OTP: <b>${otp}</b></h2><p>Valid for 10 minutes.</p>`
+    html: `<div style="padding:20px; border:1px solid #ddd;">
+      <h2>TaskEarn Verification</h2>
+      <p>Your OTP Code is: <b style="font-size: 24px; color: #007bff;">${otp}</b></p>
+      <p>This code is valid for 10 minutes.</p>
+    </div>`
   });
 }
 
 async function sendSmsOtp(mobile, otp) {
   if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN || !TWILIO_PHONE_NUMBER) {
-    throw new Error("Twilio Variables are missing in Render Environment Variables.");
+    console.warn("Twilio Env variables missing! SMS skipped.");
+    return;
   }
-
   const auth = Buffer.from(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`).toString("base64");
   const params = new URLSearchParams();
   params.append("To", mobile);
   params.append("From", TWILIO_PHONE_NUMBER);
-  params.append("Body", `TaskEarn Verification Code: ${otp}`);
+  params.append("Body", `Your TaskEarn OTP is: ${otp}`);
 
-  const response = await fetch(
+  await fetch(
     `https://api.twilio.com/2010-04-01/Accounts/${encodeURIComponent(TWILIO_ACCOUNT_SID)}/Messages.json`,
     {
       method: "POST",
@@ -221,17 +189,11 @@ async function sendSmsOtp(mobile, otp) {
       body: params.toString()
     }
   );
-
-  if (!response.ok) {
-    const errorData = await response.text();
-    console.error("Twilio Error:", errorData);
-    throw new Error("Failed to send Mobile OTP via Twilio.");
-  }
 }
 
-async function sendOtpFor(user, type, purpose) {
+async function generateAndSendOtp(user, type, purpose) {
   const otp = randomOtp();
-  const now = Date.now();
+  console.log(`[DEVELOPMENT OTP LOG] User: ${user.email} | Type: ${type} | OTP: ${otp}`);
 
   db.otpCodes = (db.otpCodes || []).filter(
     (item) => !(String(item.userId) === String(user.id) && item.type === type)
@@ -242,20 +204,20 @@ async function sendOtpFor(user, type, purpose) {
     type,
     purpose,
     otpHash: hashOtp(otp),
-    expiresAt: new Date(now + OTP_EXPIRY_MS).toISOString()
+    expiresAt: new Date(Date.now() + 10 * 60 * 1000).toISOString()
   });
 
   saveDB(db);
 
   if (type === "email") {
     await sendEmailOtp(user.email, otp);
-  } else {
+  } else if (type === "mobile") {
     await sendSmsOtp(user.mobile, otp);
   }
 }
 
 /* =====================================================
-   ENDPOINTS
+   ROUTES & ENDPOINTS
 ===================================================== */
 
 app.use(express.static(path.join(__dirname, "public")));
@@ -264,6 +226,7 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
+// 1. REGISTER
 app.post("/api/register", async (req, res) => {
   try {
     const name = cleanText(req.body.name);
@@ -272,10 +235,14 @@ app.post("/api/register", async (req, res) => {
     const password = String(req.body.password || "");
 
     if (!name || !email || !mobile || !password) {
-      return res.status(400).json({ error: "All fields are required." });
+      return res.status(400).json({ error: "అన్ని వివరాలు నమోదు చేయండి." });
     }
 
     let user = db.users.find((u) => normalizeEmail(u.email) === email);
+
+    if (user && user.emailVerified && user.mobileVerified) {
+      return res.status(400).json({ error: "ఈ ఇమెయిల్ తో అకౌంట్ ఇప్పటికే ఉంది. లాగిన్ అవ్వండి." });
+    }
 
     if (!user) {
       user = {
@@ -290,46 +257,92 @@ app.post("/api/register", async (req, res) => {
         createdAt: new Date().toISOString()
       };
       db.users.push(user);
-      saveDB(db);
+    } else {
+      user.name = name;
+      user.mobile = mobile;
+      user.passwordHash = await bcrypt.hash(password, 10);
     }
 
-    req.session.verification = { userId: user.id, step: "email", purpose: "register" };
-    await sendOtpFor(user, "email", "register");
+    saveDB(db);
 
-    res.json({ success: true, verificationRequired: true, step: "email", email: user.email });
+    // Save state in Session
+    req.session.verification = {
+      userId: user.id,
+      step: "email",
+      purpose: "register"
+    };
+
+    // Send Mail OTP
+    await generateAndSendOtp(user, "email", "register");
+
+    req.session.save((err) => {
+      if (err) {
+        console.error("Session Save Error:", err);
+        return res.status(500).json({ error: "Session Error" });
+      }
+      return res.json({
+        success: true,
+        verificationRequired: true,
+        step: "email",
+        email: user.email,
+        mobile: user.mobile,
+        message: "OTP విజయవంతంగా పంపబడింది."
+      });
+    });
   } catch (error) {
     console.error("Register Error:", error);
-    res.status(500).json({ error: error.message || "Registration failed." });
+    res.status(500).json({ error: error.message || "Registration Failed" });
   }
 });
 
+// 2. VERIFY OTP
 app.post("/api/verify-otp", async (req, res) => {
   try {
     const verification = req.session.verification;
-    if (!verification) return res.status(400).json({ error: "Session expired." });
+    if (!verification) {
+      return res.status(400).json({ error: "సెషన్ గడువు ముగిసింది. మళ్ళీ ప్రయత్నించండి." });
+    }
 
-    const user = findUserById(verification.userId);
-    const otp = cleanText(req.body.otp);
+    const user = db.users.find((u) => String(u.id) === String(verification.userId));
+    if (!user) return res.status(404).json({ error: "యూజర్ కనబడలేదు." });
+
+    const otpInput = cleanText(req.body.otp);
+    const inputHash = hashOtp(otpInput);
 
     const record = (db.otpCodes || []).find(
       (o) => String(o.userId) === String(user.id) && o.type === verification.step
     );
 
-    if (!record || hashOtp(otp) !== record.otpHash) {
-      return res.status(400).json({ error: "Invalid OTP." });
+    if (!record || record.otpHash !== inputHash) {
+      return res.status(400).json({ error: "సరికాని OTP. మళ్ళీ చూడండి." });
     }
 
+    if (new Date() > new Date(record.expiresAt)) {
+      return res.status(400).json({ error: "OTP ఎక్స్‌పైర్ అయింది." });
+    }
+
+    // Step Logic
     if (verification.step === "email") {
       user.emailVerified = true;
       saveDB(db);
 
-      if (user.mobile) {
+      if (user.mobile && !user.mobileVerified) {
         verification.step = "mobile";
         req.session.verification = verification;
-        await sendOtpFor(user, "mobile", verification.purpose);
-        return res.json({ success: true, step: "mobile", mobile: user.mobile });
+        await generateAndSendOtp(user, "mobile", verification.purpose);
+
+        return req.session.save(() => {
+          res.json({
+            success: true,
+            verificationRequired: true,
+            step: "mobile",
+            email: user.email,
+            mobile: user.mobile,
+            message: "Gmail వెరిఫై అయింది. ఇప్పుడు ఫోన్ నెంబర్ OTP నమోదు చేయండి."
+          });
+        });
       }
-    } else {
+    } else if (verification.step === "mobile") {
       user.mobileVerified = true;
       saveDB(db);
     }
@@ -337,15 +350,103 @@ app.post("/api/verify-otp", async (req, res) => {
     req.session.userId = user.id;
     delete req.session.verification;
 
-    res.json({ success: true, step: "complete", user: publicUser(user) });
+    req.session.save(() => {
+      res.json({
+        success: true,
+        verificationRequired: false,
+        step: "complete",
+        user: publicUser(user),
+        message: "అకౌంట్ విజయవంతంగా వెరిఫై చేయబడింది!"
+      });
+    });
   } catch (error) {
-    console.error("Verify Error:", error);
-    res.status(500).json({ error: error.message || "Verification failed." });
+    console.error("OTP Verification Error:", error);
+    res.status(500).json({ error: "Verification Failed" });
   }
 });
 
-app.get("/api/me", (req, res) => res.json(publicUser(currentUser(req))));
+// 3. RESEND OTP
+app.post("/api/resend-otp", async (req, res) => {
+  try {
+    const verification = req.session.verification;
+    if (!verification) return res.status(400).json({ error: "సెషన్ ముగిసింది." });
+
+    const user = db.users.find((u) => String(u.id) === String(verification.userId));
+    if (!user) return res.status(404).json({ error: "యూజర్ దొరకలేదు." });
+
+    await generateAndSendOtp(user, verification.step, verification.purpose);
+    res.json({ success: true, message: "కొత్త OTP పంపబడింది." });
+  } catch (error) {
+    res.status(500).json({ error: "OTP తిరిగి పంపడం విఫలమైంది." });
+  }
+});
+
+// 4. LOGIN
+app.post("/api/login", async (req, res) => {
+  try {
+    const email = normalizeEmail(req.body.email);
+    const password = String(req.body.password || "");
+
+    const user = db.users.find((u) => normalizeEmail(u.email) === email);
+    if (!user) return res.status(400).json({ error: "ఈ ఇమెయిల్ తో అకౌంట్ లేదు." });
+
+    const match = await bcrypt.compare(password, user.passwordHash);
+    if (!match) return res.status(400).json({ error: "పాస్‌వర్డ్ తప్పు." });
+
+    if (!user.emailVerified) {
+      req.session.verification = { userId: user.id, step: "email", purpose: "login" };
+      await generateAndSendOtp(user, "email", "login");
+
+      return req.session.save(() => {
+        res.json({ success: true, verificationRequired: true, step: "email", email: user.email });
+      });
+    }
+
+    if (!user.mobileVerified && user.mobile) {
+      req.session.verification = { userId: user.id, step: "mobile", purpose: "login" };
+      await generateAndSendOtp(user, "mobile", "login");
+
+      return req.session.save(() => {
+        res.json({ success: true, verificationRequired: true, step: "mobile", mobile: user.mobile });
+      });
+    }
+
+    req.session.userId = user.id;
+    req.session.save(() => {
+      res.json({ success: true, user: publicUser(user) });
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Login failed" });
+  }
+});
+
+// GET CURRENT USER
+app.get("/api/me", (req, res) => {
+  if (!req.session.userId) return res.json(null);
+  const user = db.users.find((u) => String(u.id) === String(req.session.userId));
+  res.json(publicUser(user));
+});
+
+// LOGOUT
+app.post("/api/logout", (req, res) => {
+  req.session.destroy(() => {
+    res.clearCookie("connect.sid");
+    res.json({ success: true });
+  });
+});
+
+/* =====================================================
+   PREVENT CRASHES & START SERVER
+===================================================== */
+
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception Error:", err.message);
+});
+
+process.on("unhandledRejection", (reason) => {
+  console.error("Unhandled Promise Rejection:", reason);
+});
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server listening on port ${PORT}`);
 });
