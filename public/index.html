@@ -1,909 +1,211 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TaskEarn - Complete Tasks & Earn Rewards</title>
-
-<!-- GOOGLE IDENTITY SERVICES -->
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-
-<style>
-* { box-sizing: border-box; }
-html, body {
-  margin: 0; padding: 0;
-  font-family: Arial, Helvetica, sans-serif;
-  background: #f7f8fc; color: #171b2d;
-}
-button, input, select, textarea { font: inherit; }
-button { cursor: pointer; }
-
-.header {
-  position: sticky; top: 0; z-index: 1000;
-  background: rgba(255,255,255,.96);
-  backdrop-filter: blur(18px);
-  border-bottom: 1px solid #e8eaf0;
-}
-.header-inner {
-  max-width: 1100px; margin: auto; min-height: 70px;
-  padding: 10px 18px; display: flex;
-  align-items: center; justify-content: space-between;
-}
-.logo { font-size: 24px; font-weight: 900; color: #ff5d2e; cursor: pointer; }
-.nav { display: flex; align-items: center; gap: 8px; }
-.nav button {
-  border: 0; background: transparent; padding: 10px 14px;
-  border-radius: 12px; font-weight: 700; color: #596174;
-}
-.nav button:hover, .nav button.active { background: #fff1eb; color: #ff5d2e; }
-
-.header-profile { position: relative; }
-.profile-avatar-button {
-  width: 44px; height: 44px; border: 0; border-radius: 50%;
-  background: #ff5d2e; color: white; font-weight: 900; font-size: 18px;
-}
-.header-profile-panel {
-  position: absolute; right: 0; top: 52px; width: 230px;
-  background: white; border: 1px solid #e7e9ef;
-  border-radius: 18px; box-shadow: 0 15px 40px rgba(20,30,60,.16);
-  padding: 12px; display: none; z-index: 1001;
-}
-.header-profile-panel.open { display: block; }
-.header-profile-panel button {
-  width: 100%; border: 0; background: transparent;
-  text-align: left; padding: 12px; border-radius: 12px; font-weight: 700;
-}
-.header-profile-panel button:hover { background: #f5f6fa; }
-
-.container { max-width: 1100px; margin: auto; padding: 25px 18px 100px; }
-.hero { padding: 40px 0 20px; }
-.hero h1 { font-size: clamp(32px, 6vw, 56px); line-height: 1.1; margin: 0 0 18px; }
-.hero h1 span { color: #ff5d2e; }
-.hero p { max-width: 680px; color: #697286; font-size: 16px; line-height: 1.6; }
-
-.card {
-  background: white; border: 1px solid #e7e9ef;
-  border-radius: 20px; padding: 22px; margin-bottom: 18px;
-  box-shadow: 0 8px 25px rgba(20,30,60,.05);
-}
-.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.full { grid-column: 1 / -1; }
-
-label { display: block; font-weight: 700; margin-bottom: 7px; font-size: 14px; }
-input, select, textarea {
-  width: 100%; padding: 13px 14px; border: 1px solid #dfe2e9;
-  border-radius: 12px; outline: none; background: white;
-}
-input:focus, select:focus, textarea:focus {
-  border-color: #ff5d2e; box-shadow: 0 0 0 3px rgba(255,93,46,.1);
-}
-
-.primary {
-  width: 100%; border: 0; background: #ff5d2e; color: white;
-  padding: 14px 18px; border-radius: 13px; font-weight: 800;
-}
-.primary:hover { opacity: .92; }
-.primary:disabled { background: #ccc; cursor: not-allowed; }
-
-.secondary {
-  border: 1px solid #e0e3ea; background: white; color: #30374a;
-  padding: 12px 16px; border-radius: 12px; font-weight: 700;
-}
-.danger { background: #fff0f0 !important; color: #d73535 !important; }
-.muted { color: #70798b; }
-.hidden { display: none !important; }
-
-.notice { padding: 13px 15px; border-radius: 12px; margin-bottom: 15px; font-weight: 700; font-size: 14px; }
-.notice.error { background: #fff0f0; color: #c92e2e; }
-.notice.success { background: #ecfff3; color: #168346; }
-
-.auth-tabs { display: flex; gap: 8px; margin-bottom: 18px; }
-.auth-tabs button {
-  flex: 1; padding: 12px; border: 0; border-radius: 12px;
-  background: #f1f3f7; font-weight: 800; color: #596174;
-}
-.auth-tabs button.active { background: #ff5d2e; color: white; }
-
-.google-area { margin-top: 15px; display: flex; justify-content: center; min-height: 44px; }
-.divider {
-  display: flex; align-items: center; gap: 10px; margin: 18px 0;
-  color: #8a92a2; font-size: 13px;
-}
-.divider::before, .divider::after {
-  content: ""; height: 1px; background: #e3e5eb; flex: 1;
-}
-
-.reward { font-size: 22px; font-weight: 900; color: #13a05a; margin: 8px 0; }
-.badge {
-  display: inline-block; padding: 4px 10px; border-radius: 8px;
-  font-size: 12px; font-weight: 800; text-transform: uppercase;
-}
-.badge.pending { background: #fff8e6; color: #b7791f; }
-.badge.approved { background: #e6fffa; color: #234e52; }
-.badge.rejected { background: #ffe6e6; color: #9b2c2c; }
-
-.modal {
-  position: fixed; inset: 0; background: rgba(10,15,30,.55);
-  display: none; align-items: center; justify-content: center;
-  z-index: 2000; padding: 18px;
-}
-.modal.open { display: flex; }
-.modal-box {
-  width: min(480px,100%); max-height: 90vh; overflow: auto;
-  background: white; border-radius: 22px; padding: 22px;
-}
-.modal-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
-.close { border: 0; background: #f1f3f7; width: 36px; height: 36px; border-radius: 50%; font-size: 20px; }
-
-.mobile-bottom-nav {
-  position: fixed; display: none; left: 10px; right: 10px; bottom: 10px;
-  height: 60px; z-index: 1500; background: rgba(255,255,255,.96);
-  backdrop-filter: blur(18px); border: 1px solid #e7e9ef; border-radius: 20px;
-  box-shadow: 0 12px 35px rgba(20,30,60,.16); align-items: center; justify-content: space-around; padding: 5px;
-}
-.mobile-bottom-nav.logged-in { display: flex; }
-.bottom-item {
-  border: 0; background: transparent; height: 50px; min-width: 75px;
-  border-radius: 15px; color: #70798b; font-size: 11px; font-weight: 700;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-}
-.bottom-item.active { background: #fff1eb; color: #ff5d2e; }
-
-@media(max-width:760px) {
-  .nav { display: none; }
-  .form-grid { grid-template-columns: 1fr; }
-  .container { padding-bottom: 90px; }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaskEarn - Complete Tasks & Earn Money</title>
+  <style>
+    /* basic reset & layout styles */
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+    body { background: #f4f6f8; color: #333; line-height: 1.6; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .card { background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    .btn { background: #2563eb; color: #fff; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
+    .btn:hover { background: #1d4ed8; }
+    .hidden { display: none !important; }
+    .google-btn-container { min-height: 40px; margin-top: 10px; }
+  </style>
+  
+  <!-- GOOGLE SIGN-IN SDK (onload తో అప్‌డేట్ చేయబడింది) -->
+  <script src="https://accounts.google.com/gsi/client" async defer onload="renderGoogleButtons()"></script>
 </head>
-
 <body>
 
-<header class="header">
-  <div class="header-inner">
-    <div class="logo" onclick="checkSession()">TaskEarn</div>
-    <nav id="mainNav" class="nav" style="display:none;">
-      <button onclick="renderTasksView()" id="navTasks">Tasks</button>
-      <button onclick="renderSubmissionsView()" id="navSubmissions">Submissions</button>
-      <button onclick="renderWalletView()" id="navWallet">Wallet</button>
-      <button onclick="renderProfileView()" id="navProfile">Profile</button>
-    </nav>
-    <div id="headerProfile" class="header-profile" style="display:none;">
-      <button id="headerAvatarButton" class="profile-avatar-button" onclick="toggleProfilePanel(event)">
-        <span id="headerAvatarInitials">U</span>
-      </button>
-      <div id="profilePanel" class="header-profile-panel">
-        <div id="profilePanelName" style="font-weight:900; padding:8px 10px 2px;">User</div>
-        <div id="profilePanelEmail" class="muted" style="padding:0 10px 10px; font-size:12px;"></div>
-        <button onclick="renderProfileView()">👤 Profile</button>
-        <button onclick="renderWalletView()">💰 Wallet</button>
-        <button onclick="renderSubmissionsView()">📜 Submissions</button>
-        <button class="danger" onclick="logoutUser()">🚪 Logout</button>
+  <div class="container">
+    <!-- Navigation UI -->
+    <header class="card">
+      <h1>TaskEarn</h1>
+      <div id="userInfo" class="hidden">
+        <span id="userName"></span> | Balance: ₹<span id="userBalance">0</span>
+        <button class="btn" onclick="logout()">Logout</button>
       </div>
-    </div>
-  </div>
-</header>
+    </header>
 
-<main class="container">
+    <!-- Auth Section -->
+    <div id="authSection" class="card">
+      <div id="authMessage" style="color: red; margin-bottom: 10px;"></div>
 
-<!-- PUBLIC HOME AREA -->
-<section id="homeArea">
-  <div class="hero">
-    <h1>Complete Tasks.<br><span>Earn Rewards.</span></h1>
-    <p>Welcome to TaskEarn. Complete simple online tasks, submit your proof, and earn instant wallet rewards.</p>
-    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:20px;">
-      <button class="primary" style="width:auto; padding:12px 24px;" onclick="openAuth('register')">Get Started</button>
-      <button class="secondary" onclick="openAuth('login')">Login</button>
-    </div>
-  </div>
-  <div class="grid" style="margin-top:30px;">
-    <div class="card">
-      <h3>📋 Easy Tasks</h3>
-      <p class="muted">Access active tasks anytime and follow simple guidelines to complete them.</p>
-    </div>
-    <div class="card">
-      <h3>💰 Fair Rewards</h3>
-      <p class="muted">Earn real money directly in your wallet balance upon task approval.</p>
-    </div>
-    <div class="card">
-      <h3>🔐 Verified & Safe</h3>
-      <p class="muted">Protected with Dual-OTP (Gmail & SMS) verification and Google Sign-In.</p>
-    </div>
-  </div>
-</section>
-
-<!-- AUTH AREA -->
-<section id="authArea" class="hidden">
-  <div class="card" style="max-width:480px; margin:20px auto;">
-    <div class="auth-tabs">
-      <button id="loginTab" onclick="showAuthMode('login')">Login</button>
-      <button id="registerTab" onclick="showAuthMode('register')">Register</button>
-    </div>
-    
-    <div id="authMessage" class="hidden"></div>
-
-    <!-- LOGIN FORM -->
-    <form id="loginForm" onsubmit="loginUser(event)">
-      <h2>Welcome Back 👋</h2>
-      <p class="muted" style="margin-bottom:15px;">Login using your email or Google account.</p>
-      
-      <label>Email Address</label>
-      <input id="loginEmail" type="email" required placeholder="name@example.com">
-      <br><br>
-      <label>Password</label>
-      <input id="loginPassword" type="password" required placeholder="••••••••">
-      <br><br>
-      <label style="font-weight:normal; cursor:pointer;">
-        <input type="checkbox" id="loginRemember" style="width:auto;"> Remember me for 30 days
-      </label>
-      <br>
-      <button class="primary" type="submit" id="btnLoginSubmit">Login</button>
-      
-      <div class="divider">OR</div>
-      <div id="googleLoginButton" class="google-area"></div>
-    </form>
-
-    <!-- REGISTER FORM -->
-    <form id="registerForm" class="hidden" onsubmit="registerUser(event)">
-      <h2>Create Account 🚀</h2>
-      <p class="muted" style="margin-bottom:15px;">Join TaskEarn and start earning today.</p>
-      
-      <label>Full Name</label>
-      <input id="registerName" type="text" required placeholder="John Doe">
-      <br><br>
-      <label>Gmail / Email</label>
-      <input id="registerEmail" type="email" required placeholder="name@gmail.com">
-      <br><br>
-      <label>Mobile Number (with country code)</label>
-      <input id="registerMobile" type="tel" required placeholder="+919876543210">
-      <br><br>
-      <label>City</label>
-      <input id="registerCity" type="text" required placeholder="Hyderabad">
-      <br><br>
-      <label>Password</label>
-      <input id="registerPassword" type="password" required minlength="6" placeholder="Min 6 characters">
-      <br><br>
-      <button class="primary" type="submit" id="btnRegisterSubmit">Create Account</button>
-      
-      <div class="divider">OR</div>
-      <div id="googleRegisterButton" class="google-area"></div>
-    </form>
-  </div>
-</section>
-
-<!-- APPLICATION AREA -->
-<section id="appArea" class="hidden">
-  <div id="appContent"></div>
-</section>
-
-</main>
-
-<!-- OTP MODAL -->
-<div id="otpModal" class="modal">
-  <div class="modal-box">
-    <div class="modal-head">
-      <h3 id="otpTitle" style="margin:0;">Verify Verification Code</h3>
-      <button class="close" onclick="closeOtpModal()">×</button>
-    </div>
-    <div id="otpMessage" class="muted" style="margin-bottom:15px; font-size:14px;"></div>
-    
-    <label>6-Digit OTP</label>
-    <input id="otpInput" type="text" inputmode="numeric" maxlength="6" placeholder="123456" style="text-align:center; font-size:20px; letter-spacing:6px;">
-    <br><br>
-    <button class="primary" onclick="verifyOtp()" id="btnVerifyOtp">Verify OTP</button>
-    <br><br>
-    <button class="secondary" style="width:100%;" onclick="resendOtp()">Resend OTP</button>
-  </div>
-</div>
-
-<!-- MOBILE BOTTOM NAVIGATION -->
-<div id="mobileBottomNav" class="mobile-bottom-nav">
-  <button class="bottom-item" id="mbTasks" onclick="renderTasksView()"><span>🏠</span><span>Tasks</span></button>
-  <button class="bottom-item" id="mbSubmissions" onclick="renderSubmissionsView()"><span>📜</span><span>History</span></button>
-  <button class="bottom-item" id="mbWallet" onclick="renderWalletView()"><span>💰</span><span>Wallet</span></button>
-  <button class="bottom-item" id="mbProfile" onclick="renderProfileView()"><span>👤</span><span>Profile</span></button>
-</div>
-
-<script>
-/* STATE MANAGEMENT */
-let currentUser = null;
-let activeTab = "tasks";
-let isProfileVerification = false;
-
-/* UTILITIES */
-function escapeHtml(str) {
-  return String(str || "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-async function api(url, options = {}) {
-  const res = await fetch(url, {
-    credentials: "same-origin",
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...(options.headers || {})
-    }
-  });
-
-  let data = null;
-  try { data = await res.json(); } catch {}
-
-  if (!res.ok) {
-    throw new Error(data?.error || "An unexpected error occurred.");
-  }
-  return data;
-}
-
-function showAuthMessage(msg, type = "error") {
-  const box = document.getElementById("authMessage");
-  if (!msg) {
-    box.classList.add("hidden");
-    return;
-  }
-  box.className = "notice " + type;
-  box.textContent = msg;
-  box.classList.remove("hidden");
-}
-
-/* AUTHENTICATION & VIEWS CONTROL */
-function openAuth(mode = "login") {
-  document.getElementById("homeArea").classList.add("hidden");
-  document.getElementById("appArea").classList.add("hidden");
-  document.getElementById("authArea").classList.remove("hidden");
-  showAuthMode(mode);
-}
-
-function showAuthMode(mode) {
-  document.getElementById("loginForm").classList.toggle("hidden", mode !== "login");
-  document.getElementById("registerForm").classList.toggle("hidden", mode !== "register");
-  document.getElementById("loginTab").classList.toggle("active", mode === "login");
-  document.getElementById("registerTab").classList.toggle("active", mode === "register");
-  showAuthMessage("");
-  renderGoogleButtons();
-}
-
-function updateNavigationUI() {
-  const isLoggedIn = !!currentUser;
-  document.getElementById("mainNav").style.display = isLoggedIn ? "flex" : "none";
-  document.getElementById("headerProfile").style.display = isLoggedIn ? "block" : "none";
-  
-  const bottom = document.getElementById("mobileBottomNav");
-  if (isLoggedIn) {
-    bottom.classList.add("logged-in");
-    document.getElementById("headerAvatarInitials").textContent = (currentUser.name || "U").charAt(0).toUpperCase();
-    document.getElementById("profilePanelName").textContent = currentUser.name || "User";
-    document.getElementById("profilePanelEmail").textContent = currentUser.email || "";
-  } else {
-    bottom.classList.remove("logged-in");
-  }
-}
-
-function toggleProfilePanel(e) {
-  e.stopPropagation();
-  document.getElementById("profilePanel").classList.toggle("open");
-}
-
-window.addEventListener("click", () => {
-  document.getElementById("profilePanel").classList.remove("open");
-});
-
-/* GOOGLE AUTHENTICATION */
-async function renderGoogleButtons() {
-  if (!window.google || !window.google.accounts) return;
-  try {
-    const { clientId } = await api("/api/google-config");
-    if (!clientId) return;
-
-    window.google.accounts.id.initialize({
-      client_id: clientId,
-      callback: async (res) => {
-        if (res.credential) {
-          try {
-            showAuthMessage("Signing in with Google...", "success");
-            const data = await api("/api/auth/google", {
-              method: "POST",
-              body: JSON.stringify({ credential: res.credential })
-            });
-            currentUser = data.user;
-            updateNavigationUI();
-            renderTasksView();
-          } catch (err) {
-            showAuthMessage(err.message);
-          }
-        }
-      }
-    });
-
-    const lBtn = document.getElementById("googleLoginButton");
-    const rBtn = document.getElementById("googleRegisterButton");
-    if (lBtn) { lBtn.innerHTML = ""; window.google.accounts.id.renderButton(lBtn, { theme: "outline", size: "large" }); }
-    if (rBtn) { rBtn.innerHTML = ""; window.google.accounts.id.renderButton(rBtn, { theme: "outline", size: "large" }); }
-  } catch {}
-}
-
-/* REGISTER & LOGIN HANDLERS */
-async function registerUser(e) {
-  e.preventDefault();
-  const btn = document.getElementById("btnRegisterSubmit");
-  btn.disabled = true; btn.textContent = "Creating Account...";
-
-  try {
-    const data = await api("/api/register", {
-      method: "POST",
-      body: JSON.stringify({
-        name: document.getElementById("registerName").value,
-        email: document.getElementById("registerEmail").value,
-        mobile: document.getElementById("registerMobile").value,
-        city: document.getElementById("registerCity").value,
-        password: document.getElementById("registerPassword").value
-      })
-    });
-
-    if (data.verificationRequired) {
-      isProfileVerification = false;
-      openOtpModal(data.step, data.email, data.mobile);
-    }
-  } catch (err) {
-    showAuthMessage(err.message);
-  } finally {
-    btn.disabled = false; btn.textContent = "Create Account";
-  }
-}
-
-async function loginUser(e) {
-  e.preventDefault();
-  const btn = document.getElementById("btnLoginSubmit");
-  btn.disabled = true; btn.textContent = "Logging in...";
-
-  try {
-    const data = await api("/api/login", {
-      method: "POST",
-      body: JSON.stringify({
-        email: document.getElementById("loginEmail").value,
-        password: document.getElementById("loginPassword").value,
-        remember: document.getElementById("loginRemember").checked
-      })
-    });
-
-    if (data.user) {
-      currentUser = data.user;
-      updateNavigationUI();
-      renderTasksView();
-      return;
-    }
-
-    if (data.verificationRequired) {
-      isProfileVerification = false;
-      openOtpModal(data.step, data.email, data.mobile);
-    }
-  } catch (err) {
-    showAuthMessage(err.message);
-  } finally {
-    btn.disabled = false; btn.textContent = "Login";
-  }
-}
-
-/* OTP MODAL & VERIFICATION */
-function openOtpModal(step, email, mobile) {
-  const title = document.getElementById("otpTitle");
-  const msg = document.getElementById("otpMessage");
-
-  if (step === "email") {
-    title.textContent = "Verify Email Address";
-    msg.textContent = `A 6-digit OTP code has been sent to ${email}.`;
-  } else {
-    title.textContent = "Verify Mobile Number";
-    msg.textContent = `A 6-digit OTP code has been sent to ${mobile}.`;
-  }
-
-  document.getElementById("otpInput").value = "";
-  document.getElementById("otpModal").classList.add("open");
-}
-
-function closeOtpModal() {
-  document.getElementById("otpModal").classList.remove("open");
-}
-
-async function verifyOtp() {
-  const otp = document.getElementById("otpInput").value.trim();
-  if (!/^\d{6}$/.test(otp)) {
-    alert("Please enter a valid 6-digit OTP.");
-    return;
-  }
-
-  const btn = document.getElementById("btnVerifyOtp");
-  btn.disabled = true; btn.textContent = "Verifying...";
-
-  const endpoint = isProfileVerification ? "/api/profile/verify-otp" : "/api/verify-otp";
-
-  try {
-    const data = await api(endpoint, {
-      method: "POST",
-      body: JSON.stringify({ otp })
-    });
-
-    if (data.step === "mobile") {
-      openOtpModal("mobile", data.email, data.mobile);
-      return;
-    }
-
-    if (data.user) {
-      currentUser = data.user;
-      closeOtpModal();
-      updateNavigationUI();
-      if (isProfileVerification) {
-        alert("Mobile number verified successfully!");
-        renderProfileView();
-      } else {
-        renderTasksView();
-      }
-    }
-  } catch (err) {
-    alert(err.message);
-  } finally {
-    btn.disabled = false; btn.textContent = "Verify OTP";
-  }
-}
-
-async function resendOtp() {
-  const endpoint = isProfileVerification ? "/api/profile/resend-otp" : "/api/resend-otp";
-  try {
-    const data = await api(endpoint, { method: "POST" });
-    alert(data.message || "OTP resent successfully.");
-  } catch (err) {
-    alert(err.message);
-  }
-}
-
-/* ROUTING & VIEWS RENDERING */
-function setActiveNav(tab) {
-  activeTab = tab;
-  document.querySelectorAll(".nav button").forEach(b => b.classList.remove("active"));
-  document.querySelectorAll(".bottom-item").forEach(b => b.classList.remove("active"));
-
-  const navBtn = document.getElementById("nav" + tab.charAt(0).toUpperCase() + tab.slice(1));
-  const mbBtn = document.getElementById("mb" + tab.charAt(0).toUpperCase() + tab.slice(1));
-  if (navBtn) navBtn.classList.add("active");
-  if (mbBtn) mbBtn.classList.add("active");
-
-  document.getElementById("homeArea").classList.add("hidden");
-  document.getElementById("authArea").classList.add("hidden");
-  document.getElementById("appArea").classList.remove("hidden");
-}
-
-/* 1. TASKS VIEW */
-async function renderTasksView() {
-  if (!currentUser) return openAuth("login");
-  setActiveNav("tasks");
-
-  const app = document.getElementById("appContent");
-  app.innerHTML = `
-    <div class="card">
-      <h2>Available Tasks 📋</h2>
-      <p class="muted">Complete any task below and submit it for approval.</p>
-    </div>
-    <div id="tasksList">Loading available tasks...</div>
-  `;
-
-  try {
-    const tasks = await api("/api/tasks");
-    const container = document.getElementById("tasksList");
-
-    if (!tasks || !tasks.length) {
-      container.innerHTML = `<div class="card"><p class="muted">No active tasks available right now.</p></div>`;
-      return;
-    }
-
-    container.innerHTML = `<div class="grid">` + tasks.map(t => `
-      <div class="card" style="display:flex; flex-direction:column; justify-space-between;">
-        <div>
-          <span class="badge pending">${escapeHtml(t.type || "General")}</span>
-          <h3 style="margin:10px 0 5px;">${escapeHtml(t.title)}</h3>
-          <p class="muted" style="font-size:14px; margin-bottom:15px;">${escapeHtml(t.description)}</p>
-        </div>
-        <div>
-          <div class="reward">₹${Number(t.reward).toFixed(2)}</div>
-          <button class="primary" onclick="submitTask(${t.id}, this)">Submit Task</button>
-        </div>
-      </div>
-    `).join("") + `</div>`;
-  } catch (err) {
-    app.innerHTML = `<div class="notice error">${escapeHtml(err.message)}</div>`;
-  }
-}
-
-async function submitTask(taskId, btn) {
-  btn.disabled = true; btn.textContent = "Submitting...";
-  try {
-    const data = await api(`/api/tasks/${taskId}/submit`, { method: "POST" });
-    alert(data.message || "Task submitted successfully.");
-    renderSubmissionsView();
-  } catch (err) {
-    alert(err.message);
-    btn.disabled = false; btn.textContent = "Submit Task";
-  }
-}
-
-/* 2. SUBMISSIONS VIEW */
-async function renderSubmissionsView() {
-  if (!currentUser) return openAuth("login");
-  setActiveNav("submissions");
-
-  const app = document.getElementById("appContent");
-  app.innerHTML = `
-    <div class="card">
-      <h2>My Submissions 📜</h2>
-      <p class="muted">Track the review status of your completed tasks.</p>
-    </div>
-    <div id="submissionsList">Loading submissions...</div>
-  `;
-
-  try {
-    const list = await api("/api/my-submissions");
-    const container = document.getElementById("submissionsList");
-
-    if (!list || !list.length) {
-      container.innerHTML = `<div class="card"><p class="muted">You haven't submitted any tasks yet.</p></div>`;
-      return;
-    }
-
-    container.innerHTML = list.map(s => `
-      <div class="card" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
-        <div>
-          <h4 style="margin:0 0 5px;">${escapeHtml(s.taskTitle)}</h4>
-          <span class="muted" style="font-size:12px;">Submitted: ${new Date(s.submittedAt).toLocaleString()}</span>
-        </div>
-        <div style="text-align:right;">
-          <div class="reward" style="font-size:18px;">+₹${Number(s.reward).toFixed(2)}</div>
-          <span class="badge ${s.status}">${escapeHtml(s.status)}</span>
-        </div>
-      </div>
-    `).join("");
-  } catch (err) {
-    app.innerHTML = `<div class="notice error">${escapeHtml(err.message)}</div>`;
-  }
-}
-
-/* 3. WALLET VIEW & WITHDRAWAL */
-async function renderWalletView() {
-  if (!currentUser) return openAuth("login");
-  setActiveNav("wallet");
-
-  const app = document.getElementById("appContent");
-  app.innerHTML = `
-    <div class="card">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
-        <div>
-          <span class="muted">Wallet Balance</span>
-          <h1 style="margin:5px 0; font-size:36px; color:#13a05a;">₹<span id="walletBalance">0.00</span></h1>
-        </div>
-        <button class="primary" style="width:auto; padding:12px 24px;" onclick="openWithdrawModal()">Request Withdrawal</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <h3>Withdrawal History</h3>
-      <div id="withdrawalsList">Loading history...</div>
-    </div>
-
-    <!-- WITHDRAW MODAL -->
-    <div id="withdrawModal" class="modal">
-      <div class="modal-box">
-        <div class="modal-head">
-          <h3 style="margin:0;">Withdraw Funds</h3>
-          <button class="close" onclick="closeWithdrawModal()">×</button>
-        </div>
-        <form onsubmit="handleWithdraw(event)">
-          <label>Amount (₹) (Min ₹100)</label>
-          <input id="withdrawAmount" type="number" min="100" step="1" required placeholder="100">
-          <br><br>
-          <label>Payment Method</label>
-          <select id="withdrawMethod" onchange="togglePaymentFields()">
-            <option value="UPI">UPI</option>
-            <option value="Bank Account">Bank Account</option>
-          </select>
-          <br><br>
-
-          <div id="upiFields">
-            <label>UPI ID</label>
-            <input id="withdrawUpiId" type="text" placeholder="username@upi">
-          </div>
-
-          <div id="bankFields" class="hidden">
-            <label>Account Holder Name</label>
-            <input id="withdrawBankName" type="text" placeholder="John Doe">
-            <br><br>
-            <label>Account Number</label>
-            <input id="withdrawAccNo" type="text" placeholder="1234567890">
-            <br><br>
-            <label>IFSC Code</label>
-            <input id="withdrawIfsc" type="text" placeholder="SBIN0001234">
-            <br><br>
-            <label>Bank Name</label>
-            <input id="withdrawBank" type="text" placeholder="State Bank of India">
-          </div>
-          <br>
-          <button class="primary" type="submit" id="btnWithdrawSubmit">Submit Request</button>
+      <!-- Login Form -->
+      <div id="loginMode">
+        <h2>Login</h2>
+        <form onsubmit="handleLogin(event)">
+          <input type="email" id="loginEmail" placeholder="Email" required><br><br>
+          <input type="password" id="loginPassword" placeholder="Password" required><br><br>
+          <button type="submit" class="btn">Submit</button>
         </form>
+        <div id="googleLoginButton" class="google-btn-container"></div>
+      </div>
+
+      <!-- Register Form -->
+      <div id="registerMode" class="hidden">
+        <h2>Register</h2>
+        <form onsubmit="handleRegister(event)">
+          <input type="text" id="regName" placeholder="Full Name" required><br><br>
+          <input type="email" id="regEmail" placeholder="Email" required><br><br>
+          <input type="text" id="regMobile" placeholder="Mobile" required><br><br>
+          <input type="text" id="regCity" placeholder="City" required><br><br>
+          <input type="password" id="regPassword" placeholder="Password" required><br><br>
+          <button type="submit" class="btn">Register</button>
+        </form>
+        <div id="googleRegisterButton" class="google-btn-container"></div>
       </div>
     </div>
-  `;
 
-  try {
-    const data = await api("/api/wallet");
-    currentUser.balance = data.balance;
-    document.getElementById("walletBalance").textContent = Number(data.balance || 0).toFixed(2);
+    <!-- Main Tasks Section -->
+    <div id="tasksSection" class="card hidden">
+      <h2>Available Tasks</h2>
+      <div id="taskList"></div>
+    </div>
+  </div>
 
-    const historyBox = document.getElementById("withdrawalsList");
-    if (!data.withdrawals || !data.withdrawals.length) {
-      historyBox.innerHTML = `<p class="muted">No withdrawal history found.</p>`;
-      return;
+  <script>
+    let currentUser = null;
+
+    async function api(endpoint, options = {}) {
+      options.headers = { "Content-Type": "application/json", ...options.headers };
+      options.credentials = "include";
+      const res = await fetch(endpoint, options);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Something went wrong");
+      return data;
     }
 
-    historyBox.innerHTML = data.withdrawals.map(w => `
-      <div style="padding:12px 0; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
-        <div>
-          <strong>₹${Number(w.amount).toFixed(2)} via ${escapeHtml(w.method)}</strong>
-          <div class="muted" style="font-size:12px;">${new Date(w.createdAt).toLocaleString()}</div>
+    async function checkSession() {
+      try {
+        currentUser = await api("/api/me");
+        updateNavigationUI();
+        if (currentUser) {
+          renderTasksView();
+        } else {
+          showAuthMode("login");
+        }
+      } catch (e) {
+        showAuthMode("login");
+      }
+    }
+
+    function showAuthMode(mode) {
+      document.getElementById("authSection").classList.remove("hidden");
+      document.getElementById("tasksSection").classList.add("hidden");
+      if (mode === "login") {
+        document.getElementById("loginMode").classList.remove("hidden");
+        document.getElementById("registerMode").classList.add("hidden");
+      } else {
+        document.getElementById("loginMode").classList.add("hidden");
+        document.getElementById("registerMode").classList.remove("hidden");
+      }
+      renderGoogleButtons();
+    }
+
+    function showAuthMessage(msg, type = "error") {
+      const el = document.getElementById("authMessage");
+      el.style.color = type === "success" ? "green" : "red";
+      el.innerText = msg;
+    }
+
+    /* GOOGLE AUTHENTICATION (సరిచేసిన ఫంక్షన్) */
+    async function renderGoogleButtons() {
+      if (!window.google || !window.google.accounts) return;
+      try {
+        const { clientId } = await api("/api/google-config");
+        if (!clientId) return;
+
+        window.google.accounts.id.initialize({
+          client_id: clientId,
+          callback: async (res) => {
+            if (res.credential) {
+              try {
+                showAuthMessage("Signing in with Google...", "success");
+                const data = await api("/api/auth/google", {
+                  method: "POST",
+                  body: JSON.stringify({ credential: res.credential })
+                });
+                currentUser = data.user;
+                updateNavigationUI();
+                renderTasksView();
+              } catch (err) {
+                showAuthMessage(err.message);
+              }
+            }
+          }
+        });
+
+        setTimeout(() => {
+          const lBtn = document.getElementById("googleLoginButton");
+          const rBtn = document.getElementById("googleRegisterButton");
+          if (lBtn) { 
+            lBtn.innerHTML = ""; 
+            window.google.accounts.id.renderButton(lBtn, { theme: "outline", size: "large", width: "100%" }); 
+          }
+          if (rBtn) { 
+            rBtn.innerHTML = ""; 
+            window.google.accounts.id.renderButton(rBtn, { theme: "outline", size: "large", width: "100%" }); 
+          }
+        }, 50);
+
+      } catch (err) {
+        console.error("Google Auth Config Error:", err);
+      }
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      try {
+        const email = document.getElementById("loginEmail").value;
+        const password = document.getElementById("loginPassword").value;
+        const data = await api("/api/login", {
+          method: "POST",
+          body: JSON.stringify({ email, password })
+        });
+        currentUser = data.user;
+        updateNavigationUI();
+        renderTasksView();
+      } catch (err) {
+        showAuthMessage(err.message);
+      }
+    }
+
+    function updateNavigationUI() {
+      if (currentUser) {
+        document.getElementById("userInfo").classList.remove("hidden");
+        document.getElementById("userName").innerText = currentUser.name;
+        document.getElementById("authSection").classList.add("hidden");
+      } else {
+        document.getElementById("userInfo").classList.add("hidden");
+      }
+    }
+
+    async function renderTasksView() {
+      document.getElementById("tasksSection").classList.remove("hidden");
+      const tasks = await api("/api/tasks");
+      const container = document.getElementById("taskList");
+      container.innerHTML = tasks.map(t => `
+        <div style="border-bottom: 1px solid #ccc; padding: 10px 0;">
+          <h3>${t.title}</h3>
+          <p>${t.description}</p>
+          <small>Reward: ₹${t.reward}</small>
         </div>
-        <span class="badge ${w.status}">${escapeHtml(w.status)}</span>
-      </div>
-    `).join("");
-  } catch (err) {
-    app.innerHTML = `<div class="notice error">${escapeHtml(err.message)}</div>`;
-  }
-}
-
-function openWithdrawModal() { document.getElementById("withdrawModal").classList.add("open"); }
-function closeWithdrawModal() { document.getElementById("withdrawModal").classList.remove("open"); }
-
-function togglePaymentFields() {
-  const method = document.getElementById("withdrawMethod").value;
-  document.getElementById("upiFields").classList.toggle("hidden", method !== "UPI");
-  document.getElementById("bankFields").classList.toggle("hidden", method !== "Bank Account");
-}
-
-async function handleWithdraw(e) {
-  e.preventDefault();
-  const btn = document.getElementById("btnWithdrawSubmit");
-  btn.disabled = true; btn.textContent = "Processing...";
-
-  const method = document.getElementById("withdrawMethod").value;
-  const amount = Number(document.getElementById("withdrawAmount").value);
-  
-  let paymentDetails = {};
-  if (method === "UPI") {
-    paymentDetails = { upiId: document.getElementById("withdrawUpiId").value };
-  } else {
-    paymentDetails = {
-      accountHolderName: document.getElementById("withdrawBankName").value,
-      accountNumber: document.getElementById("withdrawAccNo").value,
-      ifscCode: document.getElementById("withdrawIfsc").value,
-      bankName: document.getElementById("withdrawBank").value
-    };
-  }
-
-  try {
-    const res = await api("/api/withdraw", {
-      method: "POST",
-      body: JSON.stringify({ amount, method, paymentDetails })
-    });
-    alert(res.message);
-    closeWithdrawModal();
-    renderWalletView();
-  } catch (err) {
-    alert(err.message);
-  } finally {
-    btn.disabled = false; btn.textContent = "Submit Request";
-  }
-}
-
-/* 4. PROFILE VIEW & UPDATES */
-async function renderProfileView() {
-  if (!currentUser) return openAuth("login");
-  setActiveNav("profile");
-
-  const app = document.getElementById("appContent");
-  app.innerHTML = `
-    <div class="card" style="max-width:600px; margin:0 auto;">
-      <h2>User Profile 👤</h2>
-      <div id="profileNotice" class="hidden"></div>
-      
-      <form onsubmit="saveProfile(event)">
-        <label>Full Name</label>
-        <input id="profName" type="text" required value="${escapeHtml(currentUser.name)}">
-        <br><br>
-        <label>Email Address</label>
-        <input type="text" disabled value="${escapeHtml(currentUser.email)}" style="background:#f1f3f7;">
-        <span class="muted" style="font-size:12px;">Email cannot be changed directly.</span>
-        <br><br>
-        <label>Mobile Number</label>
-        <input id="profMobile" type="tel" value="${escapeHtml(currentUser.mobile)}" placeholder="+919876543210">
-        <span class="muted" style="font-size:12px;">
-          Status: ${currentUser.mobileVerified ? '✅ Verified' : '❌ Not Verified'}
-        </span>
-        <br><br>
-        <label>City</label>
-        <input id="profCity" type="text" required value="${escapeHtml(currentUser.city)}">
-        <br><br>
-        <button class="primary" type="submit" id="btnSaveProfile">Save Profile</button>
-      </form>
-    </div>
-  `;
-}
-
-async function saveProfile(e) {
-  e.preventDefault();
-  const btn = document.getElementById("btnSaveProfile");
-  btn.disabled = true; btn.textContent = "Saving...";
-
-  try {
-    const data = await api("/api/profile", {
-      method: "PUT",
-      body: JSON.stringify({
-        name: document.getElementById("profName").value,
-        mobile: document.getElementById("profMobile").value,
-        city: document.getElementById("profCity").value
-      })
-    });
-
-    if (data.verificationRequired) {
-      isProfileVerification = true;
-      openOtpModal("mobile", currentUser.email, document.getElementById("profMobile").value);
-    } else {
-      currentUser = data.user;
-      alert(data.message || "Profile updated.");
-      renderProfileView();
+      `).join('');
     }
-  } catch (err) {
-    alert(err.message);
-  } finally {
-    btn.disabled = false; btn.textContent = "Save Profile";
-  }
-}
 
-/* SESSION & LOGOUT */
-async function logoutUser() {
-  try { await api("/api/logout", { method: "POST" }); } catch {}
-  currentUser = null;
-  updateNavigationUI();
-  document.getElementById("appArea").classList.add("hidden");
-  document.getElementById("authArea").classList.add("hidden");
-  document.getElementById("homeArea").classList.remove("hidden");
-}
-
-async function checkSession() {
-  try {
-    const user = await api("/api/me");
-    if (user && user.id) {
-      currentUser = user;
-      updateNavigationUI();
-      renderTasksView();
-    } else {
+    async function logout() {
+      await api("/api/logout", { method: "POST" });
       currentUser = null;
       updateNavigationUI();
-      document.getElementById("appArea").classList.add("hidden");
-      document.getElementById("authArea").classList.add("hidden");
-      document.getElementById("homeArea").classList.remove("hidden");
+      showAuthMode("login");
     }
-  } catch {
-    currentUser = null;
-    updateNavigationUI();
-    document.getElementById("appArea").classList.add("hidden");
-    document.getElementById("authArea").classList.add("hidden");
-    document.getElementById("homeArea").classList.remove("hidden");
-  }
-}
 
-document.addEventListener("DOMContentLoaded", () => {
-  checkSession();
-});
-</script>
+    document.addEventListener("DOMContentLoaded", checkSession);
+  </script>
 </body>
 </html>
