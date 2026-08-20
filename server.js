@@ -4,25 +4,41 @@ const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
+const nodemailer = require("nodemailer");
 
 const app = express();
 
 app.set("trust proxy", 1);
-app.get("/api/google-config", (req, res) => {
-  res.json({
-    clientId:
-      process.env.GOOGLE_CLIENT_ID || ""
-  });
-});
+
 app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: true, limit: "100kb" }));
 
 /* =====================================================
-   DATABASE
+   CONFIGURATION
 ===================================================== */
+
+const PORT = Number(process.env.PORT) || 10000;
 
 const DATA_DIR = path.join(__dirname, "data");
 const DB_FILE = path.join(DATA_DIR, "database.json");
+
+const SESSION_SECRET =
+  process.env.SESSION_SECRET ||
+  "CHANGE_THIS_TASKEARN_SECRET_2026";
+
+const GMAIL_USER =
+  process.env.GMAIL_USER ||
+  "taskearn.otp@gmail.com";
+
+const GMAIL_APP_PASSWORD =
+  process.env.GMAIL_APP_PASSWORD || "";
+
+const GOOGLE_CLIENT_ID =
+  process.env.GOOGLE_CLIENT_ID || "";
+
+/* =====================================================
+   DATABASE
+===================================================== */
 
 if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -113,10 +129,18 @@ function loadDB() {
       user.mobileVerified ??= false;
 
       user.googleId ??= "";
-      user.authProvider ??= user.googleId ? "google" : "local";
+      user.authProvider ??=
+        user.googleId ? "google" : "local";
 
       user.balance ??= 0;
       user.role ??= "Member";
+
+      /*
+        IMPORTANT:
+        We intentionally keep passwordHash.
+        Plain password is never stored.
+      */
+      user.passwordHash ??= "";
     });
 
     return database;
@@ -128,7 +152,10 @@ function loadDB() {
     try {
       saveDB(database);
     } catch (saveError) {
-      console.error("Database recovery error:", saveError);
+      console.error(
+        "Database recovery error:",
+        saveError
+      );
     }
 
     return database;
@@ -141,13 +168,9 @@ let db = loadDB();
    SESSION
 ===================================================== */
 
-const sessionSecret =
-  process.env.SESSION_SECRET ||
-  "CHANGE_THIS_TASKEARN_SECRET_2026";
-
 app.use(
   session({
-    secret: sessionSecret,
+    secret: SESSION_SECRET,
 
     resave: false,
 
@@ -155,6 +178,7 @@ app.use(
 
     cookie: {
       httpOnly: true,
+
       sameSite: "lax",
 
       secure:
@@ -171,11 +195,11 @@ app.use(
 );
 
 /* =====================================================
-   HELPERS
+   GENERAL HELPERS
 ===================================================== */
 
 function cleanText(value, maxLength = 200) {
-  return String(value || "")
+  return String(value ?? "")
     .trim()
     .slice(0, maxLength);
 }
@@ -200,7 +224,9 @@ function validMobile(mobile) {
 }
 
 function publicUser(user) {
-  if (!user) return null;
+  if (!user) {
+    return null;
+  }
 
   return {
     id: user.id,
@@ -210,10 +236,18 @@ function publicUser(user) {
     mobile: user.mobile || "",
     city: user.city || "",
     profileImage: user.profileImage || "",
-    emailVerified: Boolean(user.emailVerified),
-    mobileVerified: Boolean(user.mobileVerified),
-    authProvider: user.authProvider || "local",
-    createdAt: user.createdAt
+
+    emailVerified:
+      Boolean(user.emailVerified),
+
+    mobileVerified:
+      Boolean(user.mobileVerified),
+
+    authProvider:
+      user.authProvider || "local",
+
+    createdAt:
+      user.createdAt
   };
 }
 
@@ -244,8 +278,21 @@ function requireLogin(req, res, next) {
   }
 
   req.user = user;
+
   next();
 }
+
+/* =====================================================
+   OTP HELPERS
+===================================================== */
+
+const OTP_EXPIRY_MS =
+  10 * 60 * 1000;
+
+const OTP_RESEND_MS =
+  60 * 1000;
+
+const OTP_MAX_ATTEMPTS = 5;
 
 function randomOtp() {
   return String(
@@ -275,38 +322,16 @@ function safeCompare(a, b) {
 }
 
 /* =====================================================
-   OTP SETTINGS
+   EMAIL SMTP
 ===================================================== */
-
-const OTP_EXPIRY_MS =
-  10 * 60 * 1000;
-
-const OTP_RESEND_MS =
-  60 * 1000;
-
-const OTP_MAX_ATTEMPTS = 5;
-
-/* =====================================================
-   EMAIL OTP - GMAIL SMTP
-===================================================== */
-
-const nodemailer = require("nodemailer");
-
-const gmailUser =
-  process.env.GMAIL_USER ||
-  "taskearn.otp@gmail.com";
-
-const gmailAppPassword =
-  process.env.GMAIL_APP_PASSWORD || "";
 
 const mailTransporter =
   nodemailer.createTransport({
     service: "gmail",
 
     auth: {
-      user: gmailUser,
-
-      pass: gmailAppPassword
+      user: GMAIL_USER,
+      pass: GMAIL_APP_PASSWORD
     }
   });
 
@@ -316,8 +341,8 @@ async function sendEmailOtp(
   purpose
 ) {
   if (
-    !gmailUser ||
-    !gmailAppPassword
+    !GMAIL_USER ||
+    !GMAIL_APP_PASSWORD
   ) {
     throw new Error(
       "Gmail email service is not configured."
@@ -327,68 +352,108 @@ async function sendEmailOtp(
   const subject =
     purpose === "login"
       ? "TaskEarn Login Verification Code"
+      : purpose === "profile"
+      ? "TaskEarn Mobile Verification"
       : "TaskEarn Email Verification Code";
 
   const html = `
-    <div style="
-      font-family:Arial,sans-serif;
-      max-width:600px;
-      margin:auto;
-      padding:25px;
-      color:#171b2d;
-      background:#ffffff;
-    ">
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>TaskEarn Verification</title>
+</head>
 
-      <h2 style="color:#171b2d;">
-        TaskEarn Email Verification
-      </h2>
+<body style="
+margin:0;
+padding:0;
+background:#f4f6f8;
+font-family:Arial,Helvetica,sans-serif;
+">
 
-      <p>
-        Your TaskEarn verification code is:
-      </p>
+<div style="
+max-width:600px;
+margin:30px auto;
+background:#ffffff;
+border-radius:16px;
+padding:30px;
+box-shadow:0 4px 20px rgba(0,0,0,0.08);
+">
 
-      <div style="
-        font-size:32px;
-        font-weight:900;
-        letter-spacing:8px;
-        margin:20px 0;
-        padding:15px;
-        background:#f3f4f6;
-        border-radius:10px;
-        text-align:center;
-      ">
-        ${otp}
-      </div>
+<h1 style="
+margin:0 0 10px;
+color:#171b2d;
+">
+TaskEarn
+</h1>
 
-      <p>
-        This code expires in 10 minutes.
-      </p>
+<h2 style="
+color:#222;
+">
+Verification Code
+</h2>
 
-      <p>
-        If you did not request this code,
-        you can safely ignore this email.
-      </p>
+<p style="
+font-size:16px;
+color:#555;
+">
+Your TaskEarn verification code is:
+</p>
 
-      <hr>
+<div style="
+font-size:34px;
+font-weight:900;
+letter-spacing:10px;
+text-align:center;
+background:#f1f3f5;
+border-radius:12px;
+padding:20px;
+margin:25px 0;
+color:#111827;
+">
+${otp}
+</div>
 
-      <p style="
-        color:#777;
-        font-size:12px;
-      ">
-        TaskEarn Security Team
-      </p>
+<p style="
+font-size:14px;
+color:#666;
+">
+This verification code expires in
+<strong>10 minutes</strong>.
+</p>
 
-    </div>
-  `;
+<p style="
+font-size:14px;
+color:#666;
+">
+If you did not request this code,
+you can safely ignore this email.
+</p>
+
+<hr style="
+border:none;
+border-top:1px solid #eee;
+margin:25px 0;
+">
+
+<p style="
+font-size:12px;
+color:#999;
+">
+TaskEarn Security Team
+</p>
+
+</div>
+
+</body>
+</html>
+`;
 
   try {
     await mailTransporter.sendMail({
-      from: `"TaskEarn" <${gmailUser}>`,
-
+      from: `"TaskEarn" <${GMAIL_USER}>`,
       to: email,
-
       subject,
-
       html
     });
 
@@ -408,7 +473,7 @@ async function sendEmailOtp(
 }
 
 /* =====================================================
-   SMS OTP
+   SMS OTP - TWILIO
 ===================================================== */
 
 async function sendSmsOtp(
@@ -424,7 +489,11 @@ async function sendSmsOtp(
   const from =
     process.env.TWILIO_PHONE_NUMBER;
 
-  if (!sid || !token || !from) {
+  if (
+    !sid ||
+    !token ||
+    !from
+  ) {
     throw new Error(
       "Mobile verification service is not configured. Please contact the administrator."
     );
@@ -438,7 +507,10 @@ async function sendSmsOtp(
   const params =
     new URLSearchParams();
 
-  params.append("To", mobile);
+  params.append(
+    "To",
+    mobile
+  );
 
   params.append(
     "From",
@@ -450,24 +522,26 @@ async function sendSmsOtp(
     `TaskEarn verification code: ${otp}. This code expires in 10 minutes.`
   );
 
-  const response = await fetch(
-    `https://api.twilio.com/2010-04-01/Accounts/${encodeURIComponent(
-      sid
-    )}/Messages.json`,
-    {
-      method: "POST",
+  const response =
+    await fetch(
+      `https://api.twilio.com/2010-04-01/Accounts/${encodeURIComponent(
+        sid
+      )}/Messages.json`,
+      {
+        method: "POST",
 
-      headers: {
-        Authorization:
-          "Basic " + auth,
+        headers: {
+          Authorization:
+            "Basic " + auth,
 
-        "Content-Type":
-          "application/x-www-form-urlencoded"
-      },
+          "Content-Type":
+            "application/x-www-form-urlencoded"
+        },
 
-      body: params.toString()
-    }
-  );
+        body:
+          params.toString()
+      }
+    );
 
   if (!response.ok) {
     const text =
@@ -485,7 +559,7 @@ async function sendSmsOtp(
 }
 
 /* =====================================================
-   OTP RECORDS
+   OTP DATABASE
 ===================================================== */
 
 function createOtpRecord(
@@ -497,7 +571,8 @@ function createOtpRecord(
   const now = Date.now();
 
   const record = {
-    userId: user.id,
+    userId:
+      user.id,
 
     type,
 
@@ -514,7 +589,8 @@ function createOtpRecord(
         now + OTP_EXPIRY_MS
       ).toISOString(),
 
-    attempts: 0,
+    attempts:
+      0,
 
     lastSentAt:
       new Date(now).toISOString()
@@ -592,25 +668,28 @@ async function sendOtpFor(
       purpose
     );
 
-  if (existing && !force) {
+  if (
+    existing &&
+    !force
+  ) {
     const lastSent =
       new Date(
         existing.lastSentAt
       ).getTime();
 
-    if (
+    const elapsed =
       Date.now() -
-        lastSent <
+      lastSent;
+
+    if (
+      elapsed <
       OTP_RESEND_MS
     ) {
       const remaining =
         Math.ceil(
           (
             OTP_RESEND_MS -
-            (
-              Date.now() -
-              lastSent
-            )
+            elapsed
           ) / 1000
         );
 
@@ -651,14 +730,28 @@ async function startVerification(
   purpose
 ) {
   req.session.verification = {
-    userId: user.id,
+    userId:
+      user.id,
+
     purpose,
+
     emailVerified:
-      Boolean(user.emailVerified),
+      Boolean(
+        user.emailVerified
+      ),
+
     mobileVerified:
-      Boolean(user.mobileVerified),
-    createdAt: Date.now()
+      Boolean(
+        user.mobileVerified
+      ),
+
+    createdAt:
+      Date.now()
   };
+
+  /*
+    EMAIL FIRST
+  */
 
   if (!user.emailVerified) {
     await sendOtpFor(
@@ -673,6 +766,10 @@ async function startVerification(
 
     return "email";
   }
+
+  /*
+    MOBILE SECOND
+  */
 
   if (!user.mobileVerified) {
     await sendOtpFor(
@@ -717,16 +814,13 @@ function completeLogin(
 }
 
 /* =====================================================
-   GOOGLE SIGN-IN
+   GOOGLE TOKEN VERIFICATION
 ===================================================== */
 
 async function verifyGoogleIdToken(
   idToken
 ) {
-  const clientId =
-    process.env.GOOGLE_CLIENT_ID;
-
-  if (!clientId) {
+  if (!GOOGLE_CLIENT_ID) {
     throw new Error(
       "Google Sign-In is not configured. Please add GOOGLE_CLIENT_ID."
     );
@@ -740,7 +834,9 @@ async function verifyGoogleIdToken(
 
   const url =
     "https://oauth2.googleapis.com/tokeninfo?id_token=" +
-    encodeURIComponent(idToken);
+    encodeURIComponent(
+      idToken
+    );
 
   const response =
     await fetch(url);
@@ -755,7 +851,8 @@ async function verifyGoogleIdToken(
     await response.json();
 
   if (
-    data.aud !== clientId
+    data.aud !==
+    GOOGLE_CLIENT_ID
   ) {
     throw new Error(
       "Google client ID does not match."
@@ -773,7 +870,11 @@ async function verifyGoogleIdToken(
     );
   }
 
-  if (!validEmail(data.email)) {
+  if (
+    !validEmail(
+      data.email
+    )
+  ) {
     throw new Error(
       "Google account email is invalid."
     );
@@ -807,6 +908,20 @@ async function verifyGoogleIdToken(
 }
 
 /* =====================================================
+   GOOGLE CONFIG
+===================================================== */
+
+app.get(
+  "/api/google-config",
+  (req, res) => {
+    return res.json({
+      clientId:
+        GOOGLE_CLIENT_ID
+    });
+  }
+);
+
+/* =====================================================
    GOOGLE LOGIN / REGISTER
 ===================================================== */
 
@@ -823,9 +938,18 @@ app.post(
         db.users.find(
           (u) =>
             u.googleId &&
-            String(u.googleId) ===
-              String(google.googleId)
+            String(
+              u.googleId
+            ) ===
+              String(
+                google.googleId
+              )
         );
+
+      /*
+        If Google ID is not found,
+        try matching email.
+      */
 
       if (!user) {
         user =
@@ -833,9 +957,14 @@ app.post(
             (u) =>
               normalizeEmail(
                 u.email
-              ) === google.email
+              ) ===
+              google.email
           );
       }
+
+      /*
+        NEW GOOGLE USER
+      */
 
       if (!user) {
         user = {
@@ -848,6 +977,10 @@ app.post(
           email:
             google.email,
 
+          /*
+            Google account does not
+            require a local password.
+          */
           passwordHash:
             "",
 
@@ -866,6 +999,10 @@ app.post(
           emailVerified:
             true,
 
+          /*
+            Google does NOT automatically
+            verify the user's mobile number.
+          */
           mobileVerified:
             false,
 
@@ -884,6 +1021,10 @@ app.post(
 
         db.users.push(user);
       } else {
+        /*
+          EXISTING USER
+        */
+
         user.googleId =
           google.googleId;
 
@@ -913,14 +1054,18 @@ app.post(
       saveDB(db);
 
       /*
-        Google has already verified
+        IMPORTANT:
+        Google already verified
         the Gmail address.
 
-        We therefore do NOT ask for
-        Email OTP again.
+        Therefore:
+        - No Email OTP
+        - No password
+        - Direct Google login
 
-        We also do NOT force mobile OTP
-        for Google login.
+        Mobile OTP is NOT forced here,
+        because Google users may not have
+        a mobile number yet.
       */
 
       completeLogin(
@@ -955,18 +1100,21 @@ app.post(
 );
 
 /* =====================================================
-   BASIC ROUTES
+   STATIC WEBSITE
 ===================================================== */
 
-app.get("/", (req, res) => {
-  res.sendFile(
-    path.join(
-      __dirname,
-      "public",
-      "index.html"
-    )
-  );
-});
+app.get(
+  "/",
+  (req, res) => {
+    res.sendFile(
+      path.join(
+        __dirname,
+        "public",
+        "index.html"
+      )
+    );
+  }
+);
 
 app.use(
   express.static(
@@ -1025,21 +1173,27 @@ app.post(
         });
       }
 
-      if (!validEmail(email)) {
+      if (
+        !validEmail(email)
+      ) {
         return res.status(400).json({
           error:
             "Please enter a valid email address."
         });
       }
 
-      if (!validMobile(mobile)) {
+      if (
+        !validMobile(mobile)
+      ) {
         return res.status(400).json({
           error:
             "Please enter a valid mobile number."
         });
       }
 
-      if (password.length < 6) {
+      if (
+        password.length < 6
+      ) {
         return res.status(400).json({
           error:
             "Password must contain at least 6 characters."
@@ -1057,7 +1211,7 @@ app.post(
       if (existingEmail) {
         return res.status(409).json({
           error:
-            "An account with this email already exists. Please login with Google or your password."
+            "An account with this email already exists. Please login."
         });
       }
 
@@ -1073,6 +1227,11 @@ app.post(
             "This mobile number is already registered."
         });
       }
+
+      /*
+        NEVER store plain password.
+        Only bcrypt hash is stored.
+      */
 
       const passwordHash =
         await bcrypt.hash(
@@ -1128,12 +1287,33 @@ app.post(
           req.body.remember
         );
 
-      const step =
-        await startVerification(
-          req,
-          user,
-          "register"
-        );
+      let step;
+
+      try {
+        step =
+          await startVerification(
+            req,
+            user,
+            "register"
+          );
+      } catch (otpError) {
+        /*
+          Remove newly created user
+          if the first OTP could not
+          be sent.
+        */
+
+        db.users =
+          db.users.filter(
+            (u) =>
+              String(u.id) !==
+              String(user.id)
+          );
+
+        saveDB(db);
+
+        throw otpError;
+      }
 
       return res.json({
         verificationRequired:
@@ -1185,7 +1365,10 @@ app.post(
           req.body.remember
         );
 
-      if (!email || !password) {
+      if (
+        !email ||
+        !password
+      ) {
         return res.status(400).json({
           error:
             "Please enter email and password."
@@ -1208,11 +1391,12 @@ app.post(
       }
 
       /*
-        Google-only account does not have
-        a local password.
+        Google-only account
       */
 
-      if (!user.passwordHash) {
+      if (
+        !user.passwordHash
+      ) {
         return res.status(401).json({
           error:
             "This account uses Google Sign-In. Please continue with Google."
@@ -1234,6 +1418,27 @@ app.post(
 
       req.session.remember =
         remember;
+
+      /*
+        If both verification states
+        are already true, login directly.
+      */
+
+      if (
+        user.emailVerified &&
+        user.mobileVerified
+      ) {
+        completeLogin(
+          req,
+          user,
+          remember
+        );
+
+        return res.json({
+          user:
+            publicUser(user)
+        });
+      }
 
       const step =
         await startVerification(
@@ -1286,7 +1491,7 @@ app.post(
 );
 
 /* =====================================================
-   VERIFY OTP
+   VERIFY LOGIN / REGISTER OTP
 ===================================================== */
 
 app.post(
@@ -1334,6 +1539,16 @@ app.post(
 
       const step =
         verification.step;
+
+      if (
+        step !== "email" &&
+        step !== "mobile"
+      ) {
+        return res.status(400).json({
+          error:
+            "Invalid verification step."
+        });
+      }
 
       const record =
         getOtpRecord(
@@ -1406,15 +1621,34 @@ app.post(
         verification.purpose
       );
 
-      if (step === "email") {
+      /*
+        EMAIL VERIFIED
+      */
+
+      if (
+        step === "email"
+      ) {
         user.emailVerified =
           true;
-      } else {
+      }
+
+      /*
+        MOBILE VERIFIED
+      */
+
+      if (
+        step === "mobile"
+      ) {
         user.mobileVerified =
           true;
       }
 
       saveDB(db);
+
+      /*
+        EMAIL SUCCESS
+        -> SEND MOBILE OTP
+      */
 
       if (
         step === "email" &&
@@ -1451,12 +1685,20 @@ app.post(
         });
       }
 
+      /*
+        BOTH VERIFIED
+        -> LOGIN
+      */
+
+      const remember =
+        Boolean(
+          req.session.remember
+        );
+
       completeLogin(
         req,
         user,
-        Boolean(
-          req.session.remember
-        )
+        remember
       );
 
       saveDB(db);
@@ -1662,9 +1904,12 @@ app.put(
       }
 
       const mobileChanged =
-        mobile !== user.mobile;
+        mobile !==
+        user.mobile;
 
-      if (mobileChanged) {
+      if (
+        mobileChanged
+      ) {
         if (!mobile) {
           user.mobile =
             "";
@@ -1705,6 +1950,11 @@ app.put(
         profileImage;
 
       saveDB(db);
+
+      /*
+        If mobile was changed,
+        verify the new number.
+      */
 
       if (
         mobileChanged &&
@@ -1776,7 +2026,7 @@ app.put(
 );
 
 /* =====================================================
-   PROFILE MOBILE OTP VERIFICATION
+   PROFILE MOBILE OTP VERIFY
 ===================================================== */
 
 app.post(
@@ -2232,7 +2482,9 @@ app.post(
         });
       }
 
-      if (amount < 100) {
+      if (
+        amount < 100
+      ) {
         return res.status(400).json({
           error:
             "Minimum withdrawal amount is ₹100."
@@ -2263,7 +2515,13 @@ app.post(
 
       let paymentDetails;
 
-      if (method === "UPI") {
+      /*
+        UPI
+      */
+
+      if (
+        method === "UPI"
+      ) {
         const upiId =
           cleanText(
             details.upiId,
@@ -2284,7 +2542,13 @@ app.post(
         paymentDetails = {
           upiId
         };
-      } else {
+      }
+
+      /*
+        BANK
+      */
+
+      else {
         const accountHolderName =
           cleanText(
             details.accountHolderName,
@@ -2334,11 +2598,18 @@ app.post(
 
         paymentDetails = {
           accountHolderName,
+
           accountNumber,
+
           ifscCode,
+
           bankName
         };
       }
+
+      /*
+        Deduct balance
+      */
 
       req.user.balance =
         Number(
@@ -2410,7 +2681,21 @@ app.get(
 );
 
 /* =====================================================
-   ERROR HANDLER
+   404 API HANDLER
+===================================================== */
+
+app.use(
+  "/api",
+  (req, res) => {
+    return res.status(404).json({
+      error:
+        "API endpoint not found."
+    });
+  }
+);
+
+/* =====================================================
+   GENERAL ERROR HANDLER
 ===================================================== */
 
 app.use(
@@ -2425,7 +2710,9 @@ app.use(
       err
     );
 
-    if (res.headersSent) {
+    if (
+      res.headersSent
+    ) {
       return next(err);
     }
 
@@ -2437,12 +2724,8 @@ app.use(
 );
 
 /* =====================================================
-   SERVER
+   START SERVER
 ===================================================== */
-
-const PORT =
-  process.env.PORT ||
-  10000;
 
 app.listen(
   PORT,
@@ -2450,6 +2733,28 @@ app.listen(
   () => {
     console.log(
       `TaskEarn server running on port ${PORT}`
+    );
+
+    console.log(
+      `Gmail OTP account: ${GMAIL_USER}`
+    );
+
+    console.log(
+      `Google Login configured: ${
+        GOOGLE_CLIENT_ID
+          ? "YES"
+          : "NO"
+      }`
+    );
+
+    console.log(
+      `Mobile OTP configured: ${
+        process.env.TWILIO_ACCOUNT_SID &&
+        process.env.TWILIO_AUTH_TOKEN &&
+        process.env.TWILIO_PHONE_NUMBER
+          ? "YES"
+          : "NO"
+      }`
     );
   }
 );
