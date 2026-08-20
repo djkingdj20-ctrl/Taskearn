@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+
 <title>TaskEarn</title>
 
 <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -15,15 +16,16 @@
 html,body{
   margin:0;
   padding:0;
+  min-height:100%;
   font-family:Arial,Helvetica,sans-serif;
-  background:#f5f7fb;
-  color:#171a21;
+  background:#f6f7fb;
+  color:#171717;
 }
 
 button,
 input,
 select{
-  font:inherit;
+  font-family:inherit;
 }
 
 button{
@@ -31,29 +33,30 @@ button{
 }
 
 .hidden{
-  display:none !important;
+  display:none!important;
 }
 
-/* =========================
+/* ==============================
    HEADER
-========================= */
+============================== */
 
-.header{
-  background:linear-gradient(135deg,#ff5d2e,#ff2f68);
+header{
+  background:linear-gradient(135deg,#ff5d2e,#ff7b39);
   color:white;
   padding:18px 20px;
   position:sticky;
   top:0;
-  z-index:50;
-  box-shadow:0 3px 15px rgba(0,0,0,.15);
+  z-index:100;
+  box-shadow:0 4px 15px rgba(0,0,0,.12);
 }
 
 .header-inner{
   max-width:1100px;
   margin:auto;
   display:flex;
-  justify-content:space-between;
   align-items:center;
+  justify-content:space-between;
+  gap:15px;
 }
 
 .logo{
@@ -67,72 +70,66 @@ button{
   gap:10px;
 }
 
-.avatar-small{
+.avatar{
   width:38px;
   height:38px;
   border-radius:50%;
-  object-fit:cover;
   background:white;
-  color:#ff4d3a;
+  color:#ff5d2e;
   display:flex;
-  justify-content:center;
   align-items:center;
+  justify-content:center;
   font-weight:bold;
+  overflow:hidden;
 }
 
-/* =========================
-   MAIN
-========================= */
+.avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+/* ==============================
+   CONTAINER
+============================== */
 
 .container{
+  width:100%;
   max-width:1100px;
   margin:auto;
-  padding:25px 16px 90px;
+  padding:25px 16px 100px;
 }
 
-.card{
-  background:#fff;
-  border-radius:18px;
-  padding:22px;
-  margin-bottom:18px;
-  box-shadow:0 5px 25px rgba(0,0,0,.06);
-}
-
-h1,h2,h3{
-  margin-top:0;
-}
-
-/* =========================
+/* ==============================
    AUTH
-========================= */
+============================== */
 
-.auth-wrapper{
+.auth-screen{
   min-height:100vh;
   display:flex;
-  align-items:center;
   justify-content:center;
+  align-items:center;
   padding:20px;
   background:
-    radial-gradient(circle at top left,#ffe2d8,transparent 35%),
-    radial-gradient(circle at bottom right,#ffdbe7,transparent 35%),
-    #f5f7fb;
+    radial-gradient(circle at top right,#ffe4da,transparent 35%),
+    #f6f7fb;
 }
 
 .auth-card{
   width:100%;
-  max-width:460px;
-  background:white;
-  border-radius:24px;
+  max-width:430px;
+  background:#fff;
+  border-radius:22px;
   padding:28px;
-  box-shadow:0 15px 50px rgba(0,0,0,.10);
+  box-shadow:0 12px 45px rgba(0,0,0,.10);
 }
 
 .auth-logo{
   text-align:center;
-  font-size:34px;
+  font-size:32px;
   font-weight:900;
-  color:#ff4c39;
-  margin-bottom:5px;
+  color:#ff5d2e;
+  margin-bottom:8px;
 }
 
 .auth-subtitle{
@@ -141,41 +138,67 @@ h1,h2,h3{
   margin-bottom:25px;
 }
 
+.auth-tabs{
+  display:flex;
+  background:#f2f3f6;
+  padding:4px;
+  border-radius:12px;
+  margin-bottom:22px;
+}
+
+.auth-tab{
+  flex:1;
+  border:0;
+  background:transparent;
+  padding:12px;
+  border-radius:9px;
+  font-weight:bold;
+  color:#777;
+}
+
+.auth-tab.active{
+  background:white;
+  color:#ff5d2e;
+  box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+
 .form-group{
   margin-bottom:15px;
 }
 
-label{
+.form-group label{
   display:block;
-  font-weight:700;
   font-size:14px;
+  font-weight:bold;
   margin-bottom:7px;
 }
 
-input,
-select{
+.form-group input,
+.form-group select{
   width:100%;
   padding:13px 14px;
   border:1px solid #ddd;
   border-radius:11px;
   outline:none;
+  font-size:15px;
   background:#fff;
 }
 
-input:focus,
-select:focus{
-  border-color:#ff5938;
-  box-shadow:0 0 0 3px rgba(255,89,56,.10);
+.form-group input:focus,
+.form-group select:focus{
+  border-color:#ff5d2e;
+  box-shadow:0 0 0 3px rgba(255,93,46,.10);
 }
 
 .primary-btn{
   width:100%;
   border:0;
   border-radius:12px;
+  background:linear-gradient(135deg,#ff5d2e,#ff7b39);
+  color:white;
   padding:14px;
-  background:linear-gradient(135deg,#ff5d2e,#ff2f68);
-  color:#fff;
-  font-weight:800;
+  font-size:16px;
+  font-weight:bold;
   margin-top:5px;
 }
 
@@ -184,234 +207,181 @@ select:focus{
   cursor:not-allowed;
 }
 
-.secondary-btn{
+.google-btn{
   width:100%;
   border:1px solid #ddd;
+  background:white;
   border-radius:12px;
   padding:13px;
-  background:#fff;
-  font-weight:700;
-}
-
-.google-box{
-  margin:18px 0;
+  margin-top:12px;
+  font-weight:bold;
   display:flex;
   justify-content:center;
+  align-items:center;
+  gap:10px;
 }
 
 .divider{
   display:flex;
   align-items:center;
   gap:10px;
-  margin:18px 0;
   color:#999;
+  margin:18px 0;
   font-size:13px;
 }
 
-.divider::before,
-.divider::after{
+.divider:before,
+.divider:after{
   content:"";
-  flex:1;
   height:1px;
   background:#ddd;
+  flex:1;
 }
 
-.auth-switch{
-  text-align:center;
-  margin-top:20px;
-  color:#666;
-}
-
-.link-btn{
-  border:0;
-  background:none;
-  color:#ff4c39;
-  font-weight:800;
-}
-
-/* =========================
-   ALERT
-========================= */
-
-.alert{
-  padding:12px 14px;
+.auth-message{
+  margin-top:14px;
+  padding:12px;
   border-radius:10px;
-  margin-bottom:15px;
   font-size:14px;
-  font-weight:600;
+  display:none;
 }
 
-.alert.error{
-  background:#ffe9e9;
-  color:#b42318;
+.auth-message.error{
+  display:block;
+  background:#fff0ef;
+  color:#c62828;
 }
 
-.alert.success{
-  background:#e7f8ed;
-  color:#147a3e;
+.auth-message.success{
+  display:block;
+  background:#ecfff3;
+  color:#18864b;
 }
 
-/* =========================
-   DASHBOARD
-========================= */
+/* ==============================
+   APP
+============================== */
 
-.hero{
-  background:linear-gradient(135deg,#ff5d2e,#ff2f68);
-  color:#fff;
-  border-radius:22px;
-  padding:25px;
-  margin-bottom:20px;
+#appScreen{
+  display:none;
 }
 
-.hero h1{
-  margin-bottom:8px;
+.page-title{
+  font-size:26px;
+  margin:0 0 6px;
 }
 
-.stats{
+.page-subtitle{
+  color:#777;
+  margin:0 0 22px;
+}
+
+/* ==============================
+   CARDS
+============================== */
+
+.card{
+  background:white;
+  border-radius:18px;
+  padding:20px;
+  box-shadow:0 5px 20px rgba(0,0,0,.06);
+  margin-bottom:18px;
+}
+
+.stats-grid{
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:15px;
+  margin-bottom:20px;
 }
 
-.stat{
+.stat-card{
   background:white;
-  border-radius:16px;
-  padding:18px;
-  box-shadow:0 5px 20px rgba(0,0,0,.05);
+  padding:20px;
+  border-radius:18px;
+  box-shadow:0 5px 20px rgba(0,0,0,.06);
 }
 
-.stat-title{
+.stat-label{
   color:#777;
   font-size:13px;
 }
 
 .stat-value{
-  font-size:25px;
-  font-weight:900;
+  font-size:26px;
+  font-weight:800;
   margin-top:7px;
+  color:#ff5d2e;
 }
 
-/* =========================
+/* ==============================
    TASKS
-========================= */
+============================== */
 
 .task-grid{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:16px;
+  gap:18px;
 }
 
 .task-card{
-  background:#fff;
-  border-radius:17px;
+  background:white;
+  border-radius:18px;
   padding:20px;
-  box-shadow:0 5px 20px rgba(0,0,0,.05);
+  box-shadow:0 5px 20px rgba(0,0,0,.06);
   display:flex;
   flex-direction:column;
 }
 
 .task-type{
   display:inline-block;
-  background:#fff0eb;
-  color:#ff4c39;
-  border-radius:20px;
+  align-self:flex-start;
+  background:#fff0ea;
+  color:#ff5d2e;
   padding:6px 10px;
+  border-radius:20px;
   font-size:12px;
-  font-weight:800;
-  margin-bottom:10px;
+  font-weight:bold;
+  margin-bottom:12px;
 }
 
-.task-card h3{
+.task-title{
+  font-size:18px;
+  font-weight:bold;
   margin-bottom:8px;
 }
 
 .task-description{
-  color:#666;
-  line-height:1.5;
+  color:#777;
   font-size:14px;
+  line-height:1.5;
   flex:1;
 }
 
-.reward{
-  font-size:22px;
-  font-weight:900;
-  color:#1b9a55;
+.task-reward{
+  font-size:21px;
+  font-weight:800;
+  color:#159447;
   margin:15px 0;
 }
 
-/* =========================
-   PROFILE
-========================= */
-
-.profile-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:15px;
-}
-
-/* =========================
-   WALLET
-========================= */
-
-.balance-card{
-  background:linear-gradient(135deg,#111827,#374151);
-  color:#fff;
-  border-radius:20px;
-  padding:25px;
-}
-
-.balance{
-  font-size:38px;
-  font-weight:900;
-  margin-top:8px;
-}
-
-/* =========================
-   TABLE
-========================= */
-
-.table-wrap{
-  overflow-x:auto;
-}
-
-table{
+.small-btn{
   width:100%;
-  border-collapse:collapse;
+  padding:11px;
+  border:0;
+  border-radius:10px;
+  background:#ff5d2e;
+  color:white;
+  font-weight:bold;
 }
 
-th,td{
-  text-align:left;
-  padding:12px 10px;
-  border-bottom:1px solid #eee;
-  font-size:14px;
+.small-btn:disabled{
+  opacity:.55;
 }
 
-.status{
-  display:inline-block;
-  padding:5px 9px;
-  border-radius:20px;
-  font-size:12px;
-  font-weight:800;
-}
-
-.status.pending{
-  background:#fff4d8;
-  color:#9a6700;
-}
-
-.status.approved{
-  background:#e7f8ed;
-  color:#147a3e;
-}
-
-.status.rejected{
-  background:#ffe9e9;
-  color:#b42318;
-}
-
-/* =========================
+/* ==============================
    NAVIGATION
-========================= */
+============================== */
 
 .bottom-nav{
   position:fixed;
@@ -420,156 +390,335 @@ th,td{
   right:0;
   background:white;
   border-top:1px solid #eee;
-  z-index:40;
-  box-shadow:0 -5px 20px rgba(0,0,0,.08);
+  display:flex;
+  justify-content:center;
+  z-index:200;
+  box-shadow:0 -4px 15px rgba(0,0,0,.06);
 }
 
 .bottom-nav-inner{
+  width:100%;
   max-width:700px;
-  margin:auto;
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
+  display:flex;
 }
 
 .nav-btn{
+  flex:1;
   border:0;
   background:white;
   padding:12px 5px;
   color:#777;
   font-size:12px;
-  font-weight:700;
 }
 
 .nav-btn.active{
-  color:#ff4c39;
+  color:#ff5d2e;
+  font-weight:bold;
 }
 
-/* =========================
+/* ==============================
+   PROFILE
+============================== */
+
+.profile-avatar-large{
+  width:90px;
+  height:90px;
+  border-radius:50%;
+  margin:0 auto 15px;
+  background:#fff0ea;
+  color:#ff5d2e;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:32px;
+  font-weight:bold;
+  overflow:hidden;
+}
+
+.profile-avatar-large img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.profile-center{
+  text-align:center;
+}
+
+/* ==============================
+   WALLET
+============================== */
+
+.wallet-balance{
+  background:linear-gradient(135deg,#ff5d2e,#ff7d3d);
+  color:white;
+  border-radius:20px;
+  padding:25px;
+  margin-bottom:20px;
+}
+
+.wallet-balance-label{
+  opacity:.85;
+}
+
+.wallet-amount{
+  font-size:38px;
+  font-weight:900;
+  margin-top:8px;
+}
+
+.withdraw-form{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+}
+
+.full{
+  grid-column:1/-1;
+}
+
+.withdrawal-list{
+  margin-top:20px;
+}
+
+.withdrawal-item{
+  padding:14px 0;
+  border-bottom:1px solid #eee;
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.status{
+  font-size:12px;
+  font-weight:bold;
+  padding:5px 8px;
+  border-radius:8px;
+  background:#fff4df;
+  color:#b26b00;
+}
+
+/* ==============================
    MODAL
-========================= */
+============================== */
 
 .modal-overlay{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.65);
-  display:flex;
-  justify-content:center;
+  background:rgba(0,0,0,.60);
+  display:none;
   align-items:center;
+  justify-content:center;
   padding:18px;
   z-index:1000;
 }
 
+.modal-overlay.show{
+  display:flex;
+}
+
 .modal{
   width:100%;
-  max-width:430px;
+  max-width:420px;
   background:white;
   border-radius:22px;
   padding:25px;
-  box-shadow:0 20px 70px rgba(0,0,0,.30);
-  animation:popup .2s ease-out;
+  box-shadow:0 20px 70px rgba(0,0,0,.25);
+  animation:modalIn .2s ease;
 }
 
-@keyframes popup{
+@keyframes modalIn{
   from{
+    transform:translateY(15px);
     opacity:0;
-    transform:scale(.92);
   }
   to{
+    transform:translateY(0);
     opacity:1;
-    transform:scale(1);
   }
 }
 
-.modal-icon{
-  width:65px;
-  height:65px;
-  border-radius:50%;
-  background:#fff0eb;
-  color:#ff4c39;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-size:28px;
-  margin:0 auto 15px;
+.modal-title{
+  font-size:24px;
+  font-weight:800;
+  text-align:center;
+  margin-bottom:8px;
 }
 
-.modal h2{
+.modal-subtitle{
   text-align:center;
-}
-
-.modal-text{
-  text-align:center;
-  color:#666;
+  color:#777;
+  font-size:14px;
   line-height:1.5;
 }
 
 .otp-input{
+  width:100%;
+  margin:20px 0 10px;
+  padding:16px;
+  border:2px solid #ddd;
+  border-radius:13px;
   text-align:center;
-  font-size:30px;
-  letter-spacing:10px;
-  font-weight:900;
-  margin:18px 0;
+  font-size:27px;
+  font-weight:bold;
+  letter-spacing:9px;
+  outline:none;
 }
 
-.resend-row{
+.otp-input:focus{
+  border-color:#ff5d2e;
+}
+
+.otp-timer{
   text-align:center;
-  margin-top:15px;
-  font-size:14px;
   color:#777;
+  font-size:14px;
+  margin:10px 0;
 }
 
 .resend-btn{
+  display:block;
+  margin:10px auto;
   border:0;
-  background:none;
-  color:#ff4c39;
-  font-weight:800;
+  background:transparent;
+  color:#ff5d2e;
+  font-weight:bold;
+}
+
+.resend-btn:disabled{
+  color:#aaa;
+  cursor:not-allowed;
 }
 
 .close-modal{
   width:100%;
+  margin-top:8px;
+  padding:12px;
+  border:1px solid #ddd;
+  background:white;
+  border-radius:11px;
+  font-weight:bold;
+}
+
+.modal-message{
+  display:none;
+  padding:11px;
+  border-radius:10px;
+  font-size:13px;
   margin-top:10px;
 }
 
-/* =========================
-   LOADING
-========================= */
-
-.loading{
-  text-align:center;
-  padding:30px;
-  color:#777;
+.modal-message.error{
+  display:block;
+  background:#fff0ef;
+  color:#c62828;
 }
 
-/* =========================
+.modal-message.success{
+  display:block;
+  background:#ecfff3;
+  color:#18864b;
+}
+
+/* ==============================
+   LOADING
+============================== */
+
+.loading-screen{
+  position:fixed;
+  inset:0;
+  background:rgba(255,255,255,.92);
+  z-index:2000;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  gap:14px;
+}
+
+.spinner{
+  width:42px;
+  height:42px;
+  border:4px solid #eee;
+  border-top-color:#ff5d2e;
+  border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+
+@keyframes spin{
+  to{
+    transform:rotate(360deg);
+  }
+}
+
+/* ==============================
+   TOAST
+============================== */
+
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:80px;
+  transform:translateX(-50%);
+  background:#222;
+  color:white;
+  padding:12px 18px;
+  border-radius:10px;
+  z-index:3000;
+  display:none;
+  max-width:90%;
+  text-align:center;
+  font-size:14px;
+}
+
+.toast.show{
+  display:block;
+}
+
+/* ==============================
    RESPONSIVE
-========================= */
+============================== */
 
 @media(max-width:800px){
+
+  .stats-grid{
+    grid-template-columns:1fr;
+  }
+
   .task-grid{
     grid-template-columns:1fr;
   }
 
-  .stats{
+  .withdraw-form{
     grid-template-columns:1fr;
   }
-}
 
-@media(max-width:600px){
-  .profile-grid{
-    grid-template-columns:1fr;
+  .full{
+    grid-column:auto;
+  }
+
+  .container{
+    padding-top:20px;
   }
 
   .auth-card{
     padding:22px;
   }
+}
 
-  .container{
-    padding:18px 12px 90px;
+@media(min-width:801px){
+
+  .bottom-nav{
+    bottom:15px;
+    left:50%;
+    right:auto;
+    transform:translateX(-50%);
+    width:650px;
+    border:1px solid #eee;
+    border-radius:18px;
+    overflow:hidden;
   }
 
-  .hero{
-    padding:20px;
-  }
 }
 </style>
 </head>
@@ -577,10 +726,20 @@ th,td{
 <body>
 
 <!-- =====================================================
-     AUTH PAGE
+     LOADING
 ===================================================== -->
 
-<div id="authPage" class="auth-wrapper">
+<div id="loadingScreen" class="loading-screen">
+  <div class="spinner"></div>
+  <strong id="loadingText">Please wait...</strong>
+</div>
+
+
+<!-- =====================================================
+     AUTH SCREEN
+===================================================== -->
+
+<section id="authScreen" class="auth-screen">
 
   <div class="auth-card">
 
@@ -592,627 +751,710 @@ th,td{
       Complete tasks. Earn rewards.
     </div>
 
-    <div id="authAlert"></div>
+    <div class="auth-tabs">
+
+      <button
+        id="loginTab"
+        class="auth-tab active"
+        onclick="showAuth('login')">
+        Login
+      </button>
+
+      <button
+        id="registerTab"
+        class="auth-tab"
+        onclick="showAuth('register')">
+        Register
+      </button>
+
+    </div>
+
 
     <!-- LOGIN -->
 
-    <div id="loginForm">
-
-      <h2>Welcome Back</h2>
+    <form
+      id="loginForm"
+      onsubmit="loginUser(event)">
 
       <div class="form-group">
         <label>Email</label>
+
         <input
           id="loginEmail"
           type="email"
-          placeholder="Enter your Gmail"
           autocomplete="email"
-        >
+          placeholder="Enter your email"
+          required>
       </div>
 
       <div class="form-group">
         <label>Password</label>
+
         <input
           id="loginPassword"
           type="password"
-          placeholder="Enter your password"
           autocomplete="current-password"
-        >
+          placeholder="Enter your password"
+          required>
       </div>
 
-      <div class="form-group">
-        <label>
-          <input
-            id="rememberMe"
-            type="checkbox"
-            style="width:auto;margin-right:6px"
-          >
+      <div class="form-group"
+           style="display:flex;align-items:center;gap:8px">
+
+        <input
+          id="rememberMe"
+          type="checkbox"
+          style="width:auto">
+
+        <label
+          for="rememberMe"
+          style="margin:0;font-weight:normal">
           Remember me
         </label>
+
       </div>
 
       <button
-        id="loginBtn"
+        id="loginButton"
         class="primary-btn"
-        onclick="loginUser()"
-      >
+        type="submit">
         Login
       </button>
 
-      <div class="divider">
-        OR
-      </div>
-
-      <div id="googleLoginButton" class="google-box"></div>
-
-      <div class="auth-switch">
-        Don't have an account?
-        <button
-          class="link-btn"
-          onclick="showRegister()"
-        >
-          Register
-        </button>
-      </div>
-
-    </div>
+    </form>
 
 
     <!-- REGISTER -->
 
-    <div id="registerForm" class="hidden">
-
-      <h2>Create Account</h2>
+    <form
+      id="registerForm"
+      class="hidden"
+      onsubmit="registerUser(event)">
 
       <div class="form-group">
         <label>Full Name</label>
+
         <input
           id="registerName"
           type="text"
-          placeholder="Enter your full name"
-          maxlength="80"
-        >
+          autocomplete="name"
+          placeholder="Enter your name"
+          required>
       </div>
 
       <div class="form-group">
         <label>Email</label>
+
         <input
           id="registerEmail"
           type="email"
-          placeholder="Enter your Gmail"
           autocomplete="email"
-        >
+          placeholder="Enter your Gmail/email"
+          required>
       </div>
 
       <div class="form-group">
         <label>Mobile Number</label>
+
         <input
           id="registerMobile"
           type="tel"
-          placeholder="+919876543210"
-          maxlength="16"
-        >
+          autocomplete="tel"
+          placeholder="+91XXXXXXXXXX"
+          required>
       </div>
 
       <div class="form-group">
         <label>City</label>
+
         <input
           id="registerCity"
           type="text"
+          autocomplete="address-level2"
           placeholder="Enter your city"
-          maxlength="80"
-        >
+          required>
       </div>
 
       <div class="form-group">
         <label>Password</label>
+
         <input
           id="registerPassword"
           type="password"
-          placeholder="Minimum 6 characters"
           autocomplete="new-password"
-        >
+          placeholder="Minimum 6 characters"
+          minlength="6"
+          required>
       </div>
 
       <button
-        id="registerBtn"
+        id="registerButton"
         class="primary-btn"
-        onclick="registerUser()"
-      >
+        type="submit">
         Create Account
       </button>
 
-      <div class="divider">
-        OR
+    </form>
+
+
+    <div class="divider">
+      OR
+    </div>
+
+    <!-- GOOGLE -->
+
+    <div
+      id="googleButton"
+      class="google-btn">
+      <span>🔵</span>
+      Continue with Google
+    </div>
+
+
+    <div
+      id="authMessage"
+      class="auth-message">
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =====================================================
+     APP SCREEN
+===================================================== -->
+
+<section id="appScreen">
+
+<header>
+
+  <div class="header-inner">
+
+    <div class="logo">
+      TaskEarn
+    </div>
+
+    <div class="header-user">
+
+      <div
+        id="headerAvatar"
+        class="avatar">
+        U
       </div>
 
-      <div id="googleRegisterButton" class="google-box"></div>
-
-      <div class="auth-switch">
-        Already have an account?
-        <button
-          class="link-btn"
-          onclick="showLogin()"
-        >
-          Login
-        </button>
-      </div>
+      <strong id="headerName">
+        User
+      </strong>
 
     </div>
 
   </div>
-</div>
+
+</header>
 
 
-<!-- =====================================================
-     DASHBOARD
-===================================================== -->
-
-<div id="appPage" class="hidden">
-
-  <header class="header">
-
-    <div class="header-inner">
-
-      <div class="logo">
-        TaskEarn
-      </div>
-
-      <div class="header-user">
-
-        <span id="headerName">
-          User
-        </span>
-
-        <div
-          id="headerAvatar"
-          class="avatar-small"
-        >
-          U
-        </div>
-
-      </div>
-
-    </div>
-
-  </header>
+<div class="container">
 
 
-  <main class="container">
+  <!-- HOME -->
 
-    <!-- HOME -->
+  <section
+    id="homePage"
+    class="page">
 
-    <section id="homeSection">
+    <h1 class="page-title">
+      Welcome, <span id="welcomeName">User</span> 👋
+    </h1>
 
-      <div class="hero">
-
-        <h1>
-          Hello, <span id="welcomeName">User</span> 👋
-        </h1>
-
-        <p>
-          Complete available tasks and earn rewards.
-        </p>
-
-      </div>
-
-      <div class="stats">
-
-        <div class="stat">
-          <div class="stat-title">
-            Wallet Balance
-          </div>
-
-          <div
-            id="homeBalance"
-            class="stat-value"
-          >
-            ₹0
-          </div>
-        </div>
-
-        <div class="stat">
-          <div class="stat-title">
-            Email
-          </div>
-
-          <div
-            id="emailStatus"
-            class="stat-value"
-            style="font-size:16px"
-          >
-            —
-          </div>
-        </div>
-
-        <div class="stat">
-          <div class="stat-title">
-            Mobile
-          </div>
-
-          <div
-            id="mobileStatus"
-            class="stat-value"
-            style="font-size:16px"
-          >
-            —
-          </div>
-        </div>
-
-      </div>
-
-      <div class="card" style="margin-top:20px">
-
-        <h2>
-          Available Tasks
-        </h2>
-
-        <div
-          id="homeTasks"
-          class="task-grid"
-        >
-          <div class="loading">
-            Loading tasks...
-          </div>
-        </div>
-
-      </div>
-
-    </section>
+    <p class="page-subtitle">
+      Complete tasks and grow your earnings.
+    </p>
 
 
-    <!-- TASKS -->
+    <div class="stats-grid">
 
-    <section id="tasksSection" class="hidden">
+      <div class="stat-card">
 
-      <div class="card">
-
-        <h2>
-          Available Tasks
-        </h2>
-
-        <div
-          id="tasksList"
-          class="task-grid"
-        >
-          <div class="loading">
-            Loading tasks...
-          </div>
-        </div>
-
-      </div>
-
-      <div class="card">
-
-        <h2>
-          My Submissions
-        </h2>
-
-        <div
-          id="submissionsList"
-          class="table-wrap"
-        >
-          Loading...
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- WALLET -->
-
-    <section id="walletSection" class="hidden">
-
-      <div class="balance-card">
-
-        <div>
-          Available Balance
+        <div class="stat-label">
+          Wallet Balance
         </div>
 
         <div
-          id="walletBalance"
-          class="balance"
-        >
+          id="homeBalance"
+          class="stat-value">
           ₹0
         </div>
 
       </div>
 
-      <div class="card">
 
-        <h2>
-          Withdraw Earnings
-        </h2>
+      <div class="stat-card">
 
-        <div id="withdrawAlert"></div>
-
-        <div class="form-group">
-
-          <label>
-            Amount
-          </label>
-
-          <input
-            id="withdrawAmount"
-            type="number"
-            min="100"
-            placeholder="Minimum ₹100"
-          >
-
+        <div class="stat-label">
+          Email Status
         </div>
-
-        <div class="form-group">
-
-          <label>
-            Payment Method
-          </label>
-
-          <select
-            id="withdrawMethod"
-            onchange="changePaymentMethod()"
-          >
-
-            <option value="UPI">
-              UPI
-            </option>
-
-            <option value="Bank Account">
-              Bank Account
-            </option>
-
-          </select>
-
-        </div>
-
-
-        <!-- UPI -->
-
-        <div id="upiFields">
-
-          <div class="form-group">
-
-            <label>
-              UPI ID
-            </label>
-
-            <input
-              id="upiId"
-              type="text"
-              placeholder="example@upi"
-            >
-
-          </div>
-
-        </div>
-
-
-        <!-- BANK -->
-
-        <div id="bankFields" class="hidden">
-
-          <div class="form-group">
-
-            <label>
-              Account Holder Name
-            </label>
-
-            <input
-              id="accountHolderName"
-              type="text"
-            >
-
-          </div>
-
-          <div class="form-group">
-
-            <label>
-              Account Number
-            </label>
-
-            <input
-              id="accountNumber"
-              type="text"
-            >
-
-          </div>
-
-          <div class="form-group">
-
-            <label>
-              IFSC Code
-            </label>
-
-            <input
-              id="ifscCode"
-              type="text"
-              maxlength="11"
-            >
-
-          </div>
-
-          <div class="form-group">
-
-            <label>
-              Bank Name
-            </label>
-
-            <input
-              id="bankName"
-              type="text"
-            >
-
-          </div>
-
-        </div>
-
-
-        <button
-          class="primary-btn"
-          onclick="withdrawMoney()"
-        >
-          Request Withdrawal
-        </button>
-
-      </div>
-
-
-      <div class="card">
-
-        <h2>
-          Withdrawal History
-        </h2>
 
         <div
-          id="withdrawalHistory"
-          class="table-wrap"
-        >
-          Loading...
+          id="homeEmailStatus"
+          class="stat-value"
+          style="font-size:18px">
+          —
         </div>
 
       </div>
 
-    </section>
 
+      <div class="stat-card">
 
-    <!-- PROFILE -->
-
-    <section id="profileSection" class="hidden">
-
-      <div class="card">
-
-        <h2>
-          My Profile
-        </h2>
-
-        <div id="profileAlert"></div>
-
-        <div class="profile-grid">
-
-          <div class="form-group">
-
-            <label>
-              Name
-            </label>
-
-            <input
-              id="profileName"
-              type="text"
-            >
-
-          </div>
-
-          <div class="form-group">
-
-            <label>
-              Email
-            </label>
-
-            <input
-              id="profileEmail"
-              type="email"
-              disabled
-            >
-
-          </div>
-
-          <div class="form-group">
-
-            <label>
-              Mobile
-            </label>
-
-            <input
-              id="profileMobile"
-              type="tel"
-            >
-
-          </div>
-
-          <div class="form-group">
-
-            <label>
-              City
-            </label>
-
-            <input
-              id="profileCity"
-              type="text"
-            >
-
-          </div>
-
+        <div class="stat-label">
+          Mobile Status
         </div>
 
-        <button
-          class="primary-btn"
-          onclick="saveProfile()"
-        >
-          Save Profile
-        </button>
-
-        <button
-          class="secondary-btn"
-          style="margin-top:10px"
-          onclick="logoutUser()"
-        >
-          Logout
-        </button>
+        <div
+          id="homeMobileStatus"
+          class="stat-value"
+          style="font-size:18px">
+          —
+        </div>
 
       </div>
 
-    </section>
-
-  </main>
+    </div>
 
 
-  <!-- BOTTOM NAV -->
+    <div class="card">
 
-  <nav class="bottom-nav">
+      <h2>
+        Available Tasks
+      </h2>
 
-    <div class="bottom-nav-inner">
-
-      <button
-        id="navHome"
-        class="nav-btn active"
-        onclick="showSection('home')"
-      >
-        🏠<br>
-        Home
-      </button>
+      <p style="color:#777">
+        Start completing tasks to earn rewards.
+      </p>
 
       <button
-        id="navTasks"
-        class="nav-btn"
-        onclick="showSection('tasks')"
-      >
-        📋<br>
-        Tasks
-      </button>
-
-      <button
-        id="navWallet"
-        class="nav-btn"
-        onclick="showSection('wallet')"
-      >
-        💰<br>
-        Wallet
-      </button>
-
-      <button
-        id="navProfile"
-        class="nav-btn"
-        onclick="showSection('profile')"
-      >
-        👤<br>
-        Profile
+        class="small-btn"
+        onclick="showPage('tasks')">
+        View Tasks
       </button>
 
     </div>
 
-  </nav>
+  </section>
+
+
+  <!-- TASKS -->
+
+  <section
+    id="tasksPage"
+    class="page hidden">
+
+    <h1 class="page-title">
+      Tasks
+    </h1>
+
+    <p class="page-subtitle">
+      Complete available tasks and submit them for review.
+    </p>
+
+    <div
+      id="taskGrid"
+      class="task-grid">
+    </div>
+
+  </section>
+
+
+  <!-- WALLET -->
+
+  <section
+    id="walletPage"
+    class="page hidden">
+
+    <h1 class="page-title">
+      Wallet
+    </h1>
+
+    <p class="page-subtitle">
+      Manage your earnings and withdrawals.
+    </p>
+
+
+    <div class="wallet-balance">
+
+      <div class="wallet-balance-label">
+        Available Balance
+      </div>
+
+      <div
+        id="walletBalance"
+        class="wallet-amount">
+        ₹0
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <h2>
+        Withdraw Money
+      </h2>
+
+      <p style="color:#777">
+        Minimum withdrawal amount is ₹100.
+      </p>
+
+
+      <form
+        id="withdrawForm"
+        onsubmit="withdrawMoney(event)">
+
+        <div class="withdraw-form">
+
+          <div class="form-group">
+
+            <label>
+              Amount
+            </label>
+
+            <input
+              id="withdrawAmount"
+              type="number"
+              min="100"
+              step="1"
+              placeholder="₹100"
+              required>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>
+              Payment Method
+            </label>
+
+            <select
+              id="withdrawMethod"
+              onchange="changePaymentMethod()"
+              required>
+
+              <option value="">
+                Select method
+              </option>
+
+              <option value="UPI">
+                UPI
+              </option>
+
+              <option value="Bank Account">
+                Bank Account
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <!-- UPI -->
+
+          <div
+            id="upiFields"
+            class="full hidden">
+
+            <div class="form-group">
+
+              <label>
+                UPI ID
+              </label>
+
+              <input
+                id="upiId"
+                type="text"
+                placeholder="example@upi">
+
+            </div>
+
+          </div>
+
+
+          <!-- BANK -->
+
+          <div
+            id="bankFields"
+            class="full hidden">
+
+            <div class="form-group">
+
+              <label>
+                Account Holder Name
+              </label>
+
+              <input
+                id="accountHolderName"
+                type="text">
+
+            </div>
+
+            <div class="form-group">
+
+              <label>
+                Account Number
+              </label>
+
+              <input
+                id="accountNumber"
+                type="text">
+
+            </div>
+
+            <div class="form-group">
+
+              <label>
+                IFSC Code
+              </label>
+
+              <input
+                id="ifscCode"
+                type="text"
+                style="text-transform:uppercase">
+
+            </div>
+
+            <div class="form-group">
+
+              <label>
+                Bank Name
+              </label>
+
+              <input
+                id="bankName"
+                type="text">
+
+            </div>
+
+          </div>
+
+
+          <div class="full">
+
+            <button
+              id="withdrawButton"
+              class="primary-btn"
+              type="submit">
+              Withdraw
+            </button>
+
+          </div>
+
+        </div>
+
+      </form>
+
+    </div>
+
+
+    <div class="card">
+
+      <h2>
+        Withdrawal History
+      </h2>
+
+      <div
+        id="withdrawalList"
+        class="withdrawal-list">
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- PROFILE -->
+
+  <section
+    id="profilePage"
+    class="page hidden">
+
+    <h1 class="page-title">
+      Profile
+    </h1>
+
+    <p class="page-subtitle">
+      Manage your account information.
+    </p>
+
+
+    <div class="card">
+
+      <div class="profile-center">
+
+        <div
+          id="profileAvatar"
+          class="profile-avatar-large">
+          U
+        </div>
+
+        <h2 id="profileNameTitle">
+          User
+        </h2>
+
+        <p
+          id="profileEmailTitle"
+          style="color:#777">
+          —
+        </p>
+
+      </div>
+
+
+      <form
+        onsubmit="saveProfile(event)">
+
+        <div class="form-group">
+
+          <label>
+            Name
+          </label>
+
+          <input
+            id="profileName"
+            type="text"
+            required>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>
+            Email
+          </label>
+
+          <input
+            id="profileEmail"
+            type="email"
+            disabled>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>
+            Mobile Number
+          </label>
+
+          <input
+            id="profileMobile"
+            type="tel"
+            placeholder="+91XXXXXXXXXX">
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>
+            City
+          </label>
+
+          <input
+            id="profileCity"
+            type="text"
+            required>
+
+        </div>
+
+
+        <button
+          id="profileSaveButton"
+          class="primary-btn"
+          type="submit">
+          Save Profile
+        </button>
+
+      </form>
+
+    </div>
+
+
+    <div class="card">
+
+      <h3>
+        Account Status
+      </h3>
+
+      <p id="emailVerificationStatus">
+        Email: —
+      </p>
+
+      <p id="mobileVerificationStatus">
+        Mobile: —
+      </p>
+
+    </div>
+
+
+    <div class="card">
+
+      <button
+        class="primary-btn"
+        style="background:#222"
+        onclick="logoutUser()">
+        Logout
+      </button>
+
+    </div>
+
+  </section>
 
 </div>
+
+
+<!-- =====================================================
+     BOTTOM NAV
+===================================================== -->
+
+<nav class="bottom-nav">
+
+  <div class="bottom-nav-inner">
+
+    <button
+      id="navHome"
+      class="nav-btn active"
+      onclick="showPage('home')">
+      🏠<br>Home
+    </button>
+
+    <button
+      id="navTasks"
+      class="nav-btn"
+      onclick="showPage('tasks')">
+      📋<br>Tasks
+    </button>
+
+    <button
+      id="navWallet"
+      class="nav-btn"
+      onclick="showPage('wallet')">
+      💰<br>Wallet
+    </button>
+
+    <button
+      id="navProfile"
+      class="nav-btn"
+      onclick="showPage('profile')">
+      👤<br>Profile
+    </button>
+
+  </div>
+
+</nav>
+
+</section>
 
 
 <!-- =====================================================
@@ -1220,35 +1462,21 @@ th,td{
 ===================================================== -->
 
 <div
-  id="emailOtpModal"
-  class="modal-overlay hidden"
->
+  id="otpModal"
+  class="modal-overlay">
 
   <div class="modal">
 
-    <div class="modal-icon">
-      ✉️
+    <div class="modal-title">
+      Verify Your Email
     </div>
 
-    <h2>
-      Verify Your Email
-    </h2>
+    <div
+      id="otpDescription"
+      class="modal-subtitle">
+      We sent a 6-digit verification code to your email.
+    </div>
 
-    <p class="modal-text">
-
-      We sent a 6-digit verification code to
-
-      <strong id="otpEmail">
-        your email
-      </strong>.
-
-      <br><br>
-
-      Please enter the OTP below.
-
-    </p>
-
-    <div id="otpAlert"></div>
 
     <input
       id="otpInput"
@@ -1257,42 +1485,43 @@ th,td{
       inputmode="numeric"
       autocomplete="one-time-code"
       maxlength="6"
-      placeholder="000000"
-    >
+      placeholder="000000">
+
+
+    <div
+      id="otpTimer"
+      class="otp-timer">
+      OTP expires in 10:00
+    </div>
+
 
     <button
-      id="verifyOtpBtn"
+      id="verifyOtpButton"
       class="primary-btn"
-      onclick="verifyEmailOtp()"
-    >
+      onclick="verifyEmailOtp()">
       Verify OTP
     </button>
 
-    <div class="resend-row">
-
-      <span id="resendText">
-        You can resend OTP in 60 seconds.
-      </span>
-
-      <br>
-
-      <button
-        id="resendOtpBtn"
-        class="resend-btn"
-        onclick="resendEmailOtp()"
-        disabled
-      >
-        Resend OTP
-      </button>
-
-    </div>
 
     <button
-      class="secondary-btn close-modal"
-      onclick="closeOtpModal()"
-    >
+      id="resendOtpButton"
+      class="resend-btn"
+      onclick="resendEmailOtp()">
+      Resend OTP
+    </button>
+
+
+    <button
+      class="close-modal"
+      onclick="closeOtpModal()">
       Cancel
     </button>
+
+
+    <div
+      id="otpMessage"
+      class="modal-message">
+    </div>
 
   </div>
 
@@ -1305,30 +1534,20 @@ th,td{
 
 <div
   id="mobileOtpModal"
-  class="modal-overlay hidden"
->
+  class="modal-overlay">
 
   <div class="modal">
 
-    <div class="modal-icon">
-      📱
+    <div class="modal-title">
+      Verify Mobile
     </div>
 
-    <h2>
-      Verify Mobile
-    </h2>
+    <div
+      id="mobileOtpDescription"
+      class="modal-subtitle">
+      Enter the OTP sent to your mobile number.
+    </div>
 
-    <p class="modal-text">
-
-      A 6-digit OTP was sent to
-
-      <strong id="mobileOtpNumber">
-        your mobile
-      </strong>.
-
-    </p>
-
-    <div id="mobileOtpAlert"></div>
 
     <input
       id="mobileOtpInput"
@@ -1337,138 +1556,212 @@ th,td{
       inputmode="numeric"
       autocomplete="one-time-code"
       maxlength="6"
-      placeholder="000000"
-    >
+      placeholder="000000">
+
+
+    <div
+      id="mobileOtpTimer"
+      class="otp-timer">
+      OTP expires in 10:00
+    </div>
+
 
     <button
-      id="verifyMobileBtn"
+      id="verifyMobileOtpButton"
       class="primary-btn"
-      onclick="verifyMobileOtp()"
-    >
+      onclick="verifyMobileOtp()">
       Verify Mobile
     </button>
 
-    <div class="resend-row">
-
-      <span id="mobileResendText">
-        Resend available soon.
-      </span>
-
-      <br>
-
-      <button
-        id="resendMobileBtn"
-        class="resend-btn"
-        onclick="resendMobileOtp()"
-        disabled
-      >
-        Resend OTP
-      </button>
-
-    </div>
 
     <button
-      class="secondary-btn close-modal"
-      onclick="closeMobileOtpModal()"
-    >
+      id="resendMobileOtpButton"
+      class="resend-btn"
+      onclick="resendMobileOtp()">
+      Resend OTP
+    </button>
+
+
+    <button
+      class="close-modal"
+      onclick="closeMobileOtpModal()">
       Cancel
     </button>
+
+
+    <div
+      id="mobileOtpMessage"
+      class="modal-message">
+    </div>
 
   </div>
 
 </div>
 
 
+<!-- =====================================================
+     TOAST
+===================================================== -->
+
+<div
+  id="toast"
+  class="toast">
+</div>
+
+
 <script>
+"use strict";
 
 /* =====================================================
-   GLOBAL STATE
+   STATE
 ===================================================== */
 
-let currentUser = null;
-let otpTimer = null;
-let mobileOtpTimer = null;
+let currentUserData = null;
+let otpTimerInterval = null;
+let mobileOtpTimerInterval = null;
+let googleClientId = "";
 
 
 /* =====================================================
-   DOM HELPERS
+   HELPERS
 ===================================================== */
 
 function $(id){
   return document.getElementById(id);
 }
 
+function showLoading(text){
+  $("loadingText").textContent =
+    text || "Please wait...";
 
-/* =====================================================
-   ALERT
-===================================================== */
-
-function showAlert(containerId,message,type="error"){
-
-  const box = $(containerId);
-
-  if(!box) return;
-
-  box.innerHTML = `
-    <div class="alert ${type}">
-      ${escapeHtml(message)}
-    </div>
-  `;
-
+  $("loadingScreen").style.display =
+    "flex";
 }
 
+function hideLoading(){
+  $("loadingScreen").style.display =
+    "none";
+}
 
-function clearAlert(containerId){
+function showToast(message){
+  const toast = $("toast");
 
-  const box = $(containerId);
+  toast.textContent = message;
+  toast.classList.add("show");
 
-  if(box){
-    box.innerHTML="";
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 3500);
+}
+
+function setAuthMessage(
+  message,
+  type = "error"
+){
+  const box = $("authMessage");
+
+  if(!message){
+    box.className =
+      "auth-message";
+
+    box.textContent = "";
+
+    return;
   }
 
+  box.className =
+    "auth-message " + type;
+
+  box.textContent =
+    message;
 }
 
+function setOtpMessage(
+  message,
+  type = "error"
+){
+  const box =
+    $("otpMessage");
 
-/* =====================================================
-   HTML ESCAPE
-===================================================== */
+  if(!message){
+    box.className =
+      "modal-message";
 
-function escapeHtml(value){
+    box.textContent = "";
 
-  return String(value ?? "")
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
+    return;
+  }
 
+  box.className =
+    "modal-message " + type;
+
+  box.textContent =
+    message;
 }
 
+function setMobileOtpMessage(
+  message,
+  type = "error"
+){
+  const box =
+    $("mobileOtpMessage");
 
-/* =====================================================
-   API REQUEST
-===================================================== */
+  if(!message){
+    box.className =
+      "modal-message";
 
-async function api(url,options={}){
+    box.textContent = "";
+
+    return;
+  }
+
+  box.className =
+    "modal-message " + type;
+
+  box.textContent =
+    message;
+}
+
+async function api(
+  url,
+  options = {}
+){
 
   const config = {
-    credentials:"include",
+    credentials:"same-origin",
     ...options,
     headers:{
-      ...(options.body && typeof options.body === "string"
+      ...(options.body
         ? {"Content-Type":"application/json"}
         : {}),
       ...(options.headers || {})
     }
   };
 
-  const response = await fetch(url,config);
+  let response;
+
+  try{
+
+    response =
+      await fetch(
+        url,
+        config
+      );
+
+  }catch(error){
+
+    throw new Error(
+      "Unable to connect to TaskEarn server. The Render service may be unavailable."
+    );
+
+  }
 
   let data = {};
 
   try{
-    data = await response.json();
-  }catch(e){
+    data =
+      await response.json();
+  }catch(error){
     data = {};
   }
 
@@ -1476,7 +1769,7 @@ async function api(url,options={}){
 
     throw new Error(
       data.error ||
-      "Something went wrong. Please try again."
+      `Server error (${response.status}).`
     );
 
   }
@@ -1486,25 +1779,50 @@ async function api(url,options={}){
 
 
 /* =====================================================
-   AUTH PAGE
+   AUTH TABS
 ===================================================== */
 
-function showRegister(){
+function showAuth(type){
 
-  $("loginForm").classList.add("hidden");
-  $("registerForm").classList.remove("hidden");
+  setAuthMessage("");
 
-  clearAlert("authAlert");
+  if(type === "login"){
 
-}
+    $("loginTab")
+      .classList
+      .add("active");
 
+    $("registerTab")
+      .classList
+      .remove("active");
 
-function showLogin(){
+    $("loginForm")
+      .classList
+      .remove("hidden");
 
-  $("registerForm").classList.add("hidden");
-  $("loginForm").classList.remove("hidden");
+    $("registerForm")
+      .classList
+      .add("hidden");
 
-  clearAlert("authAlert");
+  }else{
+
+    $("registerTab")
+      .classList
+      .add("active");
+
+    $("loginTab")
+      .classList
+      .remove("active");
+
+    $("registerForm")
+      .classList
+      .remove("hidden");
+
+    $("loginForm")
+      .classList
+      .add("hidden");
+
+  }
 
 }
 
@@ -1513,93 +1831,84 @@ function showLogin(){
    REGISTER
 ===================================================== */
 
-async function registerUser(){
+async function registerUser(event){
 
-  const btn = $("registerBtn");
+  event.preventDefault();
 
-  const name =
-    $("registerName").value.trim();
+  setAuthMessage("");
 
-  const email =
-    $("registerEmail").value.trim();
+  const button =
+    $("registerButton");
 
-  const mobile =
-    $("registerMobile").value.trim();
+  button.disabled = true;
+  button.textContent =
+    "Creating account...";
 
-  const city =
-    $("registerCity").value.trim();
+  const payload = {
 
-  const password =
-    $("registerPassword").value;
+    name:
+      $("registerName").value.trim(),
 
-  clearAlert("authAlert");
+    email:
+      $("registerEmail").value.trim(),
 
-  if(!name || !email || !mobile || !city || !password){
+    mobile:
+      $("registerMobile").value.trim(),
 
-    showAlert(
-      "authAlert",
-      "Please complete all fields."
-    );
+    city:
+      $("registerCity").value.trim(),
 
-    return;
-  }
+    password:
+      $("registerPassword").value
 
-  if(password.length < 6){
-
-    showAlert(
-      "authAlert",
-      "Password must contain at least 6 characters."
-    );
-
-    return;
-  }
-
-  btn.disabled = true;
-  btn.textContent = "Creating account...";
+  };
 
   try{
 
-    const data = await api(
-      "/api/register",
-      {
-        method:"POST",
-        body:JSON.stringify({
-          name,
-          email,
-          mobile,
-          city,
-          password
-        })
-      }
-    );
+    const data =
+      await api(
+        "/api/register",
+        {
+          method:"POST",
+          body:
+            JSON.stringify(payload)
+        }
+      );
 
     if(data.verificationRequired){
 
-      openEmailOtpModal(
+      openOtpModal(
         data.email,
         data.expiresAt,
         data.resendAt
       );
 
-      showAlert(
-        "authAlert",
-        "Account created. Check your Gmail for the OTP.",
-        "success"
+      showToast(
+        "Gmail OTP sent successfully."
       );
+
+    }else if(data.user){
+
+      currentUserData =
+        data.user;
+
+      enterApp();
 
     }
 
   }catch(error){
 
-    showAlert(
-      "authAlert",
-      error.message
+    setAuthMessage(
+      error.message ||
+      "Unable to create account.",
+      "error"
     );
 
   }finally{
 
-    btn.disabled = false;
-    btn.textContent = "Create Account";
+    button.disabled = false;
+    button.textContent =
+      "Create Account";
 
   }
 
@@ -1610,84 +1919,86 @@ async function registerUser(){
    LOGIN
 ===================================================== */
 
-async function loginUser(){
+async function loginUser(event){
 
-  const btn = $("loginBtn");
+  event.preventDefault();
 
-  const email =
-    $("loginEmail").value.trim();
+  setAuthMessage("");
 
-  const password =
-    $("loginPassword").value;
+  const button =
+    $("loginButton");
 
-  const remember =
-    $("rememberMe").checked;
-
-  clearAlert("authAlert");
-
-  if(!email || !password){
-
-    showAlert(
-      "authAlert",
-      "Please enter your email and password."
-    );
-
-    return;
-  }
-
-  btn.disabled = true;
-  btn.textContent = "Logging in...";
+  button.disabled = true;
+  button.textContent =
+    "Logging in...";
 
   try{
 
-    const data = await api(
-      "/api/login",
-      {
-        method:"POST",
-        body:JSON.stringify({
-          email,
-          password,
-          remember
-        })
-      }
-    );
+    const data =
+      await api(
+        "/api/login",
+        {
+          method:"POST",
+
+          body:
+            JSON.stringify({
+
+              email:
+                $("loginEmail")
+                  .value
+                  .trim(),
+
+              password:
+                $("loginPassword")
+                  .value,
+
+              remember:
+                $("rememberMe")
+                  .checked
+
+            })
+        }
+      );
+
 
     if(data.verificationRequired){
 
-      openEmailOtpModal(
+      openOtpModal(
         data.email,
         data.expiresAt,
         data.resendAt
       );
 
-      showAlert(
-        "authAlert",
-        "Your email is not verified. Check Gmail for the OTP.",
-        "success"
+      showToast(
+        "Please enter the Gmail OTP."
       );
 
       return;
     }
 
+
     if(data.user){
 
-      currentUser = data.user;
+      currentUserData =
+        data.user;
 
-      enterDashboard();
+      enterApp();
 
     }
 
   }catch(error){
 
-    showAlert(
-      "authAlert",
-      error.message
+    setAuthMessage(
+      error.message ||
+      "Unable to login.",
+      "error"
     );
 
   }finally{
 
-    btn.disabled = false;
-    btn.textContent = "Login";
+    button.disabled = false;
+    button.textContent =
+      "Login";
 
   }
 
@@ -1695,73 +2006,66 @@ async function loginUser(){
 
 
 /* =====================================================
-   EMAIL OTP MODAL
+   OTP MODAL
 ===================================================== */
 
-function openEmailOtpModal(
+function openOtpModal(
   email,
   expiresAt,
   resendAt
 ){
 
-  $("otpEmail").textContent =
-    email || "";
+  $("otpDescription").textContent =
+    "We sent a 6-digit verification code to " +
+    email +
+    ". Please check your Gmail inbox and Spam folder.";
 
   $("otpInput").value = "";
 
-  clearAlert("otpAlert");
+  setOtpMessage("");
 
-  $("emailOtpModal")
-    .classList.remove("hidden");
-
-  document.body.style.overflow =
-    "hidden";
-
-  setTimeout(() => {
-
-    $("otpInput").focus();
-
-  },150);
+  $("otpModal")
+    .classList
+    .add("show");
 
   startOtpTimer(
     expiresAt,
     resendAt
   );
 
+  setTimeout(() => {
+    $("otpInput").focus();
+  },150);
+
 }
 
 
 function closeOtpModal(){
 
-  $("emailOtpModal")
-    .classList.add("hidden");
+  $("otpModal")
+    .classList
+    .remove("show");
 
-  document.body.style.overflow =
-    "";
+  if(otpTimerInterval){
+    clearInterval(
+      otpTimerInterval
+    );
 
-  if(otpTimer){
-
-    clearInterval(otpTimer);
-    otpTimer = null;
-
+    otpTimerInterval = null;
   }
 
 }
 
-
-/* =====================================================
-   EMAIL OTP TIMER
-===================================================== */
 
 function startOtpTimer(
   expiresAt,
   resendAt
 ){
 
-  if(otpTimer){
-
-    clearInterval(otpTimer);
-
+  if(otpTimerInterval){
+    clearInterval(
+      otpTimerInterval
+    );
   }
 
   function update(){
@@ -1772,60 +2076,60 @@ function startOtpTimer(
     const expiry =
       expiresAt
         ? new Date(expiresAt).getTime()
-        : now;
+        : now + 600000;
 
     const resend =
       resendAt
         ? new Date(resendAt).getTime()
         : now;
 
-    const expirySeconds =
+    const expiresIn =
       Math.max(
         0,
         Math.ceil(
-          (expiry-now)/1000
+          (expiry - now) / 1000
         )
       );
 
-    const resendSeconds =
+    const resendIn =
       Math.max(
         0,
         Math.ceil(
-          (resend-now)/1000
+          (resend - now) / 1000
         )
       );
 
-    if(expirySeconds > 0){
 
-      const minutes =
-        Math.floor(
-          expirySeconds/60
-        );
+    const minutes =
+      Math.floor(
+        expiresIn / 60
+      );
 
-      const seconds =
-        expirySeconds % 60;
+    const seconds =
+      expiresIn % 60;
 
-      $("resendText").textContent =
-        `OTP expires in ${minutes}:${String(seconds).padStart(2,"0")}`;
 
-    }else{
+    $("otpTimer").textContent =
+      expiresIn > 0
+        ? `OTP expires in ${minutes}:${String(seconds).padStart(2,"0")}`
+        : "OTP expired. Please resend OTP.";
 
-      $("resendText").textContent =
-        "OTP expired. Please resend a new OTP.";
 
-    }
+    const resendButton =
+      $("resendOtpButton");
 
-    $("resendOtpBtn").disabled =
-      resendSeconds > 0;
+    if(resendIn > 0){
 
-    if(resendSeconds > 0){
+      resendButton.disabled = true;
 
-      $("resendOtpBtn").textContent =
-        `Resend OTP (${resendSeconds}s)`;
+      resendButton.textContent =
+        `Resend OTP in ${resendIn}s`;
 
     }else{
 
-      $("resendOtpBtn").textContent =
+      resendButton.disabled = false;
+
+      resendButton.textContent =
         "Resend OTP";
 
     }
@@ -1834,7 +2138,7 @@ function startOtpTimer(
 
   update();
 
-  otpTimer =
+  otpTimerInterval =
     setInterval(
       update,
       1000
@@ -1849,24 +2153,18 @@ function startOtpTimer(
 
 async function verifyEmailOtp(){
 
-  const btn =
-    $("verifyOtpBtn");
-
   const otp =
-    $("otpInput").value
-      .replace(/\D/g,"")
-      .slice(0,6);
+    $("otpInput")
+      .value
+      .trim();
 
-  $("otpInput").value =
-    otp;
-
-  clearAlert("otpAlert");
+  setOtpMessage("");
 
   if(!/^\d{6}$/.test(otp)){
 
-    showAlert(
-      "otpAlert",
-      "Please enter the 6-digit OTP."
+    setOtpMessage(
+      "Please enter the 6-digit OTP.",
+      "error"
     );
 
     $("otpInput").focus();
@@ -1874,8 +2172,15 @@ async function verifyEmailOtp(){
     return;
   }
 
-  btn.disabled = true;
-  btn.textContent = "Verifying...";
+
+  const button =
+    $("verifyOtpButton");
+
+  button.disabled = true;
+
+  button.textContent =
+    "Verifying...";
+
 
   try{
 
@@ -1884,40 +2189,56 @@ async function verifyEmailOtp(){
         "/api/verify-otp",
         {
           method:"POST",
-          body:JSON.stringify({
-            otp
-          })
+
+          body:
+            JSON.stringify({
+              otp
+            })
         }
       );
 
+
     if(data.user){
 
-      currentUser =
-        data.user;
-
-      closeOtpModal();
-
-      showAlert(
-        "authAlert",
+      setOtpMessage(
         "Email verified successfully!",
         "success"
       );
 
-      enterDashboard();
+      currentUserData =
+        data.user;
+
+      setTimeout(() => {
+
+        closeOtpModal();
+
+        enterApp();
+
+      },700);
+
+    }else{
+
+      setOtpMessage(
+        "Verification completed.",
+        "success"
+      );
 
     }
 
   }catch(error){
 
-    showAlert(
-      "otpAlert",
-      error.message
+    setOtpMessage(
+      error.message ||
+      "Incorrect OTP.",
+      "error"
     );
 
   }finally{
 
-    btn.disabled = false;
-    btn.textContent = "Verify OTP";
+    button.disabled = false;
+
+    button.textContent =
+      "Verify OTP";
 
   }
 
@@ -1930,15 +2251,20 @@ async function verifyEmailOtp(){
 
 async function resendEmailOtp(){
 
-  const btn =
-    $("resendOtpBtn");
+  const button =
+    $("resendOtpButton");
 
-  if(btn.disabled) return;
+  if(button.disabled){
+    return;
+  }
 
-  btn.disabled = true;
-  btn.textContent = "Sending...";
+  button.disabled = true;
 
-  clearAlert("otpAlert");
+  button.textContent =
+    "Sending...";
+
+  setOtpMessage("");
+
 
   try{
 
@@ -1946,14 +2272,13 @@ async function resendEmailOtp(){
       await api(
         "/api/resend-otp",
         {
-          method:"POST",
-          body:"{}"
+          method:"POST"
         }
       );
 
-    showAlert(
-      "otpAlert",
-      "A new OTP has been sent to your Gmail.",
+
+    setOtpMessage(
+      "A new Gmail OTP has been sent.",
       "success"
     );
 
@@ -1964,16 +2289,21 @@ async function resendEmailOtp(){
 
     $("otpInput").value = "";
 
-    $("otpInput").focus();
+    setTimeout(() => {
+      $("otpInput").focus();
+    },100);
 
   }catch(error){
 
-    showAlert(
-      "otpAlert",
-      error.message
+    setOtpMessage(
+      error.message ||
+      "Unable to resend OTP.",
+      "error"
     );
 
-    btn.disabled = false;
+    button.disabled = false;
+    button.textContent =
+      "Resend OTP";
 
   }
 
@@ -1981,7 +2311,7 @@ async function resendEmailOtp(){
 
 
 /* =====================================================
-   OTP INPUT
+   OTP AUTO INPUT
 ===================================================== */
 
 $("otpInput").addEventListener(
@@ -1993,25 +2323,145 @@ $("otpInput").addEventListener(
         .replace(/\D/g,"")
         .slice(0,6);
 
+    if(this.value.length === 6){
+
+      setTimeout(
+        verifyEmailOtp,
+        150
+      );
+
+    }
+
   }
 );
 
 
 /* =====================================================
-   ENTER DASHBOARD
+   GOOGLE LOGIN
 ===================================================== */
 
-function enterDashboard(){
+async function loadGoogleLogin(){
 
-  $("authPage")
-    .classList.add("hidden");
+  try{
 
-  $("appPage")
-    .classList.remove("hidden");
+    const data =
+      await api(
+        "/api/google-config"
+      );
+
+    googleClientId =
+      data.clientId || "";
+
+    if(
+      !googleClientId ||
+      !window.google
+    ){
+      return;
+    }
+
+
+    window.google.accounts.id.initialize({
+
+      client_id:
+        googleClientId,
+
+      callback:
+        handleGoogleCredential
+
+    });
+
+
+    window.google.accounts.id.renderButton(
+
+      $("googleButton"),
+
+      {
+        theme:"outline",
+        size:"large",
+        width:350,
+        text:"continue_with"
+      }
+
+    );
+
+  }catch(error){
+
+    console.log(
+      "Google Sign-In unavailable:",
+      error.message
+    );
+
+  }
+
+}
+
+
+async function handleGoogleCredential(
+  response
+){
+
+  try{
+
+    showLoading(
+      "Signing in with Google..."
+    );
+
+    const data =
+      await api(
+        "/api/auth/google",
+        {
+          method:"POST",
+
+          body:
+            JSON.stringify({
+              credential:
+                response.credential
+            })
+        }
+      );
+
+
+    if(data.user){
+
+      currentUserData =
+        data.user;
+
+      enterApp();
+
+    }
+
+  }catch(error){
+
+    setAuthMessage(
+      error.message ||
+      "Google login failed.",
+      "error"
+    );
+
+  }finally{
+
+    hideLoading();
+
+  }
+
+}
+
+
+/* =====================================================
+   ENTER APP
+===================================================== */
+
+function enterApp(){
+
+  $("authScreen").style.display =
+    "none";
+
+  $("appScreen").style.display =
+    "block";
 
   updateUserUI();
 
-  showSection("home");
+  showPage("home");
 
   loadTasks();
 
@@ -2021,119 +2471,185 @@ function enterDashboard(){
 
 
 /* =====================================================
-   USER UI
+   UPDATE USER UI
 ===================================================== */
 
 function updateUserUI(){
 
-  if(!currentUser) return;
+  if(!currentUserData){
+    return;
+  }
 
-  const name =
-    currentUser.name || "User";
+  const user =
+    currentUserData;
+
 
   $("headerName").textContent =
-    name;
+    user.name || "User";
 
   $("welcomeName").textContent =
-    name;
+    user.name || "User";
 
-  $("profileName").value =
-    currentUser.name || "";
 
-  $("profileEmail").value =
-    currentUser.email || "";
+  const initial =
+    (user.name || "U")
+      .charAt(0)
+      .toUpperCase();
 
-  $("profileMobile").value =
-    currentUser.mobile || "";
 
-  $("profileCity").value =
-    currentUser.city || "";
+  const headerAvatar =
+    $("headerAvatar");
 
-  $("emailStatus").textContent =
-    currentUser.emailVerified
-      ? "✓ Verified"
-      : "Not verified";
+  const profileAvatar =
+    $("profileAvatar");
 
-  $("mobileStatus").textContent =
-    currentUser.mobileVerified
-      ? "✓ Verified"
-      : "Not verified";
 
-  if(currentUser.profileImage){
+  if(user.profileImage){
 
-    $("headerAvatar").innerHTML =
-      `<img
-        src="${escapeHtml(currentUser.profileImage)}"
-        style="width:100%;height:100%;border-radius:50%;object-fit:cover"
-      >`;
+    headerAvatar.innerHTML =
+      `<img src="${escapeHtml(user.profileImage)}">`;
+
+    profileAvatar.innerHTML =
+      `<img src="${escapeHtml(user.profileImage)}">`;
 
   }else{
 
-    $("headerAvatar").textContent =
-      name.charAt(0).toUpperCase();
+    headerAvatar.textContent =
+      initial;
+
+    profileAvatar.textContent =
+      initial;
 
   }
+
+
+  $("profileNameTitle").textContent =
+    user.name || "User";
+
+  $("profileEmailTitle").textContent =
+    user.email || "—";
+
+
+  $("profileName").value =
+    user.name || "";
+
+  $("profileEmail").value =
+    user.email || "";
+
+  $("profileMobile").value =
+    user.mobile || "";
+
+  $("profileCity").value =
+    user.city || "";
+
+
+  $("homeBalance").textContent =
+    formatMoney(user.balance);
+
+
+  $("walletBalance").textContent =
+    formatMoney(user.balance);
+
+
+  $("homeEmailStatus").textContent =
+    user.emailVerified
+      ? "Verified ✓"
+      : "Not Verified";
+
+
+  $("homeMobileStatus").textContent =
+    user.mobileVerified
+      ? "Verified ✓"
+      : "Not Verified";
+
+
+  $("emailVerificationStatus").textContent =
+    "Email: " +
+    (
+      user.emailVerified
+        ? "Verified ✓"
+        : "Not Verified"
+    );
+
+
+  $("mobileVerificationStatus").textContent =
+    "Mobile: " +
+    (
+      user.mobileVerified
+        ? "Verified ✓"
+        : "Not Verified"
+    );
+
+}
+
+
+function escapeHtml(value){
+
+  return String(value || "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+function formatMoney(value){
+
+  return "₹" +
+    Number(value || 0)
+      .toFixed(2);
 
 }
 
 
 /* =====================================================
-   SECTIONS
+   PAGES
 ===================================================== */
 
-function showSection(section){
+function showPage(page){
 
-  const sections = [
-    "home",
-    "tasks",
-    "wallet",
-    "profile"
-  ];
+  document
+    .querySelectorAll(".page")
+    .forEach(
+      p =>
+        p.classList.add("hidden")
+    );
 
-  sections.forEach(name => {
 
-    const element =
-      $(name + "Section");
+  const target =
+    $(page + "Page");
 
-    if(element){
+  if(target){
+    target.classList.remove("hidden");
+  }
 
-      element.classList.toggle(
-        "hidden",
-        name !== section
-      );
-
-    }
-
-  });
 
   document
     .querySelectorAll(".nav-btn")
-    .forEach(btn =>
-      btn.classList.remove("active")
+    .forEach(
+      b =>
+        b.classList.remove("active")
     );
+
 
   const nav =
     $("nav" +
-      section.charAt(0).toUpperCase() +
-      section.slice(1));
+      page.charAt(0).toUpperCase() +
+      page.slice(1));
 
   if(nav){
-
     nav.classList.add("active");
-
   }
 
-  if(section === "tasks"){
 
+  if(page === "tasks"){
     loadTasks();
-    loadSubmissions();
-
   }
 
-  if(section === "wallet"){
-
+  if(page === "wallet"){
     loadWallet();
-
   }
 
 }
@@ -2145,6 +2661,13 @@ function showSection(section){
 
 async function loadTasks(){
 
+  const grid =
+    $("taskGrid");
+
+  grid.innerHTML =
+    `<div class="card">Loading tasks...</div>`;
+
+
   try{
 
     const tasks =
@@ -2152,81 +2675,60 @@ async function loadTasks(){
         "/api/tasks"
       );
 
-    renderTasks(
-      tasks,
-      "homeTasks"
-    );
 
-    renderTasks(
-      tasks,
-      "tasksList"
-    );
+    if(!tasks.length){
 
-  }catch(error){
+      grid.innerHTML =
+        `<div class="card">
+          No tasks are currently available.
+        </div>`;
 
-    $("homeTasks").innerHTML =
-      `<div class="alert error">${escapeHtml(error.message)}</div>`;
-
-    $("tasksList").innerHTML =
-      `<div class="alert error">${escapeHtml(error.message)}</div>`;
-
-  }
-
-}
+      return;
+    }
 
 
-function renderTasks(
-  tasks,
-  containerId
-){
+    grid.innerHTML =
+      tasks.map(
+        task => `
 
-  const container =
-    $(containerId);
+        <div class="task-card">
 
-  if(!container) return;
-
-  if(!tasks || tasks.length === 0){
-
-    container.innerHTML =
-      `<div class="loading">No tasks available right now.</div>`;
-
-    return;
-
-  }
-
-  container.innerHTML =
-    tasks.map(task => `
-
-      <div class="task-card">
-
-        <div>
           <span class="task-type">
             ${escapeHtml(task.type)}
           </span>
+
+          <div class="task-title">
+            ${escapeHtml(task.title)}
+          </div>
+
+          <div class="task-description">
+            ${escapeHtml(task.description)}
+          </div>
+
+          <div class="task-reward">
+            ₹${Number(task.reward || 0).toFixed(2)}
+          </div>
+
+          <button
+            class="small-btn"
+            onclick="submitTask(${Number(task.id)},this)">
+            Submit Task
+          </button>
+
         </div>
 
-        <h3>
-          ${escapeHtml(task.title)}
-        </h3>
+      `
+      ).join("");
 
-        <div class="task-description">
-          ${escapeHtml(task.description)}
-        </div>
 
-        <div class="reward">
-          ₹${Number(task.reward || 0).toFixed(2)}
-        </div>
+  }catch(error){
 
-        <button
-          class="primary-btn"
-          onclick="submitTask(${Number(task.id)})"
-        >
-          Submit Task
-        </button>
+    grid.innerHTML =
+      `<div class="card">
+        ${escapeHtml(error.message)}
+      </div>`;
 
-      </div>
-
-    `).join("");
+  }
 
 }
 
@@ -2235,121 +2737,49 @@ function renderTasks(
    SUBMIT TASK
 ===================================================== */
 
-async function submitTask(taskId){
+async function submitTask(
+  taskId,
+  button
+){
 
-  if(!confirm(
-    "Are you sure you want to submit this task?"
-  )){
+  button.disabled = true;
 
-    return;
+  button.textContent =
+    "Submitting...";
 
-  }
 
   try{
 
     const data =
       await api(
-        `/api/tasks/${encodeURIComponent(taskId)}/submit`,
+        `/api/tasks/${taskId}/submit`,
         {
-          method:"POST",
-          body:"{}"
+          method:"POST"
         }
       );
 
-    alert(
+
+    showToast(
       data.message ||
       "Task submitted successfully."
     );
 
-    loadSubmissions();
+
+    button.textContent =
+      "Submitted ✓";
+
 
   }catch(error){
 
-    alert(
-      error.message
+    showToast(
+      error.message ||
+      "Unable to submit task."
     );
 
-  }
+    button.disabled = false;
 
-}
-
-
-/* =====================================================
-   SUBMISSIONS
-===================================================== */
-
-async function loadSubmissions(){
-
-  try{
-
-    const submissions =
-      await api(
-        "/api/my-submissions"
-      );
-
-    const container =
-      $("submissionsList");
-
-    if(!submissions.length){
-
-      container.innerHTML =
-        `<div class="loading">No task submissions yet.</div>`;
-
-      return;
-
-    }
-
-    container.innerHTML = `
-
-      <table>
-
-        <thead>
-          <tr>
-            <th>Task</th>
-            <th>Reward</th>
-            <th>Status</th>
-            <th>Date</th>
-          </tr>
-        </thead>
-
-        <tbody>
-
-          ${submissions.map(item => `
-
-            <tr>
-
-              <td>
-                ${escapeHtml(item.taskTitle)}
-              </td>
-
-              <td>
-                ₹${Number(item.reward || 0).toFixed(2)}
-              </td>
-
-              <td>
-                <span class="status ${escapeHtml(item.status)}">
-                  ${escapeHtml(item.status)}
-                </span>
-              </td>
-
-              <td>
-                ${formatDate(item.submittedAt)}
-              </td>
-
-            </tr>
-
-          `).join("")}
-
-        </tbody>
-
-      </table>
-
-    `;
-
-  }catch(error){
-
-    $("submissionsList").innerHTML =
-      `<div class="alert error">${escapeHtml(error.message)}</div>`;
+    button.textContent =
+      "Submit Task";
 
   }
 
@@ -2357,7 +2787,7 @@ async function loadSubmissions(){
 
 
 /* =====================================================
-   WALLET
+   LOAD WALLET
 ===================================================== */
 
 async function loadWallet(){
@@ -2369,97 +2799,98 @@ async function loadWallet(){
         "/api/wallet"
       );
 
-    const balance =
-      Number(data.balance || 0);
 
-    $("homeBalance").textContent =
-      "₹" + balance.toFixed(2);
+    if(currentUserData){
+
+      currentUserData.balance =
+        Number(
+          data.balance || 0
+        );
+
+    }
+
 
     $("walletBalance").textContent =
-      "₹" + balance.toFixed(2);
+      formatMoney(data.balance);
 
-    renderWithdrawals(
-      data.withdrawals || []
-    );
+    $("homeBalance").textContent =
+      formatMoney(data.balance);
+
+
+    const list =
+      $("withdrawalList");
+
+
+    if(!data.withdrawals ||
+       !data.withdrawals.length){
+
+      list.innerHTML =
+        `<p style="color:#777">
+          No withdrawal requests yet.
+        </p>`;
+
+      return;
+    }
+
+
+    list.innerHTML =
+      data.withdrawals.map(
+        item => `
+
+        <div class="withdrawal-item">
+
+          <div>
+
+            <strong>
+              ₹${Number(item.amount || 0).toFixed(2)}
+            </strong>
+
+            <div
+              style="color:#777;font-size:12px;margin-top:4px">
+
+              ${escapeHtml(item.method)}
+
+              •
+              ${formatDate(item.createdAt)}
+
+            </div>
+
+          </div>
+
+          <span class="status">
+            ${escapeHtml(item.status)}
+          </span>
+
+        </div>
+
+      `
+      ).join("");
+
 
   }catch(error){
 
-    console.error(
-      "Wallet error:",
-      error
-    );
+    $("withdrawalList").innerHTML =
+      `<p style="color:#c62828">
+        ${escapeHtml(error.message)}
+      </p>`;
 
   }
 
 }
 
 
-function renderWithdrawals(
-  withdrawals
-){
+function formatDate(date){
 
-  const container =
-    $("withdrawalHistory");
+  try{
 
-  if(!withdrawals.length){
+    return new Date(date)
+      .toLocaleString();
 
-    container.innerHTML =
-      `<div class="loading">No withdrawal requests yet.</div>`;
+  }catch(error){
 
-    return;
+    return "";
 
   }
-
-  container.innerHTML = `
-
-    <table>
-
-      <thead>
-
-        <tr>
-          <th>Amount</th>
-          <th>Method</th>
-          <th>Status</th>
-          <th>Date</th>
-        </tr>
-
-      </thead>
-
-      <tbody>
-
-        ${withdrawals.map(item => `
-
-          <tr>
-
-            <td>
-              ₹${Number(item.amount || 0).toFixed(2)}
-            </td>
-
-            <td>
-              ${escapeHtml(item.method)}
-            </td>
-
-            <td>
-
-              <span class="status ${escapeHtml(item.status)}">
-                ${escapeHtml(item.status)}
-              </span>
-
-            </td>
-
-            <td>
-              ${formatDate(item.createdAt)}
-            </td>
-
-          </tr>
-
-        `).join("")}
-
-      </tbody>
-
-    </table>
-
-  `;
 
 }
 
@@ -2473,21 +2904,30 @@ function changePaymentMethod(){
   const method =
     $("withdrawMethod").value;
 
+
+  $("upiFields")
+    .classList
+    .add("hidden");
+
+  $("bankFields")
+    .classList
+    .add("hidden");
+
+
   if(method === "UPI"){
 
     $("upiFields")
-      .classList.remove("hidden");
+      .classList
+      .remove("hidden");
+
+  }
+
+
+  if(method === "Bank Account"){
 
     $("bankFields")
-      .classList.add("hidden");
-
-  }else{
-
-    $("upiFields")
-      .classList.add("hidden");
-
-    $("bankFields")
-      .classList.remove("hidden");
+      .classList
+      .remove("hidden");
 
   }
 
@@ -2498,9 +2938,23 @@ function changePaymentMethod(){
    WITHDRAW
 ===================================================== */
 
-async function withdrawMoney(){
+async function withdrawMoney(event){
 
-  clearAlert("withdrawAlert");
+  event.preventDefault();
+
+
+  if(!currentUserData){
+    return;
+  }
+
+
+  if(!currentUserData.mobileVerified){
+
+    await sendMobileOtp();
+
+    return;
+  }
+
 
   const amount =
     Number(
@@ -2510,45 +2964,96 @@ async function withdrawMoney(){
   const method =
     $("withdrawMethod").value;
 
-  if(!Number.isFinite(amount) || amount < 100){
 
-    showAlert(
-      "withdrawAlert",
+  if(
+    !Number.isFinite(amount) ||
+    amount < 100
+  ){
+
+    showToast(
       "Minimum withdrawal amount is ₹100."
     );
 
     return;
-
   }
 
+
+  if(
+    amount >
+    Number(
+      currentUserData.balance || 0
+    )
+  ){
+
+    showToast(
+      "Insufficient wallet balance."
+    );
+
+    return;
+  }
+
+
   let paymentDetails = {};
+
 
   if(method === "UPI"){
 
     paymentDetails = {
+
       upiId:
-        $("upiId").value.trim()
+        $("upiId")
+          .value
+          .trim()
+
     };
 
-  }else{
+  }else if(
+    method === "Bank Account"
+  ){
 
     paymentDetails = {
 
       accountHolderName:
-        $("accountHolderName").value.trim(),
+        $("accountHolderName")
+          .value
+          .trim(),
 
       accountNumber:
-        $("accountNumber").value.trim(),
+        $("accountNumber")
+          .value
+          .trim(),
 
       ifscCode:
-        $("ifscCode").value.trim().toUpperCase(),
+        $("ifscCode")
+          .value
+          .trim()
+          .toUpperCase(),
 
       bankName:
-        $("bankName").value.trim()
+        $("bankName")
+          .value
+          .trim()
 
     };
 
+  }else{
+
+    showToast(
+      "Please select a payment method."
+    );
+
+    return;
   }
+
+
+  const button =
+    $("withdrawButton");
+
+  button.disabled = true;
+
+  button.textContent =
+    "Submitting...";
+
 
   try{
 
@@ -2557,51 +3062,50 @@ async function withdrawMoney(){
         "/api/withdraw",
         {
           method:"POST",
-          body:JSON.stringify({
-            amount,
-            method,
-            paymentDetails
-          })
+
+          body:
+            JSON.stringify({
+
+              amount,
+
+              method,
+
+              paymentDetails
+
+            })
+
         }
       );
 
-    showAlert(
-      "withdrawAlert",
+
+    showToast(
       data.message ||
-      "Withdrawal request submitted.",
-      "success"
+      "Withdrawal request submitted."
     );
 
-    $("withdrawAmount").value = "";
 
-    $("upiId").value = "";
+    $("withdrawForm").reset();
 
-    loadWallet();
+    changePaymentMethod();
+
+    await refreshUser();
+
+    await loadWallet();
+
 
   }catch(error){
 
-    /*
-      If mobile verification is required,
-      the server returns HTTP 403.
-    */
-
-    if(
-      error.message &&
-      error.message.toLowerCase().includes(
-        "verify your mobile"
-      )
-    ){
-
-      await sendMobileOtp();
-
-      return;
-
-    }
-
-    showAlert(
-      "withdrawAlert",
-      error.message
+    showToast(
+      error.message ||
+      "Unable to submit withdrawal."
     );
+
+  }finally{
+
+    button.disabled = false;
+
+    button.textContent =
+      "Withdraw";
 
   }
 
@@ -2609,12 +3113,25 @@ async function withdrawMoney(){
 
 
 /* =====================================================
-   SEND MOBILE OTP
+   MOBILE OTP
 ===================================================== */
 
 async function sendMobileOtp(){
 
-  clearAlert("withdrawAlert");
+  if(
+    !currentUserData ||
+    !currentUserData.mobile
+  ){
+
+    showPage("profile");
+
+    showToast(
+      "Please add your mobile number in Profile first."
+    );
+
+    return;
+  }
+
 
   try{
 
@@ -2622,52 +3139,35 @@ async function sendMobileOtp(){
       await api(
         "/api/withdrawal/send-mobile-otp",
         {
-          method:"POST",
-          body:"{}"
+          method:"POST"
         }
       );
 
+
     if(data.alreadyVerified){
 
-      showAlert(
-        "withdrawAlert",
-        "Your mobile number is already verified.",
-        "success"
-      );
+      currentUserData.mobileVerified =
+        true;
+
+      updateUserUI();
 
       return;
 
     }
 
-    $("mobileOtpNumber").textContent =
-      data.mobile || currentUser.mobile;
 
-    $("mobileOtpInput").value = "";
-
-    clearAlert("mobileOtpAlert");
-
-    $("mobileOtpModal")
-      .classList.remove("hidden");
-
-    document.body.style.overflow =
-      "hidden";
-
-    setTimeout(() => {
-
-      $("mobileOtpInput").focus();
-
-    },150);
-
-    startMobileOtpTimer(
+    openMobileOtpModal(
+      data.mobile,
       data.expiresAt,
       data.resendAt
     );
 
+
   }catch(error){
 
-    showAlert(
-      "withdrawAlert",
-      error.message
+    showToast(
+      error.message ||
+      "Unable to send mobile OTP."
     );
 
   }
@@ -2675,22 +3175,69 @@ async function sendMobileOtp(){
 }
 
 
-/* =====================================================
-   MOBILE OTP TIMER
-===================================================== */
+function openMobileOtpModal(
+  mobile,
+  expiresAt,
+  resendAt
+){
+
+  $("mobileOtpDescription").textContent =
+    "We sent a 6-digit OTP to " +
+    mobile +
+    ". Enter it below to verify your mobile number.";
+
+  $("mobileOtpInput").value = "";
+
+  setMobileOtpMessage("");
+
+  $("mobileOtpModal")
+    .classList
+    .add("show");
+
+  startMobileOtpTimer(
+    expiresAt,
+    resendAt
+  );
+
+  setTimeout(() => {
+    $("mobileOtpInput").focus();
+  },150);
+
+}
+
+
+function closeMobileOtpModal(){
+
+  $("mobileOtpModal")
+    .classList
+    .remove("show");
+
+  if(mobileOtpTimerInterval){
+
+    clearInterval(
+      mobileOtpTimerInterval
+    );
+
+    mobileOtpTimerInterval = null;
+
+  }
+
+}
+
 
 function startMobileOtpTimer(
   expiresAt,
   resendAt
 ){
 
-  if(mobileOtpTimer){
+  if(mobileOtpTimerInterval){
 
     clearInterval(
-      mobileOtpTimer
+      mobileOtpTimerInterval
     );
 
   }
+
 
   function update(){
 
@@ -2698,16 +3245,17 @@ function startMobileOtpTimer(
       Date.now();
 
     const expiry =
-      new Date(
-        expiresAt
-      ).getTime();
+      expiresAt
+        ? new Date(expiresAt).getTime()
+        : now + 600000;
 
     const resend =
-      new Date(
-        resendAt
-      ).getTime();
+      resendAt
+        ? new Date(resendAt).getTime()
+        : now;
 
-    const expirySeconds =
+
+    const expiresIn =
       Math.max(
         0,
         Math.ceil(
@@ -2715,7 +3263,8 @@ function startMobileOtpTimer(
         )
       );
 
-    const resendSeconds =
+
+    const resendIn =
       Math.max(
         0,
         Math.ceil(
@@ -2723,24 +3272,48 @@ function startMobileOtpTimer(
         )
       );
 
-    $("mobileResendText").textContent =
-      expirySeconds > 0
-        ? `OTP expires in ${Math.floor(expirySeconds/60)}:${String(expirySeconds%60).padStart(2,"0")}`
-        : "OTP expired. Request a new OTP.";
 
-    $("resendMobileBtn").disabled =
-      resendSeconds > 0;
+    const minutes =
+      Math.floor(
+        expiresIn/60
+      );
 
-    $("resendMobileBtn").textContent =
-      resendSeconds > 0
-        ? `Resend OTP (${resendSeconds}s)`
-        : "Resend OTP";
+    const seconds =
+      expiresIn%60;
+
+
+    $("mobileOtpTimer").textContent =
+      expiresIn > 0
+        ? `OTP expires in ${minutes}:${String(seconds).padStart(2,"0")}`
+        : "OTP expired. Please resend OTP.";
+
+
+    const button =
+      $("resendMobileOtpButton");
+
+
+    if(resendIn > 0){
+
+      button.disabled = true;
+
+      button.textContent =
+        `Resend OTP in ${resendIn}s`;
+
+    }else{
+
+      button.disabled = false;
+
+      button.textContent =
+        "Resend OTP";
+
+    }
 
   }
 
+
   update();
 
-  mobileOtpTimer =
+  mobileOtpTimerInterval =
     setInterval(
       update,
       1000
@@ -2755,33 +3328,31 @@ function startMobileOtpTimer(
 
 async function verifyMobileOtp(){
 
-  const btn =
-    $("verifyMobileBtn");
-
   const otp =
     $("mobileOtpInput")
       .value
-      .replace(/\D/g,"")
-      .slice(0,6);
+      .trim();
 
-  $("mobileOtpInput").value =
-    otp;
-
-  clearAlert("mobileOtpAlert");
 
   if(!/^\d{6}$/.test(otp)){
 
-    showAlert(
-      "mobileOtpAlert",
-      "Please enter the 6-digit OTP."
+    setMobileOtpMessage(
+      "Please enter the 6-digit OTP.",
+      "error"
     );
 
     return;
-
   }
 
-  btn.disabled = true;
-  btn.textContent = "Verifying...";
+
+  const button =
+    $("verifyMobileOtpButton");
+
+  button.disabled = true;
+
+  button.textContent =
+    "Verifying...";
+
 
   try{
 
@@ -2790,40 +3361,54 @@ async function verifyMobileOtp(){
         "/api/withdrawal/verify-mobile-otp",
         {
           method:"POST",
-          body:JSON.stringify({
-            otp
-          })
+
+          body:
+            JSON.stringify({
+              otp
+            })
         }
       );
 
+
     if(data.verified){
 
-      currentUser =
+      currentUserData =
         data.user;
 
       updateUserUI();
 
-      closeMobileOtpModal();
-
-      showAlert(
-        "withdrawAlert",
-        "Mobile verified successfully. You can now request your withdrawal.",
+      setMobileOtpMessage(
+        "Mobile number verified successfully!",
         "success"
       );
 
+
+      setTimeout(() => {
+
+        closeMobileOtpModal();
+
+        showToast(
+          "Mobile number verified. You can now withdraw."
+        );
+
+      },700);
+
     }
+
 
   }catch(error){
 
-    showAlert(
-      "mobileOtpAlert",
-      error.message
+    setMobileOtpMessage(
+      error.message ||
+      "Incorrect OTP.",
+      "error"
     );
 
   }finally{
 
-    btn.disabled = false;
-    btn.textContent =
+    button.disabled = false;
+
+    button.textContent =
       "Verify Mobile";
 
   }
@@ -2831,20 +3416,22 @@ async function verifyMobileOtp(){
 }
 
 
-/* =====================================================
-   RESEND MOBILE OTP
-===================================================== */
-
 async function resendMobileOtp(){
 
-  const btn =
-    $("resendMobileBtn");
+  const button =
+    $("resendMobileOtpButton");
 
-  if(btn.disabled) return;
 
-  btn.disabled = true;
-  btn.textContent =
+  if(button.disabled){
+    return;
+  }
+
+
+  button.disabled = true;
+
+  button.textContent =
     "Sending...";
+
 
   try{
 
@@ -2852,68 +3439,53 @@ async function resendMobileOtp(){
       await api(
         "/api/withdrawal/resend-mobile-otp",
         {
-          method:"POST",
-          body:"{}"
+          method:"POST"
         }
       );
+
 
     if(data.alreadyVerified){
 
       closeMobileOtpModal();
 
-      return;
+      currentUserData.mobileVerified =
+        true;
 
+      updateUserUI();
+
+      return;
     }
 
-    showAlert(
-      "mobileOtpAlert",
+
+    setMobileOtpMessage(
       "A new mobile OTP has been sent.",
       "success"
     );
+
 
     startMobileOtpTimer(
       data.expiresAt,
       data.resendAt
     );
 
+
   }catch(error){
 
-    showAlert(
-      "mobileOtpAlert",
-      error.message
+    setMobileOtpMessage(
+      error.message ||
+      "Unable to resend mobile OTP.",
+      "error"
     );
 
-    btn.disabled = false;
+    button.disabled = false;
+
+    button.textContent =
+      "Resend OTP";
 
   }
 
 }
 
-
-function closeMobileOtpModal(){
-
-  $("mobileOtpModal")
-    .classList.add("hidden");
-
-  document.body.style.overflow =
-    "";
-
-  if(mobileOtpTimer){
-
-    clearInterval(
-      mobileOtpTimer
-    );
-
-    mobileOtpTimer = null;
-
-  }
-
-}
-
-
-/* =====================================================
-   MOBILE OTP INPUT
-===================================================== */
 
 $("mobileOtpInput").addEventListener(
   "input",
@@ -2924,26 +3496,36 @@ $("mobileOtpInput").addEventListener(
         .replace(/\D/g,"")
         .slice(0,6);
 
+    if(this.value.length === 6){
+
+      setTimeout(
+        verifyMobileOtp,
+        150
+      );
+
+    }
+
   }
 );
 
 
 /* =====================================================
-   PROFILE
+   PROFILE SAVE
 ===================================================== */
 
-async function saveProfile(){
+async function saveProfile(event){
 
-  clearAlert("profileAlert");
+  event.preventDefault();
 
-  const name =
-    $("profileName").value.trim();
 
-  const mobile =
-    $("profileMobile").value.trim();
+  const button =
+    $("profileSaveButton");
 
-  const city =
-    $("profileCity").value.trim();
+  button.disabled = true;
+
+  button.textContent =
+    "Saving...";
+
 
   try{
 
@@ -2952,32 +3534,55 @@ async function saveProfile(){
         "/api/profile",
         {
           method:"PUT",
-          body:JSON.stringify({
-            name,
-            mobile,
-            city
-          })
+
+          body:
+            JSON.stringify({
+
+              name:
+                $("profileName")
+                  .value
+                  .trim(),
+
+              mobile:
+                $("profileMobile")
+                  .value
+                  .trim(),
+
+              city:
+                $("profileCity")
+                  .value
+                  .trim()
+
+            })
+
         }
       );
 
-    currentUser =
+
+    currentUserData =
       data.user;
 
     updateUserUI();
 
-    showAlert(
-      "profileAlert",
+    showToast(
       data.message ||
-      "Profile saved successfully.",
-      "success"
+      "Profile saved successfully."
     );
+
 
   }catch(error){
 
-    showAlert(
-      "profileAlert",
-      error.message
+    showToast(
+      error.message ||
+      "Unable to save profile."
     );
+
+  }finally{
+
+    button.disabled = false;
+
+    button.textContent =
+      "Save Profile";
 
   }
 
@@ -2995,177 +3600,46 @@ async function logoutUser(){
     await api(
       "/api/logout",
       {
-        method:"POST",
-        body:"{}"
+        method:"POST"
       }
     );
 
   }catch(error){
 
-    console.error(
-      "Logout error:",
-      error
+    console.log(
+      "Logout request:",
+      error.message
     );
 
   }
 
-  currentUser = null;
 
-  $("appPage")
-    .classList.add("hidden");
+  currentUserData = null;
 
-  $("authPage")
-    .classList.remove("hidden");
 
-  showLogin();
+  $("appScreen").style.display =
+    "none";
+
+  $("authScreen").style.display =
+    "flex";
+
+
+  showAuth("login");
 
   $("loginPassword").value = "";
 
-}
-
-
-/* =====================================================
-   GOOGLE LOGIN
-===================================================== */
-
-async function googleCredentialResponse(
-  response
-){
-
-  clearAlert("authAlert");
-
-  try{
-
-    const data =
-      await api(
-        "/api/auth/google",
-        {
-          method:"POST",
-          body:JSON.stringify({
-            credential:
-              response.credential
-          })
-        }
-      );
-
-    if(data.user){
-
-      currentUser =
-        data.user;
-
-      enterDashboard();
-
-    }
-
-  }catch(error){
-
-    showAlert(
-      "authAlert",
-      error.message
-    );
-
-  }
+  showToast(
+    "Logged out successfully."
+  );
 
 }
 
 
 /* =====================================================
-   LOAD GOOGLE BUTTON
+   REFRESH USER
 ===================================================== */
 
-async function setupGoogleLogin(){
-
-  try{
-
-    const config =
-      await api(
-        "/api/google-config"
-      );
-
-    if(
-      !config.clientId
-    ){
-
-      console.log(
-        "Google Sign-In is not configured."
-      );
-
-      return;
-
-    }
-
-    if(
-      !window.google ||
-      !google.accounts ||
-      !google.accounts.id
-    ){
-
-      setTimeout(
-        setupGoogleLogin,
-        1000
-      );
-
-      return;
-
-    }
-
-    google.accounts.id.initialize({
-
-      client_id:
-        config.clientId,
-
-      callback:
-        googleCredentialResponse
-
-    });
-
-    if($("googleLoginButton")){
-
-      google.accounts.id.renderButton(
-        $("googleLoginButton"),
-        {
-          theme:"outline",
-          size:"large",
-          width:320,
-          text:"continue_with",
-          shape:"rectangular"
-        }
-      );
-
-    }
-
-    if($("googleRegisterButton")){
-
-      google.accounts.id.renderButton(
-        $("googleRegisterButton"),
-        {
-          theme:"outline",
-          size:"large",
-          width:320,
-          text:"signup_with",
-          shape:"rectangular"
-        }
-      );
-
-    }
-
-  }catch(error){
-
-    console.log(
-      "Google button setup:",
-      error.message
-    );
-
-  }
-
-}
-
-
-/* =====================================================
-   CHECK CURRENT LOGIN
-===================================================== */
-
-async function checkCurrentUser(){
+async function refreshUser(){
 
   try{
 
@@ -3176,17 +3650,18 @@ async function checkCurrentUser(){
 
     if(user){
 
-      currentUser =
+      currentUserData =
         user;
 
-      enterDashboard();
+      updateUserUI();
 
     }
 
   }catch(error){
 
     console.log(
-      "No active session."
+      "Refresh user error:",
+      error.message
     );
 
   }
@@ -3195,27 +3670,48 @@ async function checkCurrentUser(){
 
 
 /* =====================================================
-   DATE FORMAT
+   INITIAL SESSION CHECK
 ===================================================== */
 
-function formatDate(value){
-
-  if(!value) return "—";
+async function checkSession(){
 
   try{
 
-    return new Date(value)
-      .toLocaleString(
-        "en-IN",
-        {
-          dateStyle:"medium",
-          timeStyle:"short"
-        }
+    const user =
+      await api(
+        "/api/me"
       );
 
-  }catch(e){
 
-    return value;
+    if(user){
+
+      currentUserData =
+        user;
+
+      enterApp();
+
+    }else{
+
+      $("authScreen").style.display =
+        "flex";
+
+      $("appScreen").style.display =
+        "none";
+
+    }
+
+  }catch(error){
+
+    console.log(
+      "Session check:",
+      error.message
+    );
+
+    $("authScreen").style.display =
+      "flex";
+
+    $("appScreen").style.display =
+      "none";
 
   }
 
@@ -3223,34 +3719,52 @@ function formatDate(value){
 
 
 /* =====================================================
-   KEYBOARD SUPPORT
+   CLOSE MODAL WHEN CLICKING OUTSIDE
 ===================================================== */
 
-$("otpInput").addEventListener(
-  "keydown",
+$("otpModal").addEventListener(
+  "click",
   function(event){
 
     if(
-      event.key === "Enter"
+      event.target ===
+      $("otpModal")
     ){
-
-      verifyEmailOtp();
-
+      closeOtpModal();
     }
 
   }
 );
 
 
-$("mobileOtpInput").addEventListener(
-  "keydown",
+$("mobileOtpModal").addEventListener(
+  "click",
   function(event){
 
     if(
-      event.key === "Enter"
+      event.target ===
+      $("mobileOtpModal")
     ){
+      closeMobileOtpModal();
+    }
 
-      verifyMobileOtp();
+  }
+);
+
+
+/* =====================================================
+   ESCAPE KEY
+===================================================== */
+
+document.addEventListener(
+  "keydown",
+  function(event){
+
+    if(event.key === "Escape"){
+
+      closeOtpModal();
+
+      closeMobileOtpModal();
 
     }
 
@@ -3262,13 +3776,16 @@ $("mobileOtpInput").addEventListener(
    START
 ===================================================== */
 
-document.addEventListener(
-  "DOMContentLoaded",
+window.addEventListener(
+  "load",
   function(){
 
-    setupGoogleLogin();
+    setTimeout(
+      loadGoogleLogin,
+      1000
+    );
 
-    checkCurrentUser();
+    checkSession();
 
   }
 );
@@ -3276,4 +3793,4 @@ document.addEventListener(
 </script>
 
 </body>
-  </html>
+</html>
