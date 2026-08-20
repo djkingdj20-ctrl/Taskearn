@@ -95,7 +95,6 @@ app.use(
   })
 );
 
-
 /* =====================================================
    HELPERS & VALIDATIONS
 ===================================================== */
@@ -133,12 +132,16 @@ function publicUser(user) {
    OTP & MAILER SERVICES
 ===================================================== */
 
+// Connection Timeouts జోడించబడ్డాయి (హ్యాంగ్ అవ్వకుండా ఉండటానికి)
 const mailTransporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: GMAIL_USER,
     pass: GMAIL_APP_PASSWORD
-  }
+  },
+  connectionTimeout: 10000,
+  greetingTimeout: 5000,
+  socketTimeout: 10000
 });
 
 function randomOtp() {
@@ -151,16 +154,16 @@ function hashOtp(otp) {
 
 async function sendEmailOtp(email, otp) {
   if (!GMAIL_USER || !GMAIL_APP_PASSWORD) {
-    console.warn("Gmail Env variables missing! OTP email skipped.");
-    return;
+    throw new Error("బ్యాకెండ్‌లో Gmail డీటైల్స్ (GMAIL_USER / GMAIL_APP_PASSWORD) అమర్చలేదు.");
   }
+
   await mailTransporter.sendMail({
     from: `"TaskEarn" <${GMAIL_USER}>`,
     to: email,
     subject: "TaskEarn Verification Code",
-    html: `<div style="padding:20px; border:1px solid #ddd;">
-      <h2>TaskEarn Verification</h2>
-      <p>Your OTP Code is: <b style="font-size: 24px; color: #007bff;">${otp}</b></p>
+    html: `<div style="padding:20px; border:1px solid #ddd; font-family: sans-serif;">
+      <h2 style="color:#ff5d2e;">TaskEarn Verification</h2>
+      <p>Your OTP Code is: <b style="font-size: 26px; color: #ff5d2e;">${otp}</b></p>
       <p>This code is valid for 10 minutes.</p>
     </div>`
   });
@@ -264,7 +267,6 @@ app.post("/api/register", async (req, res) => {
 
     saveDB(db);
 
-    // Save state in Session
     req.session.verification = {
       userId: user.id,
       step: "email",
@@ -320,7 +322,6 @@ app.post("/api/verify-otp", async (req, res) => {
       return res.status(400).json({ error: "OTP ఎక్స్‌పైర్ అయింది." });
     }
 
-    // Step Logic
     if (verification.step === "email") {
       user.emailVerified = true;
       saveDB(db);
@@ -376,7 +377,7 @@ app.post("/api/resend-otp", async (req, res) => {
     await generateAndSendOtp(user, verification.step, verification.purpose);
     res.json({ success: true, message: "కొత్త OTP పంపబడింది." });
   } catch (error) {
-    res.status(500).json({ error: "OTP తిరిగి పంపడం విఫలమైంది." });
+    res.status(500).json({ error: error.message || "OTP తిరిగి పంపడం విఫలమైంది." });
   }
 });
 
@@ -415,7 +416,7 @@ app.post("/api/login", async (req, res) => {
       res.json({ success: true, user: publicUser(user) });
     });
   } catch (error) {
-    res.status(500).json({ error: "Login failed" });
+    res.status(500).json({ error: error.message || "Login failed" });
   }
 });
 
