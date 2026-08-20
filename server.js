@@ -134,12 +134,6 @@ function loadDB() {
 
       user.balance ??= 0;
       user.role ??= "Member";
-
-      /*
-        IMPORTANT:
-        We intentionally keep passwordHash.
-        Plain password is never stored.
-      */
       user.passwordHash ??= "";
     });
 
@@ -283,6 +277,63 @@ function requireLogin(req, res, next) {
 }
 
 /* =====================================================
+   VERIFIED DUPLICATE HELPERS
+   IMPORTANT:
+   Only VERIFIED email/mobile blocks registration.
+===================================================== */
+
+function findVerifiedUserByEmail(email) {
+  const normalized =
+    normalizeEmail(email);
+
+  return db.users.find(
+    (user) =>
+      Boolean(user.emailVerified) &&
+      normalizeEmail(user.email) ===
+        normalized
+  );
+}
+
+function findVerifiedUserByMobile(mobile) {
+  const normalized =
+    normalizeMobile(mobile);
+
+  return db.users.find(
+    (user) =>
+      Boolean(user.mobileVerified) &&
+      normalizeMobile(user.mobile) ===
+        normalized
+  );
+}
+
+/*
+  Find an existing UNVERIFIED account.
+  This allows the user to continue/restart
+  verification instead of receiving
+  "Already registered".
+*/
+
+function findUnverifiedUser(email, mobile) {
+  const normalizedEmail =
+    normalizeEmail(email);
+
+  const normalizedMobile =
+    normalizeMobile(mobile);
+
+  return db.users.find(
+    (user) =>
+      !user.emailVerified &&
+      !user.mobileVerified &&
+      (
+        normalizeEmail(user.email) ===
+          normalizedEmail ||
+        normalizeMobile(user.mobile) ===
+          normalizedMobile
+      )
+  );
+}
+
+/* =====================================================
    OTP HELPERS
 ===================================================== */
 
@@ -387,9 +438,7 @@ color:#171b2d;
 TaskEarn
 </h1>
 
-<h2 style="
-color:#222;
-">
+<h2 style="color:#222;">
 Verification Code
 </h2>
 
@@ -556,6 +605,10 @@ async function sendSmsOtp(
       "Unable to send mobile verification code."
     );
   }
+
+  console.log(
+    `Mobile OTP sent successfully to ${mobile}`
+  );
 }
 
 /* =====================================================
@@ -771,7 +824,10 @@ async function startVerification(
     MOBILE SECOND
   */
 
-  if (!user.mobileVerified) {
+  if (
+    !user.mobileVerified &&
+    user.mobile
+  ) {
     await sendOtpFor(
       user,
       "mobile",
@@ -946,11 +1002,6 @@ app.post(
               )
         );
 
-      /*
-        If Google ID is not found,
-        try matching email.
-      */
-
       if (!user) {
         user =
           db.users.find(
@@ -961,10 +1012,6 @@ app.post(
               google.email
           );
       }
-
-      /*
-        NEW GOOGLE USER
-      */
 
       if (!user) {
         user = {
@@ -977,10 +1024,6 @@ app.post(
           email:
             google.email,
 
-          /*
-            Google account does not
-            require a local password.
-          */
           passwordHash:
             "",
 
@@ -999,10 +1042,6 @@ app.post(
           emailVerified:
             true,
 
-          /*
-            Google does NOT automatically
-            verify the user's mobile number.
-          */
           mobileVerified:
             false,
 
@@ -1021,10 +1060,6 @@ app.post(
 
         db.users.push(user);
       } else {
-        /*
-          EXISTING USER
-        */
-
         user.googleId =
           google.googleId;
 
@@ -1052,21 +1087,6 @@ app.post(
       }
 
       saveDB(db);
-
-      /*
-        IMPORTANT:
-        Google already verified
-        the Gmail address.
-
-        Therefore:
-        - No Email OTP
-        - No password
-        - Direct Google login
-
-        Mobile OTP is NOT forced here,
-        because Google users may not have
-        a mobile number yet.
-      */
 
       completeLogin(
         req,
@@ -1127,6 +1147,8 @@ app.use(
 
 /* =====================================================
    REGISTER
+   IMPORTANT:
+   UNVERIFIED EMAIL/MOBILE IS NOT "REGISTERED"
 ===================================================== */
 
 app.post(
@@ -1200,87 +1222,178 @@ app.post(
         });
       }
 
-      const existingEmail =
-        db.users.find(
-          (u) =>
-            normalizeEmail(
-              u.email
-            ) === email
+      /*
+        =================================================
+        IMPORTANT FIX #1
+
+        Only VERIFIED EMAIL can cause
+        "email already registered".
+        =================================================
+      */
+
+      const existingVerifiedEmail =
+        findVerifiedUserByEmail(
+          email
         );
 
-      if (existingEmail) {
+      if (existingVerifiedEmail) {
         return res.status(409).json({
           error:
-            "An account with this email already exists. Please login."
-        });
-      }
-
-      const existingMobile =
-        db.users.find(
-          (u) =>
-            u.mobile === mobile
-        );
-
-      if (existingMobile) {
-        return res.status(409).json({
-          error:
-            "This mobile number is already registered."
+            "An account with this email is already registered and verified. Please login."
         });
       }
 
       /*
-        NEVER store plain password.
-        Only bcrypt hash is stored.
+        =================================================
+        IMPORTANT FIX #2
+
+        Only VERIFIED MOBILE can cause
+        "mobile already registered".
+        =================================================
       */
 
-      const passwordHash =
-        await bcrypt.hash(
-          password,
-          12
+      const existingVerifiedMobile =
+        findVerifiedUserByMobile(
+          mobile
         );
 
-      const user = {
-        id:
-          crypto.randomUUID(),
+      if (existingVerifiedMobile) {
+        return res.status(409).json({
+          error:
+            "This mobile number is already registered and verified. Please use another number."
+        });
+      }
 
-        name,
+      /*
+        =================================================
+        IMPORTANT FIX #3
 
-        email,
+        If an old account exists but its
+        email/mobile was NEVER verified,
+        do NOT say "Already registered".
 
-        passwordHash,
+        Instead, reuse that account and
+        restart verification.
+        =================================================
+      */
 
-        role:
-          "Member",
+      let user =
+        findUnverifiedUser(
+          email,
+          mobile
+        );
 
-        mobile,
+      /*
+        EXISTING UNVERIFIED ACCOUNT
+      */
 
-        city,
+      if (user) {
+        /*
+          Update registration details.
+          The account is still NOT verified.
+        */
 
-        profileImage:
-          "",
+        user.name =
+          name;
 
-        emailVerified:
-          false,
+        user.email =
+          email;
 
-        mobileVerified:
-          false,
+        user.mobile =
+          mobile;
 
-        googleId:
-          "",
+        user.city =
+          city;
 
-        authProvider:
-          "local",
+        user.passwordHash =
+          await bcrypt.hash(
+            password,
+            12
+          );
 
-        balance:
-          0,
+        /*
+          Keep verification false
+          until OTP succeeds.
+        */
 
-        createdAt:
-          new Date().toISOString()
-      };
+        user.emailVerified =
+          false;
 
-      db.users.push(user);
+        user.mobileVerified =
+          false;
 
-      saveDB(db);
+        user.authProvider =
+          "local";
+
+        /*
+          Clear old Google ID if this
+          is being converted to local
+          registration.
+        */
+
+        user.googleId =
+          "";
+
+        saveDB(db);
+      }
+
+      /*
+        NEW ACCOUNT
+      */
+
+      else {
+        user = {
+          id:
+            crypto.randomUUID(),
+
+          name,
+
+          email,
+
+          passwordHash:
+            await bcrypt.hash(
+              password,
+              12
+            ),
+
+          role:
+            "Member",
+
+          mobile,
+
+          city,
+
+          profileImage:
+            "",
+
+          /*
+            VERY IMPORTANT:
+            Both are FALSE initially.
+          */
+
+          emailVerified:
+            false,
+
+          mobileVerified:
+            false,
+
+          googleId:
+            "",
+
+          authProvider:
+            "local",
+
+          balance:
+            0,
+
+          createdAt:
+            new Date().toISOString()
+        };
+
+        db.users.push(user);
+
+        saveDB(db);
+      }
 
       req.session.remember =
         Boolean(
@@ -1297,20 +1410,19 @@ app.post(
             "register"
           );
       } catch (otpError) {
+        console.error(
+          "Registration OTP error:",
+          otpError
+        );
+
         /*
-          Remove newly created user
-          if the first OTP could not
-          be sent.
+          IMPORTANT:
+          Do NOT delete the user here.
+
+          The account can remain unverified
+          and the user can try registration
+          again to receive a new OTP.
         */
-
-        db.users =
-          db.users.filter(
-            (u) =>
-              String(u.id) !==
-              String(user.id)
-          );
-
-        saveDB(db);
 
         throw otpError;
       }
@@ -1325,7 +1437,12 @@ app.post(
           user.email,
 
         mobile:
-          user.mobile
+          user.mobile,
+
+        message:
+          step === "email"
+            ? "Email verification code sent."
+            : "Mobile verification code sent."
       });
     } catch (error) {
       console.error(
@@ -1391,7 +1508,8 @@ app.post(
       }
 
       /*
-        Google-only account
+        Unverified accounts are allowed
+        to continue verification.
       */
 
       if (
@@ -1420,8 +1538,7 @@ app.post(
         remember;
 
       /*
-        If both verification states
-        are already true, login directly.
+        Fully verified account
       */
 
       if (
@@ -1439,6 +1556,10 @@ app.post(
             publicUser(user)
         });
       }
+
+      /*
+        Continue verification.
+      */
 
       const step =
         await startVerification(
@@ -1654,6 +1775,13 @@ app.post(
         step === "email" &&
         !user.mobileVerified
       ) {
+        if (!user.mobile) {
+          return res.status(400).json({
+            error:
+              "Please add a mobile number before continuing."
+          });
+        }
+
         await sendOtpFor(
           user,
           "mobile",
@@ -1681,7 +1809,10 @@ app.post(
             user.email,
 
           mobile:
-            user.mobile
+            user.mobile,
+
+          message:
+            "Email verified successfully. Mobile OTP sent."
         });
       }
 
@@ -1708,7 +1839,10 @@ app.post(
           "complete",
 
         user:
-          publicUser(user)
+          publicUser(user),
+
+        message:
+          "Your account has been fully verified successfully."
       });
     } catch (error) {
       console.error(
@@ -1917,18 +2051,28 @@ app.put(
           user.mobileVerified =
             false;
         } else {
+          /*
+            Only a VERIFIED mobile number
+            blocks changing to it.
+          */
+
           const duplicate =
-            db.users.find(
-              (u) =>
-                String(u.id) !==
-                  String(user.id) &&
-                u.mobile === mobile
+            findVerifiedUserByMobile(
+              mobile
             );
 
-          if (duplicate) {
+          if (
+            duplicate &&
+            String(
+              duplicate.id
+            ) !==
+              String(
+                user.id
+              )
+          ) {
             return res.status(409).json({
               error:
-                "This mobile number is already registered."
+                "This mobile number is already registered and verified."
             });
           }
 
@@ -2515,10 +2659,6 @@ app.post(
 
       let paymentDetails;
 
-      /*
-        UPI
-      */
-
       if (
         method === "UPI"
       ) {
@@ -2542,13 +2682,7 @@ app.post(
         paymentDetails = {
           upiId
         };
-      }
-
-      /*
-        BANK
-      */
-
-      else {
+      } else {
         const accountHolderName =
           cleanText(
             details.accountHolderName,
@@ -2606,10 +2740,6 @@ app.post(
           bankName
         };
       }
-
-      /*
-        Deduct balance
-      */
 
       req.user.balance =
         Number(
