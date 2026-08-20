@@ -43,74 +43,41 @@ const GOOGLE_CLIENT_SECRET =
 const GOOGLE_REFRESH_TOKEN =
   String(process.env.GOOGLE_REFRESH_TOKEN || "").trim();
 
+/*
+   IMPORTANT
+   --------------------------------------------------
+   This secret is used to authenticate server-to-server
+   reward confirmation requests.
+
+   Do NOT put this value in frontend JavaScript.
+*/
+const AD_REWARD_SECRET =
+  String(process.env.AD_REWARD_SECRET || "").trim();
+
+/*
+   Reward configuration
+*/
+const AD_REWARD_POINTS =
+  Number(process.env.AD_REWARD_POINTS) || 10;
+
+const DAILY_AD_LIMIT =
+  Number(process.env.DAILY_AD_LIMIT) || 10;
+
+const DAILY_POINT_LIMIT =
+  AD_REWARD_POINTS * DAILY_AD_LIMIT;
+
+const REWARD_RATE_WINDOW_MS =
+  60 * 1000;
+
+const REWARD_RATE_MAX =
+  5;
+
 const GOOGLE_CLIENT_ID_FOR_LOGIN =
   GOOGLE_CLIENT_ID;
 
 if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
 }
-
-/* =====================================================
-   GMAIL API
-===================================================== */
-
-let gmailClient = null;
-let gmailApiConfigured = false;
-
-function configureGmailApi() {
-  if (
-    !GMAIL_USER ||
-    !GOOGLE_CLIENT_ID ||
-    !GOOGLE_CLIENT_SECRET ||
-    !GOOGLE_REFRESH_TOKEN
-  ) {
-    console.log(
-      "Gmail API: NOT CONFIGURED"
-    );
-
-    gmailApiConfigured = false;
-    gmailClient = null;
-
-    return;
-  }
-
-  try {
-    const oauth2Client =
-      new google.auth.OAuth2(
-        GOOGLE_CLIENT_ID,
-        GOOGLE_CLIENT_SECRET,
-        "https://developers.google.com/oauthplayground"
-      );
-
-    oauth2Client.setCredentials({
-      refresh_token:
-        GOOGLE_REFRESH_TOKEN
-    });
-
-    gmailClient =
-      google.gmail({
-        version: "v1",
-        auth: oauth2Client
-      });
-
-    gmailApiConfigured = true;
-
-    console.log(
-      "Gmail API: CONFIGURED"
-    );
-
-  } catch (error) {
-    gmailApiConfigured = false;
-    gmailClient = null;
-
-    console.error(
-      "Gmail API configuration error:",
-      error.message || error
-    );
-  }
-}
-
-configureGmailApi();
 
 /* =====================================================
    DATABASE
@@ -123,36 +90,84 @@ function defaultDatabase() {
     tasks: [
       {
         id: 1,
+        title: "Watch Ad",
+        description:
+          "Watch one rewarded advertisement and receive TaskEarn Points after the reward is confirmed.",
+        type: "Rewarded Ad",
+        reward: AD_REWARD_POINTS,
+        active: true,
+        rewardType: "ad"
+      },
+
+      {
+        id: 2,
         title: "Complete a simple online task",
         description:
           "Complete the instructions carefully and submit the task for review.",
         type: "General",
         reward: 10,
-        active: true
+        active: true,
+        rewardType: "task"
       },
+
       {
-        id: 2,
+        id: 3,
         title: "Social Media Engagement",
         description:
           "Complete the specified social media activity and submit your task.",
         type: "Social",
         reward: 15,
-        active: true
+        active: true,
+        rewardType: "task"
       },
+
       {
-        id: 3,
+        id: 4,
         title: "Website Visit Task",
         description:
           "Visit the required website and complete the provided instructions.",
         type: "Website",
         reward: 20,
-        active: true
+        active: true,
+        rewardType: "task"
       }
     ],
 
     submissions: [],
+
+    /*
+      Legacy withdrawal records are retained so old data
+      does not break, but the rewarded-ad points system
+      does NOT add money to the withdrawal balance.
+    */
     withdrawals: [],
-    otpCodes: []
+
+    /*
+      Legacy OTP records.
+    */
+    otpCodes: [],
+
+    /*
+      TaskEarn Points ledger.
+    */
+    pointTransactions: [],
+
+    /*
+      Reward event records.
+
+      One provider event ID can only be processed once.
+    */
+    adRewards: [],
+
+    /*
+      Suspicious reward activity.
+    */
+    suspiciousActivity: [],
+
+    /*
+      Temporary server-issued reward sessions.
+    */
+    rewardSessions: []
   };
 }
 
@@ -174,8 +189,7 @@ function saveDB(database) {
 function loadDB() {
   try {
     if (!fs.existsSync(DB_FILE)) {
-      const database =
-        defaultDatabase();
+      const database = defaultDatabase();
 
       saveDB(database);
 
@@ -189,8 +203,7 @@ function loadDB() {
       );
 
     if (!raw.trim()) {
-      const database =
-        defaultDatabase();
+      const database = defaultDatabase();
 
       saveDB(database);
 
@@ -205,13 +218,19 @@ function loadDB() {
     database.submissions ||= [];
     database.withdrawals ||= [];
     database.otpCodes ||= [];
+    database.pointTransactions ||= [];
+    database.adRewards ||= [];
+    database.suspiciousActivity ||= [];
+    database.rewardSessions ||= [];
 
     database.users.forEach(user => {
       user.mobile ??= "";
       user.city ??= "";
       user.profileImage ??= "";
+
       user.emailVerified ??= false;
       user.mobileVerified ??= false;
+
       user.googleId ??= "";
 
       user.authProvider ??=
@@ -219,9 +238,30 @@ function loadDB() {
           ? "google"
           : "local";
 
+      /*
+        New Points balance.
+
+        We intentionally do not automatically convert
+        old wallet money into Points.
+      */
+      user.points ??= 0;
+
+      /*
+        Keep old balance for compatibility with existing
+        database data. It is NOT used for ad rewards.
+      */
       user.balance ??= 0;
+
       user.role ??= "Member";
       user.passwordHash ??= "";
+    });
+
+    database.tasks.forEach(task => {
+      task.active ??= true;
+      task.rewardType ??=
+        task.type === "Rewarded Ad"
+          ? "ad"
+          : "task";
     });
 
     return database;
@@ -280,7 +320,7 @@ app.use(
 );
 
 /* =====================================================
-   HELPERS
+   GENERAL HELPERS
 ===================================================== */
 
 function cleanText(
@@ -364,9 +404,12 @@ function publicUser(user) {
       user.authProvider ||
       "local",
 
-    balance:
+    /*
+      Points are shown to the user.
+    */
+    points:
       Number(
-        user.balance || 0
+        user.points || 0
       ),
 
     createdAt:
@@ -409,6 +452,212 @@ function requireLogin(
     user;
 
   next();
+}
+
+function isAdmin(user) {
+  return (
+    user &&
+    (
+      user.role === "Admin" ||
+      user.role === "admin"
+    )
+  );
+}
+
+function requireAdmin(
+  req,
+  res,
+  next
+) {
+  const user =
+    currentUser(req);
+
+  if (!user) {
+    return res.status(401).json({
+      error:
+        "Please login first."
+    });
+  }
+
+  if (!isAdmin(user)) {
+    return res.status(403).json({
+      error:
+        "Admin access required."
+    });
+  }
+
+  req.user =
+    user;
+
+  next();
+}
+
+/* =====================================================
+   POINT HELPERS
+===================================================== */
+
+function getPointsBalance(user) {
+  return Number(
+    user.points || 0
+  );
+}
+
+function todayKey(
+  date = new Date()
+) {
+  const year =
+    date.getUTCFullYear();
+
+  const month =
+    String(
+      date.getUTCMonth() + 1
+    ).padStart(
+      2,
+      "0"
+    );
+
+  const day =
+    String(
+      date.getUTCDate()
+    ).padStart(
+      2,
+      "0"
+    );
+
+  return `${year}-${month}-${day}`;
+}
+
+function getTodayAdRewards(userId) {
+  const today =
+    todayKey();
+
+  return db.adRewards.filter(
+    reward =>
+      String(
+        reward.userId
+      ) ===
+        String(userId) &&
+      reward.status ===
+        "credited" &&
+      todayKey(
+        new Date(
+          reward.createdAt
+        )
+      ) ===
+        today
+  );
+}
+
+function getTodayAdRewardCount(userId) {
+  return getTodayAdRewards(
+    userId
+  ).length;
+}
+
+function getTodayAdPoints(userId) {
+  return getTodayAdRewards(
+    userId
+  ).reduce(
+    (total, reward) =>
+      total +
+      Number(
+        reward.points || 0
+      ),
+    0
+  );
+}
+
+function createPointTransaction({
+  userId,
+  type,
+  points,
+  source,
+  taskId = null,
+  adEventId = null,
+  status = "completed",
+  metadata = {}
+}) {
+  const transaction = {
+    id:
+      crypto.randomUUID(),
+
+    userId,
+
+    type,
+
+    points:
+      Number(points),
+
+    source,
+
+    taskId,
+
+    adEventId,
+
+    status,
+
+    metadata,
+
+    createdAt:
+      new Date().toISOString()
+  };
+
+  db.pointTransactions.push(
+    transaction
+  );
+
+  return transaction;
+}
+
+function creditPoints({
+  user,
+  points,
+  source,
+  taskId = null,
+  adEventId = null,
+  metadata = {}
+}) {
+  const amount =
+    Number(points);
+
+  if (
+    !Number.isInteger(
+      amount
+    ) ||
+    amount <= 0
+  ) {
+    throw new Error(
+      "Invalid point amount."
+    );
+  }
+
+  user.points =
+    getPointsBalance(
+      user
+    ) +
+    amount;
+
+  const transaction =
+    createPointTransaction({
+      userId:
+        user.id,
+
+      type:
+        "credit",
+
+      points:
+        amount,
+
+      source,
+
+      taskId,
+
+      adEventId,
+
+      metadata
+    });
+
+  return transaction;
 }
 
 /* =====================================================
@@ -589,6 +838,76 @@ function deleteOtpRecord(
 }
 
 /* =====================================================
+   GMAIL API
+===================================================== */
+
+let gmailClient = null;
+let gmailApiConfigured = false;
+
+function configureGmailApi() {
+  if (
+    !GMAIL_USER ||
+    !GOOGLE_CLIENT_ID ||
+    !GOOGLE_CLIENT_SECRET ||
+    !GOOGLE_REFRESH_TOKEN
+  ) {
+    console.log(
+      "Gmail API: NOT CONFIGURED"
+    );
+
+    gmailApiConfigured =
+      false;
+
+    gmailClient =
+      null;
+
+    return;
+  }
+
+  try {
+    const oauth2Client =
+      new google.auth.OAuth2(
+        GOOGLE_CLIENT_ID,
+        GOOGLE_CLIENT_SECRET,
+        "https://developers.google.com/oauthplayground"
+      );
+
+    oauth2Client.setCredentials({
+      refresh_token:
+        GOOGLE_REFRESH_TOKEN
+    });
+
+    gmailClient =
+      google.gmail({
+        version: "v1",
+        auth: oauth2Client
+      });
+
+    gmailApiConfigured =
+      true;
+
+    console.log(
+      "Gmail API: CONFIGURED"
+    );
+
+  } catch (error) {
+    gmailApiConfigured =
+      false;
+
+    gmailClient =
+      null;
+
+    console.error(
+      "Gmail API configuration error:",
+      error.message ||
+        error
+    );
+  }
+}
+
+configureGmailApi();
+
+/* =====================================================
    RFC 2047 / BASE64 GMAIL MESSAGE
 ===================================================== */
 
@@ -601,7 +920,8 @@ function createRawEmail({
 }) {
   const boundary =
     "TaskEarnBoundary" +
-    crypto.randomBytes(16)
+    crypto
+      .randomBytes(16)
       .toString("hex");
 
   const safeFrom =
@@ -667,7 +987,7 @@ function createRawEmail({
 }
 
 /* =====================================================
-   SEND EMAIL USING GMAIL API
+   SEND EMAIL OTP
 ===================================================== */
 
 async function sendEmailOtp(
@@ -1132,7 +1452,10 @@ async function verifyGoogleIdToken(
 
 app.get(
   "/api/google-config",
-  (req, res) => {
+  (
+    req,
+    res
+  ) => {
     res.json({
       clientId:
         GOOGLE_CLIENT_ID
@@ -1213,6 +1536,9 @@ app.post(
           authProvider:
             "google",
 
+          points:
+            0,
+
           balance:
             0,
 
@@ -1233,6 +1559,8 @@ app.post(
 
         user.authProvider =
           "google";
+
+        user.points ??= 0;
 
         if (
           !user.profileImage
@@ -1286,7 +1614,10 @@ app.post(
 
 app.get(
   "/",
-  (req, res) => {
+  (
+    req,
+    res
+  ) => {
     res.sendFile(
       path.join(
         __dirname,
@@ -1454,6 +1785,16 @@ app.post(
         authProvider:
           "local",
 
+        /*
+          New users start with zero Points.
+        */
+        points:
+          0,
+
+        /*
+          Legacy balance retained but not used
+          by rewarded advertisements.
+        */
         balance:
           0,
 
@@ -1671,6 +2012,8 @@ app.post(
         });
       }
 
+      user.points ??= 0;
+
       completeLogin(
         req,
         user,
@@ -1823,6 +2166,8 @@ app.post(
 
       user.emailVerified =
         true;
+
+      user.points ??= 0;
 
       saveDB(db);
 
@@ -2243,7 +2588,11 @@ app.get(
             reward:
               Number(
                 task.reward
-              ) || 0
+              ) || 0,
+
+            rewardType:
+              task.rewardType ||
+              "task"
           })
         )
     );
@@ -2251,7 +2600,1096 @@ app.get(
 );
 
 /* =====================================================
-   SUBMIT TASK
+   POINTS SUMMARY
+===================================================== */
+
+app.get(
+  "/api/points",
+  requireLogin,
+  (
+    req,
+    res
+  ) => {
+    const transactions =
+      db.pointTransactions
+        .filter(
+          transaction =>
+            String(
+              transaction.userId
+            ) ===
+              String(
+                req.user.id
+              )
+        )
+        .sort(
+          (a, b) =>
+            new Date(
+              b.createdAt
+            ) -
+            new Date(
+              a.createdAt
+            )
+        );
+
+    res.json({
+      points:
+        getPointsBalance(
+          req.user
+        ),
+
+      todayAdCount:
+        getTodayAdRewardCount(
+          req.user.id
+        ),
+
+      todayAdPoints:
+        getTodayAdPoints(
+          req.user.id
+        ),
+
+      dailyAdLimit:
+        DAILY_AD_LIMIT,
+
+      dailyPointLimit:
+        DAILY_POINT_LIMIT,
+
+      transactions
+    });
+  }
+);
+
+/* =====================================================
+   START REWARDED AD SESSION
+=====================================================
+
+   The frontend calls this before opening the ad.
+
+   IMPORTANT:
+   This does NOT give Points.
+
+   It creates a short-lived server-side session.
+===================================================== */
+
+app.post(
+  "/api/rewards/ad-start",
+  requireLogin,
+  (
+    req,
+    res
+  ) => {
+    try {
+      const user =
+        req.user;
+
+      const taskId =
+        Number(
+          req.body.taskId
+        );
+
+      const task =
+        db.tasks.find(
+          item =>
+            Number(
+              item.id
+            ) ===
+              taskId &&
+            item.active !==
+              false &&
+            item.rewardType ===
+              "ad"
+        );
+
+      if (!task) {
+        return res.status(404).json({
+          error:
+            "Rewarded ad task not found."
+        });
+      }
+
+      const todayCount =
+        getTodayAdRewardCount(
+          user.id
+        );
+
+      if (
+        todayCount >=
+        DAILY_AD_LIMIT
+      ) {
+        return res.status(429).json({
+          error:
+            "Daily rewarded-ad limit reached. Please try again tomorrow."
+        });
+      }
+
+      const todayPoints =
+        getTodayAdPoints(
+          user.id
+        );
+
+      if (
+        todayPoints +
+          AD_REWARD_POINTS >
+        DAILY_POINT_LIMIT
+      ) {
+        return res.status(429).json({
+          error:
+            "Daily Points limit reached. Please try again tomorrow."
+        });
+      }
+
+      /*
+        Remove expired sessions.
+      */
+      const now =
+        Date.now();
+
+      db.rewardSessions =
+        db.rewardSessions.filter(
+          session =>
+            new Date(
+              session.expiresAt
+            ).getTime() >
+            now
+        );
+
+      const rewardSessionId =
+        crypto.randomUUID();
+
+      const rewardSessionSecret =
+        crypto
+          .randomBytes(32)
+          .toString("hex");
+
+      const rewardSessionHash =
+        crypto
+          .createHash("sha256")
+          .update(
+            rewardSessionSecret
+          )
+          .digest("hex");
+
+      db.rewardSessions.push({
+        id:
+          rewardSessionId,
+
+        userId:
+          user.id,
+
+        taskId:
+          task.id,
+
+        rewardPoints:
+          AD_REWARD_POINTS,
+
+        secretHash:
+          rewardSessionHash,
+
+        createdAt:
+          new Date().toISOString(),
+
+        expiresAt:
+          new Date(
+            now +
+              10 * 60 * 1000
+          ).toISOString(),
+
+        status:
+          "created"
+      });
+
+      saveDB(db);
+
+      /*
+        The secret is returned only to the logged-in
+        frontend. It is NOT itself a reward confirmation.
+      */
+      res.json({
+        success:
+          true,
+
+        rewardSessionId,
+
+        rewardSessionToken:
+          rewardSessionSecret,
+
+        taskId:
+          task.id,
+
+        points:
+          AD_REWARD_POINTS,
+
+        remainingToday:
+          Math.max(
+            0,
+            DAILY_AD_LIMIT -
+              todayCount
+          )
+      });
+
+    } catch (error) {
+      console.error(
+        "Ad start error:",
+        error
+      );
+
+      res.status(500).json({
+        error:
+          "Unable to start rewarded ad."
+      });
+    }
+  }
+);
+
+/* =====================================================
+   REWARD RATE LIMIT
+===================================================== */
+
+function rewardRateLimited(
+  userId
+) {
+  const now =
+    Date.now();
+
+  const recent =
+    db.adRewards.filter(
+      reward =>
+        String(
+          reward.userId
+        ) ===
+          String(userId) &&
+        now -
+          new Date(
+            reward.createdAt
+          ).getTime() <
+          REWARD_RATE_WINDOW_MS
+    );
+
+  return (
+    recent.length >=
+    REWARD_RATE_MAX
+  );
+}
+
+/* =====================================================
+   GOOGLE-STYLE SERVER-SIDE REWARD VERIFICATION
+=====================================================
+
+   This endpoint is intentionally separated from the
+   browser-facing reward endpoint.
+
+   A real ad provider should call this endpoint from
+   its server-side reward/SSV mechanism.
+
+   Expected body:
+
+   {
+     userId,
+     rewardSessionId,
+     adEventId,
+     points,
+     signature
+   }
+
+   signature =
+     HMAC-SHA256(
+       userId + "|" +
+       rewardSessionId + "|" +
+       adEventId + "|" +
+       points,
+       AD_REWARD_SECRET
+     )
+
+   DO NOT expose AD_REWARD_SECRET to frontend.
+===================================================== */
+
+function createRewardSignature({
+  userId,
+  rewardSessionId,
+  adEventId,
+  points
+}) {
+  if (!AD_REWARD_SECRET) {
+    return "";
+  }
+
+  const payload =
+    [
+      userId,
+      rewardSessionId,
+      adEventId,
+      points
+    ].join("|");
+
+  return crypto
+    .createHmac(
+      "sha256",
+      AD_REWARD_SECRET
+    )
+    .update(
+      payload
+    )
+    .digest("hex");
+}
+
+function verifyRewardSignature({
+  userId,
+  rewardSessionId,
+  adEventId,
+  points,
+  signature
+}) {
+  if (
+    !AD_REWARD_SECRET
+  ) {
+    return false;
+  }
+
+  const expected =
+    createRewardSignature({
+      userId,
+      rewardSessionId,
+      adEventId,
+      points
+    });
+
+  return safeCompare(
+    expected,
+    signature
+  );
+}
+
+/* =====================================================
+   SERVER-TO-SERVER REWARD CONFIRMATION
+===================================================== */
+
+app.post(
+  "/api/rewards/provider-confirm",
+  async (
+    req,
+    res
+  ) => {
+    try {
+      if (
+        !AD_REWARD_SECRET
+      ) {
+        return res.status(503).json({
+          error:
+            "Reward provider verification is not configured on the server."
+        });
+      }
+
+      const userId =
+        cleanText(
+          req.body.userId,
+          200
+        );
+
+      const rewardSessionId =
+        cleanText(
+          req.body.rewardSessionId,
+          200
+        );
+
+      const adEventId =
+        cleanText(
+          req.body.adEventId,
+          300
+        );
+
+      const points =
+        Number(
+          req.body.points
+        );
+
+      const signature =
+        cleanText(
+          req.body.signature,
+          500
+        );
+
+      if (
+        !userId ||
+        !rewardSessionId ||
+        !adEventId ||
+        !signature
+      ) {
+        return res.status(400).json({
+          error:
+            "Invalid reward confirmation data."
+        });
+      }
+
+      if (
+        !Number.isInteger(
+          points
+        ) ||
+        points <= 0
+      ) {
+        return res.status(400).json({
+          error:
+            "Invalid reward points."
+        });
+      }
+
+      /*
+        Signature verification happens before any
+        Points are credited.
+      */
+      if (
+        !verifyRewardSignature({
+          userId,
+          rewardSessionId,
+          adEventId,
+          points,
+          signature
+        })
+      ) {
+        return res.status(403).json({
+          error:
+            "Invalid reward verification signature."
+        });
+      }
+
+      /*
+        Duplicate provider event protection.
+      */
+      const duplicate =
+        db.adRewards.find(
+          reward =>
+            reward.adEventId ===
+            adEventId
+        );
+
+      if (duplicate) {
+        return res.status(409).json({
+          error:
+            "This reward has already been claimed.",
+          alreadyProcessed:
+            true
+        });
+      }
+
+      const user =
+        findUserById(
+          userId
+        );
+
+      if (!user) {
+        return res.status(404).json({
+          error:
+            "User account not found."
+        });
+      }
+
+      const rewardSession =
+        db.rewardSessions.find(
+          session =>
+            session.id ===
+              rewardSessionId &&
+            String(
+              session.userId
+            ) ===
+              String(
+                user.id
+              )
+        );
+
+      if (!rewardSession) {
+        return res.status(400).json({
+          error:
+            "Reward session not found."
+        });
+      }
+
+      if (
+        rewardSession.status ===
+        "credited"
+      ) {
+        return res.status(409).json({
+          error:
+            "This reward session has already been processed."
+        });
+      }
+
+      if (
+        rewardSession.status ===
+        "blocked"
+      ) {
+        return res.status(403).json({
+          error:
+            "This reward session is blocked."
+        });
+      }
+
+      if (
+        Date.now() >
+        new Date(
+          rewardSession.expiresAt
+        ).getTime()
+      ) {
+        rewardSession.status =
+          "expired";
+
+        saveDB(db);
+
+        return res.status(400).json({
+          error:
+            "Reward session expired."
+        });
+      }
+
+      /*
+        The provider cannot choose an arbitrary reward.
+        It must match the server-created reward session.
+      */
+      if (
+        points !==
+        Number(
+          rewardSession.rewardPoints
+        )
+      ) {
+        return res.status(400).json({
+          error:
+            "Reward amount does not match the task."
+        });
+      }
+
+      const task =
+        db.tasks.find(
+          item =>
+            Number(
+              item.id
+            ) ===
+              Number(
+                rewardSession.taskId
+              ) &&
+            item.active !==
+              false &&
+            item.rewardType ===
+              "ad"
+        );
+
+      if (!task) {
+        return res.status(404).json({
+          error:
+            "Reward task is no longer available."
+        });
+      }
+
+      if (
+        points !==
+        Number(
+          task.reward
+        )
+      ) {
+        return res.status(400).json({
+          error:
+            "Reward amount does not match the task configuration."
+        });
+      }
+
+      /*
+        Rate-limit suspicious bursts.
+      */
+      if (
+        rewardRateLimited(
+          user.id
+        )
+      ) {
+        db.suspiciousActivity.push({
+          id:
+            crypto.randomUUID(),
+
+          userId:
+            user.id,
+
+          type:
+            "reward_rate_limit",
+
+          details:
+            "Reward confirmation rate exceeded.",
+
+          createdAt:
+            new Date().toISOString()
+        });
+
+        rewardSession.status =
+          "blocked";
+
+        saveDB(db);
+
+        return res.status(429).json({
+          error:
+            "Too many reward requests. Please try again later."
+        });
+      }
+
+      const todayCount =
+        getTodayAdRewardCount(
+          user.id
+        );
+
+      if (
+        todayCount >=
+        DAILY_AD_LIMIT
+      ) {
+        rewardSession.status =
+          "blocked";
+
+        db.suspiciousActivity.push({
+          id:
+            crypto.randomUUID(),
+
+          userId:
+            user.id,
+
+          type:
+            "daily_limit",
+
+          details:
+            "Reward confirmation attempted after daily limit.",
+
+          createdAt:
+            new Date().toISOString()
+        });
+
+        saveDB(db);
+
+        return res.status(429).json({
+          error:
+            "Daily rewarded-ad limit reached."
+        });
+      }
+
+      const todayPoints =
+        getTodayAdPoints(
+          user.id
+        );
+
+      if (
+        todayPoints +
+          points >
+        DAILY_POINT_LIMIT
+      ) {
+        rewardSession.status =
+          "blocked";
+
+        db.suspiciousActivity.push({
+          id:
+            crypto.randomUUID(),
+
+          userId:
+            user.id,
+
+          type:
+            "daily_points_limit",
+
+          details:
+            "Reward confirmation attempted after daily Points limit.",
+
+          createdAt:
+            new Date().toISOString()
+        });
+
+        saveDB(db);
+
+        return res.status(429).json({
+          error:
+            "Daily Points limit reached."
+        });
+      }
+
+      /*
+        Final duplicate check immediately before credit.
+      */
+      const duplicateAgain =
+        db.adRewards.find(
+          reward =>
+            reward.adEventId ===
+            adEventId
+        );
+
+      if (duplicateAgain) {
+        return res.status(409).json({
+          error:
+            "This reward has already been claimed.",
+          alreadyProcessed:
+            true
+        });
+      }
+
+      /*
+        CREDIT POINTS
+        ------------------------------------------------
+        This is the only place where the server awards
+        automatic rewarded-ad Points.
+      */
+      const transaction =
+        creditPoints({
+          user,
+
+          points,
+
+          source:
+            "rewarded_ad",
+
+          taskId:
+            task.id,
+
+          adEventId,
+
+          metadata: {
+            rewardSessionId,
+            provider:
+              "server_verified"
+          }
+        });
+
+      db.adRewards.push({
+        id:
+          crypto.randomUUID(),
+
+        userId:
+          user.id,
+
+        taskId:
+          task.id,
+
+        rewardType:
+          "ad",
+
+        points,
+
+        adEventId,
+
+        rewardSessionId,
+
+        status:
+          "credited",
+
+        transactionId:
+          transaction.id,
+
+        createdAt:
+          new Date().toISOString()
+      });
+
+      rewardSession.status =
+        "credited";
+
+      rewardSession.completedAt =
+        new Date().toISOString();
+
+      saveDB(db);
+
+      return res.json({
+        success:
+          true,
+
+        message:
+          "Reward confirmed successfully.",
+
+        pointsAdded:
+          points,
+
+        newBalance:
+          getPointsBalance(
+            user
+          )
+      });
+
+    } catch (error) {
+      console.error(
+        "Provider reward confirmation error:",
+        error
+      );
+
+      res.status(500).json({
+        error:
+          "Unable to confirm reward."
+      });
+    }
+  }
+);
+
+/* =====================================================
+   BROWSER REWARD COMPLETE
+=====================================================
+
+   IMPORTANT:
+   This endpoint NEVER credits Points merely because
+   the browser says "completed".
+
+   It is intentionally rejected unless the server has
+   already received a verified provider event.
+
+   The frontend can poll /api/rewards/status instead.
+===================================================== */
+
+app.post(
+  "/api/rewards/ad-complete",
+  requireLogin,
+  (
+    req,
+    res
+  ) => {
+    const rewardSessionId =
+      cleanText(
+        req.body.rewardSessionId,
+        200
+      );
+
+    if (!rewardSessionId) {
+      return res.status(400).json({
+        error:
+          "Reward session is required."
+      });
+    }
+
+    const rewardSession =
+      db.rewardSessions.find(
+        session =>
+          session.id ===
+            rewardSessionId &&
+          String(
+            session.userId
+          ) ===
+            String(
+              req.user.id
+            )
+      );
+
+    if (!rewardSession) {
+      return res.status(404).json({
+        error:
+          "Reward session not found."
+      });
+    }
+
+    if (
+      rewardSession.status ===
+      "credited"
+    ) {
+      const reward =
+        db.adRewards.find(
+          item =>
+            item.rewardSessionId ===
+            rewardSessionId
+        );
+
+      return res.json({
+        success:
+          true,
+
+        completed:
+          true,
+
+        pointsAdded:
+          reward
+            ? reward.points
+            : 0,
+
+        newBalance:
+          getPointsBalance(
+            req.user
+          ),
+
+        message:
+          "Ad reward has already been confirmed."
+      });
+    }
+
+    /*
+      No verified provider event yet.
+    */
+    return res.status(202).json({
+      success:
+        false,
+
+      completed:
+        false,
+
+      rewardPending:
+        true,
+
+      message:
+        "Ad completion is waiting for reward confirmation."
+    });
+  }
+);
+
+/* =====================================================
+   REWARD STATUS
+===================================================== */
+
+app.get(
+  "/api/rewards/status/:sessionId",
+  requireLogin,
+  (
+    req,
+    res
+  ) => {
+    const sessionId =
+      cleanText(
+        req.params.sessionId,
+        200
+      );
+
+    const rewardSession =
+      db.rewardSessions.find(
+        session =>
+          session.id ===
+            sessionId &&
+          String(
+            session.userId
+          ) ===
+            String(
+              req.user.id
+            )
+      );
+
+    if (!rewardSession) {
+      return res.status(404).json({
+        error:
+          "Reward session not found."
+      });
+    }
+
+    const reward =
+      db.adRewards.find(
+        item =>
+          item.rewardSessionId ===
+          sessionId
+      );
+
+    if (
+      rewardSession.status ===
+      "credited" &&
+      reward
+    ) {
+      return res.json({
+        completed:
+          true,
+
+        status:
+          "credited",
+
+        pointsAdded:
+          reward.points,
+
+        newBalance:
+          getPointsBalance(
+            req.user
+          )
+      });
+    }
+
+    if (
+      rewardSession.status ===
+      "expired"
+    ) {
+      return res.json({
+        completed:
+          false,
+
+        status:
+          "expired",
+
+        message:
+          "Reward session expired."
+      });
+    }
+
+    if (
+      rewardSession.status ===
+      "blocked"
+    ) {
+      return res.json({
+        completed:
+          false,
+
+        status:
+          "blocked",
+
+        message:
+          "This reward session was blocked."
+      });
+    }
+
+    res.json({
+      completed:
+        false,
+
+      status:
+        "pending",
+
+      message:
+        "Reward is waiting for provider confirmation."
+    });
+  }
+);
+
+/* =====================================================
+   AD REWARD HISTORY
+===================================================== */
+
+app.get(
+  "/api/rewards/history",
+  requireLogin,
+  (
+    req,
+    res
+  ) => {
+    const history =
+      db.adRewards
+        .filter(
+          reward =>
+            String(
+              reward.userId
+            ) ===
+              String(
+                req.user.id
+              )
+        )
+        .sort(
+          (a, b) =>
+            new Date(
+              b.createdAt
+            ) -
+            new Date(
+              a.createdAt
+            )
+        )
+        .map(
+          reward => ({
+            id:
+              reward.id,
+
+            taskId:
+              reward.taskId,
+
+            rewardType:
+              reward.rewardType,
+
+            points:
+              reward.points,
+
+            status:
+              reward.status,
+
+            createdAt:
+              reward.createdAt
+          })
+        );
+
+    res.json({
+      history
+    });
+  }
+);
+
+/* =====================================================
+   SUBMIT NORMAL TASK
 ===================================================== */
 
 app.post(
@@ -2274,7 +3712,9 @@ app.post(
           ) ===
             taskId &&
           t.active !==
-            false
+            false &&
+          t.rewardType !==
+            "ad"
       );
 
     if (!task) {
@@ -2379,6 +3819,12 @@ app.get(
 
 /* =====================================================
    WALLET
+=====================================================
+
+   The old wallet endpoint is retained only for
+   compatibility with existing frontend code.
+
+   Rewarded ads DO NOT add money to balance.
 ===================================================== */
 
 app.get(
@@ -2388,34 +3834,19 @@ app.get(
     req,
     res
   ) => {
-    const withdrawals =
-      db.withdrawals
-        .filter(
-          withdrawal =>
-            String(
-              withdrawal.userId
-            ) ===
-              String(
-                req.user.id
-              )
-        )
-        .sort(
-          (a, b) =>
-            new Date(
-              b.createdAt
-            ) -
-            new Date(
-              a.createdAt
-            )
-        );
-
     res.json({
       balance:
-        Number(
-          req.user.balance
-        ) || 0,
+        0,
 
-      withdrawals
+      points:
+        getPointsBalance(
+          req.user
+        ),
+
+      withdrawals: [],
+
+      message:
+        "TaskEarn rewarded-ad rewards are Points, not cash."
     });
   }
 );
@@ -2758,7 +4189,7 @@ app.post(
 );
 
 /* =====================================================
-   WITHDRAWAL
+   WITHDRAWAL DISABLED FOR AD POINTS
 ===================================================== */
 
 app.post(
@@ -2768,199 +4199,276 @@ app.post(
     req,
     res
   ) => {
-    try {
-      if (
-        !req.user.mobileVerified
-      ) {
-        return res.status(403).json({
-          error:
-            "Please verify your mobile number before requesting a withdrawal."
-        });
-      }
+    return res.status(403).json({
+      error:
+        "Cash withdrawal is disabled for TaskEarn Points. Rewarded-ad Points cannot be converted directly to cash."
+    });
+  }
+);
 
-      const amount =
-        Number(
-          req.body.amount
-        );
+/* =====================================================
+   ADMIN — USERS
+===================================================== */
 
-      const method =
-        cleanText(
-          req.body.method,
-          30
-        );
-
-      const details =
-        req.body.paymentDetails ||
-        {};
-
-      if (
-        !Number.isFinite(
-          amount
-        ) ||
-        amount < 100
-      ) {
-        return res.status(400).json({
-          error:
-            "Minimum withdrawal amount is ₹100."
-        });
-      }
-
-      if (
-        amount >
-        Number(
-          req.user.balance ||
-            0
+app.get(
+  "/api/admin/users",
+  requireAdmin,
+  (
+    req,
+    res
+  ) => {
+    res.json({
+      users:
+        db.users.map(
+          user =>
+            publicUser(
+              user
+            )
         )
-      ) {
-        return res.status(400).json({
-          error:
-            "Insufficient wallet balance."
-        });
-      }
+    });
+  }
+);
 
-      if (
-        method !==
-          "UPI" &&
-        method !==
-          "Bank Account"
-      ) {
-        return res.status(400).json({
-          error:
-            "Please select a valid payment method."
-        });
-      }
+/* =====================================================
+   ADMIN — AD REWARD HISTORY
+===================================================== */
 
-      let paymentDetails;
+app.get(
+  "/api/admin/rewards",
+  requireAdmin,
+  (
+    req,
+    res
+  ) => {
+    const rewards =
+      db.adRewards
+        .slice()
+        .sort(
+          (a, b) =>
+            new Date(
+              b.createdAt
+            ) -
+            new Date(
+              a.createdAt
+            )
+        );
 
-      if (
-        method ===
-        "UPI"
-      ) {
-        const upiId =
-          cleanText(
-            details.upiId,
-            100
-          );
+    res.json({
+      rewards
+    });
+  }
+);
 
-        if (
-          !/^[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+$/.test(
-            upiId
-          )
-        ) {
-          return res.status(400).json({
-            error:
-              "Please enter a valid UPI ID."
-          });
-        }
+/* =====================================================
+   ADMIN — SUSPICIOUS ACTIVITY
+===================================================== */
 
-        paymentDetails = {
-          upiId
-        };
+app.get(
+  "/api/admin/suspicious-activity",
+  requireAdmin,
+  (
+    req,
+    res
+  ) => {
+    const records =
+      db.suspiciousActivity
+        .slice()
+        .sort(
+          (a, b) =>
+            new Date(
+              b.createdAt
+            ) -
+            new Date(
+              a.createdAt
+            )
+        );
 
-      } else {
-        const accountHolderName =
-          cleanText(
-            details.accountHolderName,
-            100
-          );
+    res.json({
+      records
+    });
+  }
+);
 
-        const accountNumber =
-          cleanText(
-            details.accountNumber,
-            40
-          );
+/* =====================================================
+   ADMIN — POINT TRANSACTIONS
+===================================================== */
 
-        const ifscCode =
-          cleanText(
-            details.ifscCode,
-            20
-          ).toUpperCase();
+app.get(
+  "/api/admin/points",
+  requireAdmin,
+  (
+    req,
+    res
+  ) => {
+    const transactions =
+      db.pointTransactions
+        .slice()
+        .sort(
+          (a, b) =>
+            new Date(
+              b.createdAt
+            ) -
+            new Date(
+              a.createdAt
+            )
+        );
 
-        const bankName =
-          cleanText(
-            details.bankName,
-            100
-          );
+    res.json({
+      transactions
+    });
+  }
+);
 
-        if (
-          !accountHolderName ||
-          !accountNumber ||
-          !ifscCode ||
-          !bankName
-        ) {
-          return res.status(400).json({
-            error:
-              "Please complete all bank account details."
-          });
-        }
+/* =====================================================
+   ADMIN — POINT ADJUSTMENT
+=====================================================
 
-        if (
-          !/^[A-Z]{4}0[A-Z0-9]{6}$/.test(
-            ifscCode
-          )
-        ) {
-          return res.status(400).json({
-            error:
-              "Please enter a valid IFSC code."
-          });
-        }
+   This is for manual admin adjustments only.
 
-        paymentDetails = {
-          accountHolderName,
+   It is separate from rewarded-ad automatic rewards.
+===================================================== */
 
-          accountNumber,
+app.post(
+  "/api/admin/points-adjust",
+  requireAdmin,
+  (
+    req,
+    res
+  ) => {
+    try {
+      const userId =
+        cleanText(
+          req.body.userId,
+          200
+        );
 
-          ifscCode,
-
-          bankName
-        };
-      }
-
-      req.user.balance =
+      const points =
         Number(
-          req.user.balance ||
-            0
-        ) -
-        amount;
+          req.body.points
+        );
 
-      db.withdrawals.push({
-        id:
-          crypto.randomUUID(),
+      const reason =
+        cleanText(
+          req.body.reason,
+          300
+        );
 
-        userId:
-          req.user.id,
+      if (!userId) {
+        return res.status(400).json({
+          error:
+            "User ID is required."
+        });
+      }
 
-        amount,
+      if (
+        !Number.isInteger(
+          points
+        ) ||
+        points === 0
+      ) {
+        return res.status(400).json({
+          error:
+            "Points adjustment must be a non-zero integer."
+        });
+      }
 
-        method,
+      if (!reason) {
+        return res.status(400).json({
+          error:
+            "Adjustment reason is required."
+        });
+      }
 
-        paymentDetails,
+      const user =
+        findUserById(
+          userId
+        );
 
-        status:
-          "pending",
+      if (!user) {
+        return res.status(404).json({
+          error:
+            "User not found."
+        });
+      }
 
-        createdAt:
-          new Date().toISOString()
-      });
+      user.points =
+        getPointsBalance(
+          user
+        ) +
+        points;
+
+      if (
+        user.points <
+        0
+      ) {
+        user.points =
+          0;
+      }
+
+      const transaction =
+        createPointTransaction({
+          userId:
+            user.id,
+
+          type:
+            "admin_adjustment",
+
+          points,
+
+          source:
+            "admin",
+
+          metadata: {
+            adminUserId:
+              req.user.id,
+
+            reason
+          }
+        });
 
       saveDB(db);
 
       res.json({
-        message:
-          "Withdrawal request submitted successfully."
+        success:
+          true,
+
+        user:
+          publicUser(
+            user
+          ),
+
+        transaction
       });
 
     } catch (error) {
       console.error(
-        "Withdrawal error:",
+        "Admin point adjustment:",
         error
       );
 
       res.status(500).json({
         error:
-          "Unable to submit withdrawal."
+          "Unable to adjust Points."
       });
     }
+  }
+);
+
+/* =====================================================
+   ADMIN — TASKS
+===================================================== */
+
+app.get(
+  "/api/admin/tasks",
+  requireAdmin,
+  (
+    req,
+    res
+  ) => {
+    res.json({
+      tasks:
+        db.tasks
+    });
   }
 );
 
@@ -3016,10 +4524,27 @@ app.get(
           process.env.TWILIO_PHONE_NUMBER
         ),
 
+      adRewardVerificationConfigured:
+        Boolean(
+          AD_REWARD_SECRET
+        ),
+
+      adRewardPoints:
+        AD_REWARD_POINTS,
+
+      dailyAdLimit:
+        DAILY_AD_LIMIT,
+
+      dailyPointLimit:
+        DAILY_POINT_LIMIT,
+
       emailProvider:
         "Gmail API",
 
       smtp:
+        false,
+
+      cashWithdrawalForAdPoints:
         false
     });
   }
@@ -3139,6 +4664,30 @@ app.listen(
           ? "YES"
           : "NO"
       }`
+    );
+
+    console.log(
+      `Ad reward verification configured: ${
+        AD_REWARD_SECRET
+          ? "YES"
+          : "NO"
+      }`
+    );
+
+    console.log(
+      `Reward per ad: ${AD_REWARD_POINTS} Points`
+    );
+
+    console.log(
+      `Daily rewarded ads: ${DAILY_AD_LIMIT}`
+    );
+
+    console.log(
+      `Daily Points limit: ${DAILY_POINT_LIMIT}`
+    );
+
+    console.log(
+      "Cash withdrawal for rewarded-ad Points: DISABLED"
     );
 
     console.log(
